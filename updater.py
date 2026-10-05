@@ -70,7 +70,9 @@ def apply(on_exit):
                 'copy /Y "%NEW_EXE%" "%OLD_EXE%" >nul || (timeout /t 2 /nobreak >nul & copy /Y "%NEW_EXE%" "%OLD_EXE%" >nul)\r\n'
                 'start "" "%OLD_EXE%"\r\n')
     # 单文件 exe 有两个进程：外层启动进程（父）占着 exe 文件，等它退出再覆盖
-    env = dict(os.environ, OLD_PID=str(os.getppid()), NEW_EXE=new_exe, OLD_EXE=exe)
+    # 去掉 PyInstaller 留给子进程的环境变量（_MEIPASS2、_PYI_*），否则新 exe 会去旧的临时目录找 python39.dll
+    env = {k: v for k, v in os.environ.items() if not k.upper().startswith(('_MEI', '_PYI'))}
+    env.update(OLD_PID=str(os.getppid()), NEW_EXE=new_exe, OLD_EXE=exe)
     subprocess.Popen(['cmd', '/c', bat], env=env, creationflags=0x08000000)   # CREATE_NO_WINDOW
     threading.Timer(0.5, on_exit).start()
-    return {'ok': True, 'version': info['latest']}
+    return {'version': info['latest']}
