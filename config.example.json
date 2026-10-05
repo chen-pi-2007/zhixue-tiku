@@ -1,0 +1,10 @@
+{
+  "port": 8788,
+  "host": "127.0.0.1",
+  "llm": {
+    "api_key": "",
+    "base_url": "https://open.bigmodel.cn/api/paas/v4",
+    "model": "glm-4-flash",
+    "_说明": "api_key 留空则只用内置规则解析(泛雅/学习通等常见格式已支持);填入任意 OpenAI 兼容接口的 Key 后,规则解析不出来的疑难格式会自动交给大模型解析"
+  }
+}

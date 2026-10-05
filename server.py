@@ -1,0 +1,430 @@
+# -*- coding: utf-8 -*-
+"""智学题库 本地服务(纯标准库,Python 3.6+ 可运行)
+启动:  python server.py   然后浏览器打开 http://127.0.0.1:8788
+"""
+import json
+import os
+import re
+import socketserver
+import sys
+import threading
+import traceback
+import webbrowser
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs, unquote
+
+import db
+import docparse
+from skills import service as skill_service
+
+_skills = None
+
+
+def skills_service():
+    global _skills
+    if _skills is None:
+        _skills = skill_service.Skills(db.DATA_DIR, db)
+    return _skills
+
+import appdir
+STATIC_DIR = appdir.STATIC_DIR
+MAX_UPLOAD = 30 * 1024 * 1024
+
+MIME = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'application/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.pdf': 'application/pdf',
+    '.gif': 'image/gif',
+    '.ico': 'image/x-icon',
+    '.json': 'application/json; charset=utf-8',
+}
+
+
+def load_server_config():
+    path = appdir.CONFIG_PATH
+    if os.path.exists(path):
+        try:
+            with open(path, encoding='utf-8') as f:
+                return json.load(f)
+        except (ValueError, OSError):
+            pass
+    return {}
+
+
+class Handler(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
+    server_version = 'QuizServer/1.0'
+
+    # ---- 基础工具
+    def log_message(self, fmt, *args):
+        try:
+            sys.stdout.write('%s - %s\n' % (self.address_string(), fmt % args))
+        except Exception:
+            pass
+
+    def send_json(self, obj, status=200):
+        body = json.dumps(obj, ensure_ascii=False).encode('utf-8')
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store')
+        self.end_headers()
+        self.wfile.write(body)
+
+    def send_error_json(self, msg, status=400):
+        self.send_json({'ok': False, 'error': msg}, status)
+
+    def read_body(self):
+        length = int(self.headers.get('Content-Length') or 0)
+        if length <= 0:
+            return b''
+        if length > MAX_UPLOAD:
+            raise ValueError('文件过大(超过30MB)')
+        return self.rfile.read(length)
+
+    def read_json_body(self):
+        raw = self.read_body()
+        if not raw:
+            return {}
+        return json.loads(raw.decode('utf-8'))
+
+    # ---- 路由
+    def do_GET(self):
+        try:
+            self.route('GET')
+        except Exception:
+            traceback.print_exc()
+            self.send_error_json('服务器内部错误', 500)
+
+    def do_POST(self):
+        try:
+            self.route('POST')
+        except Exception:
+            traceback.print_exc()
+            self.send_error_json('服务器内部错误', 500)
+
+    def do_DELETE(self):
+        try:
+            self.route('DELETE')
+        except Exception:
+            traceback.print_exc()
+            self.send_error_json('服务器内部错误', 500)
+
+    def route(self, method):
+        u = urlparse(self.path)
+        path = unquote(u.path)
+        qs = parse_qs(u.query)
+
+        if path.startswith('/api/'):
+            return self.api(method, path, qs)
+
+        if method == 'GET':
+            return self.static(path)
+        self.send_error_json('不支持的请求', 405)
+
+    # ---- 静态文件(/media/ 为题目图片)
+    def static(self, path):
+        if path == '/' or not path:
+            path = '/index.html'
+        root = STATIC_DIR
+        if path.startswith('/media/skill/'):              # 技能题：素材、参考答案、PDF、插图
+            root, path = os.path.join(db.DATA_DIR, 'skills'), path[len('/media/skill'):]
+        elif path.startswith('/media/'):
+            root, path = db.MEDIA_DIR, path[len('/media'):]
+        elif path.startswith('/work/'):                   # 练习文件夹里的网页（浏览器预览）
+            root, path = os.path.join(db.DATA_DIR, 'skill_work'), path[len('/work'):]
+        # 防目录穿越
+        fp = os.path.normpath(os.path.join(root, path.lstrip('/')))
+        if not fp.startswith(root + os.sep) or not os.path.isfile(fp):
+            return self.send_error_json('文件不存在', 404)
+        ext = os.path.splitext(fp)[1].lower()
+        with open(fp, 'rb') as f:
+            body = f.read()
+        self.send_response(200)
+        self.send_header('Content-Type', MIME.get(ext, 'application/octet-stream'))
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'max-age=86400' if root == db.MEDIA_DIR else 'no-cache')
+        if ext == '.pdf':
+            self.send_header('Content-Disposition', 'inline')
+        self.end_headers()
+        self.wfile.write(body)
+
+    # ---- API
+    def api(self, method, path, qs):
+        m = None
+
+        # 上传解析(原始文件体,文件名放 query)
+        if method == 'POST' and path == '/api/upload':
+            return self.api_upload(qs)
+
+        if path.startswith('/api/skills'):
+            return self.api_skills(method, path)
+
+        if method == 'GET' and path == '/api/papers':
+            return self.send_json({'ok': True, 'papers': db.list_papers()})
+
+        m = re.match(r'^/api/papers/(\d+)$', path)
+        if m and method == 'DELETE':
+            db.delete_paper(int(m.group(1)))
+            return self.send_json({'ok': True})
+
+        def arg(name, default=''):
+            return qs.get(name, [default])[0] or default
+
+        def iarg(name, default=0):
+            return int(arg(name, str(default)) or default)
+
+        if method == 'GET' and path == '/api/questions':
+            items, total = db.get_questions(iarg('paper_id') or None, arg('type') or None,
+                                            arg('q') or None, min(iarg('limit', 50), 200),
+                                            iarg('offset'), arg('subject') or None)
+            return self.send_json({'ok': True, 'items': items, 'total': total})
+
+        if method == 'GET' and path == '/api/practice':
+            items = db.practice_set(iarg('paper_id') or None, arg('scope', 'all'),
+                                    shuffle=arg('order', 'random') == 'random',
+                                    subject=arg('subject') or None, qtype=arg('type') or None)
+            return self.send_json({'ok': True, 'items': items})
+
+        if method == 'GET' and path == '/api/review':
+            new = arg('new')
+            return self.send_json(dict(ok=True, **db.review_queue(arg('subject') or None,
+                                                                  int(new) if new else None)))
+
+        if method == 'GET' and path == '/api/dashboard':
+            return self.send_json({'ok': True, 'data': db.dashboard()})
+
+        if method == 'POST' and path == '/api/settings':
+            data = self.read_json_body()
+            if 'new_per_day' in data:
+                db.set_setting('new_per_day', max(0, min(200, int(data['new_per_day']))))
+            if re.match(r'^\d{4}-\d{2}-\d{2}$', str(data.get('exam_date', ''))):
+                db.set_setting('exam_date', data['exam_date'])
+            return self.send_json({'ok': True})
+
+        if method == 'GET' and path == '/api/wrong':
+            return self.send_json({'ok': True, 'items': db.wrong_list(iarg('mastered'),
+                                                                      arg('subject') or None)})
+
+        if method == 'POST' and path == '/api/record':
+            data = self.read_json_body()
+            qid = int(data.get('question_id') or 0)
+            if not qid:
+                return self.send_error_json('缺少 question_id')
+            card, event = db.record_answer(qid, bool(data.get('correct')), data.get('mode') or 'practice')
+            return self.send_json({'ok': True, 'record': card, 'event': event})
+
+        if method == 'POST' and path == '/api/exam/start':
+            data = self.read_json_body()
+            try:
+                e = db.exam_start(data.get('subject') or '', data.get('preset') or 'standard')
+            except ValueError as ex:
+                return self.send_error_json(str(ex))
+            return self.send_json({'ok': True, 'exam': e})
+
+        if method == 'POST' and path == '/api/exam/submit':
+            data = self.read_json_body()
+            try:
+                e = db.exam_submit(int(data.get('id') or 0), data.get('answers') or {},
+                                   data.get('used_seconds') or 0)
+            except KeyError as ex:
+                return self.send_error_json(str(ex.args[0]), 404)
+            return self.send_json({'ok': True, 'exam': e})
+
+        if method == 'GET' and path == '/api/exams':
+            return self.send_json({'ok': True, 'items': db.exam_list()})
+
+        m = re.match(r'^/api/exams/(\d+)$', path)
+        if m and method == 'GET':
+            try:
+                return self.send_json({'ok': True, 'exam': db.exam_get(int(m.group(1)))})
+            except KeyError as ex:
+                return self.send_error_json(str(ex.args[0]), 404)
+
+        if method == 'POST' and path == '/api/wrong/mark':
+            data = self.read_json_body()
+            qid = int(data.get('question_id') or 0)
+            if not qid:
+                return self.send_error_json('缺少 question_id')
+            db.mark_mastered(qid, bool(data.get('mastered', True)))
+            return self.send_json({'ok': True})
+
+        if method == 'GET' and path == '/api/stats':
+            return self.send_json({'ok': True, 'stats': db.stats()})
+
+        if method == 'GET' and path == '/api/export/wrong':
+            return self.export_wrong()
+
+        if method == 'GET' and path == '/api/llm_status':
+            import llm
+            return self.send_json({'ok': True, 'available': llm.available()})
+
+        self.send_error_json('接口不存在', 404)
+
+    def api_skills(self, method, path):
+        """技能实操。/api/skills、/api/skills/<卷>、/api/skills/<卷>/<模块>/<动作>"""
+        sk = skills_service()
+        try:
+            if method == 'GET' and path == '/api/skills':
+                return self.send_json({'ok': True, 'items': sk.summary(),
+                                       'can_open': {e: skill_service.can_open(e) for e in ('.docx', '.xlsx', '.pptx')},
+                                       'dreamweaver': bool(skill_service.find_dreamweaver())})
+            m = re.match(r'^/api/skills/([\w-]+)$', path)
+            if m and method == 'GET':
+                return self.send_json({'ok': True, 'skill': sk.detail(m.group(1)),
+                                       'can_open': {e: skill_service.can_open(e) for e in ('.docx', '.xlsx', '.pptx')},
+                                       'dreamweaver': bool(skill_service.find_dreamweaver())})
+            m = re.match(r'^/api/skills/([\w-]+)/(\w+)/(\w+)$', path)
+            if not m or method != 'POST':
+                return self.send_error_json('接口不存在', 404)
+            key, mod, action = m.groups()
+            data = self.read_json_body()
+            if action == 'start':
+                f = sk.start(key, mod, reset=bool(data.get('reset', True)))
+                opened = sk.open(key, mod, 'work') if data.get('open', True) else None
+                return self.send_json({'ok': True, 'file': f, 'opened': opened})
+            if action == 'open':
+                return self.send_json({'ok': True, 'opened': sk.open(key, mod, data.get('what', 'work'))})
+            if action == 'check':
+                if mod == 'program':
+                    r = sk.check_program(key, data.get('answers') or [])
+                elif mod == 'typing':
+                    r = sk.typing(key, data.get('typed') or '', float(data.get('seconds') or 0))
+                elif mod == 'netcfg':
+                    r = sk.check_net(key, data.get('configs') or {}, data.get('manual') or {})
+                elif data.get('checked') is not None:
+                    r = sk.card(key, mod, data.get('checked') or {})
+                else:
+                    r = sk.check(key, mod)
+                return self.send_json({'ok': True, 'result': r})
+            return self.send_error_json('接口不存在', 404)
+        except (ValueError, KeyError) as e:
+            return self.send_error_json(str(e.args[0]) if e.args else str(e))
+
+    def api_upload(self, qs):
+        import llm
+        filename = unquote(qs.get('name', [''])[0] or '未命名.docx')
+        engine = qs.get('engine', ['auto'])[0]
+        subject = qs.get('subject', ['general'])[0] or 'general'
+        data = self.read_body()
+        if not data:
+            return self.send_error_json('上传内容为空')
+
+        parsed = None
+        rule_failed = False
+        err = None
+        if engine in ('auto', 'rules'):
+            try:
+                parsed = docparse.parse_bytes(data, filename)
+                if not parsed['questions']:
+                    rule_failed = True
+            except Exception as e:
+                err = e
+                rule_failed = True
+        if (engine == 'llm' or (rule_failed and engine == 'auto')) and llm.available():
+            text = ''
+            try:
+                paras = docparse.extract_any(data, filename)
+                text = '\n'.join(paras)
+            except Exception as e:
+                text = data.decode('utf-8', 'replace')
+            parsed = llm.llm_parse(text)
+            parsed['engine'] = 'llm'
+        elif rule_failed:
+            if err:
+                raise err
+            return self.send_error_json(
+                '规则解析未识别出题目' + ('(可在 config.json 配置大模型Key后用 AI 解析)' if not llm.available() else ''))
+
+        qs_count = len(parsed['questions'])
+        if not qs_count:
+            return self.send_error_json('未识别出任何题目,请确认文档格式')
+
+        pid, name = db.add_upload(filename, parsed, subject)
+        no_ans = sum(1 for q in parsed['questions'] if not q['answer'])
+        return self.send_json({
+            'ok': True,
+            'paper': {'id': pid, 'name': name, 'total': qs_count},
+            'by_type': parsed['by_type'],
+            'no_answer': no_ans,
+            'engine': parsed.get('engine', 'rules'),
+        })
+
+    def export_wrong(self):
+        items = db.wrong_list(0)
+        lines = ['===== 错题本导出 %s =====' % db.now(), '']
+        for it in items:
+            tname = {'single': '单选', 'multi': '多选', 'judge': '判断', 'qa': '问答',
+                     'reading': '阅读', 'poem': '古诗文', 'dictation': '默写',
+                     'essay': '作文'}.get(it['type'], it['type'])
+            lines.append('【%s】%s 第%d题 (做错%d次)' % (
+                tname, it['paper_name'], it['qno'], it['wrong_count']))
+            lines.append(it['stem'])
+            for k, v in it['options']:
+                lines.append('%s. %s' % (k, v))
+            if it['type'] == 'judge':
+                lines.append('对 / 错')
+            lines.append('正确答案: %s' % it['answer'])
+            if it.get('analysis'):
+                lines.append('解析: %s' % it['analysis'])
+            lines.append('')
+        body = ('\n'.join(lines)).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/plain; charset=utf-8')
+        self.send_header('Content-Disposition',
+                         'attachment; filename="wrong_questions.txt"')
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+    allow_reuse_address = True
+
+    def handle_error(self, request, client_address):
+        # 浏览器会预开连接、用不上就直接断开,这不是错误,不打印
+        if isinstance(sys.exc_info()[1], (ConnectionResetError, ConnectionAbortedError, BrokenPipeError)):
+            return
+        super().handle_error(request, client_address)
+
+
+def configured_url():
+    cfg = load_server_config()
+    return 'http://%s:%d/' % (cfg.get('host', '127.0.0.1'), int(cfg.get('port', 8788)))
+
+
+def make_server():
+    """返回 (server, url)。端口被占用时改用下一个端口。"""
+    db.init()
+    cfg = load_server_config()
+    port = int(cfg.get('port', 8788))
+    host = cfg.get('host', '127.0.0.1')
+    try:
+        srv = ThreadingHTTPServer((host, port), Handler)
+    except OSError:
+        port += 1
+        srv = ThreadingHTTPServer((host, port), Handler)
+    return srv, 'http://%s:%d/' % (host, port)
+
+
+def main():
+    srv, url = make_server()
+    print('=' * 46)
+    print('  ZhiXue Quiz Bank running -> %s' % url)
+    print('  press Ctrl+C to stop')
+    print('=' * 46)
+    threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        print('\nbye')
+
+
+if __name__ == '__main__':
+    main()
