@@ -254,6 +254,33 @@ class Handler(BaseHTTPRequestHandler):
             db.mark_mastered(qid, bool(data.get('mastered', True)))
             return self.send_json({'ok': True})
 
+        if method == 'GET' and path == '/api/app':
+            import version
+            return self.send_json({'ok': True, 'version': version.APP_VERSION, 'data_version': version.DATA_VERSION,
+                                   'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
+                                   'repo': 'https://github.com/%s' % version.REPO})
+
+        if method == 'GET' and path == '/api/update/check':
+            import updater
+            try:
+                return self.send_json(dict(ok=True, **updater.check()))
+            except ValueError as e:
+                return self.send_error_json(str(e))
+
+        if method == 'POST' and path == '/api/update/apply':
+            import updater
+            try:
+                r = updater.apply(on_exit=lambda: os._exit(0))
+            except Exception as e:
+                return self.send_error_json(str(e))
+            return self.send_json(dict(ok=True, **r))
+
+        if method == 'POST' and path == '/api/data/clear':
+            data = self.read_json_body()
+            if data.get('confirm') != '清除':
+                return self.send_error_json('需要确认')
+            return self.send_json({'ok': True, 'backup': db.clear_progress()})
+
         if method == 'GET' and path == '/api/stats':
             return self.send_json({'ok': True, 'stats': db.stats()})
 

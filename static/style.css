@@ -447,3 +447,13 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .ty-src, .ty-line { font-size: 16px; letter-spacing: 0; }
   .ty-src { white-space: normal; }
 }
+
+/* 设置页 */
+.page-h { font-size: 20px; margin-bottom: 16px; }
+.set-card { max-width: 760px; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 0; }
+.set-row + .set-row { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
+.set-row b { font-weight: 600; }
+.set-note { margin-top: 10px; }
+.upd-box { margin-top: 12px; padding: 12px 14px; border-radius: 8px; background: var(--green-soft); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.upd-notes { white-space: pre-wrap; color: var(--ink-2); font-size: 13px; }

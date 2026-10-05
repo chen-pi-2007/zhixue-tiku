@@ -13,7 +13,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 BUILD = os.path.join(HERE, '_build')
 NAME = '智学题库'
-SEED_ITEMS = ('bank.json', 'media', 'skills')      # 打进 exe 的初始题库；不含做题记录和练习文件
+from appdir import SEED_ITEMS                    # 打进 exe 的题库文件；不含做题记录和练习文件
+from version import DATA_VERSION
 
 
 def make_seed():
@@ -26,6 +27,8 @@ def make_seed():
             shutil.copytree(src, os.path.join(seed, name))
         elif os.path.exists(src):
             shutil.copy(src, seed)
+    with open(os.path.join(seed, 'data_version.txt'), 'w', encoding='utf-8') as f:
+        f.write(str(DATA_VERSION))
     return seed
 
 
@@ -44,7 +47,7 @@ def main():
         '--specpath', BUILD,
         '--add-data', '%s%sstatic' % (os.path.join(HERE, 'static'), os.pathsep),
         '--add-data', '%s%sseed' % (seed, os.pathsep),
-        '--hidden-import', 'llm', '--hidden-import', 'pystray._win32',
+        '--hidden-import', 'llm', '--hidden-import', 'updater', '--hidden-import', 'pystray._win32',
         'tray.py',
     ])
     shutil.copy(os.path.join(BUILD, 'dist', NAME + '.exe'), os.path.join(HERE, NAME + '.exe'))

@@ -86,7 +86,24 @@ def _load():
     _bank, _prog = bank, prog
     if bank.get('version') != 2:
         _migrate_v1()
+    _merge_seed()
     return _bank, _prog
+
+
+def _merge_seed():
+    """新版程序带来的题库（bank.seed.json）逐卷合并：同 key 的卷子整卷更新（题目 id 和做题记录不变），
+    用户自己导入的卷子保留。"""
+    seed_path = os.path.join(DATA_DIR, 'bank.seed.json')
+    if not os.path.exists(seed_path):
+        return
+    seed = _read_json(seed_path) or {}
+    by_pid = {}
+    for q in seed.get('questions', []):
+        by_pid.setdefault(q['paper_id'], []).append(q)
+    for p in seed.get('papers', []):
+        qs = sorted(by_pid.get(p['id'], []), key=lambda q: int(q['key'].rsplit('#', 1)[1]))
+        upsert_paper(p['key'], p['name'], p.get('subject', 'general'), qs)
+    os.remove(seed_path)
 
 
 def _migrate_v1():
@@ -450,6 +467,23 @@ def skill_put(key, value):
         _load()
         _prog.setdefault('skills', {})[key] = value
         _save_prog()
+
+
+def clear_progress():
+    """清除做题记录（复习卡片、作答日志、模拟考、技能成绩），保留设置。
+    清除前把 progress.json 备份到 data/backups/，练习文件夹 skill_work/ 一并删除。返回备份文件路径。"""
+    global _prog
+    with _lock:
+        _load()
+        os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
+        backup = os.path.join(DATA_DIR, 'backups', 'progress-%s.json' % time.strftime('%Y%m%d-%H%M%S'))
+        _write_json(backup, _prog)
+        settings = _prog.get('settings', {})
+        _prog.clear()
+        _prog.update({'cards': {}, 'attempts': [], 'exams': [], 'settings': settings, 'skills': {}})
+        _save_prog()
+        shutil.rmtree(os.path.join(DATA_DIR, 'skill_work'), ignore_errors=True)
+        return backup
 
 
 def set_setting(name, value):

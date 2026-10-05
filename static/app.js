@@ -1108,6 +1108,74 @@ document.addEventListener('keydown', e => {
   }
 });
 
+/* ================================================================ 设置：版本更新、清除数据 */
+
+routes.settings = viewSettings;
+
+async function viewSettings() {
+  app.innerHTML = '<div class="empty">加载中…</div>';
+  let a;
+  try { a = await api('/api/app'); } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  app.innerHTML =
+    '<h2 class="page-h">设置</h2>' +
+    '<div class="card set-card">' +
+      '<div class="set-row"><div><b>版本</b><div class="muted">当前 v' + esc(a.version) + (a.frozen ? '' : '(源码运行,用 git pull 更新)') + '</div></div>' +
+        '<button class="btn ghost" id="upd-check"' + (a.frozen ? '' : ' disabled') + '>检查更新</button></div>' +
+      '<div id="upd-out"></div>' +
+      '<div class="muted set-note">更新只替换程序和题库,你的做题记录、错题本、模拟考成绩都会保留。</div>' +
+    '</div>' +
+    '<div class="card set-card">' +
+      '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在 ' + esc(a.data_dir) + '</div></div></div>' +
+      '<div class="set-row"><div><b>清除做题记录</b><div class="muted">清空复习进度、错题本、模拟考记录、技能实操成绩和练习文件。题库和设置不受影响。<br>清除前会自动备份到数据文件夹的 backups 里。</div></div>' +
+        '<button class="btn danger" onclick="clearMyData()">清除记录</button></div>' +
+    '</div>' +
+    '<div class="card set-card"><div class="set-row"><div><b>项目地址</b><div class="muted">' +
+      '<a href="' + esc(a.repo) + '" target="_blank">' + esc(a.repo) + '</a></div></div></div></div>';
+  const btn = $('#upd-check');
+  if (btn) btn.addEventListener('click', checkUpdate);
+}
+
+async function checkUpdate() {
+  const out = $('#upd-out');
+  out.innerHTML = '<div class="muted set-note">正在检查…</div>';
+  try {
+    const u = await api('/api/update/check');
+    out.innerHTML = u.has_update
+      ? '<div class="upd-box"><b>有新版本 v' + esc(u.latest) + '</b>' +
+          (u.notes ? '<div class="upd-notes">' + esc(u.notes) + '</div>' : '') +
+          '<button class="btn" id="upd-go">下载并安装</button></div>'
+      : '<div class="muted set-note">已经是最新版本。</div>';
+    const go = $('#upd-go');
+    if (go) go.addEventListener('click', applyUpdate);
+  } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; }
+}
+
+async function applyUpdate() {
+  const out = $('#upd-out');
+  out.innerHTML = '<div class="muted set-note">正在下载新版本(约 55MB),下载完程序会自动重启,请不要关闭…</div>';
+  try {
+    await api('/api/update/apply', { method: 'POST', body: {} });
+  } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; return; }
+  out.innerHTML = '<div class="muted set-note">下载完成,正在重启…页面会自动刷新。</div>';
+  // 等新程序启动后刷新
+  const start = Date.now();
+  const poll = setInterval(async () => {
+    try { await api('/api/app'); clearInterval(poll); location.reload(); } catch (e) {
+      if (Date.now() - start > 60000) { clearInterval(poll); out.innerHTML = '<div class="set-note">重启时间有点长,稍后手动打开智学题库即可。</div>'; }
+    }
+  }, 2000);
+}
+
+async function clearMyData() {
+  const v = prompt('确定要清除所有做题记录吗?清除后错题本、复习进度、考试记录都会清空。\n确认请输入:清除');
+  if (v !== '清除') { if (v != null) toast('输入不对,没有清除'); return; }
+  try {
+    const d = await api('/api/data/clear', { method: 'POST', body: { confirm: '清除' } });
+    toast('已清除,备份在 ' + d.backup.split(/[\\/]/).slice(-2).join('/'), 'good');
+    location.hash = '#/home';
+  } catch (e) { toast(e.message, 'bad'); }
+}
+
 /* ================================================================ 主题 */
 
 function applyTheme(pref) {

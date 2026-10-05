@@ -28,18 +28,47 @@ STATIC_DIR = os.path.join(APP_DIR, 'static') if os.path.isdir(os.path.join(APP_D
     else os.path.join(RES_DIR, 'static')
 
 
+SEED_ITEMS = ('bank.json', 'media', 'skills')      # 题库文件；progress.json（做题记录）永远不在这里
+
+
+def _read_ver(path):
+    try:
+        with open(path, encoding='utf-8') as f:
+            return int(f.read().strip() or 0)
+    except (OSError, ValueError):
+        return 0
+
+
 def ensure_data():
-    """只拿到 exe 时：第一次运行把打包的初始题库（题目、图片、技能题）释放到 DATA_DIR。
-    已有的文件不覆盖，做题记录从空开始。"""
+    """把 exe 里打包的题库放到 DATA_DIR：
+    - 第一次运行：全部释放
+    - 装了带新题库的 exe（打包的题库版本 > 已安装的）：只替换题库文件（SEED_ITEMS），做题记录不动
+    题目用固定 key（卷子key#序号）关联做题记录，所以换题库后记录照样对得上。"""
     seed = os.path.join(RES_DIR, 'seed')
     os.makedirs(DATA_DIR, exist_ok=True)
     if not os.path.isdir(seed):
         return
-    for name in os.listdir(seed):
+    bundled = _read_ver(os.path.join(seed, 'data_version.txt'))
+    mark = os.path.join(DATA_DIR, 'data_version.txt')
+    installed = _read_ver(mark)
+    upgrade = bundled > installed
+    for name in SEED_ITEMS:
         src, dst = os.path.join(seed, name), os.path.join(DATA_DIR, name)
-        if os.path.exists(dst):
+        if not os.path.exists(src) or (os.path.exists(dst) and not upgrade):
+            continue
+        if name == 'bank.json' and os.path.exists(dst):
+            # 题库不整个覆盖：放成 bank.seed.json，由 db 启动时逐卷合并，用户自己导入的卷子保留
+            shutil.copy(src, os.path.join(DATA_DIR, 'bank.seed.json'))
             continue
         if os.path.isdir(src):
-            shutil.copytree(src, dst)
+            tmp = dst + '.new'
+            shutil.rmtree(tmp, ignore_errors=True)
+            shutil.copytree(src, tmp)
+            shutil.rmtree(dst, ignore_errors=True)
+            os.replace(tmp, dst)
         else:
-            shutil.copy(src, dst)
+            shutil.copy(src, dst + '.new')
+            os.replace(dst + '.new', dst)
+    if upgrade:
+        with open(mark, 'w', encoding='utf-8') as f:
+            f.write(str(bundled))

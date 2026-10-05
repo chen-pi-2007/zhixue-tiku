@@ -161,3 +161,86 @@ class DbFlowTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class DataSafetyTest(unittest.TestCase):
+    """更新题库、清除记录都不能误伤用户数据"""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        db._bank = db._prog = None
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+    def test_seed_upgrade_keeps_progress(self):
+        import appdir
+        seed = os.path.join(self.dir, 'seed')
+        data = os.path.join(self.dir, 'data')
+        os.makedirs(os.path.join(seed, 'media'))
+        os.makedirs(data)
+        with open(os.path.join(seed, 'bank.json'), 'w') as f:
+            f.write('NEW')
+        with open(os.path.join(seed, 'data_version.txt'), 'w') as f:
+            f.write('3')
+        for name, text in (('bank.json', 'OLD'), ('progress.json', 'MINE'), ('data_version.txt', '2')):
+            with open(os.path.join(data, name), 'w') as f:
+                f.write(text)
+        old = appdir.RES_DIR, appdir.DATA_DIR
+        appdir.RES_DIR, appdir.DATA_DIR = self.dir, data
+        try:
+            appdir.ensure_data()
+            # 题库不直接覆盖，放成 bank.seed.json 等 db 合并；做题记录不动
+            self.assertEqual(open(os.path.join(data, 'bank.json')).read(), 'OLD')
+            self.assertEqual(open(os.path.join(data, 'bank.seed.json')).read(), 'NEW')
+            self.assertEqual(open(os.path.join(data, 'progress.json')).read(), 'MINE')
+            # 版本相同时不再处理
+            os.remove(os.path.join(data, 'bank.seed.json'))
+            appdir.ensure_data()
+            self.assertFalse(os.path.exists(os.path.join(data, 'bank.seed.json')))
+        finally:
+            appdir.RES_DIR, appdir.DATA_DIR = old
+
+    def test_clear_progress_backs_up_and_keeps_settings(self):
+        db.DATA_DIR = self.dir
+        db.BANK_PATH = os.path.join(self.dir, 'bank.json')
+        db.PROGRESS_PATH = os.path.join(self.dir, 'progress.json')
+        db.MEDIA_DIR = os.path.join(self.dir, 'media')
+        db._bank = db._prog = None
+        db.init()
+        db.upsert_paper('p-1', '卷', 'politics', [{'type': 'single', 'stem': 'q', 'options': [['A', '1']], 'answer': 'A'}])
+        qid = db.get_questions()[0][0]['id']
+        db.record_answer(qid, False)
+        db.set_setting('exam_date', '2026-11-07')
+        backup = db.clear_progress()
+        self.assertTrue(os.path.exists(backup))
+        self.assertEqual(db.stats()['answered'], 0)
+        self.assertEqual(db.wrong_list(0), [])
+        self.assertEqual(db._prog['settings']['exam_date'], '2026-11-07')
+        self.assertEqual(db.stats()['questions'], 1)
+
+    def test_seed_merge_keeps_user_papers_and_records(self):
+        db.DATA_DIR = self.dir
+        db.BANK_PATH = os.path.join(self.dir, 'bank.json')
+        db.PROGRESS_PATH = os.path.join(self.dir, 'progress.json')
+        db.MEDIA_DIR = os.path.join(self.dir, 'media')
+        db._bank = db._prog = None
+        db.init()
+        q = lambda stem: {'type': 'single', 'stem': stem, 'options': [['A', '1']], 'answer': 'A'}
+        db.upsert_paper('politics-1', '政治1', 'politics', [q('旧题1'), q('旧题2')])
+        db.upsert_paper('upload-1', '我导入的', 'general', [q('我的题')])
+        qid = db.get_questions(paper_id=None)[0][0]['id']
+        db.record_answer(qid, False)
+        # 新版题库：政治1 的题干改了
+        seed = {'version': 2, 'papers': [{'id': 1, 'key': 'politics-1', 'name': '政治1', 'subject': 'politics'}],
+                'questions': [dict(q('新题1'), id=1, key='politics-1#1', paper_id=1, qno=1),
+                              dict(q('新题2'), id=2, key='politics-1#2', paper_id=1, qno=2)]}
+        db._write_json(os.path.join(self.dir, 'bank.seed.json'), seed)
+        db._bank = db._prog = None
+        db.init()
+        stems = [x['stem'] for x in db.get_questions()[0]]
+        self.assertIn('新题1', stems)
+        self.assertIn('我的题', stems)
+        self.assertNotIn('旧题1', stems)
+        self.assertEqual(len(db.wrong_list(0)), 1)       # 做题记录还在
+        self.assertFalse(os.path.exists(os.path.join(self.dir, 'bank.seed.json')))
