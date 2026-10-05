@@ -20,3 +20,4 @@ config.json
 _build/
 *.exe
 server.log
+data/data_version.txt

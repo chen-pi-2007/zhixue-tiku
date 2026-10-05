@@ -74,6 +74,18 @@ function optionList(q) {
   return q.options || [];
 }
 
+// 英语题的中文翻译开关（平时练习、错题本、题库浏览显示；模拟考没有这些字段）
+// 译文总是渲染进页面，开关只切换 html.cn-off（做题中途切换不会重画、不丢作答状态）。
+// 带 .after 的译文在练习卡片里要作答后才显示：选项译文（含音标、语法提示）和带空格的题干译文会直接暴露答案。
+function cnOn() { const v = store.get('quiz.cn'); return v == null ? true : !!v; }
+function applyCn() { document.documentElement.classList.toggle('cn-off', !cnOn()); $$('.cn-btn').forEach(b => b.classList.toggle('on', cnOn())); }
+function toggleCn() { store.set('quiz.cn', !cnOn()); applyCn(); }
+function hasCn(q) { return !!(q.stem_cn || q.material_cn || (q.options_cn && q.options_cn.length)); }
+function cnBtn(q) { return hasCn(q) ? '<button class="cn-btn' + (cnOn() ? ' on' : '') + '" onclick="toggleCn()" title="显示/隐藏中文翻译">译</button>' : ''; }
+function stemCn(q) { return q.stem_cn ? '<div class="stem-cn' + (/_{2,}/.test(q.stem) ? ' after' : '') + '">' + rich(q.stem_cn) + '</div>' : ''; }
+function optCn(q, i) { return q.options_cn && q.options_cn[i] ? '<span class="opt-cn after">' + esc(q.options_cn[i]) + '</span>' : ''; }
+function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b><div>' + rich(q.point) + '</div></div>' : ''; }
+
 // 阅读材料/情境材料展示框
 // fold:长材料默认折叠(错题本、报告里同一篇材料会重复出现)
 function materialBox(q, fold) {
@@ -81,10 +93,14 @@ function materialBox(q, fold) {
   if (fold && q.material.length > 160) {
     return '<details class="material-box"><summary class="material-title">材料(点开查看)· ' +
       esc(q.material.split('\n')[0].slice(0, 40)) + '…</summary>' +
-      '<div class="material-body">' + rich(q.material) + '</div></details>';
+      '<div class="material-body">' + rich(q.material) + '</div>' + materialCn(q) + '</details>';
   }
   return '<div class="material-box"><div class="material-title">材料</div>' +
-    '<div class="material-body">' + rich(q.material) + '</div></div>';
+    '<div class="material-body">' + rich(q.material) + '</div>' + materialCn(q) + '</div>';
+}
+
+function materialCn(q) {
+  return q.material_cn ? '<div class="material-cn"><div class="material-title">参考译文</div>' + rich(q.material_cn) + '</div>' : '';
 }
 
 function recBadge(q) {
@@ -95,17 +111,17 @@ function recBadge(q) {
 
 function ansHtml(q) {
   return '正确答案 <b>' + rich(q.answer) + '</b>' +
-    (q.analysis ? '<div class="analysis">解析:' + rich(q.analysis) + '</div>' : '');
+    (q.analysis ? '<div class="analysis">解析:' + rich(q.analysis) + '</div>' : '') + pointBox(q);
 }
 
 function optsStatic(q, given) {
   const opts = optionList(q);
   if (!opts.length) return '';
-  return '<div class="opts">' + opts.map(o => {
+  return '<div class="opts">' + opts.map((o, i) => {
     const isAns = q.type === 'multi' ? q.answer.indexOf(o[0]) >= 0 : o[0] === q.answer;
     const isGiven = given != null && given.indexOf(o[0]) >= 0;
     const cls = isAns ? ' ok' : (isGiven ? ' bad' : '');
-    return '<div class="opt' + cls + '" style="cursor:default"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + '</span></div>';
+    return '<div class="opt' + cls + '" style="cursor:default"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></div>';
   }).join('') + '</div>';
 }
 
@@ -138,6 +154,7 @@ function route() {
   routes[name](parts.slice(1));
 }
 window.addEventListener('hashchange', route);
+applyCn();
 
 /* ================================================================ 首页:今日 + 各科 */
 
@@ -664,9 +681,10 @@ function renderQ() {
         '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
         (again ? '<span class="rec-badge bad">刚才做错,再来一次</span>' : recBadge(q)) +
+        '<span class="spacer"></span>' + cnBtn(q) +
       '</div>' +
       materialBox(q) +
-      '<div class="stem">' + (p.idx + 1) + '/' + p.list.length + '、' + rich(q.stem) + '</div>' +
+      '<div class="stem">' + (p.idx + 1) + '/' + p.list.length + '、' + rich(q.stem) + '</div>' + stemCn(q) +
       '<div id="qbody"></div>' +
       '<div class="msg-bar"><span class="muted">答对:</span><span class="num-green">' + p.correct + ' 题</span>' +
         '<span class="muted">答错:</span><span class="num-red">' + wrongN + ' 题</span>' +
@@ -686,8 +704,8 @@ function renderQ() {
       '<div class="qactions" id="qact"><button class="btn" onclick="showQaAns()">' + btnText + '</button></div>';
   } else if (q.type === 'multi') {
     body.innerHTML =
-      '<div class="opts" id="optsbox">' + opts.map(o =>
-        '<button class="opt" data-k="' + esc(o[0]) + '" onclick="toggleMulti(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + '</span></button>').join('') + '</div>' +
+      '<div class="opts" id="optsbox">' + opts.map((o, i) =>
+        '<button class="opt" data-k="' + esc(o[0]) + '" onclick="toggleMulti(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>' +
       '<div class="qactions" id="qact"><span class="muted">多选题:选择多项后确认</span><div class="spacer"></div>' +
         '<button class="btn" id="multi-ok" disabled onclick="confirmMulti()">确认答案</button></div>';
   } else {
@@ -695,8 +713,8 @@ function renderQ() {
       (q.type === 'judge'
         ? '<div class="judge-row">' + opts.map(o =>
           '<button class="opt" data-k="' + esc(o[0]) + '" onclick="submitChoice(\'' + esc(o[0]) + '\')"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
-        : '<div class="opts" id="optsbox">' + opts.map(o =>
-          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="submitChoice(\'' + esc(o[0]) + '\')"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + '</span></button>').join('') + '</div>') +
+        : '<div class="opts" id="optsbox">' + opts.map((o, i) =>
+          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="submitChoice(\'' + esc(o[0]) + '\')"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
       '<div class="qactions" id="qact"></div>';
   }
 }
@@ -746,6 +764,7 @@ function gradeAndShow(selKeys) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
+  $('.qcard-main').classList.add('answered');
   recordResult(q, isRight);
 
   $$('#qbody .opt').forEach(b => {
@@ -762,7 +781,7 @@ function gradeAndShow(selKeys) {
   fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
     ' 正确答案:<b>' + esc(q.answer) + '</b></div>' +
-    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '');
+    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
 
   $('#qact').innerHTML = '<span class="muted">回车 = 下一题</span><div class="spacer"></div>' +
@@ -775,12 +794,13 @@ function showQaAns() {
   const p = state.practice;
   const q = p.list[p.idx];
   p.answered = true;
+  $('.qcard-main').classList.add('answered');
   const ta = $('#self-input');
   const fb = document.createElement('div');
   fb.className = 'feedback';
   fb.style.background = 'var(--primary-l)';
   fb.innerHTML = '<div class="ans-line">参考答案</div><div class="analysis">' + rich(q.answer) + '</div>' +
-    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '');
+    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
   if (ta) ta.disabled = true;
   $('#qact').innerHTML =

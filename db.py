@@ -27,6 +27,7 @@ MEDIA_DIR = os.path.join(DATA_DIR, 'media')
 
 SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general']
 SELF_TYPES = ('qa', 'dictation', 'essay', 'blank', 'solution')
+STUDY_FIELDS = ('stem_cn', 'options_cn', 'material_cn', 'point')   # 平时练习才显示的翻译、知识点
 # 旧版卷子 → key（第一次升级时用）
 LEGACY_KEYS = {'学测2025练习卷1 泛雅格式': 'politics-1'}
 
@@ -196,12 +197,16 @@ def upsert_paper(key, name, subject, questions, media_src=None):
             qid = old_ids.get(qk)
             if qid is None:
                 qid, nid = nid, nid + 1
-            _bank['questions'].append({
+            row = {
                 'id': qid, 'key': qk, 'paper_id': pid, 'qno': q.get('qno') or i,
                 'type': q['type'], 'stem': q['stem'], 'material': q.get('material') or '',
                 'options': q.get('options') or [], 'answer': q.get('answer') or '',
                 'analysis': q.get('analysis') or '',
-            })
+            }
+            for f in STUDY_FIELDS:                 # 英语题的中文翻译、知识点（只在平时练习显示）
+                if q.get(f):
+                    row[f] = q[f]
+            _bank['questions'].append(row)
         if media_src and os.path.isdir(media_src):
             dst = os.path.join(MEDIA_DIR, key)
             shutil.rmtree(dst, ignore_errors=True)
@@ -279,9 +284,11 @@ def _view(q, papers, hide_answer=False):
     d['box'] = c.get('box', 0) if c else None
     d['streak'] = c.get('streak', 0)
     d['due'] = c.get('due', '')
-    if hide_answer:
+    if hide_answer:                                # 模拟考：不给答案、解析、翻译和知识点
         d['answer'] = ''
         d['analysis'] = ''
+        for f in STUDY_FIELDS:
+            d.pop(f, None)
     return d
 
 
