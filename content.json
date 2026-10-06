@@ -1,6 +1,6 @@
 {
- "content_version": 5,
- "created": "2026-10-06 20:32:53",
+ "content_version": 6,
+ "created": "2026-10-06 20:40:54",
  "files": {
   "data/bank.json": [
    "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
@@ -1555,8 +1555,8 @@
    35634
   ],
   "static/app.js": [
-   "495417984a89639be8d279647bda5da3b3bbd6dc9e83c08a067201c30990eeb7",
-   80149
+   "b1df7fd9f1f0064ca7041678ead11b3139f2592401859a75322c237c3dafa7e9",
+   82606
   ],
   "static/index.html": [
    "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
@@ -1567,12 +1567,12 @@
    27900
   ],
   "static/style.css": [
-   "5ca5394501f726f300ae6c08ed57619163f964ae2f944c0d544a905311c01707",
-   35102
+   "16f835da63091fcb2add93fd4fad4a971982194bf3eba61d5093e0ef88ebacee",
+   36020
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "模拟考答题时不显示更新提示条",
- "tag": "content-5"
+ "notes": "有更新时顶栏显示「有更新」、设置旁显示红点，更新完自动消失；每 6 小时自动检查一次",
+ "tag": "content-6"
 }

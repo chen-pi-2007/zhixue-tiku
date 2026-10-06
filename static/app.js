@@ -1260,6 +1260,7 @@ async function viewSettings() {
       '<a href="javascript:void(0)" onclick="openExternal(' + jsq(a.repo) + ')">' + esc(a.repo) + '</a></div></div></div></div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
+  markUpdDots();
   $$('.subj-check input').forEach(c => c.addEventListener('change', saveHidden));
 }
 
@@ -1280,6 +1281,7 @@ async function checkUpdate() {
     api('/api/update/check').catch(e => ({ error: e.message })),
     api('/api/content/check').catch(e => ({ error: e.message })),
   ]);
+  if (!(app.error && cont.error)) setUpdNotice(noticeFrom(app, cont));
   let html = '';
   if (app.has_update) {
     html += '<div class="upd-box"><b>有新版程序 v' + esc(app.latest) + '</b>' +
@@ -1318,32 +1320,78 @@ async function applyContentUpdate() {
 }
 
 // 每天第一次打开时在后台查一下有没有更新，有就在页面顶上提示（不打扰做题）
-async function autoCheckUpdate() {
-  const today = new Date().toDateString();
-  if (store.get('zx.lastAutoCheck') === today) return showUpdNotice(store.get('zx.updNotice'));
-  store.set('zx.lastAutoCheck', today);
-  const [app, cont] = await Promise.all([
-    api('/api/update/check').catch(() => ({})),
-    api('/api/content/check').catch(() => ({})),
-  ]);
-  const n = app.has_update ? { kind: 'app', text: '有新版程序 v' + app.latest }
-    : cont.has_update ? { kind: 'content', text: '题库和界面有更新（' + fmtMB(cont.bytes) + '）' } : null;
-  store.set('zx.updNotice', n);
-  showUpdNotice(n);
+// 有更新时的提示：导航「设置」和「检查更新」按钮上的红点（一直在，更新完才消失），
+// 外加页面底部的提示条（点「以后再说」只关掉提示条，红点还在）。
+// 每 6 小时在后台查一次；手动点「检查更新」的结果也会同步过来。
+const UPD_EVERY = 6 * 3600 * 1000;
+
+function cmpVer(a, b) {
+  const p = s => String(s || '').replace(/^[vV]/, '').split('.').map(x => parseInt(x, 10) || 0).concat([0, 0, 0]).slice(0, 3);
+  const x = p(a), y = p(b);
+  for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1;
+  return 0;
 }
 
-function showUpdNotice(n) {
+function noticeFrom(app, cont) {
+  if (app.has_update) return { kind: 'app', latest: app.latest, text: '有新版程序 v' + app.latest };
+  if (cont.has_update) return { kind: 'content', latest: cont.latest, text: '题库和界面有更新（' + fmtMB(cont.bytes) + '）' };
+  return null;
+}
+
+async function autoCheckUpdate(a) {
+  let n = store.get('zx.updNotice');
+  // 已经更新过了（程序或内容版本追上了提示里的版本），提示作废
+  if (n && ((n.kind === 'app' && cmpVer(n.latest, a.version) <= 0) ||
+            (n.kind === 'content' && n.latest <= (a.content_version || 0)))) n = null;
+  setUpdNotice(n);
+  if (Date.now() - (+store.get('zx.lastAutoCheck') || 0) < UPD_EVERY) return;
+  store.set('zx.lastAutoCheck', Date.now());
+  const [app, cont] = await Promise.all([
+    api('/api/update/check').catch(() => ({ failed: true })),
+    api('/api/content/check').catch(() => ({ failed: true })),
+  ]);
+  if (!(app.failed && cont.failed)) setUpdNotice(noticeFrom(app, cont));     // 都没连上就保留原来的提示
+}
+
+function setUpdNotice(n) {
+  store.set('zx.updNotice', n);
+  markUpdDots();
+  showUpdNotice();
+}
+
+function markUpdDots() {
+  const n = store.get('zx.updNotice');
+  // 顶栏右侧的「有更新」标签：手机上导航横着滚，「设置」常常在屏幕外，靠它提醒
+  const top = $('#top-upd');
+  if (n && !top) {
+    const pick = $('.theme-pick');
+    if (pick) pick.insertAdjacentHTML('beforebegin',
+      '<a id="top-upd" class="top-upd" href="#/settings" onclick="setTimeout(checkUpdate,300)" title="' + esc(n.text) + '"><i class="upd-dot"></i>有更新</a>');
+  } else if (!n && top) top.remove();
+  [$('#nav a[data-v="settings"]'), $('#upd-check')].forEach(el => {
+    if (!el) return;
+    const dot = el.querySelector('.upd-dot');
+    if (n && !dot) el.insertAdjacentHTML('beforeend', '<i class="upd-dot" title="' + esc(n.text) + '"></i>');
+    else if (!n && dot) dot.remove();
+  });
+}
+
+function showUpdNotice() {
   const old = $('#upd-banner');
   if (old) old.remove();
-  if (!n || location.hash.indexOf('#/exam/run') === 0) return;      // 模拟考答题时不打扰
+  const n = store.get('zx.updNotice');
+  const h = location.hash;
+  // 模拟考答题时不打扰；在设置页里已经能看到，也不用再提示；点过「以后再说」的这一版不再弹
+  if (!n || h.indexOf('#/exam/run') === 0 || h.indexOf('#/settings') === 0 || store.get('zx.updBannerOff') === n.kind + n.latest) return;
   const d = document.createElement('div');
   d.id = 'upd-banner';
   d.className = 'upd-banner';
-  d.innerHTML = '<span>' + esc(n.text) + '</span>' +
+  d.innerHTML = '<i class="upd-dot"></i><span>' + esc(n.text) + '</span>' +
     '<button class="btn sm" onclick="location.hash=\'#/settings\';setTimeout(checkUpdate,300)">去更新</button>' +
-    '<button class="btn ghost sm" onclick="store.set(\'zx.updNotice\',null);this.parentNode.remove()">以后再说</button>';
+    '<button class="btn ghost sm" onclick="store.set(\'zx.updBannerOff\',' + jsq(n.kind + n.latest) + ');this.parentNode.remove()">以后再说</button>';
   document.body.appendChild(d);
 }
+window.addEventListener('hashchange', showUpdNotice);
 
 async function applyUpdate() {
   const out = $('#upd-out');
@@ -1507,5 +1555,5 @@ function applyTheme(pref) {
 window.addEventListener('DOMContentLoaded', () => {
   route();
   // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
-  api('/api/app').then(a => { if (a.frozen || a.mobile) setTimeout(autoCheckUpdate, 1500); }).catch(() => {});
+  api('/api/app').then(a => { if (a.frozen || a.mobile) setTimeout(() => autoCheckUpdate(a), 1500); }).catch(() => {});
 });
