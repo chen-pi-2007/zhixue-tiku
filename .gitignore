@@ -21,3 +21,6 @@ _build/
 *.exe
 server.log
 data/data_version.txt
+
+# 热更新下载的内容（content/current、content/next）
+content/

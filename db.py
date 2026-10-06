@@ -157,6 +157,14 @@ def init():
         _load()
 
 
+def reload():
+    """热更新放好 bank.seed.json 后调用：重新读文件并合并新题库（做题记录在内存里的都已存盘）"""
+    global _bank, _prog
+    with _lock:
+        _bank = _prog = None
+        _load()
+
+
 def now():
     return time.strftime('%Y-%m-%d %H:%M:%S')
 

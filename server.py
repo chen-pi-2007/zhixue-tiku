@@ -27,7 +27,6 @@ def skills_service():
     return _skills
 
 import appdir
-STATIC_DIR = appdir.STATIC_DIR
 MAX_UPLOAD = 30 * 1024 * 1024
 
 MIME = {
@@ -152,7 +151,7 @@ class Handler(BaseHTTPRequestHandler):
     def static(self, path):
         if path == '/' or not path:
             path = '/index.html'
-        root = STATIC_DIR
+        root = appdir.static_dir()               # 热更新后会换成新内容里的界面
         if path.startswith('/media/skill/'):              # 技能题：素材、参考答案、PDF、插图
             root, path = os.path.join(db.DATA_DIR, 'skills'), path[len('/media/skill'):]
         elif path.startswith('/media/'):
@@ -280,7 +279,7 @@ class Handler(BaseHTTPRequestHandler):
 
         if method == 'GET' and path == '/api/app':
             import version
-            return self.send_json({'ok': True, 'version': version.APP_VERSION, 'data_version': version.DATA_VERSION,
+            return self.send_json({'ok': True, 'version': version.APP_VERSION, 'content_version': appdir.content_version(),
                                    'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
                                    'repo': 'https://github.com/%s' % version.REPO})
 
@@ -295,6 +294,19 @@ class Handler(BaseHTTPRequestHandler):
         if method == 'POST' and path == '/api/update/download':
             import updater
             return self.send_json(dict(ok=True, **updater.start_download()))
+
+        # 热更新（界面 + 题库）：检查、开始下载、查进度
+        if method == 'GET' and path == '/api/content/check':
+            import hotupdate
+            return self.send_json(dict(ok=True, **hotupdate.check()))
+
+        if method == 'POST' and path == '/api/content/update':
+            import hotupdate
+            return self.send_json(dict(ok=True, **hotupdate.start()))
+
+        if method == 'GET' and path == '/api/content/progress':
+            import hotupdate
+            return self.send_json(dict(ok=True, **hotupdate.progress()))
 
         if method == 'GET' and path == '/api/update/progress':
             import updater

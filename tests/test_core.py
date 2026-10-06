@@ -203,25 +203,23 @@ class DataSafetyTest(unittest.TestCase):
         os.makedirs(data)
         with open(os.path.join(seed, 'bank.json'), 'w') as f:
             f.write('NEW')
-        with open(os.path.join(seed, 'data_version.txt'), 'w') as f:
-            f.write('3')
         for name, text in (('bank.json', 'OLD'), ('progress.json', 'MINE'), ('data_version.txt', '2')):
             with open(os.path.join(data, name), 'w') as f:
                 f.write(text)
-        old = appdir.RES_DIR, appdir.DATA_DIR
-        appdir.RES_DIR, appdir.DATA_DIR = self.dir, data
+        old = appdir.DATA_DIR
+        appdir.DATA_DIR = data
         try:
-            appdir.ensure_data()
+            appdir.seed_data(seed, 3)
             # 题库不直接覆盖，放成 bank.seed.json 等 db 合并；做题记录不动
             self.assertEqual(open(os.path.join(data, 'bank.json')).read(), 'OLD')
             self.assertEqual(open(os.path.join(data, 'bank.seed.json')).read(), 'NEW')
             self.assertEqual(open(os.path.join(data, 'progress.json')).read(), 'MINE')
             # 版本相同时不再处理
             os.remove(os.path.join(data, 'bank.seed.json'))
-            appdir.ensure_data()
+            appdir.seed_data(seed, 3)
             self.assertFalse(os.path.exists(os.path.join(data, 'bank.seed.json')))
         finally:
-            appdir.RES_DIR, appdir.DATA_DIR = old
+            appdir.DATA_DIR = old
 
     def test_clear_progress_backs_up_and_keeps_settings(self):
         db.DATA_DIR = self.dir

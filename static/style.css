@@ -498,3 +498,7 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .upd-bar.busy i { width: 30%; animation: upd-busy 1.4s ease-in-out infinite; }
 @keyframes upd-busy { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
 @media (prefers-reduced-motion: reduce) { .upd-bar.busy i { animation: none; width: 100%; opacity: .5; } }
+/* 有更新时页面底部的提示条 */
+.upd-banner { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 10px;
+  max-width: calc(100vw - 32px); padding: 10px 12px 10px 16px; border-radius: 10px; background: var(--layer-1); box-shadow: var(--pop); font-size: 14px; }
+.upd-banner span { flex: 1; min-width: 0; }

@@ -1241,11 +1241,13 @@ async function viewSettings() {
       subjBox('culture') + subjBox('pro') + subjBox('other') +
     '</div>' +
     '<div class="card set-card">' +
-      '<div class="set-row"><div><b>版本</b><div class="muted">当前 v' + esc(a.version) + (a.frozen || a.mobile ? '' : '(源码运行,用 git pull 更新)') + '</div></div>' +
+      '<div class="set-row"><div><b>版本</b><div class="muted">程序 v' + esc(a.version) +
+        (a.content_version ? ' · 题库和界面 第 ' + a.content_version + ' 版' : '') +
+        (a.frozen || a.mobile ? '' : '（源码运行，用 git pull 更新）') + '</div></div>' +
         '<button class="btn ghost" id="upd-check"' + (a.frozen || a.mobile ? '' : ' disabled') + '>检查更新</button></div>' +
       '<div id="upd-out"></div>' +
-      '<div class="muted set-note">' + (a.mobile ? '新版安装包从 GitHub 下载，覆盖安装就行，做题记录会保留（不要先卸载）。'
-        : '更新只替换程序和题库,你的做题记录、错题本、模拟考成绩都会保留。') + '</div>' +
+      '<div class="muted set-note">题库和界面的更新只下载改动的文件，几秒钟就好，不用重启；程序本身有更新时' +
+        (a.mobile ? '下载新安装包覆盖安装（不要先卸载）' : '下载新程序后自动重启') + '。做题记录、错题本、考试成绩都会保留。</div>' +
     '</div>' +
     '<div class="card set-card">' +
       '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在 ' + esc(a.data_dir) + '</div></div></div>' +
@@ -1270,19 +1272,77 @@ async function saveHidden() {
   } catch (e) { toast(e.message, 'bad'); }
 }
 
+// 检查更新：程序（exe / apk，要重装）和内容（界面 + 题库，热更新）分开检查，各自显示
 async function checkUpdate() {
   const out = $('#upd-out');
   out.innerHTML = '<div class="muted set-note">正在检查…</div>';
-  try {
-    const u = await api('/api/update/check');
-    out.innerHTML = u.has_update
-      ? '<div class="upd-box"><b>有新版本 v' + esc(u.latest) + '</b>' +
-          (u.notes ? '<div class="upd-notes">' + esc(u.notes) + '</div>' : '') +
-          '<button class="btn" id="upd-go">下载并安装</button></div>'
-      : '<div class="muted set-note">已经是最新版本。</div>';
-    const go = $('#upd-go');
-    if (go) go.addEventListener('click', applyUpdate);
-  } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; }
+  const [app, cont] = await Promise.all([
+    api('/api/update/check').catch(e => ({ error: e.message })),
+    api('/api/content/check').catch(e => ({ error: e.message })),
+  ]);
+  let html = '';
+  if (app.has_update) {
+    html += '<div class="upd-box"><b>有新版程序 v' + esc(app.latest) + '</b>' +
+      (app.notes ? '<div class="upd-notes">' + esc(app.notes) + '</div>' : '') +
+      '<button class="btn" onclick="applyUpdate()">下载并安装' + (app.size ? '（' + fmtMB(app.size) + '）' : '') + '</button></div>';
+  }
+  if (cont.has_update) {
+    html += '<div class="upd-box"><b>题库和界面有更新（第 ' + cont.latest + ' 版，' + cont.files + ' 个文件，' + fmtMB(cont.bytes) + '）</b>' +
+      (cont.notes ? '<div class="upd-notes">' + esc(cont.notes) + '</div>' : '') +
+      '<button class="btn" onclick="applyContentUpdate()">现在更新</button></div>';
+  } else if (cont.latest > cont.current && !cont.compatible && !app.has_update) {
+    html += '<div class="set-note num-orange">有新的题库和界面，但需要程序 v' + esc(cont.min_app_version) + ' 以上，等新版程序发布后先更新程序。</div>';
+  }
+  if (!html) {
+    const err = app.error && cont.error ? app.error : '';
+    html = err ? '<div class="set-note num-red">' + esc(err) + '</div>'
+               : '<div class="muted set-note">程序和题库都已经是最新的。</div>';
+  }
+  out.innerHTML = html;
+}
+
+// 热更新：下载改动的文件（进度条），装好后刷新页面就是新界面和新题库
+async function applyContentUpdate() {
+  const out = $('#upd-out');
+  let p;
+  try { p = await api('/api/content/update', { method: 'POST' }); } catch (e) { return updFail(e.message); }
+  while (p.state === 'downloading') {
+    out.innerHTML = updProgress(p, '正在更新题库和界面' + (p.files_total ? '（' + p.files_done + ' / ' + p.files_total + ' 个文件）' : ''));
+    await new Promise(r => setTimeout(r, 400));
+    try { p = await api('/api/content/progress'); } catch (e) { return updFail(e.message); }
+  }
+  if (p.state !== 'done') return updFail(p.error || '更新失败');
+  store.del('zx.updNotice');
+  out.innerHTML = updProgress(Object.assign({}, p, { done: p.total || 1, total: p.total || 1 }), '更新好了，正在刷新…');
+  setTimeout(() => location.reload(), 800);
+}
+
+// 每天第一次打开时在后台查一下有没有更新，有就在页面顶上提示（不打扰做题）
+async function autoCheckUpdate() {
+  const today = new Date().toDateString();
+  if (store.get('zx.lastAutoCheck') === today) return showUpdNotice(store.get('zx.updNotice'));
+  store.set('zx.lastAutoCheck', today);
+  const [app, cont] = await Promise.all([
+    api('/api/update/check').catch(() => ({})),
+    api('/api/content/check').catch(() => ({})),
+  ]);
+  const n = app.has_update ? { kind: 'app', text: '有新版程序 v' + app.latest }
+    : cont.has_update ? { kind: 'content', text: '题库和界面有更新（' + fmtMB(cont.bytes) + '）' } : null;
+  store.set('zx.updNotice', n);
+  showUpdNotice(n);
+}
+
+function showUpdNotice(n) {
+  const old = $('#upd-banner');
+  if (old) old.remove();
+  if (!n) return;
+  const d = document.createElement('div');
+  d.id = 'upd-banner';
+  d.className = 'upd-banner';
+  d.innerHTML = '<span>' + esc(n.text) + '</span>' +
+    '<button class="btn sm" onclick="location.hash=\'#/settings\';setTimeout(checkUpdate,300)">去更新</button>' +
+    '<button class="btn ghost sm" onclick="store.set(\'zx.updNotice\',null);this.parentNode.remove()">以后再说</button>';
+  document.body.appendChild(d);
 }
 
 async function applyUpdate() {
@@ -1444,4 +1504,8 @@ function applyTheme(pref) {
 
 /* ================================================================ 启动 */
 
-window.addEventListener('DOMContentLoaded', route);
+window.addEventListener('DOMContentLoaded', () => {
+  route();
+  // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
+  api('/api/app').then(a => { if (a.frozen || a.mobile) setTimeout(autoCheckUpdate, 1500); }).catch(() => {});
+});
