@@ -130,7 +130,7 @@ def release_content(notes):
     set_version('CONTENT_VERSION', v)
     write_manifest(v, notes)
     push(['content-%d' % v], '内容第 %d 版：%s' % (v, notes))
-    print('\n✓ 已发布内容第 %d 版。用户点「检查更新」（或第二天打开时自动提示）就能更新。' % v)
+    print('\n✓ 已发布内容第 %d 版。用户打开题库后 6 小时内会看到「有更新」提示，或者自己点「检查更新」。' % v)
     print('  GitHub 原站几分钟内生效；jsDelivr 镜像可能要晚几个小时。')
 
 
