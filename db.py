@@ -292,12 +292,22 @@ def _view(q, papers, hide_answer=False):
     return d
 
 
+def hidden_subjects():
+    """设置里不学的科目（科目 key，技能方向是 skill:<方向>）"""
+    return set(_prog['settings'].get('hidden_subjects') or [])
+
+
 def _filter(paper_id=None, subject=None, qtype=None, search=None):
+    """没指定卷子和科目时（今日复习、全部随机练、错题本、搜索）跳过不学的科目"""
     papers = _papers_by_id()
+    hidden = hidden_subjects() if not (paper_id or subject) else set()
     for q in _bank['questions']:
         if paper_id and q['paper_id'] != paper_id:
             continue
-        if subject and papers.get(q['paper_id'], {}).get('subject') != subject:
+        s = papers.get(q['paper_id'], {}).get('subject')
+        if subject and s != subject:
+            continue
+        if s in hidden:
             continue
         if qtype and q['type'] != qtype:
             continue
@@ -542,8 +552,10 @@ def dashboard():
                 d['mastery_sum'] += srs.mastery(c)
                 t['mastery_sum'] += srs.mastery(c)
         out = []
+        hidden = hidden_subjects()
         for s in sorted(subj, key=lambda x: SUBJECTS.index(x) if x in SUBJECTS else 99):
             d = subj[s]
+            d['hidden'] = s in hidden
             d['mastery'] = round(100 * d.pop('mastery_sum') / d['total']) if d['total'] else 0
             types = []
             for t in d.pop('types').values():
@@ -563,13 +575,15 @@ def dashboard():
             day = srs.add_days(today, -i)
             hist.append({'day': day, 'n': sum(1 for a in _prog['attempts'] if a['t'][:10] == day)})
         new_left = _new_left(today)
+        rq = review_queue()       # 实际题数：材料题会把同一篇材料的整组题带出来，比每日新题数多
         return {
             'subjects': out,
             'today': {'done': len(today_att), 'right': sum(1 for a in today_att if a['ok']),
-                      'due': sum(d['due'] for d in out), 'new_left': new_left},
+                      'due': sum(d['due'] for d in out if not d['hidden']), 'new_left': new_left,
+                      'new': len(rq['items']) - rq['due'], 'todo': len(rq['items'])},
             'streak': _day_streak(days),
             'history': hist,
-            'wrong_open': sum(d['wrong_open'] for d in out),
+            'wrong_open': sum(d['wrong_open'] for d in out if not d['hidden']),
             'questions': sum(d['total'] for d in out),
             'papers': len(_bank['papers']),
             'settings': _prog['settings'],

@@ -23,6 +23,13 @@ async function viewSkills(args) {
   app.innerHTML = '<div class="empty">加载中…</div>';
   let d;
   try { d = await api('/api/skills'); } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  await loadHidden();
+  const all = d.items.length;
+  d.items = d.items.filter(s => !isHidden('skill:' + s.direction));
+  if (all && !d.items.length) {
+    app.innerHTML = '<div class="empty">技能实操的方向都设成了不学<br><span class="muted">要练的话去 <a href="#/settings">设置</a> 里勾选</span></div>';
+    return;
+  }
   if (!d.items.length) {
     app.innerHTML = '<div class="empty">还没有导入技能题库<br><span class="muted">在 学测/_脚本 运行 build_skills.py,再关掉本服务运行 python import_packs.py ..\\学测\\题库包</span></div>';
     return;

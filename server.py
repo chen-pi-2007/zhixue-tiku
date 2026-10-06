@@ -95,22 +95,23 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---- 路由
     def do_GET(self):
-        try:
-            self.route('GET')
-        except Exception:
-            traceback.print_exc()
-            self.send_error_json('服务器内部错误', 500)
+        self._run('GET')
 
     def do_POST(self):
-        try:
-            self.route('POST')
-        except Exception:
-            traceback.print_exc()
-            self.send_error_json('服务器内部错误', 500)
+        self._run('POST')
 
     def do_DELETE(self):
+        self._run('DELETE')
+
+    def _run(self, method):
         try:
-            self.route('DELETE')
+            self.route(method)
+        except (ValueError, KeyError, TypeError) as e:     # 参数格式不对、题目或卷子不存在
+            msg = e.args[0] if e.args and isinstance(e.args[0], str) else ''
+            if not msg or isinstance(e, TypeError) or msg.isascii():
+                traceback.print_exc()                       # 不是我们自己抛的提示，留个记录方便查
+                msg = '参数不对'
+            self.send_error_json(msg, 400)
         except Exception:
             traceback.print_exc()
             self.send_error_json('服务器内部错误', 500)
@@ -205,6 +206,9 @@ class Handler(BaseHTTPRequestHandler):
                 db.set_setting('new_per_day', max(0, min(200, int(data['new_per_day']))))
             if re.match(r'^\d{4}-\d{2}-\d{2}$', str(data.get('exam_date', ''))):
                 db.set_setting('exam_date', data['exam_date'])
+            if isinstance(data.get('hidden_subjects'), list):     # 不学的科目
+                db.set_setting('hidden_subjects', sorted({str(s) for s in data['hidden_subjects']
+                                                          if re.match(r'^[\w:-]{1,40}$', str(s))}))
             return self.send_json({'ok': True})
 
         if method == 'GET' and path == '/api/wrong':

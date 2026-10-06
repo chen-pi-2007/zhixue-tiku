@@ -42,6 +42,8 @@ class Skills:
 
     def skill(self, key):
         path = os.path.join(self.root, key, 'skill.json')
+        if not os.path.exists(path):
+            raise KeyError('没有这套技能卷：%s' % key)
         mt = os.path.getmtime(path)
         if key not in self._cache or self._cache[key][0] != mt:
             with open(path, encoding='utf-8') as f:
@@ -210,6 +212,8 @@ class Skills:
         """自查卡：checked = {条目序号: True}"""
         m = self.module(key, mid)
         items = card_items(m)
+        if isinstance(checked, list):          # 也接受勾选序号的列表
+            checked = {str(i): True for i in checked}
         score = round(sum(it['points'] for i, it in enumerate(items) if checked.get(str(i))), 2)
         total = round(sum(it['points'] for it in items), 2)
         self._record(key, mid, score, total, saved={'checked': checked})

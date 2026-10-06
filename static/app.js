@@ -191,8 +191,13 @@ async function viewHome() {
     return;
   }
   try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库时首页照常显示 */ }
+  state.hidden = d.settings.hidden_subjects || [];
+  d.subjects = d.subjects.filter(s => !s.hidden);
+  papers = papers.filter(p => !isHidden(p.subject));
+  skills = skills.filter(s => !isHidden('skill:' + s.direction));
   const h = state.home;
   h.group = h.group || '';
+  if (h.subj && isHidden(h.subj)) h.subj = '';
   const unfinished = store.get('quiz.exam');
   // 科目条目：各科卷子 + 技能卷方向（计算机应用、网络技术，筛选值 skill:<方向>），分成文化课、专业技能两类
   const entries = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, group: subjectGroup(s.subject),
@@ -276,6 +281,17 @@ function subjectGroup(subj) {
   return 'other';
 }
 
+// 不学的科目（设置里取消勾选的），首页、错题本、搜索、模拟考、技能实操都不显示；技能方向写成 skill:<方向>
+state.hidden = null;
+async function loadHidden() {
+  if (!state.hidden) {
+    try { state.hidden = (await api('/api/dashboard')).data.settings.hidden_subjects || []; } catch (e) { state.hidden = []; }
+  }
+  return state.hidden;
+}
+function isHidden(subj) { return !!state.hidden && state.hidden.indexOf(subj) >= 0; }
+function shownSubjectKeys() { return Object.keys(SUBJECT_NAME).filter(k => !isHidden(k)); }
+
 // 技能卷行：题数一栏写模块数，掌握度用最好成绩占总分的比例，点开进技能实操
 function skillRow(s, i) {
   const pct = s.total ? Math.round(100 * s.best_total / s.total) : 0;
@@ -298,7 +314,7 @@ function examDays(date) {
 
 function todayCard(d) {
   const t = d.today;
-  const todo = t.due + t.new_left;
+  const todo = t.todo != null ? t.todo : t.due + t.new_left;
   const days = examDays(d.settings.exam_date);
   return '<div class="side-card">' +
     '<div class="sc-head"><b>今日复习</b>' +
@@ -307,7 +323,7 @@ function todayCard(d) {
     '</div>' +
     '<div class="sc-stats">' +
       '<div><em>' + t.due + '</em><span>到期</span></div>' +
-      '<div><em>' + t.new_left + '</em><span>新题</span></div>' +
+      '<div><em>' + (t.new != null ? t.new : t.new_left) + '</em><span>新题</span></div>' +
       '<div><em>' + t.done + '</em><span>已做</span></div>' +
       '<div><em>' + (t.done ? Math.round(100 * t.right / t.done) + '%' : '-') + '</em><span>正确率</span></div>' +
     '</div>' +
@@ -516,14 +532,15 @@ function bindUpload() {
 
 async function viewBank() {
   const b = state.bank;
+  await loadHidden();
   if (!b.papers.length) {
     try { b.papers = (await api('/api/papers')).papers; } catch (e) { /* ignore */ }
   }
-  const plist = b.subject ? b.papers.filter(p => p.subject === b.subject) : b.papers;
+  const plist = b.subject ? b.papers.filter(p => p.subject === b.subject) : b.papers.filter(p => !isHidden(p.subject));
   app.innerHTML =
     '<div class="filters">' +
       '<select class="inp" id="f-subj"><option value="">全部科目</option>' +
-        Object.keys(SUBJECT_NAME).map(k => '<option value="' + k + '"' + (b.subject === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
+        shownSubjectKeys().map(k => '<option value="' + k + '"' + (b.subject === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
       '</select>' +
       '<select class="inp" id="f-paper"><option value="0">全部卷子</option>' +
         plist.map(p => '<option value="' + p.id + '"' + (b.paper_id === p.id ? ' selected' : '') + '>' + esc(p.name) + '(' + p.total + ')</option>').join('') +
@@ -608,6 +625,8 @@ function revealAns(qid, btn) {
 
 async function viewWrong() {
   app.innerHTML = '<div class="empty">加载中…</div>';
+  await loadHidden();
+  if (state.wrongSubject && isHidden(state.wrongSubject)) state.wrongSubject = '';
   const subj = state.wrongSubject;
   let items, done;
   try {
@@ -624,7 +643,7 @@ async function viewWrong() {
       '<button class="chip' + (!tab ? ' on' : '') + '" id="wt0">待消灭(' + items.length + ')</button>' +
       '<button class="chip' + (tab ? ' on' : '') + '" id="wt1">已消灭(' + done.length + ')</button>' +
       '<select class="inp" id="w-subj"><option value="">全部科目</option>' +
-        Object.keys(SUBJECT_NAME).map(k => '<option value="' + k + '"' + (subj === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
+        shownSubjectKeys().map(k => '<option value="' + k + '"' + (subj === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
       '</select>' +
       '<div style="flex:1"></div>' +
       (items.length
@@ -948,7 +967,8 @@ async function viewExamNew(subject) {
     return;
   }
   const unfinished = store.get('quiz.exam');
-  const subs = d.subjects.filter(s => s.subject !== 'general');
+  state.hidden = d.settings.hidden_subjects || [];
+  const subs = d.subjects.filter(s => s.subject !== 'general' && !s.hidden);
   app.innerHTML =
     (unfinished ? '<div class="card notice">还没交卷:<b>' + esc(unfinished.exam.title) + '</b><div class="spacer"></div>' +
       '<a class="btn sm" href="#/exam/run">继续作答</a><button class="btn danger sm" onclick="abandonExam()">放弃</button></div>' : '') +
@@ -1184,10 +1204,34 @@ routes.settings = viewSettings;
 
 async function viewSettings() {
   app.innerHTML = '<div class="empty">加载中…</div>';
-  let a;
-  try { a = await api('/api/app'); } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  let a, d, skills = [];
+  try {
+    a = await api('/api/app');
+    d = (await api('/api/dashboard')).data;
+  } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库 */ }
+  state.hidden = d.settings.hidden_subjects || [];
+  // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 专业技能 / 其他分组
+  const subjOpts = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, note: s.total + ' 题' }));
+  skills.forEach(s => {
+    const k = 'skill:' + s.direction;
+    const o = subjOpts.find(x => x.key === k);
+    if (o) o.n++;
+    else subjOpts.push({ key: k, name: SKILL_DIR_NAME[s.direction] || s.direction, n: 1 });
+  });
+  subjOpts.forEach(o => { if (o.n) o.note = o.n + ' 套实操'; });
+  const subjBox = g => {
+    const os = subjOpts.filter(o => subjectGroup(o.key) === g);
+    return os.length ? '<div class="subj-pick"><span class="muted">' + (GROUP_NAME[g] || '其他') + '</span>' + os.map(o =>
+      '<label class="subj-check"><input type="checkbox" data-k="' + esc(o.key) + '"' + (isHidden(o.key) ? '' : ' checked') + '>' +
+        esc(o.name) + '<span class="muted">' + esc(o.note) + '</span></label>').join('') + '</div>' : '';
+  };
   app.innerHTML =
     '<h2 class="page-h">设置</h2>' +
+    '<div class="card set-card">' +
+      '<div class="set-row"><div><b>我要学的科目</b><div class="muted">不用考的科目取消勾选，它就不会出现在首页、今日复习、错题本、搜索和模拟考里。做题记录会保留，以后再勾上就回来了。</div></div></div>' +
+      subjBox('culture') + subjBox('pro') + subjBox('other') +
+    '</div>' +
     '<div class="card set-card">' +
       '<div class="set-row"><div><b>版本</b><div class="muted">当前 v' + esc(a.version) + (a.frozen ? '' : '(源码运行,用 git pull 更新)') + '</div></div>' +
         '<button class="btn ghost" id="upd-check"' + (a.frozen ? '' : ' disabled') + '>检查更新</button></div>' +
@@ -1203,6 +1247,16 @@ async function viewSettings() {
       '<a href="' + esc(a.repo) + '" target="_blank">' + esc(a.repo) + '</a></div></div></div></div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
+  $$('.subj-check input').forEach(c => c.addEventListener('change', saveHidden));
+}
+
+async function saveHidden() {
+  const hidden = $$('.subj-check input').filter(c => !c.checked).map(c => c.dataset.k);
+  try {
+    await api('/api/settings', { method: 'POST', body: { hidden_subjects: hidden } });
+    state.hidden = hidden;
+    toast(hidden.length ? '已保存，' + hidden.length + ' 个科目不再显示' : '已保存，全部科目都显示', 'good');
+  } catch (e) { toast(e.message, 'bad'); }
 }
 
 async function checkUpdate() {

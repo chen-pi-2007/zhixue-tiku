@@ -158,6 +158,28 @@ class DbFlowTest(unittest.TestCase):
         self.assertEqual(len(db.wrong_list(0)), 34)
         self.assertEqual(db.dashboard()['exams'][0]['score'], round(100.0 / 35, 1))
 
+    def test_hidden_subjects_leave_review_and_wrong_book(self):
+        db.upsert_paper('english-1', '英语1', 'english',
+                        [{'type': 'single', 'stem': 'e%d' % i, 'options': [['A', '1'], ['B', '2']], 'answer': 'A'}
+                         for i in range(1, 6)])
+        en = db.get_questions(subject='english')[0][0]
+        db.record_answer(en['id'], False)
+        db._prog['cards'][en['key']]['due'] = '2000-01-01'
+        db.set_setting('hidden_subjects', ['english'])
+        r = db.review_queue(new_limit=100)
+        self.assertEqual(r['due'], 0)
+        self.assertTrue(all(i['subject'] == 'politics' for i in r['items']))
+        self.assertEqual(db.wrong_list(0), [])
+        self.assertTrue(all(i['subject'] == 'politics' for i in db.practice_set()))
+        d = db.dashboard()
+        self.assertEqual((d['today']['due'], d['wrong_open']), (0, 0))
+        self.assertTrue(next(s for s in d['subjects'] if s['subject'] == 'english')['hidden'])
+        # 直接点进不学的科目或卷子仍然能练，做题记录没丢
+        self.assertEqual(len(db.practice_set(subject='english')), 5)
+        self.assertEqual(len(db.wrong_list(0, subject='english')), 1)
+        db.set_setting('hidden_subjects', [])
+        self.assertEqual(db.review_queue(new_limit=0)['due'], 1)
+
 
 if __name__ == '__main__':
     unittest.main()
