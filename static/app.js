@@ -1335,7 +1335,7 @@ async function autoCheckUpdate() {
 function showUpdNotice(n) {
   const old = $('#upd-banner');
   if (old) old.remove();
-  if (!n) return;
+  if (!n || location.hash.indexOf('#/exam/run') === 0) return;      // 模拟考答题时不打扰
   const d = document.createElement('div');
   d.id = 'upd-banner';
   d.className = 'upd-banner';

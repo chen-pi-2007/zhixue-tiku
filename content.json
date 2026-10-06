@@ -1,6 +1,6 @@
 {
- "content_version": 4,
- "created": "2026-10-06 20:28:56",
+ "content_version": 5,
+ "created": "2026-10-06 20:32:53",
  "files": {
   "data/bank.json": [
    "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
@@ -1555,8 +1555,8 @@
    35634
   ],
   "static/app.js": [
-   "397ffe0b1cb99a9469dd3b310332dc31aa0773ca117bdddcd3e65aea43012e55",
-   80068
+   "495417984a89639be8d279647bda5da3b3bbd6dc9e83c08a067201c30990eeb7",
+   80149
   ],
   "static/index.html": [
    "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
@@ -1573,6 +1573,6 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "题库和界面支持热更新：只下载改动的文件，不用重装；手机版也能热更新",
- "tag": "content-4"
+ "notes": "模拟考答题时不显示更新提示条",
+ "tag": "content-5"
 }
