@@ -1290,7 +1290,7 @@ async function applyUpdate() {
   if (IS_APP) return applyUpdateApp();
   // 电脑：后台下载 → 轮询进度画进度条 → 下完自动安装并重启 → 新版起来后页面自动刷新
   let p;
-  try { p = await api('/api/update/download', { method: 'POST', body: {} }); } catch (e) {
+  try { p = await api('/api/update/download', { method: 'POST' }); } catch (e) {
     if (/接口不存在/.test(e.message)) return applyUpdateLegacy();
     return updFail(e.message);
   }
@@ -1301,7 +1301,7 @@ async function applyUpdate() {
   }
   if (p.state !== 'done') return updFail(p.error || '下载失败', p.page);
   out.innerHTML = updProgress(p, '下载完成，正在安装并重启…');
-  try { await api('/api/update/install', { method: 'POST', body: {} }); } catch (e) { return updFail(e.message, p.page); }
+  try { await api('/api/update/install', { method: 'POST' }); } catch (e) { return updFail(e.message, p.page); }
   waitRestart(p.version);
 }
 
@@ -1318,7 +1318,7 @@ async function applyUpdateLegacy() {
   tick();
   const timer = setInterval(tick, 1000);
   let r;
-  try { r = await api('/api/update/apply', { method: 'POST', body: {} }); } catch (e) {
+  try { r = await api('/api/update/apply', { method: 'POST' }); } catch (e) {
     clearInterval(timer);
     return updFail(e.message, 'https://github.com/chen-pi-2007/zhixue-tiku/releases/latest');
   }

@@ -80,18 +80,29 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json({'ok': False, 'error': msg}, status)
 
     def read_body(self):
+        if getattr(self, '_body', None) is not None:      # 已经读过（或已丢弃）
+            return self._body
         length = int(self.headers.get('Content-Length') or 0)
         if length <= 0:
-            return b''
+            self._body = b''
+            return self._body
         if length > MAX_UPLOAD:
+            self.close_connection = True                   # 正文没读，这条连接不能再用
             raise ValueError('文件过大(超过30MB)')
-        return self.rfile.read(length)
+        self._body = self.rfile.read(length)
+        return self._body
 
     def read_json_body(self):
         raw = self.read_body()
         if not raw:
             return {}
-        return json.loads(raw.decode('utf-8'))
+        try:
+            data = json.loads(raw.decode('utf-8'))
+        except ValueError:
+            raise ValueError('请求内容格式不对')
+        if not isinstance(data, dict):            # 接口都按对象取字段，数组之类当成格式不对
+            raise ValueError('请求内容格式不对')
+        return data
 
     # ---- 路由
     def do_GET(self):
@@ -104,6 +115,7 @@ class Handler(BaseHTTPRequestHandler):
         self._run('DELETE')
 
     def _run(self, method):
+        self._body = None
         try:
             self.route(method)
         except (ValueError, KeyError, TypeError) as e:     # 参数格式不对、题目或卷子不存在
@@ -115,6 +127,14 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             traceback.print_exc()
             self.send_error_json('服务器内部错误', 500)
+        finally:
+            # 没用到的请求正文也要读掉：浏览器会在同一条连接上发下一个请求，
+            # 剩下的字节会粘到下一个请求开头（曾经因此把 POST 读成 "{}POST" 报 501）
+            if self._body is None and not self.close_connection:
+                try:
+                    self.read_body()
+                except Exception:
+                    self.close_connection = True
 
     def route(self, method):
         u = urlparse(self.path)
