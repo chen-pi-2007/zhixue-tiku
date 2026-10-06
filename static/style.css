@@ -488,3 +488,10 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .subj-check input { accent-color: var(--green); margin: 0; }
 .subj-check .muted { font-size: 12px; }
 .subj-check:has(input:not(:checked)) { color: var(--ink-3); text-decoration: line-through; }
+
+/* 更新下载进度 */
+.upd-prog { width: 100%; align-items: stretch; }
+.upd-bar { height: 8px; border-radius: 4px; background: var(--layer-3); overflow: hidden; }
+.upd-bar i { display: block; height: 100%; border-radius: 4px; background: var(--green); transition: width .4s; }
+.upd-err { background: var(--red-soft); }
+.upd-acts { display: flex; gap: 8px; flex-wrap: wrap; }

@@ -4,6 +4,8 @@
 
     <!-- 只在检查更新时连 GitHub；做题完全离线 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 下载好新版后打开系统安装界面（第一次会问是否允许本 App 安装应用） -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:label="智学题库"

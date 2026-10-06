@@ -164,8 +164,12 @@ def main():
 
     def on_ready(icon):
         icon.visible = True
-        open_app()
-        icon.notify('已在后台运行，点托盘图标打开；右键可退出', APP_NAME)
+        if '--updated' in sys.argv:          # 在线更新后自动重启：原来的网页会自己刷新，不再新开一个
+            from version import APP_VERSION
+            icon.notify('已更新到 v%s' % APP_VERSION, APP_NAME)
+        else:
+            open_app()
+            icon.notify('已在后台运行，点托盘图标打开；右键可退出', APP_NAME)
 
     icon.run(setup=on_ready)
 

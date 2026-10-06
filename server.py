@@ -271,13 +271,18 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError as e:
                 return self.send_error_json(str(e))
 
-        if method == 'POST' and path == '/api/update/apply':
+        # 更新分三步，界面轮询 progress 显示进度条
+        if method == 'POST' and path == '/api/update/download':
             import updater
-            try:
-                r = updater.apply(on_exit=lambda: os._exit(0))
-            except Exception as e:
-                return self.send_error_json(str(e))
-            return self.send_json(dict(ok=True, **r))
+            return self.send_json(dict(ok=True, **updater.start_download()))
+
+        if method == 'GET' and path == '/api/update/progress':
+            import updater
+            return self.send_json(dict(ok=True, **updater.progress()))
+
+        if method == 'POST' and path == '/api/update/install':
+            import updater
+            return self.send_json(dict(ok=True, **updater.install(on_exit=lambda: os._exit(0))))
 
         if method == 'POST' and path == '/api/data/clear':
             data = self.read_json_body()

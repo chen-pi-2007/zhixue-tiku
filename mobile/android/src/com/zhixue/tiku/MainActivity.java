@@ -1,7 +1,10 @@
 package com.zhixue.tiku;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.Environment;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
@@ -174,6 +177,74 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void openUrl(String url) {
             runOnUiThread(() -> MainActivity.this.openUrl(url));
+        }
+
+        /** 用系统下载器下新版 apk（通知栏也有进度），返回下载编号；失败返回空串 */
+        @JavascriptInterface
+        public String download(String url, String name) {
+            try {
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                File old = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), name);
+                if (old.exists()) old.delete();
+                DownloadManager.Request r = new DownloadManager.Request(Uri.parse(url));
+                r.setTitle("智学题库 更新");
+                r.setMimeType("application/vnd.android.package-archive");
+                r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+                r.setDestinationInExternalFilesDir(MainActivity.this, Environment.DIRECTORY_DOWNLOADS, name);
+                return String.valueOf(dm.enqueue(r));
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        /** 下载进度 JSON：{state: downloading|waiting|done|error, done, total, reason} */
+        @JavascriptInterface
+        public String dlProgress(String id) {
+            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            try (Cursor c = dm.query(new DownloadManager.Query().setFilterById(Long.parseLong(id)))) {
+                if (c == null || !c.moveToFirst()) return "{\"state\":\"error\",\"reason\":\"下载任务不见了\"}";
+                int st = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                long done = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                long total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                int reason = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON));
+                String state = st == DownloadManager.STATUS_SUCCESSFUL ? "done"
+                        : st == DownloadManager.STATUS_FAILED ? "error"
+                        : st == DownloadManager.STATUS_PAUSED ? "waiting" : "downloading";
+                String why = st == DownloadManager.STATUS_PAUSED
+                        ? (reason == DownloadManager.PAUSED_WAITING_FOR_NETWORK ? "等待网络连接"
+                           : reason == DownloadManager.PAUSED_WAITING_TO_RETRY ? "网络出错，正在重试" : "已暂停")
+                        : st == DownloadManager.STATUS_FAILED ? "下载失败（错误码 " + reason + "）" : "";
+                return "{\"state\":\"" + state + "\",\"done\":" + done + ",\"total\":" + Math.max(total, 0)
+                        + ",\"reason\":\"" + why + "\"}";
+            } catch (Exception e) {
+                return "{\"state\":\"error\",\"reason\":\"查不到下载进度\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public void cancelDownload(String id) {
+            try {
+                ((DownloadManager) getSystemService(DOWNLOAD_SERVICE)).remove(Long.parseLong(id));
+            } catch (Exception e) {
+                // 已经结束了
+            }
+        }
+
+        /** 下载完成后打开系统安装界面；返回 false 表示打不开 */
+        @JavascriptInterface
+        public boolean installApk(String id) {
+            try {
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                Uri uri = dm.getUriForDownloadedFile(Long.parseLong(id));
+                if (uri == null) return false;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setDataAndType(uri, "application/vnd.android.package-archive");
+                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
         }
     }
 }

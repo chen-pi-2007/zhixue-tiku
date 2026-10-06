@@ -1287,26 +1287,85 @@ async function checkUpdate() {
 
 async function applyUpdate() {
   const out = $('#upd-out');
-  if (IS_APP) {        // 手机：交给系统浏览器下载 apk，下载完点开覆盖安装
-    try {
-      const u = await api('/api/update/check');
-      if (u.url) openExternal(u.url);
-      out.innerHTML = '<div class="muted set-note">已经在浏览器里开始下载，下载完点开安装包，选「更新」即可。</div>';
-    } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; }
-    return;
+  if (IS_APP) return applyUpdateApp();
+  // 电脑：后台下载 → 轮询进度画进度条 → 下完自动安装并重启 → 新版起来后页面自动刷新
+  let p;
+  try { p = await api('/api/update/download', { method: 'POST', body: {} }); } catch (e) { return updFail(e.message); }
+  while (p.state === 'downloading') {
+    out.innerHTML = updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启');
+    await new Promise(r => setTimeout(r, 500));
+    try { p = await api('/api/update/progress'); } catch (e) { return updFail('和题库程序的连接断了：' + e.message); }
   }
-  out.innerHTML = '<div class="muted set-note">正在下载新版本(约 55MB),下载完程序会自动重启,请不要关闭…</div>';
-  try {
-    await api('/api/update/apply', { method: 'POST', body: {} });
-  } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; return; }
-  out.innerHTML = '<div class="muted set-note">下载完成,正在重启…页面会自动刷新。</div>';
-  // 等新程序启动后刷新
-  const start = Date.now();
+  if (p.state !== 'done') return updFail(p.error || '下载失败', p.page);
+  out.innerHTML = updProgress(p, '下载完成，正在安装并重启…');
+  try { await api('/api/update/install', { method: 'POST', body: {} }); } catch (e) { return updFail(e.message, p.page); }
+  // 旧程序还要半秒才退出，所以要等到版本号变成新版才刷新
+  const want = p.version, start = Date.now();
   const poll = setInterval(async () => {
-    try { await api('/api/app'); clearInterval(poll); location.reload(); } catch (e) {
-      if (Date.now() - start > 60000) { clearInterval(poll); out.innerHTML = '<div class="set-note">重启时间有点长,稍后手动打开智学题库即可。</div>'; }
+    try {
+      const a = await api('/api/app');
+      if (a.version === want) { clearInterval(poll); location.reload(); }
+    } catch (e) { /* 正在重启 */ }
+    if (Date.now() - start > 90000) {
+      clearInterval(poll);
+      out.innerHTML = '<div class="set-note">重启时间有点长，稍后从开始菜单或桌面打开智学题库即可。</div>';
     }
-  }, 2000);
+  }, 1500);
+}
+
+// 手机：系统下载器下 apk（App 里和通知栏都有进度）→ 下完自动打开安装界面。
+// 安卓不允许 App 装完自己重启，装好后在安装界面点「打开」。
+let appDl = null;
+async function applyUpdateApp() {
+  const out = $('#upd-out');
+  let u;
+  try { u = await api('/api/update/check'); } catch (e) { return updFail(e.message); }
+  if (!u.url) return updFail('这个版本没有安卓安装包', u.page);
+  const S = window.ZXStore;
+  if (!S || !S.download) { openExternal(u.url); return; }        // 旧版 App 没有下载接口
+  if (appDl) S.cancelDownload(appDl);
+  const id = appDl = S.download(u.url, 'zhixue-tiku-' + u.latest + '.apk');
+  if (!id) return updFail('没法开始下载', u.page);
+  let lastDone = -1, lastMove = Date.now(), lastT = Date.now(), speed = 0;
+  for (;;) {
+    if (appDl !== id) return;                                     // 用户点了重试，换了新任务
+    const p = JSON.parse(S.dlProgress(id));
+    const now = Date.now();
+    if (p.done !== lastDone) {
+      if (lastDone >= 0) speed = (p.done - lastDone) / Math.max((now - lastT) / 1000, 0.001);
+      lastDone = p.done; lastMove = now; lastT = now;
+    }
+    if (p.state === 'done') break;
+    if (p.state === 'error') { appDl = null; return updFail(p.reason || '下载失败', u.page); }
+    const stalled = now - lastMove > 30000;
+    out.innerHTML = updProgress({ state: 'downloading', done: p.done, total: p.total || u.size || 0, speed: speed },
+      '正在下载 v' + u.latest + '，下载完会自动打开安装界面') +
+      (p.state === 'waiting' || stalled
+        ? '<div class="set-note num-red">' + esc(p.reason || '30 秒没有收到数据，网络可能断了') +
+          '　<a href="javascript:void(0)" onclick="applyUpdateApp()">重新下载</a>　' +
+          '<a href="javascript:void(0)" onclick="openExternal(' + jsq(u.url) + ')">用浏览器下载</a></div>' : '');
+    await new Promise(r => setTimeout(r, 600));
+  }
+  appDl = null;
+  out.innerHTML = updProgress({ state: 'done', done: lastDone, total: lastDone }, '下载完成，正在打开安装界面…') +
+    '<div class="muted set-note">在安装界面点「更新」（第一次会让你允许智学题库安装应用，打开开关再返回即可），装好后点「打开」。做题记录会保留。</div>';
+  if (!S.installApk(id)) updFail('打不开安装界面，请下拉通知栏，点「智学题库 更新」那条下载完成的通知安装', u.page);
+}
+
+function fmtMB(b) { return (b / 1048576).toFixed(1) + ' MB'; }
+
+function updProgress(p, title) {
+  const pct = p.total ? Math.min(100, Math.round(100 * p.done / p.total)) : 0;
+  return '<div class="upd-box upd-prog"><b>' + esc(title) + '</b>' +
+    '<div class="upd-bar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="muted">' + (p.total ? pct + '% · ' + fmtMB(p.done) + ' / ' + fmtMB(p.total) : fmtMB(p.done)) +
+      (p.state === 'downloading' ? (p.speed ? ' · ' + fmtMB(p.speed) + '/s' : ' · 正在连接 GitHub…') : '') + '</div></div>';
+}
+
+function updFail(msg, page) {
+  $('#upd-out').innerHTML = '<div class="upd-box upd-err"><b>更新没有完成</b><div>' + esc(msg) + '</div>' +
+    '<div class="upd-acts"><button class="btn" onclick="applyUpdate()">重试</button>' +
+    (page ? '<button class="btn ghost" onclick="openExternal(' + jsq(page) + ')">去 GitHub 手动下载</button>' : '') + '</div></div>';
 }
 
 async function clearMyData() {
