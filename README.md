@@ -10,11 +10,14 @@
 
 - 单击/双击托盘图标:打开题库;重复双击 exe 也只会打开浏览器,不会重复启动
 - 右键菜单:开机自启(勾选)、打开数据文件夹、备份数据到桌面、退出
-- exe 必须和 `data/`、`static/`、`config.json` 放在同一目录;运行日志在 `server.log`
+- exe 是单文件，可以直接发给别人；数据放在 `%LOCALAPPDATA%\智学题库`（exe 旁边有 `data/` 文件夹时用旁边的）
+- 设置页「检查更新」：题库和界面热更新（只下载改动的文件），程序本身有新版时自动下载替换并重启
+
+安卓手机版：从 [Releases](https://github.com/chen-pi-2007/zhixue-tiku/releases) 下载 `zhixue-tiku.apk` 安装，离线刷题（没有技能实操和导入试卷）。
 
 也可以用 `start.bat`(或 `python server.py`)以命令行窗口方式运行。
 
-改了代码后重新打包:双击 `build_exe.bat`(第一次会在 `_build/venv` 建打包环境,装 PyInstaller、pystray)。改界面(`static/`)不需要重新打包。
+**维护、发布新版本、接手项目：看 [MAINTAINING.md](MAINTAINING.md)。**
 
 ## 功能
 

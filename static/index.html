@@ -15,6 +15,12 @@
   document.documentElement.setAttribute('data-theme', pref === 'auto' ? (dark ? 'dark' : 'light') : pref);
   document.documentElement.setAttribute('data-theme-pref', pref);
 })();
+/* 安卓 App 里（有 ZXStore）：先加载本地后端 local.js，再隐藏手机上用不了的入口（技能实操、导入试卷）。
+   电脑和手机用同一份界面文件，热更新时两边一起更新 */
+if (window.ZXStore) {
+  document.documentElement.classList.add('app');
+  document.write('<script src="local.js"><\/script>');
+}
 </script>
 <link rel="stylesheet" href="style.css">
 </head>

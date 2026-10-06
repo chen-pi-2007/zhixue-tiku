@@ -5,7 +5,7 @@
    （App 里通过 ZXStore 写到应用私有目录，浏览器里调试时退回 localStorage）。
    改了 db.py / srs.py / exam.py 的逻辑，这里要同步改。 */
 (function () {
-  const APP_VERSION = (window.ZX_BUILD || {}).version || 'dev';     // build_apk.py 生成 build-info.js
+  const APP_VERSION = (window.ZXStore && ZXStore.appVersion && ZXStore.appVersion()) || 'dev';   // App 的版本号
   const REPO = 'chen-pi-2007/zhixue-tiku';
   const SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general'];
   const SELF = ['qa', 'dictation', 'essay', 'blank', 'solution'];
@@ -576,8 +576,11 @@
       return { exam: examView(e, !e.finished) };
     }
     if (method === 'GET' && path === '/api/app')
-      return { version: APP_VERSION, data_version: (window.ZX_BUILD || {}).data_version || 0, frozen: false, mobile: true,
-               data_dir: '手机本地（卸载 App 会一起删除）', repo: 'https://github.com/' + REPO };
+      return { version: APP_VERSION, content_version: ((await currentManifest()) || {}).content_version || 0,
+               frozen: false, mobile: true, data_dir: '手机本地（卸载 App 会一起删除）', repo: 'https://github.com/' + REPO };
+    if (method === 'GET' && path === '/api/content/check') return contentCheck();
+    if (method === 'POST' && path === '/api/content/update') return contentStart();
+    if (method === 'GET' && path === '/api/content/progress') return Object.assign({}, job);
     if (method === 'POST' && path === '/api/data/clear') {
       if (body.confirm !== '清除') throw new Error('需要确认');
       return { backup: clearProgress() };
@@ -608,6 +611,124 @@
     const latest = (rel.tag_name || '').replace(/^[vV]/, '');
     return { current: APP_VERSION, latest: latest, has_update: !!asset && cmpTuple(ver(latest), ver(APP_VERSION)) > 0,
              notes: rel.body || '', url: asset ? asset.browser_download_url : null, size: asset ? asset.size : null, page: rel.html_url };
+  }
+
+  /* ---------------------------------------------------------------- 热更新（对应 hotupdate.py）
+     内容清单 content.json 和电脑版是同一份。手机只用其中的界面、local.js、题库和图片，
+     路径换算见 wwwPath()；技能实操的文件手机上没有，跳过。
+     下载的文件交给 ZXStore 写到 App 私有目录 content/next，全部齐了 contentCommit 换上，刷新页面生效。 */
+  const MIRRORS = [
+    (ref, p) => 'https://raw.githubusercontent.com/' + REPO + '/' + ref + '/' + p,
+    (ref, p) => 'https://cdn.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,     // 国内一般能连
+  ];
+  const job = { state: 'idle', done: 0, total: 0, files_done: 0, files_total: 0, speed: 0, error: '', version: 0 };
+
+  function wwwPath(rel) {
+    if (rel.indexOf('static/') === 0) return rel.slice(7);
+    if (rel === 'mobile/local.js') return 'local.js';
+    if (rel === 'data/bank.json') return 'bank.json';
+    if (rel.indexOf('data/media/') === 0) return 'media/' + rel.slice(11);
+    return null;
+  }
+  function mobileFiles(m) {
+    const out = {};
+    Object.keys((m && m.files) || {}).forEach(rel => { const w = wwwPath(rel); if (w) out[w] = m.files[rel].concat([rel]); });
+    return out;                                     // {www路径: [sha, 大小, 仓库路径]}
+  }
+  async function currentManifest() {
+    try { const r = await fetch('content.json', { cache: 'no-store' }); return r.ok ? await r.json() : null; } catch (e) { return null; }
+  }
+  async function getTimeout(url, ms) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(url, { cache: 'no-store', signal: ctl.signal });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return new Uint8Array(await r.arrayBuffer());
+    } finally { clearTimeout(timer); }
+  }
+  async function fetchRepo(ref, rel, ms) {
+    const p = rel.split('/').map(encodeURIComponent).join('/');
+    let last;
+    for (const mk of MIRRORS) {
+      for (let i = 0; i < 2; i++) {
+        try { return await getTimeout(mk(ref, p), ms || 20000); } catch (e) { last = e; }
+      }
+    }
+    throw last;
+  }
+  async function latestManifest() {
+    try { return JSON.parse(new TextDecoder().decode(await fetchRepo('main', 'content.json', 15000))); }
+    catch (e) { throw new Error('连不上 GitHub 和镜像，检查一下网络'); }
+  }
+  const hex = buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  function b64(bytes) {
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function changedFiles(latest, cur) {
+    const nf = mobileFiles(latest), of = mobileFiles(cur);
+    const changed = [], keep = [];
+    Object.keys(nf).sort().forEach(w => { (of[w] && of[w][0] === nf[w][0] ? keep : changed).push(w); });
+    return { nf: nf, changed: changed, keep: keep };
+  }
+
+  async function contentCheck() {
+    const latest = await latestManifest();
+    const cur = await currentManifest();
+    const c = changedFiles(latest, cur);
+    const curVer = (cur || {}).content_version || 0;
+    const ok = cmpTuple(ver(APP_VERSION), ver(latest.min_android_version || '0')) >= 0;
+    return { current: curVer, latest: latest.content_version || 0, has_update: ok && (latest.content_version || 0) > curVer,
+             compatible: ok, min_app_version: latest.min_android_version, files: c.changed.length,
+             bytes: c.changed.reduce((a, w) => a + c.nf[w][1], 0), notes: latest.notes || '' };
+  }
+
+  function contentStart() {
+    if (!window.ZXStore || !ZXStore.contentBegin) throw new Error('这个版本的 App 不支持热更新，请先更新 App');
+    if (job.state !== 'downloading') {
+      Object.assign(job, { state: 'downloading', done: 0, total: 0, files_done: 0, files_total: 0, speed: 0, error: '' });
+      contentRun().catch(e => Object.assign(job, { state: 'error', error: e.message || String(e), speed: 0 }));
+    }
+    return Object.assign({}, job);
+  }
+
+  async function contentRun() {
+    const latest = await latestManifest();
+    if (cmpTuple(ver(APP_VERSION), ver(latest.min_android_version || '0')) < 0)
+      throw new Error('新内容需要 App v' + latest.min_android_version + ' 以上，请先更新 App');
+    const cur = await currentManifest();
+    if ((latest.content_version || 0) <= ((cur || {}).content_version || 0)) throw new Error('界面和题库已经是最新的');
+    const c = changedFiles(latest, cur);
+    // 没变的文件由 App 从正在用的内容里复制；复制不了的（比如丢了）返回来，改成下载
+    const missing = JSON.parse(ZXStore.contentBegin(JSON.stringify(c.keep)) || '[]');
+    const todo = c.changed.concat(missing).sort();
+    Object.assign(job, { total: todo.reduce((a, w) => a + c.nf[w][1], 0), files_total: todo.length, version: latest.content_version });
+    let tLast = Date.now(), dLast = 0;
+    for (const w of todo) {
+      const [sha, size, rel] = c.nf[w];
+      let data = null;
+      for (let i = 0; i < 3 && !data; i++) {
+        try {
+          const got = await fetchRepo(latest.tag, rel);
+          if (hex(await crypto.subtle.digest('SHA-256', got)) === sha) data = got;
+          else job.error = '文件校验不通过，正在重下…';
+        } catch (e) {
+          job.error = '网络断了一下，正在重试…';
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+      if (!data) throw new Error('下载 ' + rel + ' 失败，请稍后再试');
+      if (!ZXStore.contentWrite(w, b64(data))) throw new Error('手机存储写不进去，检查一下剩余空间');
+      job.done += size;
+      job.files_done++;
+      job.error = '';
+      const now = Date.now();
+      if (now - tLast >= 500) { job.speed = Math.round((job.done - dLast) * 1000 / (now - tLast)); tLast = now; dLast = job.done; }
+    }
+    if (!ZXStore.contentCommit(JSON.stringify(latest))) throw new Error('换上新内容失败，请重试');
+    Object.assign(job, { state: 'done', speed: 0 });
   }
 
   window.LocalAPI = {
