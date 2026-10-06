@@ -1290,7 +1290,10 @@ async function applyUpdate() {
   if (IS_APP) return applyUpdateApp();
   // 电脑：后台下载 → 轮询进度画进度条 → 下完自动安装并重启 → 新版起来后页面自动刷新
   let p;
-  try { p = await api('/api/update/download', { method: 'POST', body: {} }); } catch (e) { return updFail(e.message); }
+  try { p = await api('/api/update/download', { method: 'POST', body: {} }); } catch (e) {
+    if (/接口不存在/.test(e.message)) return applyUpdateLegacy();
+    return updFail(e.message);
+  }
   while (p.state === 'downloading') {
     out.innerHTML = updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启');
     await new Promise(r => setTimeout(r, 500));
@@ -1299,8 +1302,35 @@ async function applyUpdate() {
   if (p.state !== 'done') return updFail(p.error || '下载失败', p.page);
   out.innerHTML = updProgress(p, '下载完成，正在安装并重启…');
   try { await api('/api/update/install', { method: 'POST', body: {} }); } catch (e) { return updFail(e.message, p.page); }
-  // 旧程序还要半秒才退出，所以要等到版本号变成新版才刷新
-  const want = p.version, start = Date.now();
+  waitRestart(p.version);
+}
+
+// 后台还是 1.3.0 以前的程序（exe 放在源码文件夹里时，界面会先用上新的）：只有一个一次下完的接口，
+// 看不到真实进度，就显示一直在动的进度条和已用时间，让人知道还在下
+async function applyUpdateLegacy() {
+  const out = $('#upd-out');
+  const t0 = Date.now();
+  const tick = () => {
+    out.innerHTML = '<div class="upd-box upd-prog"><b>正在下载新版本，下载完会自动重启</b>' +
+      '<div class="upd-bar busy"><i></i></div>' +
+      '<div class="muted">已用 ' + Math.round((Date.now() - t0) / 1000) + ' 秒（当前程序是旧版，显示不了下载进度，一般一两分钟）</div></div>';
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  let r;
+  try { r = await api('/api/update/apply', { method: 'POST', body: {} }); } catch (e) {
+    clearInterval(timer);
+    return updFail(e.message, 'https://github.com/chen-pi-2007/zhixue-tiku/releases/latest');
+  }
+  clearInterval(timer);
+  out.innerHTML = '<div class="upd-box upd-prog"><b>下载完成，正在重启…</b><div class="upd-bar"><i style="width:100%"></i></div></div>';
+  waitRestart(r.version);
+}
+
+// 旧程序还要半秒才退出，所以要等到版本号变成新版才刷新
+function waitRestart(want) {
+  const out = $('#upd-out');
+  const start = Date.now();
   const poll = setInterval(async () => {
     try {
       const a = await api('/api/app');

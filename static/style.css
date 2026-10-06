@@ -495,3 +495,6 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .upd-bar i { display: block; height: 100%; border-radius: 4px; background: var(--green); transition: width .4s; }
 .upd-err { background: var(--red-soft); }
 .upd-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.upd-bar.busy i { width: 30%; animation: upd-busy 1.4s ease-in-out infinite; }
+@keyframes upd-busy { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
+@media (prefers-reduced-motion: reduce) { .upd-bar.busy i { animation: none; width: 100%; opacity: .5; } }
