@@ -1,0 +1,1578 @@
+{
+ "content_version": 4,
+ "created": "2026-10-06 20:28:56",
+ "files": {
+  "data/bank.json": [
+   "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
+   1777314
+  ],
+  "data/media/english-picture/001.png": [
+   "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
+   61074
+  ],
+  "data/media/english-picture/002.png": [
+   "7edaaa1e932dd03ed23434ecbef80ba6b70b961048af368ba1fcdfde65b52493",
+   62945
+  ],
+  "data/media/english-picture/003.png": [
+   "dc1ea8ec85d069391a60e04c7c7a726f49d4bbed8e007c1fc94e2265d920393b",
+   168009
+  ],
+  "data/media/english-picture/004.png": [
+   "e1e6d1368230e301934831ae5095472c35f38f5759373d44c89edc7f4251f775",
+   94882
+  ],
+  "data/media/english-picture/005.png": [
+   "78e957193c22aff409ae342f76306645ae0907a598da448541161dc34d34cc06",
+   184514
+  ],
+  "data/media/english-picture/006.png": [
+   "fdf6fb033abfbc7163922792287edae17cd4ee978a7b1ab84c0001e957a980b8",
+   59585
+  ],
+  "data/media/english-picture/007.png": [
+   "d24dbb8989d35b79f7d4492a940e30bbd754752826cd6b911c3afeb9226cae29",
+   168578
+  ],
+  "data/media/english-picture/008.png": [
+   "5c9daba026b136a1d887a9a30d9ec922e16cfebd6eb30f88759cc4b39636f26b",
+   42220
+  ],
+  "data/media/english-picture/009.png": [
+   "3e8904397f410847cf825ae8e26098583d8db651fc3346bd2a26c5f0d8d82576",
+   132757
+  ],
+  "data/media/english-picture/010.png": [
+   "9330191eb37c839bd619e8b6859e17cb560245c3042fdaf3a8e920a19849240c",
+   63719
+  ],
+  "data/media/english-picture/011.png": [
+   "97c8e93fd5b40017ec6035e1333282f8dcd1c10b2ee3203102c1cbdd9cc993f5",
+   253610
+  ],
+  "data/media/english-picture/012.png": [
+   "ad0eea7c27bdeb6e575f51ecdbcfa110631ef2e4cb5fa65679dcba2e87479f54",
+   186770
+  ],
+  "data/media/english-picture/013.png": [
+   "ba104f931fd77d19f0f59c23cf06555de7344cf100a0eaa6f210116259aa8d91",
+   67653
+  ],
+  "data/media/english-picture/014.png": [
+   "8ab7564cc25ca6d447fadbef84afc084228320167b03f932e95090a374128d49",
+   120431
+  ],
+  "data/media/english-picture/015.png": [
+   "8b38bacf002eecf850cc43eadfeea7a31341a05906e6f96276a3c25951a19ad4",
+   83517
+  ],
+  "data/media/english-picture/016.png": [
+   "035a3f83e06ca3653552c8a2de07449c8c51947f3a6db72380d0c13270b32747",
+   49944
+  ],
+  "data/media/english-picture/017.png": [
+   "3372e3dd05cf83e256bef8788940f28ead1c3cd39dbbb6bed337505625c48454",
+   3825
+  ],
+  "data/media/english-picture/018.png": [
+   "55781efd437efcb1768c6b4ff73557fa371b1b44a48e705e9628d22bdfa5c18e",
+   16802
+  ],
+  "data/media/english-picture/019.png": [
+   "5a489c5ae12609e730c0edb3d33f77375daef43fde84e9bdd2fa309bbea246df",
+   39812
+  ],
+  "data/media/english-writing/001.png": [
+   "53508e59d1f3382266963c099d2c1e3a403d5444d9caf5fa001b5443b8c7703e",
+   51387
+  ],
+  "data/media/english-writing/002.png": [
+   "c4791b4e4be17f0ac00029ba7ba88e53081a1aca94569d4f3ca3df172e7304ea",
+   11284
+  ],
+  "data/media/english-writing/003.png": [
+   "55d0ec8b2726b0b73eb36fa26cd5170ca4309a2809a9457aee20285b43837648",
+   59523
+  ],
+  "data/media/english-writing/004.png": [
+   "497ae8801733d3296d8a9c9f74a33823f8b2d8f76b126b7b726a2dc60e71b2c6",
+   11279
+  ],
+  "data/media/english-writing/005.png": [
+   "f1dbd6d845d5129d2f8bf31d64b747675b39b55c3925a5a035190c2202dfc58d",
+   10973
+  ],
+  "data/media/english-writing/006.png": [
+   "fd415c754906f85ef64f5116286fefb8e82f42f526b5e59b1fa2fe5fd71b327a",
+   16702
+  ],
+  "data/media/english-writing/007.png": [
+   "59255e09b2318e6b22804760b424ea13f55153ddef93bf8ece3b9071f74fa0dc",
+   13015
+  ],
+  "data/media/english-writing/008.png": [
+   "7a84fc1a1e2fc9cb68529485352e3ae97dbb44ce245bc5cfb77f8dd1aaa073df",
+   10207
+  ],
+  "data/media/english-writing/009.png": [
+   "49f41bae3bfdbe50004d0b84794f11cf588aa3dbcec41036263ee28ff56502e6",
+   43849
+  ],
+  "data/media/english-writing/010.png": [
+   "17d64bfea8912f36ebc0214a8563ee0ce4717b329aa1bdeed277091d565a5dda",
+   8355
+  ],
+  "data/media/media-color/001.png": [
+   "af13e145c3a4058ff643519f2360607e04c6fa36fabc24a07ad0ac8a0cf8f8ac",
+   218711
+  ],
+  "data/media/media-design/001.png": [
+   "71fa94a117e9b34e0b80317619d11a1ee14f2173363749711584ab7f8187503a",
+   204340
+  ],
+  "data/media/media-design/002.png": [
+   "1d8d4fb0d6c13f60d66b13cd96eaee8340ce3c02fa1a3032e3d2be5d205a6a60",
+   477991
+  ],
+  "data/media/media-design/003.png": [
+   "03a4c22c79547b39c2f567928e47b8f7e43722e746b2e6936d053cb05efb2bad",
+   237907
+  ],
+  "data/media/media-design/004.png": [
+   "24dc568c2aa146c324ce146221d693338a924bd405e126f88133298aa946e18b",
+   218808
+  ],
+  "data/media/media-design/005.png": [
+   "1b7198de77a05525accbb0df6e02c5fdf8b0acb6770d8277d9835aadd0f522b2",
+   152790
+  ],
+  "data/media/media-design/006.png": [
+   "b2315e3838c0e87cf6f74444ff4effd4153097ff3ca9d043bb85b37ffee84d23",
+   160572
+  ],
+  "data/media/media-design/007.png": [
+   "b9e0c5710bac31ad66c4fffd797f0f6eda37a63e2bb9d216e51c933be4bd0148",
+   179534
+  ],
+  "data/media/media-design/008.png": [
+   "bffc6d06de1a86adb145c46db9366577e961e77c7bbe3af0fc6780c96c9e40b7",
+   265503
+  ],
+  "data/media/media-design/009.png": [
+   "489b0605a4ce67b3c2560ff6bcfdff64eb06e0098fbedc45b449c110cd78b09c",
+   140070
+  ],
+  "data/media/media-design/010.png": [
+   "c1b19da6e2563b1622a44dc64c5c2d30c44f19b17610cfb22a3904ea72cb6828",
+   216963
+  ],
+  "data/media/media-design/011.png": [
+   "bce03ff81937172744dd30558d1ebede84064461835dd18d110366ffbe1f5aae",
+   111970
+  ],
+  "data/media/media-design/012.png": [
+   "da9a587156e89ffcd4cf65c3f46287a8f263741eda157a026eac408d802d94e4",
+   113989
+  ],
+  "data/media/media-design/013.png": [
+   "76760aeda691ebb1d55210c402c5f459d0ecb7b7ff857499bc2533eb2ac5fa97",
+   104478
+  ],
+  "data/media/media-design/014.png": [
+   "d75f858acccd121ec0c5fe4c8408bc29997e015a235835c68a1828b2db736851",
+   126367
+  ],
+  "data/media/media-design/015.png": [
+   "36d731ede9146ca58c281e7309ddf3cb6638710b430bc97edb8fe3fb6296168f",
+   108471
+  ],
+  "data/media/media-design/016.png": [
+   "a1e0a79a63d3bc50cd3fe727c1745a236fbee7de9be0e659f18a24da11f16e7c",
+   259474
+  ],
+  "data/media/media-design/017.png": [
+   "21154d93b54f5dc24774a2368bcc275e7da50c9b0cf55415b44424930924a551",
+   380456
+  ],
+  "data/media/media-design/018.png": [
+   "8b1e27b7f8eab08f0d471525036e108f5506c1de302f1e2f5a56d7aaf5db448c",
+   274678
+  ],
+  "data/media/media-design/019.png": [
+   "107089732e286d8c8b40203e23d9a429cf03784e573b8445211cf52e3c69cb8b",
+   321034
+  ],
+  "data/media/media-design/020.png": [
+   "709de71ddfdea947a8c040e75fa4da96982b41a0999ff8762c7f0de949d52018",
+   270663
+  ],
+  "data/media/media-design/021.png": [
+   "03a4c22c79547b39c2f567928e47b8f7e43722e746b2e6936d053cb05efb2bad",
+   237907
+  ],
+  "data/media/media-design/022.png": [
+   "e390d9b29782a59d76d70df1a879a1236ababf3e3b674a6b2a33228ba2e79f5c",
+   163109
+  ],
+  "data/media/media-design/023.png": [
+   "18ba620cf500e203f046301de9bbcf714c9fa79b6d9e03cfcf6e9f63a355bba0",
+   65278
+  ],
+  "data/media/media-design/024.png": [
+   "3489fb91d8c8a60076cbdbe15f14597374e85bd127c62aacfa8ba07e3bb4b044",
+   158995
+  ],
+  "data/media/media-design/025.png": [
+   "1d8d4fb0d6c13f60d66b13cd96eaee8340ce3c02fa1a3032e3d2be5d205a6a60",
+   477991
+  ],
+  "data/media/media-design/026.png": [
+   "ce3f5239d3d202ad850735e02537696d96acdaa3bd335812137a1166cb80d33b",
+   248074
+  ],
+  "data/media/media-design/027.png": [
+   "04e9fba1f8f3fb054a929e8f5c4d9fd5cd9d27a701e41980f0ea69ea964da4e7",
+   148669
+  ],
+  "data/media/media-design/028.png": [
+   "7fc7fdfc992be6952c57d80dd2ff57a420b712c33e319c4c57382eb5eb114481",
+   69342
+  ],
+  "data/media/media-design/029.png": [
+   "a7a7f6f4bb100db8fc46a495caf17ec8de9569a2170159e074008706816c5a2a",
+   81012
+  ],
+  "data/media/media-design/030.png": [
+   "24dc568c2aa146c324ce146221d693338a924bd405e126f88133298aa946e18b",
+   218808
+  ],
+  "data/media/media-design/031.png": [
+   "010fb02d401d20f3402648758a878e82265685fbb82556c9c96513d68f112132",
+   320649
+  ],
+  "data/media/media-design/032.png": [
+   "a42ed24720a12a25562928a593c397fcfd36024fffa6420bf3012333436b3392",
+   482050
+  ],
+  "data/media/media-design/033.png": [
+   "7fc7fdfc992be6952c57d80dd2ff57a420b712c33e319c4c57382eb5eb114481",
+   69342
+  ],
+  "data/media/media-design/034.png": [
+   "a1e0a79a63d3bc50cd3fe727c1745a236fbee7de9be0e659f18a24da11f16e7c",
+   259474
+  ],
+  "data/media/media-design/035.png": [
+   "46d886300a244af5e552d528378ad0b69433b25a9fde952e025c9244476c9d23",
+   288072
+  ],
+  "data/media/media-design/036.png": [
+   "a7a7f6f4bb100db8fc46a495caf17ec8de9569a2170159e074008706816c5a2a",
+   81012
+  ],
+  "data/media/media-design/037.png": [
+   "107089732e286d8c8b40203e23d9a429cf03784e573b8445211cf52e3c69cb8b",
+   321034
+  ],
+  "data/media/media-design/038.png": [
+   "0c13ce7f88f22110f7dd94790550e8f1917e6ab3d8bb3042ee110f325d770740",
+   116709
+  ],
+  "data/media/media-effects/001.png": [
+   "2be68b431731c2743286184a8aa7c1a4950c0bc3b9e96c1b2cde7f523c3bf150",
+   13687
+  ],
+  "data/media/media-effects/002.png": [
+   "de1367388fca29edfc217883e612c023678b485f75f83d13642e3b0d08d1a683",
+   149990
+  ],
+  "data/media/media-effects/003.png": [
+   "fccb9159dafaacc9ce6e65c5b0c101a772b7a5b8886e464bed9065e83e2a3da9",
+   63895
+  ],
+  "data/media/media-effects/004.png": [
+   "b0abec529ee3124c0ed7393758aeb175ac421ccef19426f8c90d8d146b55e3ef",
+   3778
+  ],
+  "data/media/media-effects/005.png": [
+   "a420709e3178a7c7d82130a885fa17655ca4268f53c87e03730d27d8962a7355",
+   88563
+  ],
+  "data/media/media-effects/006.png": [
+   "4904601f5a29409519477b3e8e5114a91a0672bbe76a5752fdb1d76521a74fd5",
+   13760
+  ],
+  "data/media/media-effects/007.png": [
+   "eba0baeb6ff9afa9c1d8550a8367c2eb2c611125177c42ad4fcb211284a0a31a",
+   22509
+  ],
+  "data/media/media-effects/008.png": [
+   "e1350f2f5b9bd5a3ebb166a68dcf11516078accdaeb43f1345552204cf1a66cd",
+   23838
+  ],
+  "data/media/media-effects/009.png": [
+   "1c380ecf18187e540dd1be411300f1bee2525060645402ad4f134ac3d28691c6",
+   12282
+  ],
+  "data/media/media-effects/010.png": [
+   "25a1a80551033bc04729a0cedeb356108474b4732d8540a0229a5ce66d2b95af",
+   118721
+  ],
+  "data/media/media-effects/011.png": [
+   "fbc269305e62e8007d76c4d621ed41e505e217da30a0d0a819d9d64a102e8c8b",
+   15210
+  ],
+  "data/media/media-effects/012.png": [
+   "9840d66ff5a81d79d1fbd27122e2e7a8884ac787b0aad89fde6a053fbfb37296",
+   100501
+  ],
+  "data/media/media-effects/013.png": [
+   "259f078b44f279ba1cbe6d8098f61625c308f0bc3770b30dc0ad91c95f8281be",
+   3467
+  ],
+  "data/media/media-effects/014.png": [
+   "86ed66091b74014e7d5def4fc48958186f05f1bc4180578ab5aa7b2d0dd8d3c5",
+   177938
+  ],
+  "data/media/media-effects/015.png": [
+   "7eb3860789c23757983ac97c08fc1f3e52ed6616962f6bb9d999be7d61156542",
+   17837
+  ],
+  "data/media/media-effects/016.png": [
+   "0573d993e89dc94cdcddf00013e4d281362a143c1b98eb932bd27c3f75d8e437",
+   21043
+  ],
+  "data/media/media-effects/017.png": [
+   "771a923573ac3296d1176cc0eff896779d2dd8ba1d0cd5b00055bcdff8e11c79",
+   48208
+  ],
+  "data/media/media-effects/018.png": [
+   "fbf055baed9bbcfe8dd03de1b9dfe2666526836a27d344e9c3161640cd3b6520",
+   95160
+  ],
+  "data/media/media-effects/019.png": [
+   "5c6e68dc5e791c3a5fd92388f74553aaac2d1541c87140f7c761a8d608cd7a26",
+   215456
+  ],
+  "data/media/media-effects/020.png": [
+   "776ac0783b56ccd239e92b2036a6549f925e73ff44744b9a5e239043960482b0",
+   164701
+  ],
+  "data/media/media-effects/021.png": [
+   "2fbf53f34f4356bb24a7bbf45cb8d6bea843d0e2f00785bb1a191dbfea99d9d2",
+   7833
+  ],
+  "data/media/media-effects/022.png": [
+   "e9e973aa1a20cd4ef5d279a2e2058e54d9f77d0051c37df425efe1333a5d5996",
+   28334
+  ],
+  "data/media/media-effects/023.png": [
+   "648140c811de3927b8ba4838fe5512a7faa6e9673ffb095ff91d83f3c76c6d3c",
+   99661
+  ],
+  "data/media/media-effects/024.png": [
+   "93fb866fff084ccd228979304a8bec021f1c3b7437145c96230885561f1216b3",
+   31288
+  ],
+  "data/media/media-effects/025.png": [
+   "84d804a8747ef7caff789fc40fb6629c5a1823237c41514b3ec2f0f257929777",
+   89671
+  ],
+  "data/media/media-effects/026.png": [
+   "b60f556e0258db7e6242f4a28e09f2fb78dff036055a423e8c2540030b56e928",
+   55162
+  ],
+  "data/media/media-effects/027.png": [
+   "eef7fce066a1b55a041f72e242079357d8b9a1ebdb756b18ad4b5bc99201d8d3",
+   25070
+  ],
+  "data/media/media-effects/028.png": [
+   "d2c6d63e001d4f5d7bd90c70a53319f53a324706bd430b458a9e458da39b3349",
+   26091
+  ],
+  "data/media/media-effects/029.png": [
+   "a6bb20e0cdd29cbdbf358d8b6eed2436fa586a6c48acba2da83e0bab852f24fb",
+   94456
+  ],
+  "data/media/media-effects/030.png": [
+   "5e4c9b1ce7b542a3012caff9c8730173646ea2d4e32619f884b03bcdc8ee9e92",
+   192459
+  ],
+  "data/media/media-effects/031.png": [
+   "59de831b147e90dc6948bab27920a5fb94232344f8815417c3a7ca09ee29dea8",
+   190549
+  ],
+  "data/media/media-ops/001.png": [
+   "35e23157088966c2cb093057fcf9a0fe195cd1e978cacd0b4a2907423db8043b",
+   252905
+  ],
+  "data/media/media-ops/002.png": [
+   "eded1575ff8ae8966df9758250115f13e123efb7c86394674330bf305f848b3a",
+   147959
+  ],
+  "data/media/media-ops/003.png": [
+   "1e55f620668735bb24cb69ecda6e798f26e65ac61f219f9ce418f9c31a4ebec0",
+   93444
+  ],
+  "data/media/media-ops/004.png": [
+   "d48a2d4035b2febcaf09ae214655700dfe8ddec136df80e29f5419e407d237f5",
+   452
+  ],
+  "data/media/media-ops/005.png": [
+   "43872a7be45069093fad8809704157a8d74f46ea7e7844c2f790b5c87d37f47e",
+   148456
+  ],
+  "data/media/media-ops/006.png": [
+   "4b766bf50ce22104f2be102d932b4d6486c94f39636085903d8929738b0bbf27",
+   320
+  ],
+  "data/media/media-ops/007.png": [
+   "9eb44da6f15fa5fb919db3f7a2e2de5d50ce44fcb139ba0d805ca6e2e629f73a",
+   168716
+  ],
+  "data/media/media-ops/008.png": [
+   "805e74d5a964227450c4b39771b7534f2d84c302ba51238e136e5407dc091953",
+   76761
+  ],
+  "data/media/media-ops/009.png": [
+   "65a095354021e9aac245846a6b40dc7f709823f364f56264bb70a5cfe52dabe4",
+   145314
+  ],
+  "data/media/media-ops/010.png": [
+   "555a1056925a74025ec97a57b2f65431fcb1131db4599883dd0ad01565f4a390",
+   18815
+  ],
+  "data/media/media-ops/011.png": [
+   "439c0764e9c0682881976edbceb7deb392168add74f3034098dbe380fb9ff82e",
+   64339
+  ],
+  "data/media/media-ops/012.png": [
+   "617fbab03ff2f7e63a50630181fe7fc570d802efb207f0a4e53bd5e2d00a84a2",
+   126608
+  ],
+  "data/media/media-ops/013.png": [
+   "0a121f59156bac4fd3d7ecddb2fcce4d32093dd79941f367c4df9718a4ef8a9f",
+   58703
+  ],
+  "data/media/media-ops/014.png": [
+   "f6de494cee6a9016c47f58c1db60f0f5b8eca9528525338a23a9cb4df79f215d",
+   340
+  ],
+  "data/media/media-ops/015.png": [
+   "a8b0284d188dcfb9afe559165730515fc72488eb4e27b77f30f5944582169af2",
+   453
+  ],
+  "data/media/media-ops/016.png": [
+   "fc0f3054f0c7694d2239f3a6aea1f7d00963c355ca63dfd54ab73a3259bd7fdd",
+   441
+  ],
+  "data/media/media-ops/017.png": [
+   "683e453c9a72193449e4b2c0c7ba1f3d8f0e8c7b268d0662644e5028be38787a",
+   350
+  ],
+  "data/media/media-ops/018.png": [
+   "62680560853ee3d62222ad6d9442590e8da37d565b9b5fb010848b7dc3423cad",
+   32297
+  ],
+  "data/media/media-ops/019.png": [
+   "14b07bc2d7e187aaa06b26c8f192576b331ae8e8bf527a47ffcfeb3a5b62effd",
+   133335
+  ],
+  "data/media/media-ops/020.png": [
+   "96d9befe39bd948ab914e2650b263ea0b38090cd115e996310710c9c3df19805",
+   123025
+  ],
+  "data/media/media-ops/021.png": [
+   "8dabfcaa8d677498840798a651054ddee6bfc9604b4f3fc4fa0c24055ff4d45a",
+   57232
+  ],
+  "data/media/media-ops/022.png": [
+   "db690c0b2673581fdb289aa0275e6f7c9a01cf4449744e88f5ebde53ee11dd26",
+   64629
+  ],
+  "data/media/media-ops/023.png": [
+   "dd0b7e89e67484735970dc4b066ae7ae237f68248a77fd9638f69c6b41edae15",
+   100297
+  ],
+  "data/media/media-ops/024.png": [
+   "1c8a105293fcb62db70029b09f2fd9c2cf8c38294c63cf134f96372c69380f73",
+   49035
+  ],
+  "data/media/media-ops/025.png": [
+   "f98dc8ce660539e435d307a8bd55b549f739445d14862f73bc683d1424a1a9af",
+   84635
+  ],
+  "data/media/media-ops/026.png": [
+   "5e03f37e96f70e4461696d0754fb063301b4a51267ef66c5297fb52c56ab78b9",
+   5455
+  ],
+  "data/media/media-ops/027.png": [
+   "951dd8bc6f0f02f2b2ce449672ffa9bbc4e0a44686e51bdb01a68d01580de793",
+   24154
+  ],
+  "data/media/media-ops/028.png": [
+   "ab93174a5d7e8d159fe2f54ea259b1ecee6f8c78078089ee43d35e66d21313d2",
+   73695
+  ],
+  "data/media/media-ops/029.png": [
+   "ef28ed7b2d4228b9192f0007ab076650e6d7ba3496ad0a3a20582a3045dae2dd",
+   102306
+  ],
+  "data/media/media-ops/030.png": [
+   "78b00d2aab02f336a81182f0b848029d476dd40b319856c219aac6e7a9069b4f",
+   11408
+  ],
+  "data/media/media-ops/031.png": [
+   "1b0faa33b8ea274e96deca234f1629f2f415b36e731c400853a46c7dfd853653",
+   538
+  ],
+  "data/media/media-ops/032.png": [
+   "5e03f37e96f70e4461696d0754fb063301b4a51267ef66c5297fb52c56ab78b9",
+   5455
+  ],
+  "data/media/media-ops/033.png": [
+   "02e8e5d66c2a436d10761380c4a74763296e845f2815d98a5e95cbf390f46c55",
+   25836
+  ],
+  "data/media/media-ops/034.png": [
+   "fdfb46d567548c75f468eb9aa19a5cab19792c8edff1668e8c7ad7288f5de8e9",
+   48253
+  ],
+  "data/media/media-ops/035.png": [
+   "7ebb5eac17abec603bc0921ea9c53b54e8bb46ab3e57c9d66cabef6593a5ea37",
+   174030
+  ],
+  "data/media/media-ops/036.png": [
+   "05651d70da7448f927fb89a0fd107f8ce6fd826c7da113f3046a619c8542749e",
+   542
+  ],
+  "data/media/media-ops/037.png": [
+   "5d2d5b4cdac947217462567525347ceab441cd094e9fcad310e547423294b22b",
+   24073
+  ],
+  "data/media/media-ops/038.png": [
+   "e6565a034c5d469a26c24901b0e83fc8c0dc2ee980a697b0ff1d6832dd5b7dde",
+   401
+  ],
+  "data/media/media-ops/039.png": [
+   "bac178c28fdb50201aeaf785232ae3f2adfc7d325da718c3f8d0991255eebe20",
+   254
+  ],
+  "data/media/media-ops/040.png": [
+   "89c90d592fb6c089534e460453207d483b6c46b39feda1fcb2d5a08306fd4d55",
+   118575
+  ],
+  "data/media/media-ops/041.png": [
+   "d87b76c943b68087434afc6928baeef73c9002d382605fac6a50cf1988b57a0c",
+   138208
+  ],
+  "data/media/media-ops/042.png": [
+   "a8149200e80d5d97557bd9221f46384d230800b1452080efc9d391cbd520ed1b",
+   40166
+  ],
+  "data/media/media-ops/043.png": [
+   "35ee6b757d258062e1aa835d8ed70db75bcd81d755af6ec7834c3fb51419539b",
+   82636
+  ],
+  "data/media/media-ops/044.png": [
+   "00be36958a8b7e35ec65c361f13f34c4983e36fd2c7ce4dcd43dbddd4a7d8605",
+   229838
+  ],
+  "data/media/media-ops/045.png": [
+   "bd3847a405d2900203ad186545a8648e69312cf4f78e7bda9eccd9aadb8c957d",
+   110911
+  ],
+  "data/media/media-ops/046.png": [
+   "1eed5dc9fa4286eb263b56be138f520e035a5e65b8d868f6e0bb290925e97b47",
+   192544
+  ],
+  "data/media/media-ops/047.png": [
+   "eb09eed1189e0cd25163885be794c2743dfc0650e04f4836d90e3ea6cb23cfc0",
+   1776
+  ],
+  "data/media/media-ops/048.png": [
+   "6faeedf46ba65998432f44ea61d396aa49f4cd4088e99fb497353d19ccc17862",
+   112870
+  ],
+  "data/media/media-ops/049.png": [
+   "4323c164fdda644c1d80c17809fc0d7eebd603c09555856ef0ab9ae4b3a6c2c6",
+   84109
+  ],
+  "data/media/media-ops/050.png": [
+   "91e2976e1c9b9f167cc0b3bd1ebcf02cfd5a08717849753f0400c304d8ef1f4b",
+   40243
+  ],
+  "data/media/media-ops/051.png": [
+   "0c8ec81b9a13d6a25aecfd9372b02748c53aaf038ba1bf568e5b7dd369cebdba",
+   61455
+  ],
+  "data/media/media-sketch/001.png": [
+   "54dbe55fea6b652eb69d2177973945909db9e68d0f0e40b49693205e56410468",
+   94319
+  ],
+  "data/media/media-sketch/002.png": [
+   "3e46f6737751b672b6c9581bae81a2ace1b23f264d377ac371d96544b6294f9d",
+   334516
+  ],
+  "data/media/media-sketch/003.png": [
+   "67421698aa1e3bf071274e6a1009c117768e8cd82c909555b91bb7bca2f86dd4",
+   68012
+  ],
+  "data/media/media-sketch/004.png": [
+   "08c3db7c897015d60de44902dd1c89a08e9174fa2aad5069a2dae6008816b51a",
+   102379
+  ],
+  "data/media/media-sketch/005.png": [
+   "fb971e19d89521aa9ce8988f95ddb759153bf8e4cd9a7540b49aaf678407f2ab",
+   79210
+  ],
+  "data/media/media-sketch/006.png": [
+   "e29f10b9b919d8657dbecba9e70ca97e5ac988fe01f71f7124dbc41c6a1e7e62",
+   148518
+  ],
+  "data/media/media-sketch/007.png": [
+   "daae47b963cbb136ac6b0ff2325ddd22bef23ae98b55daf5c0aeb9dd7dc76452",
+   4502
+  ],
+  "data/media/media-sketch/008.png": [
+   "f315d4cafc8020c5ae084c87ac1a1aa1a885f2ea870535d1bcfa08d9fe18b693",
+   3596
+  ],
+  "data/media/media-sketch/009.png": [
+   "117689c4aea25833cbf2a916e2725888229b8a7179d97f741d2cfd1a04f250e0",
+   2841
+  ],
+  "data/media/media-sketch/010.png": [
+   "3e0f5213bd5511c75e19bafb8c24e8822def6727a59cfcf0b51bca18884f2890",
+   2795
+  ],
+  "data/media/media-sketch/011.png": [
+   "7c0c49cfccec78250053a334b654f71ecf65aa283fa05e2b1b99c4abb976aef6",
+   6352
+  ],
+  "data/media/media-sketch/012.png": [
+   "26efb7cc137cc13c24e20859a9d0ab75ca7ebe927e6afbbb1b06f08b2915fafb",
+   541865
+  ],
+  "data/media/media-sketch/013.png": [
+   "caa20173fff7aba22ed429e8e49cced38a524f61cb80479dda5e46eaade01aef",
+   24498
+  ],
+  "data/media/media-sketch/014.png": [
+   "be90e34c63e425ea02318731075bde6e7672ee305add328161a2a5b595af606b",
+   5895
+  ],
+  "data/media/media-sketch/015.png": [
+   "86da9766e19e0330dfd5179ca18e323dc96bba16d22affba26e09b71fbed04b2",
+   4081
+  ],
+  "data/media/media-sketch/016.png": [
+   "9ef3753a06af1ae962ab1e1957623fb823b82f813a0ff9dc8fd19dd5985a8775",
+   7348
+  ],
+  "data/media/media-sketch/017.png": [
+   "9c23c6a9307efb760c0b09eb67d5a3ef57242262b22dcf17299f7878a2bd7611",
+   6969
+  ],
+  "data/media/media-sketch/018.png": [
+   "3448919c00b004a8bde62b87085602050902dca187176538dd3113d50625b416",
+   37538
+  ],
+  "data/media/media-sketch/019.png": [
+   "6769cb0d4bf548bebc7f959fbb763a4c89418ceb5f0f070cb485029424295eb9",
+   144325
+  ],
+  "data/media/media-sketch/020.png": [
+   "b7caf3431e3d1452ac0ab233d240ff2bc7f304fb919b1b389ce1a6f683cd485e",
+   71441
+  ],
+  "data/media/media-sketch/021.png": [
+   "e27530bcd2e42e64ef757722cf04585ddc11b4e645c1542ad189ce016d34e0c2",
+   72421
+  ],
+  "data/media/media-tools/001.png": [
+   "4caac1a68850e8e47fbee3db26266a5802ef2914f92c99952cff5e9e37d44640",
+   155797
+  ],
+  "data/media/media-tools/002.png": [
+   "89f5f8fa7b50cfce527d36497121d51c7218453fe94531a73fc8921131b29463",
+   94075
+  ],
+  "data/media/media-tools/003.png": [
+   "f5e38deb4b603e981fb3673e8e644cf6c1b61c7265ec5014bbfe5118ecf1cf66",
+   20664
+  ],
+  "data/media/media-tools/004.png": [
+   "d739c859f49cac0c6c8f00b9790ae0b77e3f6a9dcdc6b390167b43d22095b504",
+   117615
+  ],
+  "data/media/media-tools/005.png": [
+   "1400661819d6349e18b4b5e9e1e7adc1aff0dfdcdb48f594a3675d17abd8e3c5",
+   199558
+  ],
+  "data/skills/comp-1/answer/web/bottom.html": [
+   "f7f4f3f7bd41f31856c246518aca9587ce2c0b022058898cc01463cf92f8e13c",
+   515
+  ],
+  "data/skills/comp-1/answer/web/image/1.jpg": [
+   "f729e19c10e201037cd39f05ed7088e9721360124c7e67f6319e84a100b87004",
+   16193
+  ],
+  "data/skills/comp-1/answer/web/image/2.jpg": [
+   "40c387ef56ebafb455687bd99aac8ae6b4d1a4864f759be4f576ec8080aaed2b",
+   23137
+  ],
+  "data/skills/comp-1/answer/web/image/3.jpg": [
+   "ab2b81a2654e19c8813948c96b487b310f0bf46f22fa81bb5320556228afb606",
+   14233
+  ],
+  "data/skills/comp-1/answer/web/image/4.jpg": [
+   "1504679f23c03ce26a40169959fbdef6ad3f6bc1c25b8be63f97cf50e7579a6a",
+   14868
+  ],
+  "data/skills/comp-1/answer/web/image/logo.jpg": [
+   "f918602bc9cf0085daa98fb1fca76ac2db5dea4a60607bd3d5bb694514d7f7c2",
+   23787
+  ],
+  "data/skills/comp-1/answer/web/index.html": [
+   "c2aee54e66dfad9d2e5b047b3722ed1db100c0888be63bad912c4ce186e4dc31",
+   687
+  ],
+  "data/skills/comp-1/answer/web/middle.html": [
+   "ecf96b13c39234ddc61cfa46bd5b07b406ace670f38d6d16cac05890ba369c8a",
+   701
+  ],
+  "data/skills/comp-1/answer/web/new.html": [
+   "65e3781a9d59ff859bd1b332e204fe16ec0356495a5b7618f3765fa7f9264104",
+   2742
+  ],
+  "data/skills/comp-1/answer/web/top.html": [
+   "e6069bc4ffcf96b9fe8e0374e945c33dc22998d801604dad0f01ace296a38b62",
+   435
+  ],
+  "data/skills/comp-1/answer/文档.docx": [
+   "d035210b340226b93bfc3a7f0ec3ac7bbb2265b858733edb7389a5d6b1dc7ffc",
+   118659
+  ],
+  "data/skills/comp-1/answer/文档.pptx": [
+   "2f7138885b52c13bf298a2b6bd84a57eae05f4a0421f967660d73e220ea64ff7",
+   143046
+  ],
+  "data/skills/comp-1/answer/文档.xlsx": [
+   "2756f1571f874e6ce702c069bc08212f3511bd615f1256ffecf5f54729d0c3b4",
+   9915
+  ],
+  "data/skills/comp-1/answer_pdf/excel-1.png": [
+   "106c5d998dfa0a8631f9bd4de05ab7878e4c87efea278593151a74fb6ec362c1",
+   53146
+  ],
+  "data/skills/comp-1/answer_pdf/ppt-1.png": [
+   "fc7db5eb6a0d9622155930b5cbc8ab2b9e2946b55af61bdd77518fb0ffbd75db",
+   23800
+  ],
+  "data/skills/comp-1/answer_pdf/ppt-2.png": [
+   "f4fb0c5c8b31825a0a088c1077eabd4076f5e8ed54c4db68f40a746360d03a6e",
+   235213
+  ],
+  "data/skills/comp-1/answer_pdf/ppt-3.png": [
+   "bff2909830dcd3216c90288d0932bbe89a36ed9dc184ddb96ce951ce9130861a",
+   72520
+  ],
+  "data/skills/comp-1/answer_pdf/ppt-4.png": [
+   "990edc84ef7a994ceec512a44b05925af0b0d5f9af54e71b216e58a3843f7953",
+   160404
+  ],
+  "data/skills/comp-1/answer_pdf/word-1.png": [
+   "36f6ef439c14a78d54728e37691362c5defe910492e7c45b25ddda01794e5113",
+   336218
+  ],
+  "data/skills/comp-1/answer_pdf/文档.docx.pdf": [
+   "da924f5b29f993449561a821d9c2058efea922bbdacd0778276d853c9bdaf253",
+   130001
+  ],
+  "data/skills/comp-1/answer_pdf/文档.pptx.pdf": [
+   "6768da023c1392872e3f8454fce1bd34059c3180a0847c5a40af1dec07a108d4",
+   212734
+  ],
+  "data/skills/comp-1/answer_pdf/文档.xlsx.pdf": [
+   "cae5d78fdcd1bf5bb8431a3d3e23a4e93af68d538fcc75b890feac9e2a41373e",
+   64508
+  ],
+  "data/skills/comp-1/material/pic.jpg": [
+   "312b65bacdcdd4609a50e48afc2fca8ebec8c9ab967db39e1275375dd4aba8fe",
+   101317
+  ],
+  "data/skills/comp-1/material/web/bottom.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-1/material/web/image/1.jpg": [
+   "f729e19c10e201037cd39f05ed7088e9721360124c7e67f6319e84a100b87004",
+   16193
+  ],
+  "data/skills/comp-1/material/web/image/2.jpg": [
+   "40c387ef56ebafb455687bd99aac8ae6b4d1a4864f759be4f576ec8080aaed2b",
+   23137
+  ],
+  "data/skills/comp-1/material/web/image/3.jpg": [
+   "ab2b81a2654e19c8813948c96b487b310f0bf46f22fa81bb5320556228afb606",
+   14233
+  ],
+  "data/skills/comp-1/material/web/image/4.jpg": [
+   "1504679f23c03ce26a40169959fbdef6ad3f6bc1c25b8be63f97cf50e7579a6a",
+   14868
+  ],
+  "data/skills/comp-1/material/web/image/logo.jpg": [
+   "f918602bc9cf0085daa98fb1fca76ac2db5dea4a60607bd3d5bb694514d7f7c2",
+   23787
+  ],
+  "data/skills/comp-1/material/web/index.html": [
+   "e60a56089e785741c04a5cc7d59ea5416f92f47b6dda68ef94bf96660c7951c0",
+   525
+  ],
+  "data/skills/comp-1/material/web/middle.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-1/material/web/new.html": [
+   "5eb69c672e6734899df4abec8aa94f1acf2d7b7374541dea172f583975564788",
+   2608
+  ],
+  "data/skills/comp-1/material/web/top.html": [
+   "afdcd0986c3e2c4b4e80788e8c48fae945aebaa4f0540edaa18e62af5712a752",
+   317
+  ],
+  "data/skills/comp-1/material/文档.docx": [
+   "94aeedb9b77e49cf4b0f43ff21ab09ee9f50076d560714995cca38c0b8fa278f",
+   14107
+  ],
+  "data/skills/comp-1/material/文档.pptx": [
+   "2b14e45ce8c1e403441dd245cdd178d02ed8d691be611d26197b5d275e0b32ba",
+   37692
+  ],
+  "data/skills/comp-1/material/文档.xlsx": [
+   "e8ccac285d71f3b6aa3fb42be79d32f969349ae7b602bd722b90268b183f09b5",
+   9550
+  ],
+  "data/skills/comp-1/material/样张_网页样张.jpg": [
+   "aaf13c1e16f20213896c15b33523cfc51fc6208ae8ef2f1bfd1270531054858c",
+   287708
+  ],
+  "data/skills/comp-1/material/背景图片.jpg": [
+   "31933cb956ffb1c1fd2651f0f8180c96e08ebb777819c44a7fed2045ebf8ff31",
+   102308
+  ],
+  "data/skills/comp-1/skill.json": [
+   "c5b2a9fdd89048f2bb77361571c160f95cf988a3cb6c41740003c5daccb5aed0",
+   12783
+  ],
+  "data/skills/comp-2/answer/web/bottom.html": [
+   "738bf26b3257e6e9c60fbfad3543c64121c4894d639d282472ce8b11dc0c6bb8",
+   533
+  ],
+  "data/skills/comp-2/answer/web/image/1.jpg": [
+   "f4a8287c845cc431c934dcfa30eca51fedf7d926db765a1c8d7d13c4c0e00128",
+   34602
+  ],
+  "data/skills/comp-2/answer/web/image/2.jpg": [
+   "6b1507c1d6ce2804577d86e5d4cc1aa5e9808a947e959c3bb62fc0728a2043d5",
+   31697
+  ],
+  "data/skills/comp-2/answer/web/image/3.jpg": [
+   "3ae378adb7cec9eee9e26adc3e55929630d08b35a7967ed309eb0b0e79eefebf",
+   28227
+  ],
+  "data/skills/comp-2/answer/web/image/4.jpg": [
+   "6cd4e2830e662c81b7a070a49aa29e37484352f04372f9fe43d2de34ea90187d",
+   27435
+  ],
+  "data/skills/comp-2/answer/web/index.html": [
+   "164de5e6d58833b2ae6b4939439898ffa6d5639554b0a86d0c34f22eb81d49f2",
+   664
+  ],
+  "data/skills/comp-2/answer/web/middle.html": [
+   "48a687853bc57ffbcfcd716c6fa5985333fe6ef61cbf51b57fe69b1d07642ed2",
+   686
+  ],
+  "data/skills/comp-2/answer/web/new.html": [
+   "b5557d9e870dece745e733c121891c7e4f1f7314cc7ae42e3b34c5ace9289193",
+   1826
+  ],
+  "data/skills/comp-2/answer/web/top.html": [
+   "cc16ee62b160c058b452b98ce0c9661d098c1449a8dbcd1a202c29b69fb7f224",
+   469
+  ],
+  "data/skills/comp-2/answer/文档.docx": [
+   "741ac5891bd77fd2998a02228c649119111f750df6cc41391c510622337c538b",
+   118616
+  ],
+  "data/skills/comp-2/answer/文档.pptx": [
+   "6658b9254007d9e8caeede01989a6ab78a7024c9bacc34225214eeae46b24cc6",
+   1301529
+  ],
+  "data/skills/comp-2/answer/文档.xlsx": [
+   "10bd782d2b1c6465ac13d065714c024f1336552dc918c8249ca549ae517b76ea",
+   10965
+  ],
+  "data/skills/comp-2/answer_pdf/excel-1.png": [
+   "c32a5138fa8a2f9999d88bce7639e7bcebea1664da5ab1731cdb34fa7ef6455f",
+   49129
+  ],
+  "data/skills/comp-2/answer_pdf/ppt-1.png": [
+   "c3aebe1da99bf0fe549efc09dc53acd7b32a4528eec2a0f58cea03ffae4ca163",
+   36365
+  ],
+  "data/skills/comp-2/answer_pdf/ppt-2.png": [
+   "8baeda0e385ddceca378abde3ef0612e305db8824d4f8d99f311b29ff47e035c",
+   701978
+  ],
+  "data/skills/comp-2/answer_pdf/ppt-3.png": [
+   "90ac57bf8b2ee2f2b39519c1849988b028b3c9aeb4e07f55991bd83203a639bd",
+   1416951
+  ],
+  "data/skills/comp-2/answer_pdf/ppt-4.png": [
+   "bb440673fda747f0ca7d80f46f1b7a3c4a170c98c05b28656051b4656f660223",
+   1099743
+  ],
+  "data/skills/comp-2/answer_pdf/word-1.png": [
+   "ffa82b05c147ac274ccebd74775938ac773c3229b399c3e843fee56a4eedfaed",
+   308430
+  ],
+  "data/skills/comp-2/answer_pdf/文档.docx.pdf": [
+   "4eaa72ebc688f7e2deba77160d33d6cef1cfe3deaae1d4734494a77012179477",
+   122846
+  ],
+  "data/skills/comp-2/answer_pdf/文档.pptx.pdf": [
+   "0645d8bc2b3a70d9fed7bc952fa1991516453502276200e8996822594a95568d",
+   499990
+  ],
+  "data/skills/comp-2/answer_pdf/文档.xlsx.pdf": [
+   "c853a611b140aaaafc8eaad59e489a4e8bc3c254f24ad71095b0509e52182d46",
+   88232
+  ],
+  "data/skills/comp-2/material/web/bottom.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-2/material/web/image/1.jpg": [
+   "f4a8287c845cc431c934dcfa30eca51fedf7d926db765a1c8d7d13c4c0e00128",
+   34602
+  ],
+  "data/skills/comp-2/material/web/image/2.jpg": [
+   "6b1507c1d6ce2804577d86e5d4cc1aa5e9808a947e959c3bb62fc0728a2043d5",
+   31697
+  ],
+  "data/skills/comp-2/material/web/image/3.jpg": [
+   "3ae378adb7cec9eee9e26adc3e55929630d08b35a7967ed309eb0b0e79eefebf",
+   28227
+  ],
+  "data/skills/comp-2/material/web/image/4.jpg": [
+   "6cd4e2830e662c81b7a070a49aa29e37484352f04372f9fe43d2de34ea90187d",
+   27435
+  ],
+  "data/skills/comp-2/material/web/index.html": [
+   "e60a56089e785741c04a5cc7d59ea5416f92f47b6dda68ef94bf96660c7951c0",
+   525
+  ],
+  "data/skills/comp-2/material/web/middle.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-2/material/web/new.html": [
+   "c20b3db1563ebcc8ceaadb5803d51721c476f6d478889b72a71c0da74554b513",
+   1527
+  ],
+  "data/skills/comp-2/material/web/top.html": [
+   "afdcd0986c3e2c4b4e80788e8c48fae945aebaa4f0540edaa18e62af5712a752",
+   317
+  ],
+  "data/skills/comp-2/material/文档.docx": [
+   "e0d157f9b682b4e1547a29eb78dc6004b293930d8891af9217e8fa57daa63ff3",
+   14560
+  ],
+  "data/skills/comp-2/material/文档.pptx": [
+   "819b8cacfd9e452d0f894f02f900b3dd75416778fbbdeca6d2153a649001c245",
+   1305653
+  ],
+  "data/skills/comp-2/material/文档.xlsx": [
+   "3f00bc7ccec8b10f48cb4a1c870fc03b8becb42ff4dfd20f1c0663809a7cca0e",
+   9544
+  ],
+  "data/skills/comp-2/material/样张_网页样张.jpg": [
+   "0d704e064ad6ab8c98f2988ee6e0105429e9ad85446c66f5f6b2390f5212ef7c",
+   239267
+  ],
+  "data/skills/comp-2/material/背景图片.jpg": [
+   "31933cb956ffb1c1fd2651f0f8180c96e08ebb777819c44a7fed2045ebf8ff31",
+   102308
+  ],
+  "data/skills/comp-2/skill.json": [
+   "0e3e080c859f512031698dfe8fc1b66c31209c3290b2b651bc9ddee3f79248ef",
+   13125
+  ],
+  "data/skills/comp-3/answer/web/bottom.html": [
+   "d4ae33697ab32dcb682fd6085311e5d777b1d20a4effc81b795c28fc3d59f835",
+   520
+  ],
+  "data/skills/comp-3/answer/web/image/1.jpg": [
+   "b26302d449af91dc678d6ebb70e2f99e0002fd3ff655f11fc823126471ad40cf",
+   18064
+  ],
+  "data/skills/comp-3/answer/web/image/2.jpg": [
+   "fd797f5a9e1668b4090ed2b1648f360e20fd7eda33aeeb34dbe7c581993d54b1",
+   15297
+  ],
+  "data/skills/comp-3/answer/web/image/3.jpg": [
+   "b6b7acba0d33e3e0f3923b0a0c9530cd0147bc696da2561dfd2203f6d06eff7d",
+   15705
+  ],
+  "data/skills/comp-3/answer/web/image/4.jpg": [
+   "9fc8bc48ca2c5a5130086858cbddaa6af2875d2ed5549a78b81e5bb99e365583",
+   16987
+  ],
+  "data/skills/comp-3/answer/web/image/bg.png": [
+   "b6206f486d94f1f6968afc62c6452bf7553bf01e1527aa66d256a4eb11090edc",
+   33242
+  ],
+  "data/skills/comp-3/answer/web/index.html": [
+   "0d267061eb2877557e49b8254a51e90f6a5129edca5e4394962cb8dbab09d534",
+   687
+  ],
+  "data/skills/comp-3/answer/web/middle.html": [
+   "c601717148452018c54c18ec3c9e465fd1027dd36dce0a83301f1074d2579c3b",
+   650
+  ],
+  "data/skills/comp-3/answer/web/new.html": [
+   "1be3adfa952f80994eaec2c43e26ccf10aab1590cb0ab02f9db6e875693ef876",
+   1760
+  ],
+  "data/skills/comp-3/answer/web/top.html": [
+   "b04205ac23c7e376fd4614e7745fed27943a1b5eb75bfa0b066798015969dc95",
+   361
+  ],
+  "data/skills/comp-3/answer/文档.docx": [
+   "816c40fb694f6c763908e36e61007ab52d0b2d0715ee5ab236257babdd66ff58",
+   14947
+  ],
+  "data/skills/comp-3/answer/文档.pptx": [
+   "6bb5477e73ff39454cf45515f24106ed2f91f09a14b84e8596260476696ef325",
+   146537
+  ],
+  "data/skills/comp-3/answer/文档.xlsx": [
+   "f40b1070d22b57d1eb5e3b277c967a5810217f3d7583a78b3f843e11ce781f6e",
+   16761
+  ],
+  "data/skills/comp-3/answer_pdf/excel-1.png": [
+   "b5cfa533405e710da598f9a41cb1ab3aa2348bf6b2a76d20a43dec0296cc7539",
+   88521
+  ],
+  "data/skills/comp-3/answer_pdf/excel-2.png": [
+   "61592cadfa03b7f1d65d63c4d90081f4503be8fa9aca3e395059d7c311614f15",
+   34088
+  ],
+  "data/skills/comp-3/answer_pdf/ppt-1.png": [
+   "5548e4b0d10bd5ab2dade32a21b93b307ab9f93046fd247e9081312d776e8b6c",
+   36627
+  ],
+  "data/skills/comp-3/answer_pdf/ppt-2.png": [
+   "8d1866a8017e3d89a9eca5416b2299316385e6d22a70fbd0f197b92917b50757",
+   708225
+  ],
+  "data/skills/comp-3/answer_pdf/ppt-3.png": [
+   "4af979d5b786d362af5034613eb769a16d4da2998d392027fce9339bcb02f8b0",
+   118600
+  ],
+  "data/skills/comp-3/answer_pdf/ppt-4.png": [
+   "554fee579a8fc9e608ea8e2a2f39f966272078d061daec44905912f4daeced1b",
+   178275
+  ],
+  "data/skills/comp-3/answer_pdf/word-1.png": [
+   "37f985dc1e45a6f0650aeba1b6eb443205f486d4be1757e92c2a812a8f209dfd",
+   160455
+  ],
+  "data/skills/comp-3/answer_pdf/文档.docx.pdf": [
+   "a88d847b561897641498e6ea7908a6c88fe96a1bf7dd6064896a51a127a80946",
+   117053
+  ],
+  "data/skills/comp-3/answer_pdf/文档.pptx.pdf": [
+   "b7d9f02739025063ddf633dc990b79fe5c2028a481395d6f42c0518db0ed0f91",
+   264293
+  ],
+  "data/skills/comp-3/answer_pdf/文档.xlsx.pdf": [
+   "12b467b807935e4d52b64655523dbf9751a36fe6e45f21a9b05ba4adf3087a99",
+   102866
+  ],
+  "data/skills/comp-3/material/pic.jpg": [
+   "c9211bca8fdde5e58e035455bef4c695aa3784055251aaccc3ba576098744dcf",
+   84716
+  ],
+  "data/skills/comp-3/material/web/bottom.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-3/material/web/image/1.jpg": [
+   "b26302d449af91dc678d6ebb70e2f99e0002fd3ff655f11fc823126471ad40cf",
+   18064
+  ],
+  "data/skills/comp-3/material/web/image/2.jpg": [
+   "fd797f5a9e1668b4090ed2b1648f360e20fd7eda33aeeb34dbe7c581993d54b1",
+   15297
+  ],
+  "data/skills/comp-3/material/web/image/3.jpg": [
+   "b6b7acba0d33e3e0f3923b0a0c9530cd0147bc696da2561dfd2203f6d06eff7d",
+   15705
+  ],
+  "data/skills/comp-3/material/web/image/4.jpg": [
+   "9fc8bc48ca2c5a5130086858cbddaa6af2875d2ed5549a78b81e5bb99e365583",
+   16987
+  ],
+  "data/skills/comp-3/material/web/image/bg.png": [
+   "b6206f486d94f1f6968afc62c6452bf7553bf01e1527aa66d256a4eb11090edc",
+   33242
+  ],
+  "data/skills/comp-3/material/web/index.html": [
+   "e60a56089e785741c04a5cc7d59ea5416f92f47b6dda68ef94bf96660c7951c0",
+   525
+  ],
+  "data/skills/comp-3/material/web/middle.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-3/material/web/new.html": [
+   "83921e0b8ca25aa71bec67f423441305cfd8ae0464c1895c0a11aada864092f8",
+   1659
+  ],
+  "data/skills/comp-3/material/web/top.html": [
+   "afdcd0986c3e2c4b4e80788e8c48fae945aebaa4f0540edaa18e62af5712a752",
+   317
+  ],
+  "data/skills/comp-3/material/文档.docx": [
+   "70b0d2a9e5db5c839c9c3d7269d4f21b0957b6fbe6d5fd4d54a99c6d7b6ac1b0",
+   14581
+  ],
+  "data/skills/comp-3/material/文档.pptx": [
+   "be91964403c5beeeaec4c92d8eb4d79bf7d125acd71bf5d48ef196439f4facba",
+   40296
+  ],
+  "data/skills/comp-3/material/文档.xlsx": [
+   "e21ff4928d0607d066687e3fa9b69faa69456b9a10728fc3946b5a9d67ced630",
+   9988
+  ],
+  "data/skills/comp-3/material/样张_excel样张.jpg": [
+   "c6239e25904e01d4ee77de752bc33ca7862e9ee4b6cd7f68e9766dd763adf493",
+   40198
+  ],
+  "data/skills/comp-3/material/样张_网页样张.jpg": [
+   "65702e5d6b5455646ab2d8340b7b1496dc2b5fe8ea9318034e71203b989b230e",
+   147540
+  ],
+  "data/skills/comp-3/skill.json": [
+   "df7d2dcac500b40660831ac7468d54d9823916cd8381a159c8234604ee0b0856",
+   12631
+  ],
+  "data/skills/comp-4/answer/web/bottom.html": [
+   "a67c29f97acebd2c24b6963620fa937d92b8b719c1b11e526d1499794ae4cf7d",
+   514
+  ],
+  "data/skills/comp-4/answer/web/image/1.jpg": [
+   "0c779740782262edd7607a6cf9297dda5e94ccd17fd77e48ad1690adb7f04887",
+   42677
+  ],
+  "data/skills/comp-4/answer/web/image/2.jpg": [
+   "b64bf508840a24d2c6622f569d58a3a56320f0a32596d4978a16d6a87aaba2bb",
+   18918
+  ],
+  "data/skills/comp-4/answer/web/image/3.jpg": [
+   "077f4b5168ebfdafa0bb3abc26b4f370f494680d2597f4e1a8147c10799b0fc0",
+   65172
+  ],
+  "data/skills/comp-4/answer/web/image/4.jpg": [
+   "db8bd4e294242cf77f1925fbb09f5fa61832c875a80b390b344f0acbe06674ec",
+   17392
+  ],
+  "data/skills/comp-4/answer/web/index.html": [
+   "d522e0f820b08d931eb21315bcbfbb47eba4b9fc44f910b07ce212f9c0531d73",
+   686
+  ],
+  "data/skills/comp-4/answer/web/middle.html": [
+   "097b51c2bccfbc60b89462ee08225097f75240ba74bd71a7932b42bbf0a695fa",
+   686
+  ],
+  "data/skills/comp-4/answer/web/new.html": [
+   "77d87bd59653186c917075b599a8e314a31aab92bbbb061d203c7b206e0e604f",
+   2753
+  ],
+  "data/skills/comp-4/answer/web/top.html": [
+   "8aa8a3d4956fa0ec07529d2ef847cf7a15de8699c7cfe373138fee2f2bb837e5",
+   329
+  ],
+  "data/skills/comp-4/answer/文档.docx": [
+   "e3d93e1808dbeef3f6f04ab30b6a31dee8eabc4a83b30332974a56f19e7e13df",
+   166980
+  ],
+  "data/skills/comp-4/answer/文档.pptx": [
+   "c883056d95656ffa5ca94b905fa72a7a01a3037e49bc531b85cf367ae873f6dc",
+   1908896
+  ],
+  "data/skills/comp-4/answer/文档.xlsx": [
+   "ad634cbd36791580974a25863f601e272ffcde24db7e6cf8189dac9bb437b877",
+   10385
+  ],
+  "data/skills/comp-4/answer_pdf/excel-1.png": [
+   "eb70de98857a64fe2b69c60b8b651bb0b1c34d201a0faaca6ffb87ac03ccb5eb",
+   49765
+  ],
+  "data/skills/comp-4/answer_pdf/ppt-1.png": [
+   "7e66a54f185bde291fad4ca11412b407fd2992983b2831d2f64587a9a2345f9e",
+   21374
+  ],
+  "data/skills/comp-4/answer_pdf/ppt-2.png": [
+   "a392f9e29985f314ad63263c1d6e73408aeee1cf7fc8c95c0dcfe67240ae6de4",
+   553802
+  ],
+  "data/skills/comp-4/answer_pdf/ppt-3.png": [
+   "194529e73fbc221a4ad4a70bc81eb0ba148705f56ffa5e7a5f10d80cfb2b0c4d",
+   531149
+  ],
+  "data/skills/comp-4/answer_pdf/ppt-4.png": [
+   "71cc8be6f2d7c973341061cdb22d1a3b02d1b228cfef8b91280afe0b036f2092",
+   141198
+  ],
+  "data/skills/comp-4/answer_pdf/ppt-5.png": [
+   "1eba4252eb57849e936eb627a786efce6ba1b0bfa31dd84d3c98f7bd0fe5f8f8",
+   664594
+  ],
+  "data/skills/comp-4/answer_pdf/word-1.png": [
+   "b3213cf8561e5ee5c47455475f98359a0385ed1bca198ca15ceb9a7b2a1f642f",
+   308567
+  ],
+  "data/skills/comp-4/answer_pdf/文档.docx.pdf": [
+   "dde60f4f081401faff8f7ce00d43349da80049c35f0ba02561abafacff6239af",
+   202588
+  ],
+  "data/skills/comp-4/answer_pdf/文档.pptx.pdf": [
+   "6a416e847b8f21c00740bc2ae525cfde38fd6a363f68c67e661008a93c0739a8",
+   282142
+  ],
+  "data/skills/comp-4/answer_pdf/文档.xlsx.pdf": [
+   "4818b5dd0f8252f403e9bb6ae0332779e5d8e5673ccc09b77c5e8ba45e77df0f",
+   65840
+  ],
+  "data/skills/comp-4/material/web/bottom.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-4/material/web/image/1.jpg": [
+   "0c779740782262edd7607a6cf9297dda5e94ccd17fd77e48ad1690adb7f04887",
+   42677
+  ],
+  "data/skills/comp-4/material/web/image/2.jpg": [
+   "b64bf508840a24d2c6622f569d58a3a56320f0a32596d4978a16d6a87aaba2bb",
+   18918
+  ],
+  "data/skills/comp-4/material/web/image/3.jpg": [
+   "077f4b5168ebfdafa0bb3abc26b4f370f494680d2597f4e1a8147c10799b0fc0",
+   65172
+  ],
+  "data/skills/comp-4/material/web/image/4.jpg": [
+   "db8bd4e294242cf77f1925fbb09f5fa61832c875a80b390b344f0acbe06674ec",
+   17392
+  ],
+  "data/skills/comp-4/material/web/index.html": [
+   "e60a56089e785741c04a5cc7d59ea5416f92f47b6dda68ef94bf96660c7951c0",
+   525
+  ],
+  "data/skills/comp-4/material/web/middle.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-4/material/web/new.html": [
+   "aea537f279000d04355780eba1c90d3aac030918a6ac9cdf9d771a309649ba27",
+   2476
+  ],
+  "data/skills/comp-4/material/web/top.html": [
+   "afdcd0986c3e2c4b4e80788e8c48fae945aebaa4f0540edaa18e62af5712a752",
+   317
+  ],
+  "data/skills/comp-4/material/文档.docx": [
+   "faf64142e2cd518574078156a0090bb6042503db74e36c5392f84c5fded58c7d",
+   181476
+  ],
+  "data/skills/comp-4/material/文档.pptx": [
+   "7bd13674a7de74f2c667ae89ba1076004f878c65cdfb26428e55c865f5d1fd1c",
+   1841955
+  ],
+  "data/skills/comp-4/material/文档.xlsx": [
+   "135c22b0cd8e415749057ba93f6cfb196f3ebdfbdd3f45ecac6468d12a8842b7",
+   9567
+  ],
+  "data/skills/comp-4/material/样张_word样张.jpg": [
+   "2e8794d0276461f97ccab6440fe421beaa827d14a0536a8d8b2cbf6f3aee4b80",
+   69300
+  ],
+  "data/skills/comp-4/material/样张_网页样张.jpg": [
+   "3d18be17d3ec3116786b4d52319e9c5125c1fd5a5aeb3737d3aae2b2df6e7541",
+   302725
+  ],
+  "data/skills/comp-4/skill.json": [
+   "011a873a5b2b6a3ed86f511dbbe8c394626d0a52a3b919cb0b7c173e5dc2ec7c",
+   12790
+  ],
+  "data/skills/comp-5/answer/web/bottom.html": [
+   "a756f836153cfdc0289d03661bd8b24e480dc56317ac9ccab4e5b1a511376191",
+   525
+  ],
+  "data/skills/comp-5/answer/web/image/1.jpg": [
+   "85a0b277deda4b7c6aaf229f2d4d73c06ae73e0769c142ebc68d1bc0606f9d31",
+   18691
+  ],
+  "data/skills/comp-5/answer/web/image/2.jpg": [
+   "6cb61357cbe34f13bd87d7732edcb82e1e8872e62ee9dc77eb60129f6a571178",
+   15260
+  ],
+  "data/skills/comp-5/answer/web/image/3.jpg": [
+   "e555f208c6b1c56d883a4de22c2e7ff3daf52a97f2c8f3fa6d2f1e5c16231553",
+   20778
+  ],
+  "data/skills/comp-5/answer/web/image/4.jpg": [
+   "ef0ef03ffc8e5e7cfcd72ff75ac9533de7f5daf6c293bac6422233bcd338dd85",
+   12324
+  ],
+  "data/skills/comp-5/answer/web/image/bg.jpg": [
+   "3f0c3fe8a72c562c219fb5de95ab644671e1db109e8df21e7c21758bc0423dba",
+   17769
+  ],
+  "data/skills/comp-5/answer/web/index.html": [
+   "22f7c6532b6f5dc4227db7cb3aca2b3da743193ca01934080e132a99e6ac9902",
+   688
+  ],
+  "data/skills/comp-5/answer/web/middle.html": [
+   "03b3ff58b2719c1f9363a48ca0a6b42d744b100b0d7766da16d98c4293234f4a",
+   647
+  ],
+  "data/skills/comp-5/answer/web/new.html": [
+   "8a53abc3769e66f68072d15735beac2cbeeb3729d4869c248a5d9f7f6545381d",
+   1641
+  ],
+  "data/skills/comp-5/answer/web/top.html": [
+   "57000c3315fd1c5713e70896653ae25df6f14e104e2805e4f82b6bf8c8ebea81",
+   430
+  ],
+  "data/skills/comp-5/answer/文档.docx": [
+   "7015908fc18a5243b2a492489ba5d25c2f75953072bf4b8ed9ca556495fed0ae",
+   26589
+  ],
+  "data/skills/comp-5/answer/文档.pptx": [
+   "c6d29acbef0d72d446e6277310ef1bbb78cb6d1003fea7af0936a32ae7302788",
+   40436
+  ],
+  "data/skills/comp-5/answer/文档.xlsx": [
+   "ef39c32766cf38e4d1f180e2e383e79857898f6fbcfe2572a083a93ee7daa2c3",
+   11949
+  ],
+  "data/skills/comp-5/answer_pdf/excel-1.png": [
+   "83b4872ab3209e42c1af1b0bb358a9ac67ea8ee684caeacd8177d6c46d1bdc3c",
+   37100
+  ],
+  "data/skills/comp-5/answer_pdf/ppt-1.png": [
+   "77cb75a5776f2c53b8cd943787d640f2c5c37ade02e18a37e85b2ad26666cf78",
+   18548
+  ],
+  "data/skills/comp-5/answer_pdf/ppt-2.png": [
+   "894362fcacab92dd5c328c9314c4302c622c55b54a2ce96b51d074266f143c56",
+   72587
+  ],
+  "data/skills/comp-5/answer_pdf/ppt-3.png": [
+   "e914dd62c62486962262a89f18ef45302972f70289743965bd0d112edab85e59",
+   49876
+  ],
+  "data/skills/comp-5/answer_pdf/ppt-4.png": [
+   "2b7eb890f74599c510ad4646ab800fac19c0740fa9b956caae02109cdca03e17",
+   99358
+  ],
+  "data/skills/comp-5/answer_pdf/word-1.png": [
+   "9d2f9aab41f8c4a1f8838d1b5837f127db4f857343356279eeea187635dda503",
+   159737
+  ],
+  "data/skills/comp-5/answer_pdf/文档.docx.pdf": [
+   "325bf9766df586044d8ec457f05b6d9a6df73fbe75a024132082b210db8c0705",
+   235626
+  ],
+  "data/skills/comp-5/answer_pdf/文档.pptx.pdf": [
+   "df4a158c768eb7d0e501ba35b9647fca8866368cdd09098d91637e37ae4ada9f",
+   137279
+  ],
+  "data/skills/comp-5/answer_pdf/文档.xlsx.pdf": [
+   "2013ab6cba8f788db333f501f2b006dff4fac7e320ce34a067d332e101b15233",
+   49326
+  ],
+  "data/skills/comp-5/material/web/bottom.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-5/material/web/image/1.jpg": [
+   "85a0b277deda4b7c6aaf229f2d4d73c06ae73e0769c142ebc68d1bc0606f9d31",
+   18691
+  ],
+  "data/skills/comp-5/material/web/image/2.jpg": [
+   "6cb61357cbe34f13bd87d7732edcb82e1e8872e62ee9dc77eb60129f6a571178",
+   15260
+  ],
+  "data/skills/comp-5/material/web/image/3.jpg": [
+   "e555f208c6b1c56d883a4de22c2e7ff3daf52a97f2c8f3fa6d2f1e5c16231553",
+   20778
+  ],
+  "data/skills/comp-5/material/web/image/4.jpg": [
+   "ef0ef03ffc8e5e7cfcd72ff75ac9533de7f5daf6c293bac6422233bcd338dd85",
+   12324
+  ],
+  "data/skills/comp-5/material/web/image/bg.jpg": [
+   "3f0c3fe8a72c562c219fb5de95ab644671e1db109e8df21e7c21758bc0423dba",
+   17769
+  ],
+  "data/skills/comp-5/material/web/index.html": [
+   "e60a56089e785741c04a5cc7d59ea5416f92f47b6dda68ef94bf96660c7951c0",
+   525
+  ],
+  "data/skills/comp-5/material/web/middle.html": [
+   "43e259fb8607ab8966639594b2772e966a4c196dab396ec01219ad9a165b7038",
+   316
+  ],
+  "data/skills/comp-5/material/web/new.html": [
+   "7d2739c0568ea5f3ef1248034d664dcef1a857f2b0d63512b9f897369fb4d4dd",
+   1540
+  ],
+  "data/skills/comp-5/material/web/top.html": [
+   "afdcd0986c3e2c4b4e80788e8c48fae945aebaa4f0540edaa18e62af5712a752",
+   317
+  ],
+  "data/skills/comp-5/material/文档.docx": [
+   "804a314504f53cdcce3dffa17660fd1aa90be3728a3784e3bccb6e96db4f6c52",
+   22322
+  ],
+  "data/skills/comp-5/material/文档.pptx": [
+   "3fc50afec63ddaa5de2b1238d5d4e41bac95e1ae5f043264cd005133e9d811aa",
+   38098
+  ],
+  "data/skills/comp-5/material/文档.xlsx": [
+   "a1dce15e292c2c305615859859063352f72360f2a39ebc8a05ddbef2024ea6a6",
+   10680
+  ],
+  "data/skills/comp-5/material/样张_ppt样张.jpg": [
+   "51632c21a9f724a131b81d26d64375a97b4b0669c1351015a7304f23d0bdfe1f",
+   16090
+  ],
+  "data/skills/comp-5/material/样张_网页样张.jpg": [
+   "f28608cef35fe12a8bdc534985f21b44e6eedf9520b7c85f72bfc3a42c510372",
+   290181
+  ],
+  "data/skills/comp-5/skill.json": [
+   "91a875da70bba15e93c6898b5e677bd6625aa403540d1fd9a00955da92bfcf91",
+   12221
+  ],
+  "data/skills/net-1/img/001.png": [
+   "9c305aec3a6707913ca2edf4b4cb3efa6e1ad23a1af3ecb7375f61799bc22afb",
+   148334
+  ],
+  "data/skills/net-1/img/002.png": [
+   "fb2781a2b768e0d0127bd79f83f627d69cd3366bba52da2d1ed396cf18905133",
+   3825
+  ],
+  "data/skills/net-1/img/003.png": [
+   "f660a4df2294aa3bae9a3edd1fde577e4fba0423dbbea77ab8ab6b3194138814",
+   9492
+  ],
+  "data/skills/net-1/skill.json": [
+   "d817a3ad14294c600583e4be78897ca4e175b08df22fc7c65a99d2cbbb297a11",
+   17663
+  ],
+  "data/skills/net-2/img/001.png": [
+   "9c305aec3a6707913ca2edf4b4cb3efa6e1ad23a1af3ecb7375f61799bc22afb",
+   148334
+  ],
+  "data/skills/net-2/img/002.png": [
+   "fb2781a2b768e0d0127bd79f83f627d69cd3366bba52da2d1ed396cf18905133",
+   3825
+  ],
+  "data/skills/net-2/img/003.png": [
+   "98f685f3bb77e1ad2d725c1922ac67bde6e5b4a627dc4054cf1f58b9da28ae7d",
+   10601
+  ],
+  "data/skills/net-2/skill.json": [
+   "eb297ee233caf50bb2e6108b6577e819fc348230ce8e5ea6942e4b9d60494d77",
+   16829
+  ],
+  "data/skills/net-3/img/001.png": [
+   "9c305aec3a6707913ca2edf4b4cb3efa6e1ad23a1af3ecb7375f61799bc22afb",
+   148334
+  ],
+  "data/skills/net-3/img/002.png": [
+   "fb2781a2b768e0d0127bd79f83f627d69cd3366bba52da2d1ed396cf18905133",
+   3825
+  ],
+  "data/skills/net-3/img/003.png": [
+   "26e528515325bd98aac71c1ded7dac0dee0218283893319c4cf71f671b25066f",
+   10667
+  ],
+  "data/skills/net-3/skill.json": [
+   "180aeb34a944b51ea61d2f3dc3bcdf6c1282e1fa49e3c242a604a606198e18a1",
+   17074
+  ],
+  "data/skills/net-4/img/001.png": [
+   "9c305aec3a6707913ca2edf4b4cb3efa6e1ad23a1af3ecb7375f61799bc22afb",
+   148334
+  ],
+  "data/skills/net-4/img/002.png": [
+   "fb2781a2b768e0d0127bd79f83f627d69cd3366bba52da2d1ed396cf18905133",
+   3825
+  ],
+  "data/skills/net-4/img/003.png": [
+   "5f76e36d6620100f8dcdf3548559c1352d111646e05cf92c0c239b8ab134143f",
+   20469
+  ],
+  "data/skills/net-4/skill.json": [
+   "37db0cf8f49ce760908c5779e00a00fee70a33751ece6c3616de041c60acdd1b",
+   17074
+  ],
+  "data/skills/net-5/img/001.png": [
+   "9c305aec3a6707913ca2edf4b4cb3efa6e1ad23a1af3ecb7375f61799bc22afb",
+   148334
+  ],
+  "data/skills/net-5/img/002.png": [
+   "fb2781a2b768e0d0127bd79f83f627d69cd3366bba52da2d1ed396cf18905133",
+   3825
+  ],
+  "data/skills/net-5/img/003.png": [
+   "6cfccad3fb9905dde79f2a774c58a1432c8d3e451be8cd1ad2f11102f57de0b7",
+   22872
+  ],
+  "data/skills/net-5/skill.json": [
+   "f2d038923cc30a68a4360b34fdae3b762119653f63feb7c996029b384566d177",
+   17784
+  ],
+  "mobile/local.js": [
+   "a46e435d635bfbd4208e11ae82f87f0f44b36a8722ee277dd16d34ee44e1d8e8",
+   35634
+  ],
+  "static/app.js": [
+   "397ffe0b1cb99a9469dd3b310332dc31aa0773ca117bdddcd3e65aea43012e55",
+   80068
+  ],
+  "static/index.html": [
+   "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
+   5408
+  ],
+  "static/skills.js": [
+   "abd0cec79f1c3b0c77a97c4cd449be5388a8a596d9bb743b1cabd150c67a8bf7",
+   27900
+  ],
+  "static/style.css": [
+   "5ca5394501f726f300ae6c08ed57619163f964ae2f944c0d544a905311c01707",
+   35102
+  ]
+ },
+ "min_android_version": "1.4.0",
+ "min_app_version": "1.4.0",
+ "notes": "题库和界面支持热更新：只下载改动的文件，不用重装；手机版也能热更新",
+ "tag": "content-4"
+}
