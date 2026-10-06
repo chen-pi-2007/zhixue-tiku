@@ -15,6 +15,7 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.error
 import urllib.request
 
 from version import APP_VERSION, REPO, EXE_NAME
@@ -37,14 +38,40 @@ def _ver(s):
     return tuple(out + [0] * (3 - len(out)))
 
 
+# 连 GitHub 的两条路：按系统设置（开了代理就走代理）、直连。国内网络或代理偶尔握手超时，
+# 一条路失败就换另一条再试，比让用户反复点「检查更新」靠谱
+_ROUTES = [urllib.request.build_opener(), urllib.request.build_opener(urllib.request.ProxyHandler({}))]
+_good_route = 0             # 上次成功的那条路先试
+
+
+def _open(url, timeout, headers=None, tries=4):
+    """依次换路重试打开 url，返回响应；全失败时抛出最后一个错误"""
+    global _good_route
+    last = None
+    for i in range(tries):
+        k = (_good_route + i) % len(_ROUTES)
+        req = urllib.request.Request(url, headers=dict({'User-Agent': 'zhixue-tiku'}, **(headers or {})))
+        try:
+            r = _ROUTES[k].open(req, timeout=timeout)
+            _good_route = k
+            return r
+        except urllib.error.HTTPError as e:
+            if e.code not in (403, 429, 500, 502, 503, 504):   # 404 之类换路也没用
+                raise
+            last = e
+        except Exception as e:
+            last = e
+        time.sleep(min(1 + i, 3))
+    raise last
+
+
 def check():
     """返回 {current, latest, has_update, notes, url, size}"""
-    req = urllib.request.Request(API, headers={'Accept': 'application/vnd.github+json', 'User-Agent': 'zhixue-tiku'})
     try:
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with _open(API, 15, {'Accept': 'application/vnd.github+json'}) as r:
             rel = json.loads(r.read().decode('utf-8'))
     except Exception as e:
-        raise ValueError('连不上 GitHub，检查一下网络（%s）' % e)
+        raise ValueError('连不上 GitHub，检查一下网络（试了 4 次，走代理和直连都没成功：%s）' % e)
     asset = next((a for a in rel.get('assets', []) if a.get('name', '').lower().endswith('.exe')), None)
     latest = rel.get('tag_name', '')
     return {'current': APP_VERSION, 'latest': latest.lstrip('vV'),
@@ -84,21 +111,39 @@ def _download():
             raise ValueError('已经是最新版本 %s' % info['current'])
         _set(total=info['size'] or 0)
         new_exe = os.path.join(tempfile.mkdtemp(prefix='zhixue-update-'), EXE_NAME)
-        req = urllib.request.Request(info['url'], headers={'User-Agent': 'zhixue-tiku'})
         done, t0, last_t, last_done = 0, time.time(), time.time(), 0
-        # timeout 对每次读都生效：STALL_SECONDS 内没收到数据就抛异常，界面显示下载失败而不是一直卡着
-        with urllib.request.urlopen(req, timeout=STALL_SECONDS) as r, open(new_exe, 'wb') as f:
-            _set(total=int(r.headers.get('Content-Length') or 0) or info['size'] or 0)
+        retries = 0
+        with open(new_exe, 'wb') as f:
             while True:
-                chunk = r.read(1 << 16)
-                if not chunk:
-                    break
-                f.write(chunk)
-                done += len(chunk)
-                now = time.time()
-                if now - last_t >= 0.5:
-                    _set(done=done, speed=int((done - last_done) / (now - last_t)))
-                    last_t, last_done = now, done
+                try:
+                    # 断了就带 Range 从已下载的位置接着下；timeout 对每次读都生效，STALL_SECONDS 收不到数据就算断
+                    hdr = {'Range': 'bytes=%d-' % done} if done else {}
+                    with _open(info['url'], STALL_SECONDS, hdr, tries=2) as r:
+                        if done and r.status != 206:      # 服务器不支持续传，只能从头来
+                            f.seek(0)
+                            f.truncate()
+                            done = last_done = 0
+                        if not done:
+                            _set(total=int(r.headers.get('Content-Length') or 0) or info['size'] or 0)
+                        while True:
+                            chunk = r.read(1 << 16)
+                            if not chunk:
+                                break
+                            f.write(chunk)
+                            done += len(chunk)
+                            now = time.time()
+                            if now - last_t >= 0.5:
+                                _set(done=done, speed=int((done - last_done) / (now - last_t)), error='')
+                                last_t, last_done = now, done
+                    if not info['size'] or done >= info['size']:
+                        break
+                    raise IOError('连接提前断开')
+                except Exception as e:
+                    retries += 1
+                    if retries > 3:
+                        raise
+                    _set(error='网络断了一下，正在第 %d 次重连，从 %.1f MB 处接着下…' % (retries, done / 1048576.0), speed=0)
+                    time.sleep(2)
         if info['size'] and os.path.getsize(new_exe) != info['size']:
             raise ValueError('下载不完整（%d / %d 字节），请重试' % (os.path.getsize(new_exe), info['size']))
         _file = new_exe

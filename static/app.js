@@ -1389,7 +1389,8 @@ function updProgress(p, title) {
   return '<div class="upd-box upd-prog"><b>' + esc(title) + '</b>' +
     '<div class="upd-bar"><i style="width:' + pct + '%"></i></div>' +
     '<div class="muted">' + (p.total ? pct + '% · ' + fmtMB(p.done) + ' / ' + fmtMB(p.total) : fmtMB(p.done)) +
-      (p.state === 'downloading' ? (p.speed ? ' · ' + fmtMB(p.speed) + '/s' : ' · 正在连接 GitHub…') : '') + '</div></div>';
+      (p.state === 'downloading' ? (p.speed ? ' · ' + fmtMB(p.speed) + '/s' : ' · 正在连接 GitHub…') : '') + '</div>' +
+    (p.state === 'downloading' && p.error ? '<div class="num-orange">' + esc(p.error) + '</div>' : '') + '</div>';
 }
 
 function updFail(msg, page) {

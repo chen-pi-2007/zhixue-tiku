@@ -590,11 +590,20 @@
   /* 检查更新：看 GitHub Release 里有没有更新版本的 apk，下载交给系统浏览器 */
   function ver(s) { return (s || '').replace(/^[vV]/, '').split('.').map(x => parseInt(x, 10) || 0).concat([0, 0, 0]).slice(0, 3); }
   async function checkUpdate() {
-    let rel;
-    try {
-      const r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
-      rel = await r.json();
-    } catch (e) { throw new Error('连不上 GitHub，检查一下网络'); }
+    // 网络偶尔握手超时，最多试 3 次，每次最多等 15 秒
+    let rel = null;
+    for (let i = 0; i < 3 && !rel; i++) {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 15000);
+      try {
+        const r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest',
+                              { headers: { Accept: 'application/vnd.github+json' }, signal: ctl.signal });
+        if (r.ok) rel = await r.json();
+      } catch (e) { /* 再试 */ }
+      clearTimeout(timer);
+      if (!rel && i < 2) await new Promise(res => setTimeout(res, 1500));
+    }
+    if (!rel) throw new Error('连不上 GitHub，试了 3 次都没成功，检查一下网络');
     const asset = (rel.assets || []).find(a => /\.apk$/i.test(a.name || ''));
     const latest = (rel.tag_name || '').replace(/^[vV]/, '');
     return { current: APP_VERSION, latest: latest, has_update: !!asset && cmpTuple(ver(latest), ver(APP_VERSION)) > 0,
