@@ -192,31 +192,43 @@ async function viewHome() {
   }
   try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库时首页照常显示 */ }
   const h = state.home;
+  h.group = h.group || '';
   const unfinished = store.get('quiz.exam');
-  // 技能卷（计算机应用、网络技术）和各科一样出现在标签和列表里，筛选值是 skill:<方向>
-  const dirs = [];
-  skills.forEach(s => { if (dirs.indexOf(s.direction) < 0) dirs.push(s.direction); });
-  const dirName = dir => SKILL_DIR_NAME[dir] || dir;
+  // 科目条目：各科卷子 + 技能卷方向（计算机应用、网络技术，筛选值 skill:<方向>），分成文化课、专业技能两类
+  const entries = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, group: subjectGroup(s.subject),
+                                         dot: 's-' + s.subject, count: s.total, href: '#/subject/' + s.subject }));
+  skills.forEach(s => {
+    const k = 'skill:' + s.direction;
+    let e = entries.find(x => x.key === k);
+    if (!e) entries.push(e = { key: k, name: SKILL_DIR_NAME[s.direction] || s.direction, group: 'pro',
+                               dot: 's-skill-' + s.direction, count: 0, unit: ' 套', href: '#/skills' });
+    e.count++;
+  });
+  const inGroup = e => !h.group || e.group === h.group;
+  const tagRow = g => {
+    const es = entries.filter(e => e.group === g);
+    return es.length ? '<div class="tag-row"><b class="tag-group">' + GROUP_NAME[g] + '</b>' + es.map(e =>
+      '<a href="' + e.href + '">' + esc(e.name) + '<span>' + e.count + (e.unit || '') + '</span></a>').join('') + '</div>' : '';
+  };
+  const canShuffle = !h.group ? h.subj.indexOf('skill:') !== 0 : (h.subj && h.subj.indexOf('skill:') !== 0);
   app.innerHTML =
     '<div class="home">' +
       '<section class="home-main">' +
         (unfinished ? '<div class="notice">有一场模拟考还没交卷:' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
-        '<div class="tag-row">' + d.subjects.map(s =>
-          '<a href="#/subject/' + s.subject + '">' + (SUBJECT_NAME[s.subject] || s.subject) + '<span>' + s.total + '</span></a>').join('') +
-          dirs.map(dir => '<a href="#/skills">' + dirName(dir) + '<span>' + skills.filter(s => s.direction === dir).length + ' 套</span></a>').join('') +
+        tagRow('culture') + tagRow('pro') +
+        '<div class="group-tabs">' + [['', '全部'], ['culture', GROUP_NAME.culture], ['pro', GROUP_NAME.pro]].map(g =>
+          '<button class="group-tab' + (h.group === g[0] ? ' on' : '') + '" data-g="' + g[0] + '">' + g[1] + '</button>').join('') +
         '</div>' +
         '<div class="pill-row">' +
-          '<button class="pill-tab' + (h.subj === '' ? ' on' : '') + '" data-s="">全部卷子</button>' +
-          d.subjects.map(s => '<button class="pill-tab' + (h.subj === s.subject ? ' on' : '') + '" data-s="' + s.subject + '">' +
-            '<span class="dot s-' + s.subject + '"></span>' + (SUBJECT_NAME[s.subject] || s.subject) + '</button>').join('') +
-          dirs.map(dir => '<button class="pill-tab' + (h.subj === 'skill:' + dir ? ' on' : '') + '" data-s="skill:' + dir + '">' +
-            '<span class="dot s-skill-' + dir + '"></span>' + dirName(dir) + '</button>').join('') +
+          '<button class="pill-tab' + (h.subj === '' ? ' on' : '') + '" data-s="">' + (h.group ? '全部' + GROUP_NAME[h.group] : '全部卷子') + '</button>' +
+          entries.filter(inGroup).map(e => '<button class="pill-tab' + (h.subj === e.key ? ' on' : '') + '" data-s="' + e.key + '">' +
+            '<span class="dot ' + e.dot + '"></span>' + esc(e.name) + '</button>').join('') +
         '</div>' +
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
-          (h.subj.indexOf('skill:') === 0 ? '' :
-            '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>') +
+          (canShuffle ?
+            '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' : '') +
         '</div>' +
         '<div class="plist" id="plist"></div>' +
       '</section>' +
@@ -226,12 +238,15 @@ async function viewHome() {
   const render = () => {
     const q = h.q.trim();
     const isSkill = h.subj.indexOf('skill:') === 0;
-    const list = isSkill ? [] : papers.filter(p => (!h.subj || p.subject === h.subj) && (!q || p.name.indexOf(q) >= 0));
-    const sks = skills.filter(s => (!h.subj || h.subj === 'skill:' + s.direction) && (!q || s.name.indexOf(q) >= 0));
+    const list = isSkill ? [] : papers.filter(p => (h.subj ? p.subject === h.subj : !h.group || subjectGroup(p.subject) === h.group) &&
+                                                   (!q || p.name.indexOf(q) >= 0));
+    const sks = skills.filter(s => (h.subj ? h.subj === 'skill:' + s.direction : !h.group || h.group === 'pro') &&
+                                   (!q || s.name.indexOf(q) >= 0));
     const rows = list.map((p, i) => paperRow(p, i)).concat(sks.map((s, i) => skillRow(s, list.length + i)));
     $('#plist').innerHTML = rows.length ? rows.join('') : '<div class="empty">没有符合条件的卷子</div>';
   };
   render();
+  $$('.group-tab').forEach(b => b.addEventListener('click', () => { h.group = b.dataset.g; h.subj = ''; viewHome(); }));
   $$('.pill-tab').forEach(b => b.addEventListener('click', () => { h.subj = b.dataset.s; viewHome(); }));
   $('#home-q').addEventListener('input', e => { h.q = e.target.value; render(); });
   const np = $('#newper');
@@ -252,6 +267,14 @@ function paperRow(p, i) {
 }
 
 const SKILL_DIR_NAME = { comp: '计算机应用', net: '网络技术' };
+// 首页的两大类：文化课（公共基础课）和专业技能；自己导入的"其他"卷子只在"全部"里出现
+const GROUP_NAME = { culture: '文化课', pro: '专业技能' };
+const CULTURE_SUBJECTS = ['chinese', 'math', 'english', 'politics'];
+function subjectGroup(subj) {
+  if (CULTURE_SUBJECTS.indexOf(subj) >= 0) return 'culture';
+  if (subj === 'media' || subj.indexOf('skill:') === 0) return 'pro';
+  return 'other';
+}
 
 // 技能卷行：题数一栏写模块数，掌握度用最好成绩占总分的比例，点开进技能实操
 function skillRow(s, i) {
