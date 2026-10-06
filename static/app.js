@@ -182,7 +182,7 @@ state.home = state.home || { subj: '', q: '' };
 
 async function viewHome() {
   app.innerHTML = '<div class="empty">加载中…</div>';
-  let d, papers;
+  let d, papers, skills = [];
   try {
     d = (await api('/api/dashboard')).data;
     papers = (await api('/api/papers')).papers;
@@ -190,24 +190,33 @@ async function viewHome() {
     app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
     return;
   }
+  try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库时首页照常显示 */ }
   const h = state.home;
   const unfinished = store.get('quiz.exam');
+  // 技能卷（计算机应用、网络技术）和各科一样出现在标签和列表里，筛选值是 skill:<方向>
+  const dirs = [];
+  skills.forEach(s => { if (dirs.indexOf(s.direction) < 0) dirs.push(s.direction); });
+  const dirName = dir => SKILL_DIR_NAME[dir] || dir;
   app.innerHTML =
     '<div class="home">' +
       '<section class="home-main">' +
         (unfinished ? '<div class="notice">有一场模拟考还没交卷:' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
         '<div class="tag-row">' + d.subjects.map(s =>
           '<a href="#/subject/' + s.subject + '">' + (SUBJECT_NAME[s.subject] || s.subject) + '<span>' + s.total + '</span></a>').join('') +
+          dirs.map(dir => '<a href="#/skills">' + dirName(dir) + '<span>' + skills.filter(s => s.direction === dir).length + ' 套</span></a>').join('') +
         '</div>' +
         '<div class="pill-row">' +
           '<button class="pill-tab' + (h.subj === '' ? ' on' : '') + '" data-s="">全部卷子</button>' +
           d.subjects.map(s => '<button class="pill-tab' + (h.subj === s.subject ? ' on' : '') + '" data-s="' + s.subject + '">' +
             '<span class="dot s-' + s.subject + '"></span>' + (SUBJECT_NAME[s.subject] || s.subject) + '</button>').join('') +
+          dirs.map(dir => '<button class="pill-tab' + (h.subj === 'skill:' + dir ? ' on' : '') + '" data-s="skill:' + dir + '">' +
+            '<span class="dot s-skill-' + dir + '"></span>' + dirName(dir) + '</button>').join('') +
         '</div>' +
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
-          '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' +
+          (h.subj.indexOf('skill:') === 0 ? '' :
+            '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>') +
         '</div>' +
         '<div class="plist" id="plist"></div>' +
       '</section>' +
@@ -216,9 +225,11 @@ async function viewHome() {
 
   const render = () => {
     const q = h.q.trim();
-    const list = papers.filter(p => (!h.subj || p.subject === h.subj) && (!q || p.name.indexOf(q) >= 0));
-    $('#plist').innerHTML = list.length ? list.map((p, i) => paperRow(p, i)).join('')
-      : '<div class="empty">没有符合条件的卷子</div>';
+    const isSkill = h.subj.indexOf('skill:') === 0;
+    const list = isSkill ? [] : papers.filter(p => (!h.subj || p.subject === h.subj) && (!q || p.name.indexOf(q) >= 0));
+    const sks = skills.filter(s => (!h.subj || h.subj === 'skill:' + s.direction) && (!q || s.name.indexOf(q) >= 0));
+    const rows = list.map((p, i) => paperRow(p, i)).concat(sks.map((s, i) => skillRow(s, list.length + i)));
+    $('#plist').innerHTML = rows.length ? rows.join('') : '<div class="empty">没有符合条件的卷子</div>';
   };
   render();
   $$('.pill-tab').forEach(b => b.addEventListener('click', () => { h.subj = b.dataset.s; viewHome(); }));
@@ -237,6 +248,22 @@ function paperRow(p, i) {
     '<span class="prow-m">' + p.mastery + '%</span>' +
     '<span class="prow-s ' + st[1] + '">' + st[0] + '</span>' +
     (p.wrong_open ? '<span class="prow-w">错 ' + p.wrong_open + '</span>' : '<span class="prow-w"></span>') +
+  '</a>';
+}
+
+const SKILL_DIR_NAME = { comp: '计算机应用', net: '网络技术' };
+
+// 技能卷行：题数一栏写模块数，掌握度用最好成绩占总分的比例，点开进技能实操
+function skillRow(s, i) {
+  const pct = s.total ? Math.round(100 * s.best_total / s.total) : 0;
+  const tried = s.modules.some(m => m.best != null);
+  const st = pct >= 80 ? ['已掌握', 'st-done'] : (tried ? ['练习中', 'st-doing'] : ['未开始', 'st-new']);
+  return '<a class="prow" href="#/skills/' + s.key + '">' +
+    '<span class="prow-t">' + (i + 1) + '. ' + esc(s.name) + '</span>' +
+    '<span class="prow-c">' + s.modules.length + ' 项实操</span>' +
+    '<span class="prow-m">' + pct + '%</span>' +
+    '<span class="prow-s ' + st[1] + '">' + st[0] + '</span>' +
+    '<span class="prow-w"></span>' +
   '</a>';
 }
 

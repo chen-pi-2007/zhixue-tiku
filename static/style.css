@@ -178,6 +178,8 @@ main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1280px; }
 .s-english { background: #9b59ff; }
 .s-politics { background: #ffb700; }
 .s-media { background: #1cbaba; }
+.s-skill-comp { background: #2db55d; }
+.s-skill-net { background: #ff7a45; }
 .s-general { background: #999; }
 
 .list-tools { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; }
