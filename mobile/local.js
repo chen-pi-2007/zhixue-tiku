@@ -1,0 +1,624 @@
+'use strict';
+/* 手机 App 的本地后端：把电脑版 server.py + db.py + srs.py + exam.py 的逻辑搬到 JS 里，
+   app.js 的 api() 发现 window.LocalAPI 就不走网络，直接调这里。
+   题库 bank.json 和图片打包在 App 里；做题记录 progress 存在手机上
+   （App 里通过 ZXStore 写到应用私有目录，浏览器里调试时退回 localStorage）。
+   改了 db.py / srs.py / exam.py 的逻辑，这里要同步改。 */
+(function () {
+  const APP_VERSION = (window.ZX_BUILD || {}).version || 'dev';     // build_apk.py 生成 build-info.js
+  const REPO = 'chen-pi-2007/zhixue-tiku';
+  const SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general'];
+  const SELF = ['qa', 'dictation', 'essay', 'blank', 'solution'];
+  const STUDY_FIELDS = ['stem_cn', 'options_cn', 'material_cn', 'point'];
+
+  /* ---------------------------------------------------------------- 存储 */
+  const PROG_KEY = 'zx.progress';
+  const disk = {
+    read() {
+      try { if (window.ZXStore) return window.ZXStore.read() || ''; } catch (e) { /* ignore */ }
+      try { return localStorage.getItem(PROG_KEY) || ''; } catch (e) { return ''; }
+    },
+    write(text) {
+      if (window.ZXStore) { window.ZXStore.write(text); return; }
+      localStorage.setItem(PROG_KEY, text);
+    },
+  };
+  let bank = null, prog = null, loading = null;
+
+  function load() {
+    if (bank) return Promise.resolve();
+    if (!loading) {
+      loading = fetch('bank.json').then(r => r.json()).then(b => {
+        bank = b;
+        bank.papers = bank.papers || [];
+        bank.questions = bank.questions || [];
+        let p = null;
+        try { p = JSON.parse(disk.read() || 'null'); } catch (e) { p = null; }
+        prog = p && typeof p === 'object' ? p : {};
+        prog.cards = prog.cards || {};
+        prog.attempts = prog.attempts || [];
+        prog.exams = prog.exams || [];
+        prog.settings = prog.settings || { new_per_day: 20 };
+        if (!prog.settings.exam_date) prog.settings.exam_date = '2026-11-07';
+      });
+    }
+    return loading;
+  }
+  function save() { disk.write(JSON.stringify(prog)); }
+
+  /* ---------------------------------------------------------------- 日期 */
+  const pad = n => String(n).padStart(2, '0');
+  const dayOf = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const todayStr = () => dayOf(new Date());
+  const nowStr = () => { const d = new Date(); return dayOf(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); };
+  function addDays(day, n) {
+    const p = day.split('-').map(Number);
+    return dayOf(new Date(p[0], p[1] - 1, p[2] + n));
+  }
+
+  /* ---------------------------------------------------------------- 间隔复习（srs.py） */
+  const INTERVALS = [1, 1, 2, 4, 7, 15, 30];
+  const MAX_BOX = INTERVALS.length - 1, FIRST_RIGHT_BOX = 3, MASTER_STREAK = 3;
+  const newCard = () => ({ box: 0, due: '', right: 0, wrong: 0, streak: 0, last: '', last_ok: null, credit_day: '', in_wrong: false });
+
+  function srsApply(card, ok, now) {
+    const c = Object.assign(newCard(), card || {});
+    const today = now.slice(0, 10);
+    const fresh = c.right + c.wrong === 0;
+    let event = null;
+    if (ok) {
+      c.right++;
+      if (c.credit_day !== today) {
+        c.credit_day = today;
+        c.streak++;
+        c.box = fresh ? FIRST_RIGHT_BOX : Math.min(c.box + 1, MAX_BOX);
+      }
+      c.due = addDays(today, INTERVALS[c.box]);
+      if (c.in_wrong && c.streak >= MASTER_STREAK) { c.in_wrong = false; event = 'released'; }
+    } else {
+      c.wrong++;
+      c.streak = 0;
+      c.box = 0;
+      c.credit_day = '';
+      c.due = addDays(today, INTERVALS[0]);
+      if (!c.in_wrong) event = 'entered';
+      c.in_wrong = true;
+    }
+    c.last = now;
+    c.last_ok = !!ok;
+    return [c, event];
+  }
+  function srsMark(card, mastered, today) {
+    const c = Object.assign(newCard(), card || {});
+    if (mastered) { c.in_wrong = false; c.box = Math.max(c.box, 4); c.due = addDays(today, INTERVALS[c.box]); }
+    else { c.in_wrong = true; c.streak = 0; c.box = 0; c.due = today; }
+    return c;
+  }
+  const isDue = (c, today) => !!c && !!c.due && c.due <= today;
+  const mastery = c => c ? c.box / MAX_BOX : 0;
+
+  /* ---------------------------------------------------------------- 题目查询（db.py） */
+  const papersById = () => { const m = {}; bank.papers.forEach(p => { m[p.id] = p; }); return m; };
+  const hiddenSubjects = () => new Set(prog.settings.hidden_subjects || []);
+  const subjIndex = s => { const i = SUBJECTS.indexOf(s); return i < 0 ? 99 : i; };
+
+  function view(q, papers, hideAnswer) {
+    const c = prog.cards[q.key] || {};
+    const p = papers[q.paper_id] || {};
+    const d = Object.assign({}, q);
+    d.paper_name = p.name || '';
+    d.subject = p.subject || 'general';
+    d.wrong_count = c.wrong || 0;
+    d.right_count = c.right || 0;
+    d.in_wrong = !!c.in_wrong;
+    d.mastered = (c.wrong && !c.in_wrong) ? 1 : 0;
+    d.box = prog.cards[q.key] ? (c.box || 0) : null;
+    d.streak = c.streak || 0;
+    d.due = c.due || '';
+    if (hideAnswer) {
+      d.answer = '';
+      d.analysis = '';
+      STUDY_FIELDS.forEach(f => { delete d[f]; });
+    }
+    return d;
+  }
+
+  function filter(paperId, subject, qtype, search) {
+    const papers = papersById();
+    const hidden = (paperId || subject) ? new Set() : hiddenSubjects();
+    return bank.questions.filter(q => {
+      if (paperId && q.paper_id !== paperId) return false;
+      const s = (papers[q.paper_id] || {}).subject;
+      if (subject && s !== subject) return false;
+      if (hidden.has(s)) return false;
+      if (qtype && q.type !== qtype) return false;
+      if (search && q.stem.indexOf(search) < 0 && (q.material || '').indexOf(search) < 0) return false;
+      return true;
+    });
+  }
+
+  function listPapers() {
+    const qmap = {};
+    bank.questions.forEach(q => { (qmap[q.paper_id] = qmap[q.paper_id] || []).push(q); });
+    return bank.papers.slice().sort((a, b) => subjIndex(a.subject || 'general') - subjIndex(b.subject || 'general') ||
+                                              (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)).map(p => {
+      const qs = qmap[p.id] || [];
+      const cs = qs.filter(q => prog.cards[q.key]).map(q => prog.cards[q.key]);
+      const counts = {};
+      qs.forEach(q => { counts[q.type] = (counts[q.type] || 0) + 1; });
+      return {
+        id: p.id, key: p.key, name: p.name, created_at: p.created_at || '', total: qs.length,
+        subject: p.subject || 'general', gradable: qs.filter(q => q.answer).length, counts: counts,
+        seen: cs.length, answered: cs.reduce((a, c) => a + c.right + c.wrong, 0),
+        correct: cs.reduce((a, c) => a + c.right, 0), wrong_open: cs.filter(c => c.in_wrong).length,
+        mastery: qs.length ? Math.round(100 * cs.reduce((a, c) => a + mastery(c), 0) / qs.length) : 0,
+      };
+    });
+  }
+
+  function getQuestions(paperId, qtype, search, limit, offset, subject) {
+    const papers = papersById();
+    const qs = filter(paperId, subject, qtype, search).sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno || a.id - b.id);
+    return { items: qs.slice(offset, offset + limit).map(q => view(q, papers)), total: qs.length };
+  }
+
+  function groupMaterial(items) {
+    const order = [], groups = {};
+    items.forEach(q => {
+      const k = q.material ? q.paper_id + '\u0001' + q.material : 'q\u0001' + q.id;
+      if (!groups[k]) { groups[k] = []; order.push(k); }
+      groups[k].push(q);
+    });
+    const out = [];
+    order.forEach(k => { out.push.apply(out, groups[k].sort((a, b) => a.qno - b.qno)); });
+    return out;
+  }
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+
+  function practiceSet(paperId, scope, doShuffle, subject, qtype) {
+    const papers = papersById();
+    let items = [];
+    filter(paperId, subject, qtype).forEach(q => {
+      if (!q.answer) return;
+      const c = prog.cards[q.key];
+      if (scope === 'wrong' && !(c && c.in_wrong)) return;
+      if (scope === 'new' && c) return;
+      items.push(view(q, papers));
+    });
+    if (doShuffle) shuffle(items);
+    else items.sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno);
+    return groupMaterial(items);
+  }
+
+  /* ---------------------------------------------------------------- 作答 / 错题本 / 今日复习 */
+  const byId = id => bank.questions.find(x => x.id === id);
+
+  function recordAnswer(qid, correct, mode) {
+    const q = byId(qid);
+    if (!q) throw new Error('题目不存在');
+    const t = nowStr();
+    const r = srsApply(prog.cards[q.key], !!correct, t);
+    prog.cards[q.key] = r[0];
+    prog.attempts.push({ k: q.key, ok: !!correct, t: t, m: mode });
+    save();
+    return { record: Object.assign({}, r[0]), event: r[1] };
+  }
+
+  function markMastered(qid, mastered) {
+    const q = byId(qid);
+    if (!q) return;
+    prog.cards[q.key] = srsMark(prog.cards[q.key], mastered, todayStr());
+    save();
+  }
+
+  function wrongList(mastered, subject) {
+    const papers = papersById();
+    const items = [];
+    filter(null, subject).forEach(q => {
+      const c = prog.cards[q.key];
+      if (!c || !c.wrong) return;
+      if (!!mastered === !!c.in_wrong) return;
+      const d = view(q, papers);
+      d.last_time = c.last;
+      items.push(d);
+    });
+    return items.sort((a, b) => (b.last_time || '').localeCompare(a.last_time || ''));
+  }
+
+  function typeAccuracy(subject) {
+    const papers = papersById();
+    const qinfo = {};
+    bank.questions.forEach(q => { qinfo[q.key] = [(papers[q.paper_id] || {}).subject, q.type]; });
+    const hist = {};
+    for (let i = prog.attempts.length - 1; i >= 0; i--) {
+      const a = prog.attempts[i];
+      const k = qinfo[a.k];
+      if (!k || (subject && k[0] !== subject)) continue;
+      const kk = k.join('|');
+      const h = hist[kk] = hist[kk] || [];
+      if (h.length < 60) h.push(a.ok);
+    }
+    const out = {};
+    Object.keys(hist).forEach(k => { out[k] = hist[k].filter(Boolean).length / hist[k].length; });
+    return out;
+  }
+
+  function newLeft(today) {
+    const first = {};
+    prog.attempts.forEach(a => { if (!(a.k in first)) first[a.k] = a.t.slice(0, 10); });
+    const done = Object.keys(first).filter(k => first[k] === today).length;
+    return Math.max(0, (prog.settings.new_per_day == null ? 20 : prog.settings.new_per_day) - done);
+  }
+
+  function cmpTuple(a, b) {
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] < b[i]) return -1;
+      if (a[i] > b[i]) return 1;
+    }
+    return 0;
+  }
+
+  function reviewQueue(subject, limit) {
+    const today = todayStr();
+    const papers = papersById();
+    if (limit == null) limit = newLeft(today);
+    const acc = typeAccuracy(subject);
+    const due = [], fresh = {};
+    filter(null, subject).forEach(q => {
+      if (!q.answer) return;
+      const c = prog.cards[q.key];
+      if (c) {
+        if (isDue(c, today)) due.push([c.in_wrong ? 0 : 1, c.due, c.box, q]);
+      } else if (SELF.indexOf(q.type) < 0) {
+        const s = (papers[q.paper_id] || {}).subject;
+        const a = acc[s + '|' + q.type];
+        const weak = (a == null ? 1 : a) < 0.7;
+        (fresh[s] = fresh[s] || []).push([weak ? 0 : 1, q.paper_id, q.qno, q]);
+      }
+    });
+    due.sort((x, y) => cmpTuple(x.slice(0, 3), y.slice(0, 3)));
+    const queues = Object.keys(fresh).sort().map(s => fresh[s].sort((x, y) => cmpTuple(x.slice(0, 3), y.slice(0, 3))).map(t => t[3]));
+    const newQs = [];
+    while (newQs.length < limit && queues.some(qq => qq.length)) {
+      queues.forEach(qq => { if (qq.length && newQs.length < limit) newQs.push(qq.shift()); });
+    }
+    // 阅读等材料题整组带出
+    const keys = new Set(newQs.filter(q => q.material).map(q => q.paper_id + '\u0001' + q.material));
+    const ids = new Set(newQs.map(q => q.id));
+    Object.keys(fresh).forEach(s => fresh[s].forEach(t => {
+      const q = t[3];
+      if (q.material && keys.has(q.paper_id + '\u0001' + q.material) && !ids.has(q.id)) { newQs.push(q); ids.add(q.id); }
+    }));
+    const items = due.map(t => view(t[3], papers)).concat(newQs.map(q => view(q, papers)));
+    return { due: due.length, new: newQs.length, items: groupMaterial(items) };
+  }
+
+  function clearProgress() {
+    try { localStorage.setItem('zx.progress.backup', JSON.stringify(prog)); } catch (e) { /* 太大就算了 */ }
+    if (window.ZXStore && window.ZXStore.backup) window.ZXStore.backup(JSON.stringify(prog));
+    const settings = prog.settings;
+    prog = { cards: {}, attempts: [], exams: [], settings: settings, skills: {} };
+    save();
+    return '手机本地备份';
+  }
+
+  function dayStreak(days) {
+    let d = todayStr();
+    if (!days.has(d)) d = addDays(d, -1);
+    let n = 0;
+    while (days.has(d)) { n++; d = addDays(d, -1); }
+    return n;
+  }
+
+  function dashboard() {
+    const today = todayStr();
+    const papers = papersById();
+    const acc = typeAccuracy();
+    const subj = {};
+    bank.questions.forEach(q => {
+      const s = (papers[q.paper_id] || {}).subject || 'general';
+      const d = subj[s] = subj[s] || { subject: s, total: 0, gradable: 0, seen: 0, right: 0, wrong: 0, wrong_open: 0, due: 0, mastery_sum: 0, types: {} };
+      d.total++;
+      const t = d.types[q.type] = d.types[q.type] || { type: q.type, total: 0, seen: 0, mastery_sum: 0 };
+      t.total++;
+      if (q.answer) d.gradable++;
+      const c = prog.cards[q.key];
+      if (c) {
+        d.seen++; t.seen++;
+        d.right += c.right; d.wrong += c.wrong;
+        d.wrong_open += c.in_wrong ? 1 : 0;
+        d.due += (isDue(c, today) && q.answer) ? 1 : 0;
+        d.mastery_sum += mastery(c); t.mastery_sum += mastery(c);
+      }
+    });
+    const hidden = hiddenSubjects();
+    const out = Object.keys(subj).sort((a, b) => subjIndex(a) - subjIndex(b)).map(s => {
+      const d = subj[s];
+      d.hidden = hidden.has(s);
+      d.mastery = d.total ? Math.round(100 * d.mastery_sum / d.total) : 0;
+      delete d.mastery_sum;
+      d.types = Object.values(d.types).map(t => {
+        t.mastery = t.total ? Math.round(100 * t.mastery_sum / t.total) : 0;
+        delete t.mastery_sum;
+        const a = acc[s + '|' + t.type];
+        t.accuracy = a != null ? Math.round(100 * a) : null;
+        return t;
+      }).sort((x, y) => y.total - x.total);
+      const n = d.right + d.wrong;
+      d.accuracy = n ? Math.round(1000 * d.right / n) / 10 : null;
+      return d;
+    });
+    const days = new Set(prog.attempts.map(a => a.t.slice(0, 10)));
+    const todayAtt = prog.attempts.filter(a => a.t.slice(0, 10) === today);
+    const perDay = {};
+    prog.attempts.forEach(a => { const k = a.t.slice(0, 10); perDay[k] = (perDay[k] || 0) + 1; });
+    const hist = [];
+    for (let i = 41; i >= 0; i--) { const day = addDays(today, -i); hist.push({ day: day, n: perDay[day] || 0 }); }
+    const rq = reviewQueue();
+    const visible = out.filter(d => !d.hidden);
+    return {
+      subjects: out,
+      today: { done: todayAtt.length, right: todayAtt.filter(a => a.ok).length,
+               due: visible.reduce((a, d) => a + d.due, 0), new_left: newLeft(today),
+               new: rq.items.length - rq.due, todo: rq.items.length },
+      streak: dayStreak(days),
+      history: hist,
+      wrong_open: visible.reduce((a, d) => a + d.wrong_open, 0),
+      questions: out.reduce((a, d) => a + d.total, 0),
+      papers: bank.papers.length,
+      settings: prog.settings,
+      exams: prog.exams.slice().reverse().filter(e => e.finished).slice(0, 5).map(examSummary),
+    };
+  }
+
+  /* ---------------------------------------------------------------- 模拟考试（exam.py） */
+  const OBJECTIVE = ['single', 'multi', 'judge', 'reading', 'poem'];
+  const BLUEPRINTS = {
+    politics: { standard: { title: '思想政治 模拟卷', minutes: 45, sections: [
+      ['单项选择题', '', ['single'], 20], ['多项选择题', '', ['multi'], 5], ['判断题', '', ['judge'], 10]] } },
+    chinese: { standard: { title: '语文 模拟卷（客观题）', minutes: 40, sections: [
+      ['基础知识', '', ['single'], 6], ['现代文阅读', '', ['reading'], 10], ['古诗文阅读', '', ['poem'], 4]] } },
+    math: { standard: { title: '数学 模拟卷（选择题）', minutes: 30, sections: [['单项选择题', '', ['single'], 13]] } },
+    english: { standard: { title: '英语 模拟卷', minutes: 60, sections: [
+      ['语音辨析', 'english-phonetics', ['single'], 5], ['词汇与语法', 'english-vocab', ['single'], 15],
+      ['交际对话', 'english-dialogue', ['single'], 5], ['完形填空', 'english-cloze', ['single'], 10],
+      ['阅读理解', 'english-reading', ['single', 'judge'], 10], ['图文理解', 'english-picture', ['single'], 5],
+      ['书面表达', 'english-writing', ['single'], 5]] } },
+    media: { standard: { title: '数字媒体理论 模拟卷', minutes: 60, sections: [
+      ['单项选择题', '', ['single'], 30], ['多项选择题', '', ['multi'], 10], ['判断题', '', ['judge'], 20]] } },
+  };
+
+  function blueprint(subject, preset) {
+    if (preset === 'quick') return { title: '快速小测', minutes: 15, sections: [['小测', '', OBJECTIVE, 20]] };
+    const bp = (BLUEPRINTS[subject] || {})[preset];
+    if (!bp) throw new Error('该科目没有这个组卷方案');
+    return bp;
+  }
+  function units(pool) {
+    const groups = {}, order = [];
+    pool.forEach(q => {
+      const k = q.material ? q.paper_id + '\u0001' + q.material : 'q\u0001' + q.id;
+      if (!groups[k]) { groups[k] = []; order.push(k); }
+      groups[k].push(q);
+    });
+    return order.map(k => groups[k].sort((a, b) => a.qno - b.qno));
+  }
+  function pick(pool, count) {
+    const us = shuffle(units(pool));
+    const out = [];
+    for (const u of us) {
+      if (out.length >= count) break;
+      if (out.length + u.length <= count) out.push.apply(out, u);
+    }
+    if (out.length < count) {
+      for (const u of us) for (const q of u) { if (out.length >= count) break; if (out.indexOf(q) < 0) out.push(q); }
+    }
+    return out;
+  }
+  function compose(questions, papers, subject, preset) {
+    const bp = blueprint(subject, preset);
+    const pkey = {};
+    papers.forEach(p => { pkey[p.id] = p.key || ''; });
+    const used = new Set();
+    const sections = [];
+    bp.sections.forEach(([name, prefix, types, count]) => {
+      const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) && (pkey[q.paper_id] || '').indexOf(prefix) === 0);
+      const got = pick(pool, count);
+      got.forEach(q => used.add(q.id));
+      if (got.length) sections.push([name, got]);
+    });
+    if (!sections.length) throw new Error('题库里没有可用于组卷的客观题');
+    return [bp.title, bp.minutes, sections];
+  }
+  const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[A-G]\s*[和与及、,，]\s*[A-G](?![A-Za-z])|^[A-G]{1,4}$|见材料|(?<!可)见图|\b(?:[Aa]ll|[Nn]one|[Bb]oth|[Nn]either) of the above\b|\b[A-G] and [A-G]\b/;
+  function shufflePerm(q) {
+    const opts = q.options || [];
+    if (q.type === 'judge' || opts.length < 2) return null;
+    if (opts.some(o => NO_SHUFFLE.test((o[1] || '').trim()))) return null;
+    return shuffle(opts.map((_, i) => i));
+  }
+  const shuffledOptions = (q, perm) => perm.map((j, i) => [String.fromCharCode(65 + i), q.options[j][1]]);
+  function toOriginal(given, perm) {
+    if (!perm || !given) return given || '';
+    return given.split('').map(c => { const i = c.charCodeAt(0) - 65; return i >= 0 && i < perm.length ? String.fromCharCode(65 + perm[i]) : c; }).sort().join('');
+  }
+  function isRight(q, given) {
+    given = (given || '').trim();
+    if (!given) return false;
+    if (q.type === 'multi') return given.split('').sort().join('') === q.answer.split('').sort().join('');
+    return given === q.answer;
+  }
+  const examSummary = e => {
+    const d = {};
+    ['id', 'subject', 'title', 'minutes', 'started', 'finished', 'total', 'correct', 'score', 'used_seconds'].forEach(k => { d[k] = e[k] == null ? null : e[k]; });
+    return d;
+  };
+  const nextId = items => items.reduce((m, x) => Math.max(m, x.id || 0), 0) + 1;
+
+  function examStart(subject, preset) {
+    const papers = bank.papers.filter(p => p.subject === subject);
+    const pids = new Set(papers.map(p => p.id));
+    const qs = bank.questions.filter(q => pids.has(q.paper_id) && OBJECTIVE.indexOf(q.type) >= 0);
+    const [title, minutes, sections] = compose(qs, papers, subject, preset);
+    const perms = {};
+    sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));
+    const e = { id: nextId(prog.exams), subject: subject, preset: preset, title: title, minutes: minutes,
+                started: nowStr(), finished: '', perms: perms,
+                sections: sections.map(([n, g]) => ({ name: n, keys: g.map(q => q.key) })) };
+    prog.exams.push(e);
+    save();
+    return examView(e, true);
+  }
+  function examView(e, hide) {
+    const pb = papersById();
+    const byKey = {};
+    bank.questions.forEach(q => { byKey[q.key] = q; });
+    const secs = e.sections.map(s => ({ name: s.name, items: s.keys.filter(k => byKey[k]).map(k => {
+      const q = byKey[k];
+      const v = view(q, pb, hide);
+      const pm = (e.perms || {})[k];
+      if (hide && pm) v.options = shuffledOptions(q, pm);
+      if (!hide && e.answers) { v.given = e.answers[k] || ''; v.correct = isRight(q, v.given); }
+      return v;
+    }) }));
+    const d = examSummary(e);
+    d.sections = secs;
+    if (!hide) { d.by_section = e.by_section; d.by_type = e.by_type; }
+    return d;
+  }
+  function examSubmit(eid, answers, used) {
+    const e = prog.exams.find(x => x.id === eid);
+    if (!e) throw new Error('考试不存在');
+    if (e.finished) return examView(e, false);
+    const byKey = {}, id2key = {};
+    bank.questions.forEach(q => { byKey[q.key] = q; id2key[String(q.id)] = q.key; });
+    const perms = e.perms || {};
+    const given = {};
+    Object.keys(answers || {}).forEach(i => { if (id2key[i]) { const k = id2key[i]; given[k] = toOriginal(answers[i] || '', perms[k]); } });
+    const t = nowStr();
+    let total = 0, correct = 0;
+    const bySection = [], byType = {};
+    e.sections.forEach(s => {
+      let sc = 0, st = 0;
+      s.keys.forEach(k => {
+        const q = byKey[k];
+        if (!q) return;
+        const ok = isRight(q, given[k]);
+        st++; sc += ok ? 1 : 0;
+        const bt = byType[q.type] = byType[q.type] || { correct: 0, total: 0 };
+        bt.correct += ok ? 1 : 0; bt.total++;
+        prog.cards[k] = srsApply(prog.cards[k], ok, t)[0];
+        prog.attempts.push({ k: k, ok: ok, t: t, m: 'exam' });
+      });
+      bySection.push({ name: s.name, correct: sc, total: st });
+      total += st; correct += sc;
+    });
+    Object.assign(e, { answers: given, finished: t, total: total, correct: correct,
+                       score: total ? Math.round(1000 * correct / total) / 10 : 0,
+                       used_seconds: parseInt(used || 0, 10), by_section: bySection, by_type: byType });
+    save();
+    return examView(e, false);
+  }
+
+  /* ---------------------------------------------------------------- 路由（对应 server.py） */
+  async function handle(method, path, qs, body) {
+    await load();
+    const arg = (n, d) => qs.get(n) || d || '';
+    const iarg = (n, d) => { const v = parseInt(arg(n, String(d || 0)), 10); if (isNaN(v)) throw new Error('参数不对'); return v; };
+    if (method === 'GET' && path === '/api/papers') return { papers: listPapers() };
+    if (method === 'GET' && path === '/api/questions') {
+      const r = getQuestions(iarg('paper_id') || null, arg('type') || null, arg('q') || null,
+                             Math.min(Math.max(iarg('limit', 50), 0), 200), Math.max(iarg('offset'), 0), arg('subject') || null);
+      return r;
+    }
+    if (method === 'GET' && path === '/api/practice')
+      return { items: practiceSet(iarg('paper_id') || null, arg('scope', 'all'), arg('order', 'random') === 'random', arg('subject') || null, arg('type') || null) };
+    if (method === 'GET' && path === '/api/review') {
+      const n = arg('new');
+      return reviewQueue(arg('subject') || null, n ? parseInt(n, 10) : null);
+    }
+    if (method === 'GET' && path === '/api/dashboard') return { data: dashboard() };
+    if (method === 'POST' && path === '/api/settings') {
+      if ('new_per_day' in body) {
+        const n = parseInt(body.new_per_day, 10);
+        if (isNaN(n)) throw new Error('参数不对');
+        prog.settings.new_per_day = Math.max(0, Math.min(200, n));
+      }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(body.exam_date || ''))) prog.settings.exam_date = body.exam_date;
+      if (Array.isArray(body.hidden_subjects))
+        prog.settings.hidden_subjects = Array.from(new Set(body.hidden_subjects.map(String).filter(s => /^[\w:-]{1,40}$/.test(s)))).sort();
+      save();
+      return {};
+    }
+    if (method === 'GET' && path === '/api/wrong') return { items: wrongList(iarg('mastered'), arg('subject') || null) };
+    if (method === 'POST' && path === '/api/record') {
+      const qid = parseInt(body.question_id || 0, 10);
+      if (!qid) throw new Error('缺少 question_id');
+      return recordAnswer(qid, !!body.correct, body.mode || 'practice');
+    }
+    if (method === 'POST' && path === '/api/wrong/mark') {
+      const qid = parseInt(body.question_id || 0, 10);
+      if (!qid) throw new Error('缺少 question_id');
+      markMastered(qid, body.mastered == null ? true : !!body.mastered);
+      return {};
+    }
+    if (method === 'POST' && path === '/api/exam/start') return { exam: examStart(body.subject || '', body.preset || 'standard') };
+    if (method === 'POST' && path === '/api/exam/submit') return { exam: examSubmit(parseInt(body.id || 0, 10), body.answers || {}, body.used_seconds || 0) };
+    if (method === 'GET' && path === '/api/exams') return { items: prog.exams.slice().reverse().map(examSummary) };
+    let m = path.match(/^\/api\/exams\/(\d+)$/);
+    if (m && method === 'GET') {
+      const e = prog.exams.find(x => x.id === parseInt(m[1], 10));
+      if (!e) throw new Error('考试不存在');
+      return { exam: examView(e, !e.finished) };
+    }
+    if (method === 'GET' && path === '/api/app')
+      return { version: APP_VERSION, data_version: (window.ZX_BUILD || {}).data_version || 0, frozen: false, mobile: true,
+               data_dir: '手机本地（卸载 App 会一起删除）', repo: 'https://github.com/' + REPO };
+    if (method === 'POST' && path === '/api/data/clear') {
+      if (body.confirm !== '清除') throw new Error('需要确认');
+      return { backup: clearProgress() };
+    }
+    if (method === 'GET' && path === '/api/skills') return { items: [], can_open: {}, dreamweaver: false };
+    if (method === 'GET' && path === '/api/update/check') return checkUpdate();
+    throw new Error('手机版没有这个功能');
+  }
+
+  /* 检查更新：看 GitHub Release 里有没有更新版本的 apk，下载交给系统浏览器 */
+  function ver(s) { return (s || '').replace(/^[vV]/, '').split('.').map(x => parseInt(x, 10) || 0).concat([0, 0, 0]).slice(0, 3); }
+  async function checkUpdate() {
+    let rel;
+    try {
+      const r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
+      rel = await r.json();
+    } catch (e) { throw new Error('连不上 GitHub，检查一下网络'); }
+    const asset = (rel.assets || []).find(a => /\.apk$/i.test(a.name || ''));
+    const latest = (rel.tag_name || '').replace(/^[vV]/, '');
+    return { current: APP_VERSION, latest: latest, has_update: !!asset && cmpTuple(ver(latest), ver(APP_VERSION)) > 0,
+             notes: rel.body || '', url: asset ? asset.browser_download_url : null, size: asset ? asset.size : null, page: rel.html_url };
+  }
+
+  window.LocalAPI = {
+    async call(path, opts) {
+      opts = opts || {};
+      const u = new URL(path, location.href);
+      let body = {};
+      if (opts.body) { try { body = typeof opts.body === 'string' ? JSON.parse(opts.body) : opts.body; } catch (e) { body = {}; } }
+      const data = await handle((opts.method || 'GET').toUpperCase(), u.pathname, u.searchParams, body);
+      return Object.assign({ ok: true }, data);
+    },
+    exportProgress() { return JSON.stringify(prog); },
+    async importProgress(text) {
+      await load();
+      const p = JSON.parse(text);
+      if (!p || typeof p !== 'object' || !p.cards || !p.attempts) throw new Error('不是做题记录文件');
+      prog = p;
+      prog.exams = prog.exams || [];
+      prog.settings = prog.settings || { new_per_day: 20 };
+      save();
+    },
+  };
+})();

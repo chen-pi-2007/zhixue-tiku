@@ -24,8 +24,16 @@ function zoomImg(src) {
   document.body.appendChild(d);
 }
 
+// 手机 App 里没有 Python 服务，请求交给 mobile/local.js 在本地处理
+const IS_APP = !!window.LocalAPI;
+function openExternal(url) {
+  if (window.ZXStore && window.ZXStore.openUrl) window.ZXStore.openUrl(url);
+  else window.open(url, '_blank');
+}
+
 async function api(path, opts) {
   opts = opts || {};
+  if (IS_APP) return window.LocalAPI.call(path, opts);
   if (opts.body && typeof opts.body === 'object' &&
       !(opts.body instanceof ArrayBuffer) && !(opts.body instanceof Uint8Array)) {
     opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
@@ -648,7 +656,7 @@ async function viewWrong() {
       '<div style="flex:1"></div>' +
       (items.length
         ? '<button class="btn sm" onclick="startPractice({subject:' + jsq(subj) + ',scope:\'wrong\',title:\'错题重练\'})">错题重练</button>' +
-          '<a class="btn ghost sm" href="/api/export/wrong">导出</a>'
+          (IS_APP ? '' : '<a class="btn ghost sm" href="/api/export/wrong">导出</a>')
         : '') +
     '</div>' +
     (!tab ? '<div class="muted" style="margin:-4px 0 12px">错题要在<b>不同的日子</b>里连续答对 ' + MASTER_STREAK + ' 次才会消灭,今日复习会按时把它们排出来。</div>' : '') +
@@ -1233,18 +1241,21 @@ async function viewSettings() {
       subjBox('culture') + subjBox('pro') + subjBox('other') +
     '</div>' +
     '<div class="card set-card">' +
-      '<div class="set-row"><div><b>版本</b><div class="muted">当前 v' + esc(a.version) + (a.frozen ? '' : '(源码运行,用 git pull 更新)') + '</div></div>' +
-        '<button class="btn ghost" id="upd-check"' + (a.frozen ? '' : ' disabled') + '>检查更新</button></div>' +
+      '<div class="set-row"><div><b>版本</b><div class="muted">当前 v' + esc(a.version) + (a.frozen || a.mobile ? '' : '(源码运行,用 git pull 更新)') + '</div></div>' +
+        '<button class="btn ghost" id="upd-check"' + (a.frozen || a.mobile ? '' : ' disabled') + '>检查更新</button></div>' +
       '<div id="upd-out"></div>' +
-      '<div class="muted set-note">更新只替换程序和题库,你的做题记录、错题本、模拟考成绩都会保留。</div>' +
+      '<div class="muted set-note">' + (a.mobile ? '新版安装包从 GitHub 下载，覆盖安装就行，做题记录会保留（不要先卸载）。'
+        : '更新只替换程序和题库,你的做题记录、错题本、模拟考成绩都会保留。') + '</div>' +
     '</div>' +
     '<div class="card set-card">' +
       '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在 ' + esc(a.data_dir) + '</div></div></div>' +
-      '<div class="set-row"><div><b>清除做题记录</b><div class="muted">清空复习进度、错题本、模拟考记录、技能实操成绩和练习文件。题库和设置不受影响。<br>清除前会自动备份到数据文件夹的 backups 里。</div></div>' +
+      '<div class="set-row"><div><b>清除做题记录</b><div class="muted">' + (a.mobile
+        ? '清空复习进度、错题本和模拟考记录。题库和设置不受影响。清除前会在手机上留一份备份。'
+        : '清空复习进度、错题本、模拟考记录、技能实操成绩和练习文件。题库和设置不受影响。<br>清除前会自动备份到数据文件夹的 backups 里。') + '</div></div>' +
         '<button class="btn danger" onclick="clearMyData()">清除记录</button></div>' +
     '</div>' +
     '<div class="card set-card"><div class="set-row"><div><b>项目地址</b><div class="muted">' +
-      '<a href="' + esc(a.repo) + '" target="_blank">' + esc(a.repo) + '</a></div></div></div></div>';
+      '<a href="javascript:void(0)" onclick="openExternal(' + jsq(a.repo) + ')">' + esc(a.repo) + '</a></div></div></div></div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
   $$('.subj-check input').forEach(c => c.addEventListener('change', saveHidden));
@@ -1276,6 +1287,14 @@ async function checkUpdate() {
 
 async function applyUpdate() {
   const out = $('#upd-out');
+  if (IS_APP) {        // 手机：交给系统浏览器下载 apk，下载完点开覆盖安装
+    try {
+      const u = await api('/api/update/check');
+      if (u.url) openExternal(u.url);
+      out.innerHTML = '<div class="muted set-note">已经在浏览器里开始下载，下载完点开安装包，选「更新」即可。</div>';
+    } catch (e) { out.innerHTML = '<div class="set-note num-red">' + esc(e.message) + '</div>'; }
+    return;
+  }
   out.innerHTML = '<div class="muted set-note">正在下载新版本(约 55MB),下载完程序会自动重启,请不要关闭…</div>';
   try {
     await api('/api/update/apply', { method: 'POST', body: {} });
@@ -1295,7 +1314,7 @@ async function clearMyData() {
   if (v !== '清除') { if (v != null) toast('输入不对,没有清除'); return; }
   try {
     const d = await api('/api/data/clear', { method: 'POST', body: { confirm: '清除' } });
-    toast('已清除,备份在 ' + d.backup.split(/[\\/]/).slice(-2).join('/'), 'good');
+    toast(IS_APP ? '已清除，手机上留了一份备份' : '已清除,备份在 ' + d.backup.split(/[\\/]/).slice(-2).join('/'), 'good');
     location.hash = '#/home';
   } catch (e) { toast(e.message, 'bad'); }
 }
