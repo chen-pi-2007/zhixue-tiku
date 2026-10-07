@@ -521,3 +521,19 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .upd-banner span { flex: 1 1 calc(100% - 20px); }
   .upd-banner .btn { flex: 1; }
 }
+
+/* 做错时的“为什么错”、选项说明、词组 */
+.why-box { margin-top: 10px; padding: 10px 12px; border-radius: 6px; background: var(--layer-2); line-height: 1.75; }
+.why-box > b, .phrase-box > b { display: block; margin-bottom: 4px; font-size: 12px; color: var(--ink-3); font-weight: 600; }
+.why-row { display: flex; gap: 10px; padding: 2px 0; color: var(--ink-2); }
+.why-k { flex: none; min-width: 72px; font-weight: 600; }
+.why-row.bad .why-k { color: var(--red); }
+.why-row.miss .why-k { color: var(--yellow); }
+.why-row.ok .why-k { color: var(--green); }
+.why-all { margin-top: 10px; color: var(--ink-2); }
+.why-all summary { cursor: pointer; color: var(--ink-3); font-size: 13px; }
+.why-all .why-row { padding-left: 4px; }
+.phrase-box { margin-top: 10px; }
+.phrase-list { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.phrase { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border-radius: 6px; background: var(--layer-2); font-size: 13px; color: var(--ink-2); }
+.phrase em { font-style: normal; font-weight: 600; color: var(--ink); }

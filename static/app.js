@@ -94,6 +94,48 @@ function stemCn(q) { return q.stem_cn ? '<div class="stem-cn' + (/_{2,}/.test(q.
 function optCn(q, i) { return q.options_cn && q.options_cn[i] ? '<span class="opt-cn after">' + esc(q.options_cn[i]) + '</span>' : ''; }
 function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b><div>' + rich(q.point) + '</div></div>' : ''; }
 
+// 某个选项的说明：专门写的“为什么对 / 错”（option_notes），英语没写的话用选项的中文翻译（里面带着语法提示）
+function optNote(q, key) {
+  const i = optionList(q).findIndex(o => o[0] === key);
+  if (i < 0) return '';
+  return (q.option_notes && q.option_notes[i]) || (q.options_cn && q.options_cn[i]) || '';
+}
+
+// 做错时：你选的错在哪、漏选了什么、正确答案为什么对
+function whyBox(q, selKeys) {
+  if (q.type === 'judge' || !selKeys || !selKeys.length) return '';
+  const opts = optionList(q);
+  const text = k => { const o = opts.find(x => x[0] === k); return o ? o[1] : ''; };
+  const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
+  const rows = [];
+  selKeys.filter(k => ans.indexOf(k) < 0).forEach(k => {
+    const n = optNote(q, k);
+    rows.push('<div class="why-row bad"><span class="why-k">你选的 ' + esc(k) + '</span><span>' + (n ? rich(n) : rich(text(k)) + '（不对）') + '</span></div>');
+  });
+  if (q.type === 'multi') ans.filter(k => selKeys.indexOf(k) < 0).forEach(k => {
+    const n = optNote(q, k);
+    rows.push('<div class="why-row miss"><span class="why-k">漏选 ' + esc(k) + '</span><span>' + (n ? rich(n) : rich(text(k))) + '</span></div>');
+  });
+  const okNotes = ans.map(k => optNote(q, k)).filter(Boolean);
+  if (okNotes.length) rows.push('<div class="why-row ok"><span class="why-k">正确答案 ' + esc(q.answer) + '</span><span>' + okNotes.map(rich).join('；') + '</span></div>');
+  return rows.length ? '<div class="why-box"><b>为什么错</b>' + rows.join('') + '</div>' : '';
+}
+
+// 英语题相关的词组，作答后显示，方便顺手记
+function phraseBox(q) {
+  if (!q.phrases || !q.phrases.length) return '';
+  return '<div class="phrase-box"><b>词组</b><div class="phrase-list">' + q.phrases.map(p =>
+    '<span class="phrase"><em>' + esc(p[0]) + '</em>' + esc(p[1] || '') + '</span>').join('') + '</div></div>';
+}
+
+// 错题本、搜索里看答案时：每个选项的说明折起来放着
+function optNotesBox(q) {
+  if (!q.option_notes || !q.option_notes.some(Boolean)) return '';
+  return '<details class="why-all"><summary>每个选项为什么对 / 错</summary>' + optionList(q).map((o, i) =>
+    q.option_notes[i] ? '<div class="why-row' + ((q.type === 'multi' ? q.answer.indexOf(o[0]) >= 0 : o[0] === q.answer) ? ' ok' : '') +
+      '"><span class="why-k">' + esc(o[0]) + '</span><span>' + rich(q.option_notes[i]) + '</span></div>' : '').join('') + '</details>';
+}
+
 // 阅读材料/情境材料展示框
 // fold:长材料默认折叠(错题本、报告里同一篇材料会重复出现)
 function materialBox(q, fold) {
@@ -119,7 +161,7 @@ function recBadge(q) {
 
 function ansHtml(q) {
   return '正确答案 <b>' + rich(q.answer) + '</b>' +
-    (q.analysis ? '<div class="analysis">解析:' + rich(q.analysis) + '</div>' : '') + pointBox(q);
+    (q.analysis ? '<div class="analysis">解析:' + rich(q.analysis) + '</div>' : '') + pointBox(q) + optNotesBox(q) + phraseBox(q);
 }
 
 function optsStatic(q, given) {
@@ -741,14 +783,19 @@ function viewPractice() {
   renderQ();
 }
 
+function statsHtml(p) {
+  const doneN = p.results.length;
+  return '<span class="muted">答对:</span><span class="num-green">' + p.correct + ' 题</span>' +
+    '<span class="muted">答错:</span><span class="num-red">' + (doneN - p.correct) + ' 题</span>' +
+    '<span class="muted">正确率:</span>' + (doneN ? Math.round(100 * p.correct / doneN) : 0) + '%';
+}
+
 function renderQ() {
   const p = state.practice;
   const q = p.list[p.idx];
   const opts = optionList(q);
   const pct = Math.round(100 * p.idx / p.list.length);
   const again = p.idx >= p.firstTotal;
-  const wrongN = p.results.filter(r => !r.correct).length;
-  const doneN = p.results.length;
   app.innerHTML =
     '<div class="crumb">当前位置:<a href="#/home">首页</a> &gt; ' + esc(p.title) +
       '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></div>' +
@@ -763,9 +810,7 @@ function renderQ() {
       materialBox(q) +
       '<div class="stem">' + (p.idx + 1) + '/' + p.list.length + '、' + rich(q.stem) + '</div>' + stemCn(q) +
       '<div id="qbody"></div>' +
-      '<div class="msg-bar"><span class="muted">答对:</span><span class="num-green">' + p.correct + ' 题</span>' +
-        '<span class="muted">答错:</span><span class="num-red">' + wrongN + ' 题</span>' +
-        '<span class="muted">正确率:</span>' + (doneN ? Math.round(100 * p.correct / doneN) : 0) + '%</div>' +
+      '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
     '</div>';
 
   const body = $('#qbody');
@@ -821,6 +866,8 @@ function recordResult(q, ok) {
   const p = state.practice;
   p.results.push({ q: q, correct: ok });
   if (ok) p.correct++;
+  const st = $('#pstats');
+  if (st) st.innerHTML = statsHtml(p);
   // 复习模式:做错的题在本轮末尾再出现一次
   if (!ok && p.mode === 'review' && !p.requeued[q.id]) {
     p.requeued[q.id] = 1;
@@ -858,7 +905,9 @@ function gradeAndShow(selKeys) {
   fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
     ' 正确答案:<b>' + esc(q.answer) + '</b></div>' +
-    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q);
+    (isRight ? '' : whyBox(q, selKeys)) +
+    (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' : '') +
+    pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
 
   $('#qact').innerHTML = '<span class="muted">回车 = 下一题</span><div class="spacer"></div>' +
@@ -877,7 +926,7 @@ function showQaAns() {
   fb.className = 'feedback';
   fb.style.background = 'var(--primary-l)';
   fb.innerHTML = '<div class="ans-line">参考答案</div><div class="analysis">' + rich(q.answer) + '</div>' +
-    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q);
+    (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
   if (ta) ta.disabled = true;
   $('#qact').innerHTML =

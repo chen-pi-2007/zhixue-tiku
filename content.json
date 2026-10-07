@@ -1,10 +1,10 @@
 {
- "content_version": 10,
- "created": "2026-10-07 16:18:07",
+ "content_version": 11,
+ "created": "2026-10-07 21:15:04",
  "files": {
   "data/bank.json": [
-   "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
-   1777314
+   "de24bd60210d484627d024d1876040c5d97c7b143611eff2d079f2d1ee220eef",
+   1896671
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -121,6 +121,26 @@
   "data/media/english-writing/010.png": [
    "17d64bfea8912f36ebc0214a8563ee0ce4717b329aa1bdeed277091d565a5dda",
    8355
+  ],
+  "data/media/math-1/016.png": [
+   "52279643cd518d1e2758e85f5a78eb5f5a5f72760a9012cbb540586735daea38",
+   20503
+  ],
+  "data/media/math-2/005.png": [
+   "f126b62acb7b84e17a043e3b293d05e8111ce32a0f5943010ffe281d1059d07c",
+   18929
+  ],
+  "data/media/math-2/018.png": [
+   "b7c5149e5802a3eafa1de13d17a06fe0510cd002d7192bcac568c4117b3136a1",
+   28333
+  ],
+  "data/media/math-4/006.png": [
+   "842442091c01cbe60a52a851328d0494d53d5cd4059054faf27e8d8028efab91",
+   17793
+  ],
+  "data/media/math-5/015.png": [
+   "70c449765b9801aeabc9a0b703d302bb820859e6474fbaf3e0a9fe0c12f7c041",
+   18988
   ],
   "data/media/media-color/001.png": [
    "af13e145c3a4058ff643519f2360607e04c6fa36fabc24a07ad0ac8a0cf8f8ac",
@@ -1551,12 +1571,12 @@
    17784
   ],
   "mobile/local.js": [
-   "4894d23c71a11eb96479e007823a5502a439ccbe653a4dd91e8667e2f5ed173c",
-   36020
+   "388adf227083d641c5e187d6146e3ab1db4b47c7732f74f55f47eeec5132aa93",
+   36047
   ],
   "static/app.js": [
-   "6d5d1675b9d6fa42b955867a199cd42c6e9458b3710bc8ac449bc2380e92a1a5",
-   84865
+   "afb54c997bb89824684091ab4f58a445be720a04042e03fb73f04e793c0672b8",
+   87660
   ],
   "static/index.html": [
    "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
@@ -1567,12 +1587,12 @@
    27900
   ],
   "static/style.css": [
-   "16f835da63091fcb2add93fd4fad4a971982194bf3eba61d5093e0ef88ebacee",
-   36020
+   "a0082000a8c13f7203237c6a49155466ddb9371786d63f385e4a172af6b4de0d",
+   37104
   ]
  },
- "min_android_version": "1.4.0",
- "min_app_version": "1.4.0",
- "notes": "修复：更新过程中点「检查更新」界面来回跳；进行中重复点击不再重复下载；切走页面再回来进度还在；内容更新失败时「重试」重试的是内容",
- "tag": "content-10"
+ "min_android_version": "1.4.4",
+ "min_app_version": "1.4.4",
+ "notes": "做错时显示每个选项错在哪、怎么解；英语 667 题加词组；数学 5 套按原卷重新校对并加配图；练习统计答完立即刷新",
+ "tag": "content-11"
 }

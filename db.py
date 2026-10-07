@@ -27,7 +27,7 @@ MEDIA_DIR = os.path.join(DATA_DIR, 'media')
 
 SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general']
 SELF_TYPES = ('qa', 'dictation', 'essay', 'blank', 'solution')
-STUDY_FIELDS = ('stem_cn', 'options_cn', 'material_cn', 'point')   # 平时练习才显示的翻译、知识点
+STUDY_FIELDS = ('stem_cn', 'options_cn', 'material_cn', 'point', 'option_notes', 'phrases')   # 平时练习才显示：翻译、知识点、每个选项错在哪、词组
 # 旧版卷子 → key（第一次升级时用）
 LEGACY_KEYS = {'学测2025练习卷1 泛雅格式': 'politics-1'}
 
