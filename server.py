@@ -163,12 +163,23 @@ class Handler(BaseHTTPRequestHandler):
         if not fp.startswith(root + os.sep) or not os.path.isfile(fp):
             return self.send_error_json('文件不存在', 404)
         ext = os.path.splitext(fp)[1].lower()
+        # 浏览器每次都来问一下（no-cache），文件没变就回 304 不重传；热更新换了图片或界面马上就能看到
+        st = os.stat(fp)
+        etag = '"%x-%x"' % (st.st_mtime_ns, st.st_size)
+        if self.headers.get('If-None-Match') == etag:
+            self.send_response(304)
+            self.send_header('ETag', etag)
+            self.send_header('Cache-Control', 'no-cache')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
         with open(fp, 'rb') as f:
             body = f.read()
         self.send_response(200)
         self.send_header('Content-Type', MIME.get(ext, 'application/octet-stream'))
         self.send_header('Content-Length', str(len(body)))
-        self.send_header('Cache-Control', 'max-age=86400' if root == db.MEDIA_DIR else 'no-cache')
+        self.send_header('ETag', etag)
+        self.send_header('Cache-Control', 'no-cache')
         if ext == '.pdf':
             self.send_header('Content-Disposition', 'inline')
         self.end_headers()

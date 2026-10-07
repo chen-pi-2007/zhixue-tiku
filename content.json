@@ -1,6 +1,6 @@
 {
- "content_version": 7,
- "created": "2026-10-07 08:05:42",
+ "content_version": 8,
+ "created": "2026-10-07 15:51:06",
  "files": {
   "data/bank.json": [
    "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
@@ -1551,12 +1551,12 @@
    17784
   ],
   "mobile/local.js": [
-   "a46e435d635bfbd4208e11ae82f87f0f44b36a8722ee277dd16d34ee44e1d8e8",
-   35634
+   "4894d23c71a11eb96479e007823a5502a439ccbe653a4dd91e8667e2f5ed173c",
+   36020
   ],
   "static/app.js": [
-   "b1df7fd9f1f0064ca7041678ead11b3139f2592401859a75322c237c3dafa7e9",
-   82606
+   "d83381f775951fe3b751a58dec3117d312913600ac3d2db53b15f48244d8fba4",
+   82821
   ],
   "static/index.html": [
    "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
@@ -1573,6 +1573,6 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "安卓签名换成作者 chen_pi 的新证书，并带上旧证书的交接证明：装着旧版本的人也能直接覆盖升级，不用卸载",
- "tag": "content-7"
+ "notes": "修几处热更新的问题：切换内容时文件被占用会还原、复制没变的文件也核对指纹、手机端复制出错不再当成成功、更新题库时保留本机额外的图片；热更新后图片马上生效；红点不会因为一边没连上被误清掉",
+ "tag": "content-8"
 }

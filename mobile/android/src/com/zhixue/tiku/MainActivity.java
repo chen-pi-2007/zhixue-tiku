@@ -120,6 +120,30 @@ public class MainActivity extends Activity {
         f.delete();
     }
 
+    /** 复制并返回内容的 SHA-256（小写十六进制） */
+    static String copyHash(InputStream in, File dst) throws IOException {
+        java.security.MessageDigest md;
+        try {
+            md = java.security.MessageDigest.getInstance("SHA-256");
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IOException(e);
+        }
+        dst.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(dst)) {
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                out.write(buf, 0, n);
+                md.update(buf, 0, n);
+            }
+        } finally {
+            in.close();
+        }
+        StringBuilder sb = new StringBuilder();
+        for (byte b : md.digest()) sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
+
     static void copy(InputStream in, File dst) throws IOException {
         dst.getParentFile().mkdirs();
         try (OutputStream out = new FileOutputStream(dst)) {
@@ -276,8 +300,9 @@ public class MainActivity extends Activity {
             return MainActivity.this.appVersion();
         }
 
-        /** 热更新第一步：建 content/next/www，把没变的文件（keepJson 是路径数组）从正在用的内容复制过去。
-         *  返回复制不了的路径（JSON 数组），由页面改成下载 */
+        /** 热更新第一步：建 content/next/www，把没变的文件从正在用的内容复制过去。
+         *  keepJson 是 [[路径, sha256], ...]；复制时算指纹，复制不了或指纹对不上的（文件丢了、坏了）
+         *  返回给页面改成下载（JSON 数组）。整个步骤出错返回 null，页面会停下报错。 */
         @JavascriptInterface
         public String contentBegin(String keepJson) {
             JSONArray missing = new JSONArray();
@@ -285,18 +310,19 @@ public class MainActivity extends Activity {
                 File next = new File(contentDir(), "next");
                 deleteTree(next);
                 File www = new File(next, "www");
-                www.mkdirs();
+                if (!www.mkdirs()) return null;
                 JSONArray keep = new JSONArray(keepJson);
                 for (int i = 0; i < keep.length(); i++) {
-                    String p = keep.getString(i);
+                    JSONArray item = keep.getJSONArray(i);
+                    String p = item.getString(0);
                     try {
-                        copy(openContent(p), new File(www, p));
+                        if (!copyHash(openContent(p), new File(www, p)).equals(item.getString(1))) missing.put(p);
                     } catch (IOException e) {
                         missing.put(p);
                     }
                 }
             } catch (Exception e) {
-                return "[]";
+                return null;
             }
             return missing.toString();
         }

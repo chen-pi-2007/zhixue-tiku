@@ -124,11 +124,21 @@ def push(tags, message):
     sh('git', 'push', '-q', 'origin', 'main', *tags)
 
 
+def undo_versions():
+    """打包或生成清单失败时（还没提交），把改过的版本号和清单还原，下次重新发布不会跳号"""
+    print('\n  发布没完成，还原 version.py 和 content.json')
+    subprocess.run(['git', 'checkout', '--', 'version.py', content.CONTENT_FILE], cwd=ROOT)
+
+
 def release_content(notes):
     preflight('content')
     v = read_versions()['CONTENT_VERSION'] + 1
-    set_version('CONTENT_VERSION', v)
-    write_manifest(v, notes)
+    try:
+        set_version('CONTENT_VERSION', v)
+        write_manifest(v, notes)
+    except BaseException:
+        undo_versions()
+        raise
     push(['content-%d' % v], '内容第 %d 版：%s' % (v, notes))
     print('\n✓ 已发布内容第 %d 版。用户打开题库后 6 小时内会看到「有更新」提示，或者自己点「检查更新」。' % v)
     print('  GitHub 原站几分钟内生效；jsDelivr 镜像可能要晚几个小时。')
@@ -148,20 +158,24 @@ def release_app(notes, version=None, needs_new_app=False):
     if sh('git', 'tag', '-l', 'v' + new, capture=True).strip():
         die('标签 v%s 已经存在' % new)
     cv = ns['CONTENT_VERSION'] + 1
-    set_version('APP_VERSION', new)
-    set_version('CONTENT_VERSION', cv)
-    if needs_new_app:
-        set_version('CONTENT_MIN_APP', new)
-        set_version('CONTENT_MIN_ANDROID', new)
-    write_manifest(cv, notes)
-    print('== 打包电脑版')
-    sh(os.path.join(ROOT, '_build', 'venv', 'Scripts', 'python.exe'), 'build_exe.py')
-    print('== 打包安卓版')
-    sh(sys.executable, os.path.join('mobile', 'build_apk.py'))
-    exe = os.path.join(ROOT, '_build', 'release', 'zhixue-tiku.exe')       # Release 里的文件名用英文
-    os.makedirs(os.path.dirname(exe), exist_ok=True)
-    shutil.copy(os.path.join(ROOT, '_build', 'dist', '智学题库.exe'), exe)
-    apk = os.path.join(ROOT, '_build', 'mobile', 'zhixue-tiku.apk')
+    try:
+        set_version('APP_VERSION', new)
+        set_version('CONTENT_VERSION', cv)
+        if needs_new_app:
+            set_version('CONTENT_MIN_APP', new)
+            set_version('CONTENT_MIN_ANDROID', new)
+        write_manifest(cv, notes)
+        print('== 打包电脑版')
+        sh(os.path.join(ROOT, '_build', 'venv', 'Scripts', 'python.exe'), 'build_exe.py')
+        print('== 打包安卓版')
+        sh(sys.executable, os.path.join('mobile', 'build_apk.py'))
+        exe = os.path.join(ROOT, '_build', 'release', 'zhixue-tiku.exe')       # Release 里的文件名用英文
+        os.makedirs(os.path.dirname(exe), exist_ok=True)
+        shutil.copy(os.path.join(ROOT, '_build', 'dist', '智学题库.exe'), exe)
+        apk = os.path.join(ROOT, '_build', 'mobile', 'zhixue-tiku.apk')
+    except BaseException:
+        undo_versions()
+        raise
     push(['v' + new, 'content-%d' % cv], 'v%s：%s' % (new, notes))
     sh('gh', 'release', 'create', 'v' + new, exe, apk, '--title', 'v%s %s' % (new, notes.splitlines()[0][:40]),
        '--notes', notes)

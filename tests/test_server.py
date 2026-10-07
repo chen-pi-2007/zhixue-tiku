@@ -22,6 +22,7 @@ class KeepAliveTest(unittest.TestCase):
         db.DATA_DIR = self.dir
         db.BANK_PATH = os.path.join(self.dir, 'bank.json')
         db.PROGRESS_PATH = os.path.join(self.dir, 'progress.json')
+        db.MEDIA_DIR = os.path.join(self.dir, 'media')
         db._bank = db._prog = None
         db.init()
         self.srv = ThreadingHTTPServer(('127.0.0.1', 0), server.Handler)
@@ -71,6 +72,26 @@ class KeepAliveTest(unittest.TestCase):
         self.assertEqual(self.req('POST', '/api/record', b'{"question_id": 999999}')[0], 400)
         self.assertEqual(self.req('GET', '/api/practice?paper_id=abc')[0], 400)
         self.assertEqual(self.req('GET', '/api/papers')[0], 200)
+
+    def test_static_revalidates_so_hot_update_shows_at_once(self):
+        # 图片和界面文件每次都要确认有没有变：没变回 304，换了就拿到新的（以前图片缓存一天，热更新后看到的还是旧图）
+        os.makedirs(db.MEDIA_DIR, exist_ok=True)
+        img = os.path.join(db.MEDIA_DIR, 'a.png')
+        with open(img, 'wb') as f:
+            f.write(b'old')
+        self.conn.request('GET', '/media/a.png')
+        r = self.conn.getresponse()
+        self.assertEqual((r.status, r.read(), r.getheader('Cache-Control')), (200, b'old', 'no-cache'))
+        etag = r.getheader('ETag')
+        self.conn.request('GET', '/media/a.png', headers={'If-None-Match': etag})
+        r = self.conn.getresponse()
+        self.assertEqual((r.status, r.read()), (304, b''))
+        with open(img, 'wb') as f:
+            f.write(b'new image')
+        self.conn.request('GET', '/media/a.png', headers={'If-None-Match': etag})
+        r = self.conn.getresponse()
+        self.assertEqual((r.status, r.read()), (200, b'new image'))
+        self.assertEqual(self.req('GET', '/api/app')[0], 200)   # 304 之后连接照常能用
 
 
 if __name__ == '__main__':

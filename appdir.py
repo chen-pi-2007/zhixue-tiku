@@ -90,6 +90,27 @@ def ensure_data():
     seed_data(os.path.join(root, 'data'), m['content_version'] if m else 0)
 
 
+def _replace_children(src, dst):
+    """把 src 下的每个子文件夹（一份卷子的图片、一套技能卷）换进 dst。
+    只换内容包里有的，dst 里多出来的（本机自己导入的题库包的图片）保留。
+    整个换不了（文件正被打开）就逐个文件覆盖，不让更新卡在半路。"""
+    os.makedirs(dst, exist_ok=True)
+    for name in os.listdir(src):
+        s, d = os.path.join(src, name), os.path.join(dst, name)
+        if not os.path.isdir(s):
+            shutil.copy(s, d)
+            continue
+        tmp = d + '.new'
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.copytree(s, tmp)
+        shutil.rmtree(d, ignore_errors=True)
+        try:
+            os.replace(tmp, d)
+        except OSError:
+            shutil.copytree(tmp, d, dirs_exist_ok=True)
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
 def seed_data(seed, version):
     """- 第一次运行：全部放进去
     - 内容版本比已装的高：只替换题库文件（SEED_ITEMS），做题记录不动
@@ -108,11 +129,7 @@ def seed_data(seed, version):
             shutil.copy(src, os.path.join(DATA_DIR, 'bank.seed.json'))
             continue
         if os.path.isdir(src):
-            tmp = dst + '.new'
-            shutil.rmtree(tmp, ignore_errors=True)
-            shutil.copytree(src, tmp)
-            shutil.rmtree(dst, ignore_errors=True)
-            os.replace(tmp, dst)
+            _replace_children(src, dst)
         else:
             shutil.copy(src, dst + '.new')
             os.replace(dst + '.new', dst)

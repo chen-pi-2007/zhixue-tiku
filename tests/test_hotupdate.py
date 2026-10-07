@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -94,9 +95,9 @@ class HotUpdateTest(unittest.TestCase):
     def test_bad_download_leaves_current_content(self):
         def bad(ref, path):
             return b'broken'                                     # 指纹对不上
-        hotupdate.time.sleep = lambda s: None
-        with self.assertRaises(ValueError):
-            hotupdate.install(self.latest, bad)
+        with mock.patch.object(hotupdate.time, 'sleep', lambda s: None):
+            with self.assertRaises(ValueError):
+                hotupdate.install(self.latest, bad)
         appdir._active = None
         self.assertEqual(appdir.content_version(), 4)            # 还在用原来的
         self.assertEqual(open(os.path.join(appdir.static_dir(), 'app.js')).read(), 'old ui')
@@ -110,6 +111,37 @@ class HotUpdateTest(unittest.TestCase):
         content.write_manifest(os.path.join(appdir.CONTENT_DIR, 'current', 'content.json'), m)
         appdir._active = None
         self.assertEqual(appdir.content_version(), 4)
+
+    def test_corrupted_unchanged_file_is_downloaded_again(self):
+        # 正在用的内容里 style.css 坏了但大小没变：不能原样复制过去
+        with open(os.path.join(appdir.BUNDLED_DIR, 'static', 'style.css'), 'w') as f:
+            f.write('CSS')
+        hotupdate.install(self.latest, self.fetch)
+        self.assertIn('static/style.css', self.fetched)
+        self.assertEqual(open(os.path.join(appdir.static_dir(), 'style.css')).read(), 'css')
+
+    def test_failed_swap_restores_current(self):
+        hotupdate.install(self.latest, self.fetch)               # 先装好 v5
+        v6 = dict(self.latest, content_version=6, files=dict(self.latest['files']))
+        real = os.replace
+
+        def flaky(src, dst):
+            if src.endswith('next'):                             # next → current 这一步被占用
+                raise PermissionError('占用')
+            return real(src, dst)
+        with mock.patch.object(hotupdate.os, 'replace', flaky), mock.patch.object(hotupdate.time, 'sleep', lambda s: None):
+            with self.assertRaises(ValueError):
+                hotupdate.install(v6, self.fetch)
+        appdir._active = None
+        self.assertEqual(appdir.content_version(), 5)            # v5 原样放回去了
+        self.assertEqual(open(os.path.join(appdir.static_dir(), 'app.js')).read(), 'new ui')
+
+    def test_local_media_folders_are_kept(self):
+        # 本机自己导入的题库包图片不在内容包里，更新题库时不能被删
+        write(os.path.join(appdir.DATA_DIR, 'media', 'my-pack', '1.png'), b'mine')
+        hotupdate.install(self.latest, self.fetch)
+        self.assertTrue(os.path.exists(os.path.join(appdir.DATA_DIR, 'media', 'my-pack', '1.png')))
+        self.assertTrue(os.path.exists(os.path.join(appdir.DATA_DIR, 'media', 'p', '002.png')))
 
     def test_diff(self):
         old = {'files': {'a': ['1', 1], 'b': ['2', 1]}}

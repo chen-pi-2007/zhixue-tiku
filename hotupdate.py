@@ -99,6 +99,17 @@ def _run():
         _set(state='error', error=msg, speed=0)
 
 
+def _retry(fn, times=5):
+    """文件夹改名：杀毒软件、正在读的网页偶尔会短暂占着文件，等一下再试"""
+    for i in range(times):
+        try:
+            return fn()
+        except OSError:
+            if i == times - 1:
+                raise
+            time.sleep(0.4)
+
+
 def install(latest, fetch):
     """按清单 latest 凑出完整的新内容并换上。fetch(ref, path) 返回文件内容（测试时可替换）。"""
     root, cur = appdir.active()
@@ -107,13 +118,13 @@ def install(latest, fetch):
     shutil.rmtree(nxt, ignore_errors=True)
     os.makedirs(nxt)
     need = {c[0] for c in changed}
-    # 没变的文件从正在用的内容里复制（文件丢了或被改过就改成下载）
+    # 没变的文件从正在用的内容里复制；丢了或坏了（指纹对不上）就改成下载
     for rel, (sha, size) in latest['files'].items():
         if rel in need:
             continue
         src = os.path.join(root, *rel.split('/'))
         dst = os.path.join(nxt, *rel.split('/'))
-        if os.path.isfile(src) and os.path.getsize(src) == size:
+        if os.path.isfile(src) and os.path.getsize(src) == size and content.sha256_file(src) == sha:
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.copyfile(src, dst)
         else:
@@ -150,12 +161,21 @@ def install(latest, fetch):
             t_last, d_last = now, done
         _set(done=done, files_done=i + 1, error='')
     content.write_manifest(os.path.join(nxt, content.CONTENT_FILE), latest)
-    # 换上：current → old，next → current，再删 old
+    # 换上：current → old，next → current，再删 old。
+    # Windows 上文件正被读取时改名会失败：哪一步失败都把原来的 current 放回去，正在用的内容不受影响
     cur_dir, old = os.path.join(appdir.CONTENT_DIR, 'current'), os.path.join(appdir.CONTENT_DIR, 'old')
     shutil.rmtree(old, ignore_errors=True)
-    if os.path.isdir(cur_dir):
-        os.replace(cur_dir, old)
-    os.replace(nxt, cur_dir)
+    if os.path.isdir(old):
+        raise ValueError('旧的临时文件夹删不掉，请重启题库程序后再更新')
+    had_cur = os.path.isdir(cur_dir)
+    if had_cur:
+        _retry(lambda: os.replace(cur_dir, old))
+    try:
+        _retry(lambda: os.replace(nxt, cur_dir))
+    except Exception:
+        if had_cur:
+            os.replace(old, cur_dir)
+        raise ValueError('换上新内容时文件被占用，请稍后重试')
     shutil.rmtree(old, ignore_errors=True)
     # 生效：重新选内容（界面马上换）、新题库放进 data/、让 db 下次读取时合并
     appdir.refresh()

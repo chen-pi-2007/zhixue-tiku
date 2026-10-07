@@ -702,7 +702,11 @@
     if ((latest.content_version || 0) <= ((cur || {}).content_version || 0)) throw new Error('界面和题库已经是最新的');
     const c = changedFiles(latest, cur);
     // 没变的文件由 App 从正在用的内容里复制；复制不了的（比如丢了）返回来，改成下载
-    const missing = JSON.parse(ZXStore.contentBegin(JSON.stringify(c.keep)) || '[]');
+    // 1.4.2 起 App 复制时会核对指纹，要 [路径, sha]；更早的 App 只认路径（它的 contentBegin 出错时也返回 "[]"）
+    const withSha = cmpTuple(ver(APP_VERSION), ver('1.4.2')) >= 0;
+    const began = ZXStore.contentBegin(JSON.stringify(withSha ? c.keep.map(w => [w, c.nf[w][0]]) : c.keep));
+    if (began == null) throw new Error('准备更新时手机存储出错，检查一下剩余空间后重试');
+    const missing = JSON.parse(began);
     const todo = c.changed.concat(missing).sort();
     Object.assign(job, { total: todo.reduce((a, w) => a + c.nf[w][1], 0), files_total: todo.length, version: latest.content_version });
     let tLast = Date.now(), dLast = 0;

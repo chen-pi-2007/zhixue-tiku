@@ -1281,7 +1281,7 @@ async function checkUpdate() {
     api('/api/update/check').catch(e => ({ error: e.message })),
     api('/api/content/check').catch(e => ({ error: e.message })),
   ]);
-  if (!(app.error && cont.error)) setUpdNotice(noticeFrom(app, cont));
+  syncUpdNotice(app, cont, app.error, cont.error);
   let html = '';
   if (app.has_update) {
     html += '<div class="upd-box"><b>有新版程序 v' + esc(app.latest) + '</b>' +
@@ -1350,7 +1350,13 @@ async function autoCheckUpdate(a) {
     api('/api/update/check').catch(() => ({ failed: true })),
     api('/api/content/check').catch(() => ({ failed: true })),
   ]);
-  if (!(app.failed && cont.failed)) setUpdNotice(noticeFrom(app, cont));     // 都没连上就保留原来的提示
+  syncUpdNotice(app, cont, app.failed, cont.failed);
+}
+
+// 检查结果同步到提示：查到更新就提示；两边都确认没有更新才清掉；有一边没连上时保留原来的提示
+function syncUpdNotice(app, cont, appFailed, contFailed) {
+  const n = noticeFrom(app, cont);
+  if (n || (!appFailed && !contFailed)) setUpdNotice(n);
 }
 
 function setUpdNotice(n) {
