@@ -1,6 +1,6 @@
 {
- "content_version": 6,
- "created": "2026-10-06 20:40:54",
+ "content_version": 7,
+ "created": "2026-10-07 08:05:42",
  "files": {
   "data/bank.json": [
    "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
@@ -1573,6 +1573,6 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "有更新时顶栏显示「有更新」、设置旁显示红点，更新完自动消失；每 6 小时自动检查一次",
- "tag": "content-6"
+ "notes": "安卓签名换成作者 chen_pi 的新证书，并带上旧证书的交接证明：装着旧版本的人也能直接覆盖升级，不用卸载",
+ "tag": "content-7"
 }

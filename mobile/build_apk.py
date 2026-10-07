@@ -82,6 +82,30 @@ def ensure_key():
     return open(pw_file).read().strip()
 
 
+# 证书轮换：2026-10-06 第一批安装包用的是旧证书（CN=zhixue-tiku），10-07 换成了 CN=chen_pi。
+# 为了让装着旧证书版本的人也能直接覆盖升级（不卸载、不丢记录），签名时同时用两个证书，
+# 再附上 lineage.bin（旧证书签字“把身份交给新证书”的证明，APK Signature Scheme v3）：
+#   - 安卓 9 及以上认 v3：看到的是新证书 + 证明，旧证书、新证书装的版本都能覆盖升级
+#   - 安卓 7、8 只认 v1/v2：看到的是旧证书，旧证书装的版本照常覆盖升级
+# 以后每次打包都要这样签，旧证书和 lineage.bin 跟新证书一样不能丢（都在私有仓库里）。
+OLD_KEYSTORE = os.path.join(KEY_DIR, 'old', 'zhixue-2026-10-06-CN-zhixue-tiku.jks')
+OLD_PASS = os.path.join(KEY_DIR, 'old', 'pass-2026-10-06.txt')
+LINEAGE = os.path.join(KEY_DIR, 'lineage.bin')
+
+
+def sign_args(pw):
+    new = ['--ks', KEYSTORE, '--ks-key-alias', ALIAS, '--ks-pass', 'pass:' + pw, '--key-pass', 'pass:' + pw]
+    if '--old-key-only' in sys.argv:          # 只给测试用：模拟第一批旧证书安装包
+        op = open(OLD_PASS).read().strip()
+        return ['--ks', OLD_KEYSTORE, '--ks-key-alias', ALIAS, '--ks-pass', 'pass:' + op, '--key-pass', 'pass:' + op]
+    if not (os.path.exists(OLD_KEYSTORE) and os.path.exists(LINEAGE)):
+        sys.exit('找不到旧证书或 lineage.bin（%s）。它们也在私有仓库 chen-pi-2007/zhixue-android-key 里，'
+                 '先恢复再打包，否则装着旧证书版本的人没法覆盖升级' % KEY_DIR)
+    op = open(OLD_PASS).read().strip()
+    return ['--ks', OLD_KEYSTORE, '--ks-key-alias', ALIAS, '--ks-pass', 'pass:' + op, '--key-pass', 'pass:' + op,
+            '--next-signer'] + new + ['--lineage', LINEAGE, '--rotation-min-sdk-version', '28']
+
+
 def main():
     for p in (JAVA_HOME, BT, ANDROID_JAR):
         if not p or not os.path.exists(p):
@@ -124,8 +148,7 @@ def main():
     run(os.path.join(BT, 'zipalign.exe'), '-f', '-p', '4', unsigned, aligned)
     pw = ensure_key()
     apk = os.path.join(OUT, 'zhixue-tiku.apk')
-    run(os.path.join(BT, 'apksigner.bat'), 'sign', '--ks', KEYSTORE, '--ks-key-alias', ALIAS,
-        '--ks-pass', 'pass:' + pw, '--key-pass', 'pass:' + pw, '--out', apk, aligned)
+    run(os.path.join(BT, 'apksigner.bat'), 'sign', *sign_args(pw), '--out', apk, aligned)
     run(os.path.join(BT, 'apksigner.bat'), 'verify', apk)
     os.makedirs(DIST, exist_ok=True)
     final = os.path.join(DIST, 'zhixue-tiku.apk')

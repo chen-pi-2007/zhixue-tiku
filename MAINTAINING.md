@@ -79,7 +79,12 @@
 
 ## 千万别做的事
 
-- **别丢、别换安卓签名证书**（`D:\tool\android-keys\zhixue.jks`）。安卓只允许同一个证书签名的新版覆盖安装，换了证书，所有人只能卸载重装，手机上的做题记录全部丢失。证书备份在私有仓库 `chen-pi-2007/zhixue-android-key`，这个仓库永远不要公开。
+- **别丢安卓签名用的三样东西**，都在 `D:\tool\android-keys`，备份在私有仓库 `chen-pi-2007/zhixue-android-key`（永远不要公开）：
+  - `zhixue.jks`：现在的证书，持有人 `CN=chen_pi`。
+  - `old/zhixue-2026-10-06-CN-zhixue-tiku.jks`：第一批安装包（2026-10-06）用的旧证书。
+  - `lineage.bin`：旧证书签字"把身份交给新证书"的证明。
+
+  安卓只允许同一个证书签名的新版覆盖安装。现在每个安装包都同时用新旧两个证书签名，再附上这份证明（证书轮换，APK Signature Scheme v3，`build_apk.py` 的 `sign_args`）。这样装着旧证书版本的人也能直接覆盖升级，记录不丢。三样东西少了任何一样，`build_apk.py` 都会停下不打包。**不要再换证书**。万一非换不可，要用 `apksigner rotate --in lineage.bin` 在这份证明后面接着加，不能另起一份。
 - **别把私人数据提交到仓库**：`data/progress.json`（做题记录）、`config.json`（可能有大模型 API Key）已经在 `.gitignore` 里。
 - **别把自己导入的试卷发出去**：在这台电脑上用「导入试卷」导入的卷子会进 `data/bank.json`（key 以 `upload-` 开头），发布脚本会拦下来，需要先在网站里删掉它们。
 - **别调换题目顺序**（见“改题库”）。
