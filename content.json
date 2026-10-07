@@ -1,6 +1,6 @@
 {
- "content_version": 9,
- "created": "2026-10-07 16:13:45",
+ "content_version": 10,
+ "created": "2026-10-07 16:18:07",
  "files": {
   "data/bank.json": [
    "8fc79400a744360dc834cf289f0665ce2d91d2098d6f3316dcef4206a1218dc9",
@@ -1555,8 +1555,8 @@
    36020
   ],
   "static/app.js": [
-   "d83381f775951fe3b751a58dec3117d312913600ac3d2db53b15f48244d8fba4",
-   82821
+   "6d5d1675b9d6fa42b955867a199cd42c6e9458b3710bc8ac449bc2380e92a1a5",
+   84865
   ],
   "static/index.html": [
    "4dbb64a8126050ef8749d1ad6ea020c35c72553d10767caf3c578354bd7c2735",
@@ -1573,6 +1573,6 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "电脑版改成独立窗口：双击打开“智学题库”窗口，不再用浏览器；关窗口缩到托盘，再双击会把原窗口调出来；开机自启只进托盘",
- "tag": "content-9"
+ "notes": "修复：更新过程中点「检查更新」界面来回跳；进行中重复点击不再重复下载；切走页面再回来进度还在；内容更新失败时「重试」重试的是内容",
+ "tag": "content-10"
 }

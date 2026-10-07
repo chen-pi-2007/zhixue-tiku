@@ -1244,7 +1244,7 @@ async function viewSettings() {
       '<div class="set-row"><div><b>版本</b><div class="muted">程序 v' + esc(a.version) +
         (a.content_version ? ' · 题库和界面 第 ' + a.content_version + ' 版' : '') +
         (a.frozen || a.mobile ? '' : '（源码运行，用 git pull 更新）') + '</div></div>' +
-        '<button class="btn ghost" id="upd-check"' + (a.frozen || a.mobile ? '' : ' disabled') + '>检查更新</button></div>' +
+        '<button class="btn ghost" id="upd-check"' + (a.frozen || a.mobile ? '' : ' disabled data-off="1"') + '><span class="upd-label">检查更新</span></button></div>' +
       '<div id="upd-out"></div>' +
       '<div class="muted set-note">题库和界面的更新只下载改动的文件，几秒钟就好，不用重启；程序本身有更新时' +
         (a.mobile ? '下载新安装包覆盖安装（不要先卸载）' : '下载新程序后自动重启') + '。做题记录、错题本、考试成绩都会保留。</div>' +
@@ -1261,6 +1261,7 @@ async function viewSettings() {
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
   markUpdDots();
+  updRestore();
   $$('.subj-check input').forEach(c => c.addEventListener('change', saveHidden));
 }
 
@@ -1273,14 +1274,53 @@ async function saveHidden() {
   } catch (e) { toast(e.message, 'bad'); }
 }
 
+// 更新区域的状态。同一时间只做一件事（检查 / 下载程序 / 更新内容），做的时候「检查更新」按钮变灰；
+// 显示的内容记在 upd.html 里，进度循环每次写的都是“当前页面上的” #upd-out，
+// 所以中途切到别的页面再回来，进度照样接着显示，也不会两件事抢着改同一块区域
+const upd = { busy: '', html: '' };          // busy: '' / 'check' / 'app' / 'content'
+
+function updShow(html) {
+  upd.html = html;
+  const o = $('#upd-out');
+  if (o) o.innerHTML = html;
+}
+
+function updSetBusy(kind) {
+  upd.busy = kind || '';
+  updButton();
+}
+
+function updButton() {
+  const btn = $('#upd-check');
+  if (!btn) return;
+  btn.disabled = !!upd.busy || btn.dataset.off === '1';
+  const label = btn.querySelector('.upd-label');
+  if (label) label.textContent = upd.busy === 'check' ? '正在检查…' : upd.busy ? '正在更新…' : '检查更新';
+}
+
+// 设置页重新画出来以后：把正在进行（或刚失败）的更新显示回去
+function updRestore() {
+  if (upd.busy || upd.html) {
+    const o = $('#upd-out');
+    if (o) o.innerHTML = upd.html;
+  }
+  updButton();
+}
+
 // 检查更新：程序（exe / apk，要重装）和内容（界面 + 题库，热更新）分开检查，各自显示
 async function checkUpdate() {
-  const out = $('#upd-out');
-  out.innerHTML = '<div class="muted set-note">正在检查…</div>';
-  const [app, cont] = await Promise.all([
-    api('/api/update/check').catch(e => ({ error: e.message })),
-    api('/api/content/check').catch(e => ({ error: e.message })),
-  ]);
+  if (upd.busy) { updRestore(); return; }              // 正在检查或更新：只把进度显示出来，不再发一次
+  updSetBusy('check');
+  updShow('<div class="muted set-note">正在检查…</div>');
+  let app, cont;
+  try {
+    [app, cont] = await Promise.all([
+      api('/api/update/check').catch(e => ({ error: e.message })),
+      api('/api/content/check').catch(e => ({ error: e.message })),
+    ]);
+  } finally {
+    updSetBusy('');
+  }
   syncUpdNotice(app, cont, app.error, cont.error);
   let html = '';
   if (app.has_update) {
@@ -1300,23 +1340,24 @@ async function checkUpdate() {
     html = err ? '<div class="set-note num-red">' + esc(err) + '</div>'
                : '<div class="muted set-note">程序和题库都已经是最新的。</div>';
   }
-  out.innerHTML = html;
+  updShow(html);
 }
 
 // 热更新：下载改动的文件（进度条），装好后刷新页面就是新界面和新题库
 async function applyContentUpdate() {
-  const out = $('#upd-out');
+  if (upd.busy) { updRestore(); return; }
+  updSetBusy('content');
   let p;
-  try { p = await api('/api/content/update', { method: 'POST' }); } catch (e) { return updFail(e.message); }
+  try { p = await api('/api/content/update', { method: 'POST' }); } catch (e) { return updFail(e.message, '', 'content'); }
   while (p.state === 'downloading') {
-    out.innerHTML = updProgress(p, '正在更新题库和界面' + (p.files_total ? '（' + p.files_done + ' / ' + p.files_total + ' 个文件）' : ''));
+    updShow(updProgress(p, '正在更新题库和界面' + (p.files_total ? '（' + p.files_done + ' / ' + p.files_total + ' 个文件）' : '')));
     await new Promise(r => setTimeout(r, 400));
-    try { p = await api('/api/content/progress'); } catch (e) { return updFail(e.message); }
+    try { p = await api('/api/content/progress'); } catch (e) { return updFail(e.message, '', 'content'); }
   }
-  if (p.state !== 'done') return updFail(p.error || '更新失败');
+  if (p.state !== 'done') return updFail(p.error || '更新失败', '', 'content');
   store.del('zx.updNotice');
-  out.innerHTML = updProgress(Object.assign({}, p, { done: p.total || 1, total: p.total || 1 }), '更新好了，正在刷新…');
-  setTimeout(() => location.reload(), 800);
+  updShow(updProgress(Object.assign({}, p, { done: p.total || 1, total: p.total || 1 }), '更新好了，正在刷新…'));
+  setTimeout(() => location.reload(), 800);        // 刷新前一直保持“正在更新”，按钮不能再点
 }
 
 // 每天第一次打开时在后台查一下有没有更新，有就在页面顶上提示（不打扰做题）
@@ -1400,8 +1441,9 @@ function showUpdNotice() {
 window.addEventListener('hashchange', showUpdNotice);
 
 async function applyUpdate() {
-  const out = $('#upd-out');
   if (IS_APP) return applyUpdateApp();
+  if (upd.busy) { updRestore(); return; }
+  updSetBusy('app');
   // 电脑：后台下载 → 轮询进度画进度条 → 下完自动安装并重启 → 新版起来后页面自动刷新
   let p;
   try { p = await api('/api/update/download', { method: 'POST' }); } catch (e) {
@@ -1409,26 +1451,23 @@ async function applyUpdate() {
     return updFail(e.message);
   }
   while (p.state === 'downloading') {
-    out.innerHTML = updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启');
+    updShow(updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启'));
     await new Promise(r => setTimeout(r, 500));
     try { p = await api('/api/update/progress'); } catch (e) { return updFail('和题库程序的连接断了：' + e.message); }
   }
   if (p.state !== 'done') return updFail(p.error || '下载失败', p.page);
-  out.innerHTML = updProgress(p, '下载完成，正在安装并重启…');
+  updShow(updProgress(p, '下载完成，正在安装并重启…'));
   try { await api('/api/update/install', { method: 'POST' }); } catch (e) { return updFail(e.message, p.page); }
-  waitRestart(p.version);
+  waitRestart(p.version);                          // 等重启，一直保持“正在更新”
 }
 
 // 后台还是 1.3.0 以前的程序（exe 放在源码文件夹里时，界面会先用上新的）：只有一个一次下完的接口，
 // 看不到真实进度，就显示一直在动的进度条和已用时间，让人知道还在下
 async function applyUpdateLegacy() {
-  const out = $('#upd-out');
   const t0 = Date.now();
-  const tick = () => {
-    out.innerHTML = '<div class="upd-box upd-prog"><b>正在下载新版本，下载完会自动重启</b>' +
-      '<div class="upd-bar busy"><i></i></div>' +
-      '<div class="muted">已用 ' + Math.round((Date.now() - t0) / 1000) + ' 秒（当前程序是旧版，显示不了下载进度，一般一两分钟）</div></div>';
-  };
+  const tick = () => updShow('<div class="upd-box upd-prog"><b>正在下载新版本，下载完会自动重启</b>' +
+    '<div class="upd-bar busy"><i></i></div>' +
+    '<div class="muted">已用 ' + Math.round((Date.now() - t0) / 1000) + ' 秒（当前程序是旧版，显示不了下载进度，一般一两分钟）</div></div>');
   tick();
   const timer = setInterval(tick, 1000);
   let r;
@@ -1437,13 +1476,12 @@ async function applyUpdateLegacy() {
     return updFail(e.message, 'https://github.com/chen-pi-2007/zhixue-tiku/releases/latest');
   }
   clearInterval(timer);
-  out.innerHTML = '<div class="upd-box upd-prog"><b>下载完成，正在重启…</b><div class="upd-bar"><i style="width:100%"></i></div></div>';
+  updShow('<div class="upd-box upd-prog"><b>下载完成，正在重启…</b><div class="upd-bar"><i style="width:100%"></i></div></div>');
   waitRestart(r.version);
 }
 
-// 旧程序还要半秒才退出，所以要等到版本号变成新版才刷新
+// 旧程序还要半秒才退出，所以要等到版本号变成新版才刷新（独立窗口版会整个关掉重开，用不到这里）
 function waitRestart(want) {
-  const out = $('#upd-out');
   const start = Date.now();
   const poll = setInterval(async () => {
     try {
@@ -1452,27 +1490,30 @@ function waitRestart(want) {
     } catch (e) { /* 正在重启 */ }
     if (Date.now() - start > 90000) {
       clearInterval(poll);
-      out.innerHTML = '<div class="set-note">重启时间有点长，稍后从开始菜单或桌面打开智学题库即可。</div>';
+      updSetBusy('');
+      updShow('<div class="set-note">重启时间有点长，稍后从开始菜单或桌面打开智学题库即可。</div>');
     }
   }, 1500);
 }
 
 // 手机：系统下载器下 apk（App 里和通知栏都有进度）→ 下完自动打开安装界面。
 // 安卓不允许 App 装完自己重启，装好后在安装界面点「打开」。
+// restart=true 是进度里的「重新下载」：取消正在下的，重新开始
 let appDl = null;
-async function applyUpdateApp() {
-  const out = $('#upd-out');
+async function applyUpdateApp(restart) {
+  if (upd.busy && !(restart && upd.busy === 'app')) { updRestore(); return; }
+  updSetBusy('app');
   let u;
   try { u = await api('/api/update/check'); } catch (e) { return updFail(e.message); }
   if (!u.url) return updFail('这个版本没有安卓安装包', u.page);
   const S = window.ZXStore;
-  if (!S || !S.download) { openExternal(u.url); return; }        // 旧版 App 没有下载接口
+  if (!S || !S.download) { updSetBusy(''); openExternal(u.url); return; }        // 旧版 App 没有下载接口
   if (appDl) S.cancelDownload(appDl);
   const id = appDl = S.download(u.url, 'zhixue-tiku-' + u.latest + '.apk');
   if (!id) return updFail('没法开始下载', u.page);
   let lastDone = -1, lastMove = Date.now(), lastT = Date.now(), speed = 0;
   for (;;) {
-    if (appDl !== id) return;                                     // 用户点了重试，换了新任务
+    if (appDl !== id) return;                                     // 点了「重新下载」，换了新任务
     const p = JSON.parse(S.dlProgress(id));
     const now = Date.now();
     if (p.done !== lastDone) {
@@ -1482,17 +1523,18 @@ async function applyUpdateApp() {
     if (p.state === 'done') break;
     if (p.state === 'error') { appDl = null; return updFail(p.reason || '下载失败', u.page); }
     const stalled = now - lastMove > 30000;
-    out.innerHTML = updProgress({ state: 'downloading', done: p.done, total: p.total || u.size || 0, speed: speed },
+    updShow(updProgress({ state: 'downloading', done: p.done, total: p.total || u.size || 0, speed: speed },
       '正在下载 v' + u.latest + '，下载完会自动打开安装界面') +
       (p.state === 'waiting' || stalled
         ? '<div class="set-note num-red">' + esc(p.reason || '30 秒没有收到数据，网络可能断了') +
-          '　<a href="javascript:void(0)" onclick="applyUpdateApp()">重新下载</a>　' +
-          '<a href="javascript:void(0)" onclick="openExternal(' + jsq(u.url) + ')">用浏览器下载</a></div>' : '');
+          '　<a href="javascript:void(0)" onclick="applyUpdateApp(true)">重新下载</a>　' +
+          '<a href="javascript:void(0)" onclick="openExternal(' + jsq(u.url) + ')">用浏览器下载</a></div>' : ''));
     await new Promise(r => setTimeout(r, 600));
   }
   appDl = null;
-  out.innerHTML = updProgress({ state: 'done', done: lastDone, total: lastDone }, '下载完成，正在打开安装界面…') +
-    '<div class="muted set-note">在安装界面点「更新」（第一次会让你允许智学题库安装应用，打开开关再返回即可），装好后点「打开」。做题记录会保留。</div>';
+  updSetBusy('');
+  updShow(updProgress({ state: 'done', done: lastDone, total: lastDone }, '下载完成，正在打开安装界面…') +
+    '<div class="muted set-note">在安装界面点「更新」（第一次会让你允许智学题库安装应用，打开开关再返回即可），装好后点「打开」。做题记录会保留。</div>');
   if (!S.installApk(id)) updFail('打不开安装界面，请下拉通知栏，点「智学题库 更新」那条下载完成的通知安装', u.page);
 }
 
@@ -1507,10 +1549,12 @@ function updProgress(p, title) {
     (p.state === 'downloading' && p.error ? '<div class="num-orange">' + esc(p.error) + '</div>' : '') + '</div>';
 }
 
-function updFail(msg, page) {
-  $('#upd-out').innerHTML = '<div class="upd-box upd-err"><b>更新没有完成</b><div>' + esc(msg) + '</div>' +
-    '<div class="upd-acts"><button class="btn" onclick="applyUpdate()">重试</button>' +
-    (page ? '<button class="btn ghost" onclick="openExternal(' + jsq(page) + ')">去 GitHub 手动下载</button>' : '') + '</div></div>';
+// kind：失败的是哪种更新，「重试」就重试哪种（以前内容更新失败时，重试的却是程序更新）
+function updFail(msg, page, kind) {
+  updSetBusy('');
+  updShow('<div class="upd-box upd-err"><b>更新没有完成</b><div>' + esc(msg) + '</div>' +
+    '<div class="upd-acts"><button class="btn" onclick="' + (kind === 'content' ? 'applyContentUpdate()' : 'applyUpdate()') + '">重试</button>' +
+    (page ? '<button class="btn ghost" onclick="openExternal(' + jsq(page) + ')">去 GitHub 手动下载</button>' : '') + '</div></div>');
 }
 
 async function clearMyData() {
