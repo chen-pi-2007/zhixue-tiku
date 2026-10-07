@@ -6,7 +6,7 @@
 
 江苏中职学业水平考试（学测）的刷题软件：今日复习（间隔重复）、错题本、模拟考试、技能实操、英语题的中文翻译。
 
-- **电脑版**：`智学题库.exe`，单文件。双击后在后台起一个本地网页服务（http://127.0.0.1:8788），在托盘显示图标，用浏览器做题。
+- **电脑版**：`智学题库.exe`，单文件。双击后在后台起一个本地网页服务（http://127.0.0.1:8788），在自己的窗口里显示界面（WebView2，和 Edge 同一个内核，Win10/11 一般自带），托盘有图标。关窗口缩到托盘，托盘右键「退出」才真正退出。没有 WebView2 的电脑自动改用浏览器打开。
 - **安卓版**：`zhixue-tiku.apk`，离线做题。没有技能实操和导入试卷。
 - 用户的做题记录只存在他自己的电脑或手机上，不上传任何地方。
 
@@ -71,9 +71,9 @@
 
 1. 装 Python 3（作者用的是 Anaconda）、git、GitHub CLI（`gh auth login`）。
 2. `git clone https://github.com/chen-pi-2007/zhixue-tiku`
-3. 跑起来看看：`python server.py`，浏览器打开 http://127.0.0.1:8788 。源码运行时直接用仓库里的 `static/` 和 `data/`，不做热更新。
+3. 跑起来看看：`python server.py`，浏览器打开 http://127.0.0.1:8788 （或者用装了 pywebview 的 Python 运行 `tray.py`，就是独立窗口）。源码运行时直接用仓库里的 `static/` 和 `data/`，不做热更新。
 4. 要发 app：
-   - 电脑版打包环境：`build_exe.bat` 第一次会在 `_build/venv` 建好（装 PyInstaller、pystray）。
+   - 电脑版打包环境：`build_exe.bat` 第一次会在 `_build/venv` 建好（装 PyInstaller、pystray、Pillow、pywebview）。
    - 安卓打包工具：JDK 17 和 Android SDK（build-tools 34.0.0、platforms;android-34），放在 `D:\tool\jdk17`、`D:\tool\android-sdk`（或用环境变量 `JAVA_HOME_17`、`ANDROID_HOME` 指定）。不用 Android Studio 和 Gradle。
    - 安卓签名证书：`gh repo clone chen-pi-2007/zhixue-android-key D:\tool\android-keys`。这是私有仓库，要原作者给你权限。
 
@@ -105,7 +105,7 @@
 
 | 文件 | 作用 |
 |---|---|
-| `tray.py` | exe 入口：托盘图标、启动网页服务、开机自启 |
+| `tray.py` | exe 入口：启动网页服务、独立窗口（pywebview）、托盘图标、开机自启（`--tray` 只进托盘） |
 | `server.py` | 网页服务和所有 `/api/...` 接口 |
 | `db.py` | 题库和做题记录（JSON 文件）、今日复习、错题本、模拟考 |
 | `srs.py` | 间隔复习算法（莱特纳盒子） |

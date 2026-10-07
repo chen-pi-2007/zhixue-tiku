@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""系统托盘版启动器：后台跑服务，托盘图标右键菜单操作，没有黑窗口。
-打包：build_exe.bat（生成 智学题库.exe，放在本目录，读写旁边的 data/ 和 static/）。
+"""电脑版入口（智学题库.exe）：后台起本地网页服务，在自己的窗口里显示界面（WebView2，和 Edge 同一个内核，
+不用打开浏览器），托盘图标右键菜单操作。关窗口缩到托盘，托盘「退出」才真正退出。
+参数：--tray 开机自启时只放进托盘；--updated 在线更新后重启（提示已更新）；--browser 不用窗口，改用浏览器。
+没有 WebView2 的电脑自动退回浏览器方式。打包：build_exe.bat 或 release.py app。
 """
 import ctypes
 import datetime
@@ -53,9 +55,10 @@ def launch_command():
 
 
 def is_autostart():
+    # 以前登记的没有 --tray，也算开着（只比较程序本身）
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as k:
-            return winreg.QueryValueEx(k, APP_NAME)[0] == launch_command()
+            return winreg.QueryValueEx(k, APP_NAME)[0].startswith(launch_command())
     except OSError:
         return False
 
@@ -63,7 +66,8 @@ def is_autostart():
 def set_autostart(on):
     with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:
         if on:
-            winreg.SetValueEx(k, APP_NAME, 0, winreg.REG_SZ, launch_command())
+            # --tray：开机时只放进托盘，不弹窗口
+            winreg.SetValueEx(k, APP_NAME, 0, winreg.REG_SZ, launch_command() + ' --tray')
         else:
             try:
                 winreg.DeleteValue(k, APP_NAME)
@@ -107,6 +111,16 @@ def already_running(url):
         return False
 
 
+def ask_show(url):
+    """已经开着时：请正在运行的那个把窗口调出来。成功返回 True（旧版本没有窗口，返回 False）"""
+    try:
+        req = urllib.request.Request(url + 'api/window/show', data=b'', method='POST')
+        with urllib.request.urlopen(req, timeout=3) as r:
+            return r.status == 200
+    except Exception:
+        return False
+
+
 def main():
     # 无控制台时 stdout/stderr 是 None，服务日志和报错写到 server.log
     os.makedirs(appdir.HOME_DIR, exist_ok=True)
@@ -118,7 +132,8 @@ def main():
     import server
     url = server.configured_url()
     if already_running(url):
-        webbrowser.open(url)
+        if not ask_show(url):
+            webbrowser.open(url)
         return
     try:
         srv, url = server.make_server()
@@ -127,11 +142,24 @@ def main():
         raise
     threading.Thread(target=srv.serve_forever, daemon=True).start()
 
+    # 独立窗口（WebView2，和 Edge 同一个内核）。电脑上没有 WebView2 或 pywebview 出错时，退回浏览器打开
+    try:
+        import webview
+    except Exception:
+        webview = None
+    if webview is not None and '--browser' not in sys.argv:
+        try:
+            return run_window(webview, srv, url, server)
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            print('独立窗口打不开，改用浏览器')
+    run_browser(srv, url)
+
+
+def tray_icon(url, on_open, on_quit):
     import pystray
     from pystray import Menu, MenuItem as Item
-
-    def open_app(icon=None, item=None):
-        webbrowser.open(url)
 
     def toggle_autostart(icon, item):
         try:
@@ -148,26 +176,93 @@ def main():
         except Exception as e:
             message('备份失败：%s' % e, error=True)
 
-    def quit_app(icon, item):
-        icon.stop()
-        srv.shutdown()
-
-    icon = pystray.Icon('quizbank', make_icon_image(), '%s · %s' % (APP_NAME, url), Menu(
-        Item('打开题库', open_app, default=True),
+    return pystray.Icon('quizbank', make_icon_image(), '%s · %s' % (APP_NAME, url), Menu(
+        Item('打开题库', lambda icon, item: on_open(), default=True),
         Menu.SEPARATOR,
         Item('开机自启', toggle_autostart, checked=lambda item: is_autostart()),
         Item('打开数据文件夹', open_data),
         Item('备份数据到桌面', do_backup),
         Menu.SEPARATOR,
-        Item('退出', quit_app),
+        Item('退出', lambda icon, item: on_quit()),
     ))
+
+
+def run_window(webview, srv, url, server):
+    """独立窗口：关窗口缩到托盘，托盘「退出」才真正退出。开机自启（--tray）时只放进托盘不弹窗。"""
+    from version import APP_VERSION
+    state = {'quitting': False, 'hint': False}
+    # 本地存储（主题、翻译开关、没交卷的考试）要留着，不用无痕模式；存在数据目录旁边
+    storage = os.path.join(appdir.HOME_DIR, 'webview')
+    webview.settings['ALLOW_DOWNLOADS'] = True              # 导出错题本
+    webview.settings['OPEN_EXTERNAL_LINKS_IN_BROWSER'] = True
+    hidden = '--tray' in sys.argv
+    win = webview.create_window(APP_NAME, url, width=1280, height=840, min_size=(400, 560), hidden=hidden,
+                                background_color='#1a1a1a' if dark_mode() else '#eceef1')
+
+    def show():
+        win.show()
+        win.restore()
+        win.on_top = True                                    # 拉到最前面再放开，免得被别的窗口挡着
+        win.on_top = False
+
+    def quit_all():
+        state['quitting'] = True
+        icon.stop()
+        win.destroy()
+
+    def on_closing():
+        if state['quitting']:
+            return True
+        win.hide()                                           # 关窗口 = 缩到托盘
+        if not state['hint']:
+            state['hint'] = True
+            icon.notify('还在托盘里运行，点托盘图标就能打开；右键「退出」才会关闭', APP_NAME)
+        return False
+
+    win.events.closing += on_closing
+    server.SHOW_WINDOW = show
+    icon = tray_icon(url, show, quit_all)
+    icon.run_detached()
+    icon.visible = True
+    if '--updated' in sys.argv:
+        icon.notify('已更新到 v%s' % APP_VERSION, APP_NAME)
+    webview.start(gui='edgechromium', private_mode=False, storage_path=storage)
+    # 窗口全部关掉（退出）后
+    server.SHOW_WINDOW = None
+    try:
+        icon.stop()
+    except Exception:
+        pass
+    srv.shutdown()
+
+
+def dark_mode():
+    """系统是不是深色模式（窗口打开前先用对应的底色，免得闪白）"""
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                            r'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize') as k:
+            return winreg.QueryValueEx(k, 'AppsUseLightTheme')[0] == 0
+    except OSError:
+        return False
+
+
+def run_browser(srv, url):
+    """没有独立窗口时的老办法：托盘 + 浏览器打开"""
+    def open_app():
+        webbrowser.open(url)
+
+    def quit_app():
+        icon.stop()
+        srv.shutdown()
+
+    icon = tray_icon(url, open_app, quit_app)
 
     def on_ready(icon):
         icon.visible = True
         if '--updated' in sys.argv:          # 在线更新后自动重启：原来的网页会自己刷新，不再新开一个
             from version import APP_VERSION
             icon.notify('已更新到 v%s' % APP_VERSION, APP_NAME)
-        else:
+        elif '--tray' not in sys.argv:
             open_app()
             icon.notify('已在后台运行，点托盘图标打开；右键可退出', APP_NAME)
 

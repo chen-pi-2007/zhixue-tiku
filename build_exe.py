@@ -47,6 +47,8 @@ def main():
         '--add-data', '%s%scontent' % (bundled, os.pathsep),
         '--hidden-import', 'llm', '--hidden-import', 'updater', '--hidden-import', 'hotupdate',
         '--hidden-import', 'pystray._win32',
+        # 独立窗口：pywebview 用 WebView2（Edge 内核），靠 pythonnet 调 .NET；把它们的 DLL 一起打进去
+        '--collect-all', 'webview', '--collect-all', 'clr_loader', '--collect-all', 'pythonnet',
         'tray.py',
     ])
     dist = os.path.join(BUILD, 'dist', NAME + '.exe')
