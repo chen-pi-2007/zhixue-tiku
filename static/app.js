@@ -1315,41 +1315,46 @@ async function viewSettings() {
     else subjOpts.push({ key: k, name: SKILL_DIR_NAME[s.direction] || s.direction, n: 1 });
   });
   subjOpts.forEach(o => { if (o.n) o.note = o.n + ' 套实操'; });
-  const subjBox = g => {
+  // 设置页：仿手机系统设置的分组列表（分组标题 + 一行一项 + 底下一句灰色说明）
+  const subjList = g => {
     const os = subjOpts.filter(o => subjectGroup(o.key) === g);
-    return os.length ? '<div class="subj-pick"><span class="muted">' + (GROUP_NAME[g] || '其他') + '</span>' + os.map(o =>
-      '<label class="subj-check"><input type="checkbox" data-k="' + esc(o.key) + '"' + (isHidden(o.key) ? '' : ' checked') + '>' +
-        esc(o.name) + '<span class="muted">' + esc(o.note) + '</span></label>').join('') + '</div>' : '';
+    return os.length ? '<div class="set-group-t">' + (GROUP_NAME[g] || '其他') + '</div><div class="set-list">' + os.map(o =>
+      '<label class="set-item subj-check"><span class="set-main">' + esc(o.name) + '</span><span class="set-val">' + esc(o.note) + '</span>' +
+        '<input type="checkbox" class="switch" data-k="' + esc(o.key) + '"' + (isHidden(o.key) ? '' : ' checked') + '></label>').join('') + '</div>' : '';
   };
+  const item = (main, val, attrs, cls) =>
+    '<' + (attrs ? 'button' : 'div') + ' class="set-item' + (cls ? ' ' + cls : '') + '"' + (attrs || '') + '>' +
+      '<span class="set-main">' + main + '</span>' + (val ? '<span class="set-val">' + val + '</span>' : '') + '</' + (attrs ? 'button' : 'div') + '>';
+  const canUpd = a.frozen || a.mobile;
   app.innerHTML =
     '<h2 class="page-h"><a class="page-back" href="javascript:void(0)" onclick="goBack()" aria-label="返回">' +
       '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
-    '<div class="card set-card">' +
-      '<div class="set-row"><div><b>我要学的科目</b><div class="muted">不用考的科目取消勾选，它就不会出现在首页、今日复习、错题本、搜索和模拟考里。做题记录会保留，以后再勾上就回来了。</div></div></div>' +
-      subjBox('culture') + subjBox('pro') + subjBox('other') +
+    '<div class="set-page">' +
+    subjList('culture') + subjList('pro') + subjList('other') +
+    '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +
+
+    '<div class="set-group-t">更新</div><div class="set-list">' +
+      item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +
+      '<button class="set-item set-link" id="upd-check"' + (canUpd ? '' : ' disabled data-off="1"') + '><span class="set-main upd-label">检查更新</span></button>' +
     '</div>' +
-    '<div class="card set-card">' +
-      '<div class="set-row"><div><b>版本</b><div class="muted">程序 v' + esc(a.version) +
-        (a.content_version ? ' · 题库和界面 第 ' + a.content_version + ' 版' : '') +
-        (a.frozen || a.mobile ? '' : '（源码运行，用 git pull 更新）') + '</div></div>' +
-        '<button class="btn ghost" id="upd-check"' + (a.frozen || a.mobile ? '' : ' disabled data-off="1"') + '><span class="upd-label">检查更新</span></button></div>' +
-      '<div id="upd-out"></div>' +
-      '<div class="muted set-note">题库和界面的更新只下载改动的文件，几秒钟就好，不用重启；程序本身有更新时' +
-        (a.mobile ? '下载新安装包覆盖安装（不要先卸载）' : '下载新程序后自动重启') + '。做题记录、错题本、考试成绩都会保留。</div>' +
-      '<div class="muted set-note set-credit">智学题库由 十三 和 chen_pi 共同开发</div>' +
+    '<div id="upd-out"></div>' +
+    '<div class="set-foot">' + (canUpd ? '题库和界面只下载改动的部分，几秒就好；做题记录不会丢。' : '源码运行，用 git pull 更新。') + '</div>' +
+
+    '<div class="set-group-t">我的数据</div><div class="set-list">' +
+      (a.mobile ? item('保存位置', '本机') : '<div class="set-item set-col"><span class="set-main">保存位置</span><span class="set-sub">' + esc(a.data_dir) + '</span></div>') +
+      (a.open_data ? item('打开数据文件夹', '', ' onclick="openDataDir()"', 'set-link') : '') +
+      (canShareProgress() ? item('分享做题记录', '', ' onclick="shareProgress()"', 'set-link') : '') +
+      item('清除做题记录', '', ' onclick="clearMyData()"', 'set-link set-danger') +
     '</div>' +
-    '<div class="card set-card">' +
-      '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在' + (a.mobile ? '' : ' ') + esc(a.data_dir) + '</div>' +
-        (a.data_note ? '<div class="muted">' + esc(a.data_note) + '</div>' : '') + '</div>' +
-        (a.open_data ? '<button class="btn ghost" onclick="openDataDir()">打开文件夹</button>' : '') +
-        (canShareProgress() ? '<button class="btn ghost" onclick="shareProgress()">分享做题记录</button>' : '') + '</div>' +
-      '<div class="set-row"><div><b>清除做题记录</b><div class="muted">' + (a.mobile
-        ? '清空复习进度、错题本和模拟考记录。题库和设置不受影响。清除前会在手机上留一份备份。'
-        : '清空复习进度、错题本、模拟考记录、技能实操成绩和练习文件。题库和设置不受影响。<br>清除前会自动备份到数据文件夹的 backups 里。') + '</div></div>' +
-        '<button class="btn danger" onclick="clearMyData()">清除记录</button></div>' +
+    '<div class="set-foot">' + (a.mobile
+      ? '卸载 App 会一起删除做题记录' + (canShareProgress() ? '，换手机或重装前先分享一份备份' : '') + '。清除前会自动留一份备份。'
+      : '清除会清空复习进度、错题本、模拟考和技能实操记录，清除前自动备份到数据文件夹的 backups 里。') + '</div>' +
+
+    '<div class="set-group-t">关于</div><div class="set-list">' +
+      item('开发者', '十三、chen_pi') +
+      item('项目地址', 'GitHub', ' onclick="openExternal(' + jsq(a.repo) + ')"', 'set-link') +
     '</div>' +
-    '<div class="card set-card"><div class="set-row"><div><b>项目地址</b><div class="muted">' +
-      '<a href="javascript:void(0)" onclick="openExternal(' + jsq(a.repo) + ')">' + esc(a.repo) + '</a></div></div></div></div>';
+    '</div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
   markUpdDots();
