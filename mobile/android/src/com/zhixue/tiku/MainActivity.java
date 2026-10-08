@@ -1,3 +1,9 @@
+/*
+ * 智学题库 · 江苏中职学测刷题系统
+ * 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+ * 项目：https://github.com/chen-pi-2007/zhixue-tiku
+ * © 2026 十三、chen_pi，保留所有权利。转载、修改后发布请注明原作者和项目地址。
+ */
 package com.zhixue.tiku;
 
 import android.app.Activity;

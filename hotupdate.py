@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """热更新：从 GitHub 仓库下载新的内容（界面 + 题库），不用重装程序，也不用重启。
 
 1. 读仓库 main 分支上的 content.json（最新内容的清单，release.py content 发布时写的）

@@ -1,3 +1,9 @@
+/*!
+ * 智学题库 · 江苏中职学测刷题系统
+ * 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+ * 项目：https://github.com/chen-pi-2007/zhixue-tiku
+ * © 2026 十三、chen_pi，保留所有权利。转载、修改后发布请注明原作者和项目地址。
+ */
 'use strict';
 /* 手机 App 的本地后端：把电脑版 server.py + db.py + srs.py + exam.py 的逻辑搬到 JS 里，
    app.js 的 api() 发现 window.LocalAPI 就不走网络，直接调这里。
@@ -179,8 +185,38 @@
     return a;
   }
 
+  // 错题混进题海里练（同 db.py 的 _wrong_mix）：每道错题配 2 道陪练题，
+  // 优先「以前错过、后来做对了」的，其次做过的里记得最不牢的，再不够用新题补；错题均匀分散
+  const WRONG_MIX_MAX = 15, WRONG_MIX_FILL = 2;
+  function wrongMix(pool) {
+    let wrong = [];
+    const back = [], seen = [], fresh = [];
+    pool.forEach(q => {
+      const c = prog.cards[q.key];
+      if (c && c.in_wrong) wrong.push(q);
+      else if (!q.material && SELF.indexOf(q.type) < 0) {
+        if (!c) fresh.push([0, Math.random(), q]);
+        else (c.wrong ? back : seen).push([c.box, Math.random(), q]);
+      }
+    });
+    shuffle(wrong);
+    wrong = wrong.slice(0, WRONG_MIX_MAX);
+    const byBox = (x, y) => x[0] - y[0] || x[1] - y[1];
+    const fill = back.sort(byBox).concat(seen.sort(byBox), fresh).map(t => t[2]).slice(0, WRONG_MIX_FILL * wrong.length);
+    shuffle(fill);
+    const out = [], n = wrong.length + fill.length;
+    let wi = 0, fi = 0;
+    for (let k = 0; k < n; k++) {
+      if (wi < wrong.length && Math.floor((k + 1) * wrong.length / n) > wi) out.push(wrong[wi++]);
+      else out.push(fill[fi++]);
+    }
+    return out;
+  }
+
   function practiceSet(paperId, scope, doShuffle, subject, qtype) {
     const papers = papersById();
+    if (scope === 'wrongmix')
+      return groupMaterial(wrongMix(filter(paperId, subject, qtype).filter(q => q.answer)).map(q => view(q, papers)));
     let items = [];
     filter(paperId, subject, qtype).forEach(q => {
       if (!q.answer) return;
@@ -554,7 +590,8 @@
       return r;
     }
     if (method === 'GET' && path === '/api/practice')
-      return { items: practiceSet(iarg('paper_id') || null, arg('scope', 'all'), arg('order', 'random') === 'random', arg('subject') || null, arg('type') || null) };
+      return { items: practiceSet(iarg('paper_id') || null, arg('scope', 'all'), arg('order', 'random') === 'random', arg('subject') || null, arg('type') || null),
+               mix: arg('scope') === 'wrongmix' };
     if (method === 'GET' && path === '/api/review') {
       const n = arg('new');
       return reviewQueue(arg('subject') || null, n ? parseInt(n, 10) : null, arg('extra') === '1');

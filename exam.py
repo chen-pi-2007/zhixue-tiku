@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """模拟考试：按科目蓝图组卷 + 判分。纯函数，不碰存储。
 
 组卷以“单元”为单位抽题：共用同一段材料的题（阅读、完形、对话）整组抽，

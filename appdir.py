@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """程序用到的各个目录，以及“现在用哪份内容”。
 
 APP_DIR      程序所在目录：直接跑 .py 时是源码目录；打包成 exe 后是 exe 所在目录

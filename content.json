@@ -1,6 +1,6 @@
 {
- "content_version": 21,
- "created": "2026-10-08 21:17:53",
+ "content_version": 22,
+ "created": "2026-10-08 22:06:29",
  "files": {
   "data/bank.json": [
    "9f121a416f072de661c08d2ab102e5d59af4edd9af60c83b39012dfa3811ea9b",
@@ -1571,28 +1571,28 @@
    17784
   ],
   "mobile/local.js": [
-   "601845d11fa8e83a513690ea3f7fe81ecfcf243fb20efc14fe3e5f5b1a3ab1f7",
-   39548
+   "1e432525d3f8a81b619b829c6a22b19423e5a05a89ff5bed8b8b83bac059aed0",
+   41270
   ],
   "static/app.js": [
-   "c49cf2cb1ff952cbda16e3fa5be1c80898bec261a63da27452d2ec00efd343b4",
-   104779
+   "6f29eb379c13cd735d5da0ce84151774e7a5f83d877406b9a0f7199d8657aad1",
+   107819
   ],
   "static/index.html": [
-   "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
-   6417
+   "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
+   6922
   ],
   "static/skills.js": [
    "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
    27524
   ],
   "static/style.css": [
-   "7d73eea8d5e24b3ecdaf004b0b9f9887074493ffd9b60124b7ff675e2f20881c",
-   46914
+   "81ef1c7daffef14ea618a1526fe22cfa301fcbc9d51372fdf1fca8cc67281b23",
+   48128
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "数学分数、根号、乘方显示成真正的公式；手机上点卷子没反应、图片放大不出来的问题修好了；今天的复习做完后可以「再加练 20 题」（薄弱旧题掺新题）；错题标签说清楚还要几天答对才移出错题本；新版启动时如果旧版本（含 start.bat 的黑色窗口）占着端口，会询问后关掉旧版本",
- "tag": "content-21"
+ "notes": "错题重练改成混在题海里练（每道错题配两道陪练题，错题分散开）；所有练习方式都能存档、读档（全部乱序和模拟考试除外），按题型练习也有了顺序 / 打乱 / 全乱序三种方式；手机上能进科目页按题型练习；大屏全屏时界面整体放大铺满；练习页顶部在手机上不再挤成两行；加上作者署名和版权信息",
+ "tag": "content-22"
 }

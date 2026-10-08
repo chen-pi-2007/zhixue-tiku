@@ -1,7 +1,17 @@
 'use strict';
+/*!
+ * 智学题库 · 江苏中职学测刷题系统
+ * 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+ * 项目：https://github.com/chen-pi-2007/zhixue-tiku
+ * © 2026 十三、chen_pi，保留所有权利。转载、修改后发布请注明原作者和项目地址。
+ */
 /* 智学题库 前端逻辑(纯原生JS,无框架无CDN) */
 
 const $ = s => document.querySelector(s);
+try {
+  console.log('%c智学题库%c 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）\nhttps://github.com/chen-pi-2007/zhixue-tiku  © 2026 保留所有权利',
+    'background:#c4374a;color:#fff;padding:2px 8px;border-radius:4px;font-weight:bold', 'color:inherit');
+} catch (e) { /* 控制台不可用时忽略 */ }
 const $$ = s => Array.from(document.querySelectorAll(s));
 const app = $('#app');
 const esc = v => String(v == null ? '' : v)
@@ -398,6 +408,8 @@ async function viewHome() {
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
+          // 手机上顶部没有科目链接：选了科目时，从这里进科目页（按题型练习、错题重练）
+          (h.subj && h.subj.indexOf('skill:') !== 0 ? '<a class="btn ghost sm subj-go" href="#/subject/' + esc(h.subj) + '">题型练习 · 错题</a>' : '') +
           (canShuffle ?
             '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' : '') +
         '</div>' +
@@ -601,7 +613,7 @@ async function viewSubject(args) {
       '<div class="paper-acts" style="margin-top:10px">' +
         '<button class="btn" onclick="startReview(\'' + subj + '\')">复习本科</button>' +
         '<button class="btn ghost" onclick="startPractice({subject:\'' + subj + '\',scope:\'new\',order:\'seq\',title:\'' + name + '·新题\'})">只做新题</button>' +
-        (s.wrong_open ? '<button class="btn danger" onclick="startPractice({subject:\'' + subj + '\',scope:\'wrong\',title:\'' + name + '·错题\'})">错题重练(' + s.wrong_open + ')</button>' : '') +
+        (s.wrong_open ? '<button class="btn danger" onclick="startPractice({subject:\'' + subj + '\',scope:\'wrongmix\',title:\'' + name + '·错题\'})">错题重练(' + s.wrong_open + ')</button>' : '') +
         (subj !== 'general' ? '<a class="btn ghost" href="#/exam/new/' + subj + '">模拟考</a>' : '') +
         '<button class="btn ghost" onclick="goBank(0,\'' + subj + '\')">浏览题目</button>' +
       '</div>' +
@@ -609,8 +621,8 @@ async function viewSubject(args) {
 
     '<div class="sec-title">按题型练习' + (weak.length ? ' <span class="muted">· 标红的是薄弱题型（最近正确率低于 70%）</span>' : '') + '</div>' +
     '<div class="typegrid">' + s.types.map(t =>
-      '<button class="typebtn' + (weak.indexOf(t.type) >= 0 ? ' weak' : '') + '" onclick="startPractice({subject:\'' + subj +
-        '\',type:\'' + t.type + '\',scope:\'all\',title:\'' + name + '·' + TYPE_NAME[t.type] + '\'})">' +
+      '<button class="typebtn' + (weak.indexOf(t.type) >= 0 ? ' weak' : '') + '" onclick="openModeSheet({subject:\'' + subj +
+        '\',type:\'' + t.type + '\'},\'' + name + '·' + TYPE_NAME[t.type] + '\')">' +
         '<span class="ti">' + (TYPE_ICON[t.type] || '') + '</span>' +
         '<span class="tn">' + (TYPE_NAME[t.type] || t.type) + '</span>' +
         '<span class="tc">' + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
@@ -633,7 +645,7 @@ function paperCard(p) {
     bar(p.mastery) +
     '<div class="paper-acts">' +
       '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ')">开始练习</button>' +
-      (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'wrong\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
+      (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'wrongmix\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
       '<button class="btn ghost sm" onclick="goBank(' + p.id + ')">浏览</button>' +
       '<button class="btn danger sm" onclick="delPaper(' + p.id + ',' + jsq(p.name) + ')">删除</button>' +
     '</div></div>';
@@ -839,7 +851,7 @@ async function viewWrong() {
       '</select>' +
       '<div style="flex:1"></div>' +
       (items.length
-        ? '<button class="btn sm" onclick="startPractice({subject:' + jsq(subj) + ',scope:\'wrong\',title:\'错题重练\'})">错题重练</button>' +
+        ? '<button class="btn sm" onclick="startPractice({subject:' + jsq(subj) + ',scope:\'wrongmix\',title:\'错题重练\'})">错题重练</button>' +
           (IS_APP ? '' : '<a class="btn ghost sm" href="/api/export/wrong">导出</a>')
         : '') +
     '</div>' +
@@ -885,6 +897,7 @@ async function startReview(subject) {
   const title = (subject ? SUBJECT_NAME[subject] + ' · ' : '');
   if (d.items.length) {
     beginPractice(d.items, title + '今日复习', 'review');
+    allowSave({ subject: subject, scope: 'review' }, title + '今日复习');
     toast('到期 ' + d.due + ' 题 + 新题 ' + d.new + ' 题');
     return;
   }
@@ -893,6 +906,7 @@ async function startReview(subject) {
   if (d.ahead == null) { toast('今天的复习已完成。加练要更新到最新版程序（设置 → 检查更新）'); return; }   // 老版程序不认 extra
   if (!d.items.length) { toast('这里还没有做过的题，先去做几套卷子吧'); return; }
   beginPractice(d.items, title + '加练', 'review');
+  allowSave({ subject: subject, scope: 'extra' }, title + '加练');
   toast('今天的复习已完成，再加练 ' + d.items.length + ' 题：' +
     [d.ahead ? '薄弱旧题 ' + d.ahead : '', d.new ? '新题 ' + d.new : ''].filter(Boolean).join(' + '));
 }
@@ -906,18 +920,28 @@ async function startPractice(opts) {
       (opts.subject ? '&subject=' + encodeURIComponent(opts.subject) : '') +
       (opts.type ? '&type=' + encodeURIComponent(opts.type) : ''));
   } catch (e) { toast(e.message, 'bad'); return; }
+  // 1.5.0 以前的电脑版程序不认 wrongmix，会把范围里的题全返回：退回只练错题
+  if (opts.scope === 'wrongmix' && !d.mix) return startPractice(Object.assign({}, opts, { scope: 'wrong' }));
   if (!d.items.length) {
-    toast(opts.scope === 'wrong' ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
+    toast(/^wrong/.test(opts.scope) ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
     return;
   }
   const list = opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items;
   beginPractice(list, opts.title || '练习', 'practice');
-  // 选项不变的整卷练习可以手动存档；读档时按存下的题目顺序还原
-  if (opts.paper_id && !opts.shuffleOpts && opts.scope === 'all') {
-    state.practice.saveKey = 'zx.save.' + opts.paper_id;
-    state.practice.saveOpts = { paper_id: opts.paper_id, order: opts.order || 'random', title: opts.title };
-    if (location.hash === '#/practice') route();
+  // 除了全部乱序（选项每次重新打乱），平时的练习都能手动存档；模拟考试另有自己的进度保存
+  if (!opts.shuffleOpts) allowSave(opts, opts.title);
+  if (opts.scope === 'wrongmix') {
+    const w = d.items.filter(q => q.in_wrong).length;
+    const back = d.items.filter(q => !q.in_wrong && q.wrong_count).length;
+    toast(w + ' 道错题混在 ' + d.items.length + ' 道题里' + (back ? '，其中 ' + back + ' 道是以前错过、后来做对的' : ''));
   }
+}
+
+// 这一轮练习可以存档：存档按练习的来源（卷子 / 科目 / 题型 / 复习……）分开存，读档时按存下的题目顺序还原
+function allowSave(src, title) {
+  state.practice.saveKey = saveKeyOf(src);
+  state.practice.saveOpts = Object.assign(practiceSrc(src), { title: title });
+  if (location.hash === '#/practice') route();
 }
 
 function beginPractice(list, title, mode) {
@@ -928,7 +952,15 @@ function beginPractice(list, title, mode) {
   else location.hash = '#/practice';
 }
 
-/* ---- 整卷练习的两种方式 + 手动存档 ---- */
+/* ---- 整卷 / 题型练习的两种方式 + 手动存档 ---- */
+
+// 练习的范围：一张卷子，或者某科的某个题型（比如数学·单选题）
+function practiceSrc(o) { return o.paper_id ? { paper_id: o.paper_id } : { subject: o.subject || '', type: o.type || '' }; }
+function saveKeyOf(o) {
+  const scope = o.scope && o.scope !== 'all' ? '.' + o.scope : '';
+  if (o.paper_id) return 'zx.save.' + o.paper_id + scope;           // 整卷：zx.save.<卷子id>（1.4.8 起的存档沿用）
+  return 'zx.save.' + (o.subject || 'all') + '.' + (o.type || '') + scope;
+}
 
 // 选项里引用了别的选项（以上都对、A和B……）或图里标号的题，打乱会出错，不打乱（和模拟考试同一条规则）
 const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[A-G]\s*[和与及、,，]\s*[A-G](?![A-Za-z])|^[A-G]{1,4}$|见材料|(?<!可)见图|\b(?:[Aa]ll|[Nn]one|[Bb]oth|[Nn]either) of the above\b|\b[A-G] and [A-G]\b/;
@@ -952,8 +984,12 @@ function shuffleQuestion(q) {
   return c;
 }
 
-function openPaperSheet(pid, name) {
-  const save = store.get('zx.save.' + pid);
+function openPaperSheet(pid, name) { openModeSheet({ paper_id: pid }, name); }
+
+function openModeSheet(src, name) {
+  const key = saveKeyOf(src);
+  const save = store.get(key);
+  const go = o => startPractice(Object.assign(practiceSrc(src), { scope: 'all' }, o));
   const sheet = document.createElement('div');
   sheet.className = 'sheet-mask';
   sheet.innerHTML =
@@ -962,7 +998,7 @@ function openPaperSheet(pid, name) {
       '<div class="sheet-sec"><div class="sheet-t">选项不变</div>' +
         '<div class="sheet-d">选项顺序和原卷一样。做到一半可以手动存档，以后读档回到那个状态接着做。</div>' +
         (save ? '<button class="btn block" data-act="resume">从存档继续（第 ' + (save.idx + 1) + '/' + save.ids.length + ' 题，' + esc(save.t.slice(5, 16)) + ' 存）</button>' : '') +
-        '<div class="sheet-row"><button class="btn' + (save ? ' ghost' : '') + '" data-act="seq">按原卷顺序</button>' +
+        '<div class="sheet-row"><button class="btn' + (save ? ' ghost' : '') + '" data-act="seq">' + (src.paper_id ? '按原卷顺序' : '按卷子顺序') + '</button>' +
         '<button class="btn ghost" data-act="rand">题目打乱</button></div></div>' +
       '<div class="sheet-sec"><div class="sheet-t">全部乱序</div>' +
         '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。</div>' +
@@ -976,10 +1012,10 @@ function openPaperSheet(pid, name) {
     const act = btn && btn.dataset.act;
     if (!act) return;
     close();
-    if (act === 'resume') loadSave(pid);
-    else if (act === 'seq') startPractice({ paper_id: pid, scope: 'all', order: 'seq', title: name });
-    else if (act === 'rand') startPractice({ paper_id: pid, scope: 'all', order: 'random', title: name + '·题目打乱' });
-    else startPractice({ paper_id: pid, scope: 'all', order: 'random', shuffleOpts: true, title: name + '·全部乱序' });
+    if (act === 'resume') loadSave(key);
+    else if (act === 'seq') go({ order: 'seq', title: name });
+    else if (act === 'rand') go({ order: 'random', title: name + '·题目打乱' });
+    else go({ order: 'random', shuffleOpts: true, title: name + '·全部乱序' });
   });
   document.body.appendChild(sheet);
 }
@@ -997,20 +1033,26 @@ function saveProgress() {
   toast('已存档：做完了 ' + Object.keys(p.done).length + ' 题，以后可以读档回到这里');
 }
 
-async function loadSave(pid) {
-  const sv = store.get('zx.save.' + pid);
-  if (!sv) { toast('这张卷子还没有存档'); return; }
+async function loadSave(key) {
+  if (typeof key === 'number') key = 'zx.save.' + key;
+  const sv = store.get(key);
+  if (!sv) { toast('还没有存档'); return; }
+  const o = sv.opts || {};
   let d;
-  try { d = await api('/api/practice?paper_id=' + pid + '&scope=all&order=seq'); } catch (e) { toast(e.message, 'bad'); return; }
+  try {
+    // 取这个范围里的全部题，再按存档里的题目 id 和顺序还原
+    d = await api('/api/practice?scope=all&order=seq' + (o.paper_id ? '&paper_id=' + o.paper_id
+      : (o.subject ? '&subject=' + encodeURIComponent(o.subject) : '') + (o.type ? '&type=' + encodeURIComponent(o.type) : '')));
+  } catch (e) { toast(e.message, 'bad'); return; }
   const byId = {};
   d.items.forEach(q => { byId[q.id] = q; });
   const list = sv.ids.map(id => byId[id]).filter(Boolean);
-  if (list.length !== sv.ids.length) { toast('卷子的题目变过了，这个存档用不了', 'bad'); return; }
+  if (list.length !== sv.ids.length) { toast('题目变过了，这个存档用不了', 'bad'); return; }
   beginPractice(list, sv.title, 'practice');
   const p = state.practice;
   Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0,
                      results: (sv.results || []).map(r => ({ q: byId[r[0]], correct: r[1] })).filter(r => r.q),
-                     saveKey: 'zx.save.' + pid, saveOpts: sv.opts });
+                     saveKey: key, saveOpts: sv.opts });
   route();
   toast('已读档：回到第 ' + (sv.idx + 1) + ' 题');
 }
@@ -1049,10 +1091,10 @@ function renderQ() {
   const pct = Math.round(100 * p.idx / p.list.length);
   const again = p.idx >= p.firstTotal;
   app.innerHTML =
-    '<div class="crumb">当前位置：<a href="#/home">首页</a> &gt; ' + esc(p.title) +
+    '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
         (p.saveKey ? '<a href="javascript:void(0)" onclick="saveProgress()">存档</a>' +
-          (store.get(p.saveKey) ? '<a href="javascript:void(0)" onclick="loadSave(' + p.saveOpts.paper_id + ')">读档</a>' : '') : '') +
+          (store.get(p.saveKey) ? '<a href="javascript:void(0)" onclick="loadSave(' + jsq(p.saveKey) + ')">读档</a>' : '') : '') +
         '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></span></div>' +
     '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
     '<div class="card qcard-main">' +
@@ -1606,6 +1648,8 @@ async function viewSettings() {
       item('开发者', '十三、chen_pi') +
       item('项目地址', 'GitHub', ' onclick="openExternal(' + jsq(a.repo) + ')"', 'set-link') +
     '</div>' +
+    '<div class="set-foot">智学题库由 十三（xiabanghao13）和 chen_pi（chen-pi-2007）共同开发。<br>' +
+      '© 2026 十三、chen_pi，保留所有权利。源码公开仅供学习参考，转载、修改后发布请注明原作者和项目地址。</div>' +
     '</div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);

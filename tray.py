@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """电脑版入口（智学题库.exe）：后台起本地网页服务，在自己的窗口里显示界面（WebView2，和 Edge 同一个内核，
 不用打开浏览器），托盘图标右键菜单操作。关窗口缩到托盘，托盘「退出」才真正退出。
 参数：--tray 开机自启时只放进托盘；--updated 在线更新后重启（提示已更新）；--browser 不用窗口，改用浏览器。

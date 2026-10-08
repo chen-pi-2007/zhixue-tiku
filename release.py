@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """发布脚本：改完题库、界面或代码之后，用它发布给所有用户。详细说明见 MAINTAINING.md。
 
     python release.py check                    只做发布前检查（测试、私人卷子、证书……），不发布

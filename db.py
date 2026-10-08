@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """存储层：纯 JSON 文件，无数据库依赖。
 
 data/bank.json      题库内容（卷子 + 题目），可由题库包重新导入，丢了也能重建
@@ -348,12 +350,49 @@ def _group_material(items):
     return out
 
 
-def practice_set(paper_id=None, scope='all', shuffle=True, seed=None, subject=None, qtype=None):
+WRONG_MIX_MAX = 15      # 错题混练一轮最多带几道错题
+WRONG_MIX_FILL = 2      # 每道错题配几道陪练题
 
+
+def _wrong_mix(pool, cards, rnd):
+    """错题混进题海里练：每道错题配 WRONG_MIX_FILL 道陪练题，错题均匀分散开，不扎堆。
+    陪练题优先挑「以前错过、后来做对了」的题（最容易再错，顺便巩固），其次是做过的题里记得最不牢的，
+    还不够就用没做过的新题补。阅读这类整组材料题不当陪练，免得一组就把错题挤到一起。"""
+    wrong, back, seen, fresh = [], [], [], []
+    for q in pool:
+        c = cards.get(q['key'])
+        if c and c['in_wrong']:
+            wrong.append(q)
+        elif not q['material'] and q['type'] not in SELF_TYPES:
+            if not c:
+                fresh.append((0, rnd.random(), q))
+            else:
+                (back if c['wrong'] else seen).append((c['box'], rnd.random(), q))
+    rnd.shuffle(wrong)
+    wrong = wrong[:WRONG_MIX_MAX]
+    fill = [t[2] for t in sorted(back) + sorted(seen) + fresh][:WRONG_MIX_FILL * len(wrong)]
+    rnd.shuffle(fill)
+    # 错题均匀插进陪练题里：第 k 道题的位置上，按比例该轮到错题了就放错题
+    out, n, wi, fi = [], len(wrong) + len(fill), 0, 0
+    for k in range(n):
+        if wi < len(wrong) and (k + 1) * len(wrong) // n > wi:
+            out.append(wrong[wi])
+            wi += 1
+        else:
+            out.append(fill[fi])
+            fi += 1
+    return out
+
+
+def practice_set(paper_id=None, scope='all', shuffle=True, seed=None, subject=None, qtype=None):
+    """scope：all 全部、new 没做过的、wrong 错题本里的、wrongmix 错题混进做过的题里练（见 _wrong_mix）"""
     with _lock:
         _load()
         papers = _papers_by_id()
         cards = _prog['cards']
+        if scope == 'wrongmix':
+            pool = [q for q in _filter(paper_id, subject, qtype) if q['answer']]
+            return _group_material([_view(q, papers) for q in _wrong_mix(pool, cards, random.Random(seed))])
         items = []
         for q in _filter(paper_id, subject, qtype):
             if not q['answer']:

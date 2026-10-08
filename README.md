@@ -140,3 +140,9 @@ git push -u origin master
 - **上传 .doc 报错**:旧版 .doc 请先用 Word 另存为 .docx
 - **PDF 暂不支持**:先转成 docx 或 txt
 - **端口被占用**:自动改用下一个端口;也可在 `config.json` 里改 `port`
+
+## 作者与版权
+
+智学题库由 **十三**（[xiabanghao13](https://github.com/xiabanghao13)）和 **chen_pi**（[chen-pi-2007](https://github.com/chen-pi-2007)）共同开发，项目地址 https://github.com/chen-pi-2007/zhixue-tiku 。
+
+© 2026 十三、chen_pi，保留所有权利。源码公开仅供学习参考；转载、修改后发布，请保留作者署名并注明原项目地址，不得以他人名义冒充作者发布。安卓安装包用作者私有证书签名，别人改过再打包的版本装不到已安装的智学题库上，也收不到本项目的更新。

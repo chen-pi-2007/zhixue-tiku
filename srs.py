@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """间隔复习（莱特纳盒子）。纯函数，不碰存储。
 
 - 每道做过的题有一张卡片 card，box 0..6，box 越高掌握越牢、下次复习间隔越长。

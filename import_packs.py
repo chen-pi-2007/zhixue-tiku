@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """导入题库包：python import_packs.py <题库包目录或某个 .json> ...
 
 题库包由 学测/_脚本/build_packs.py 生成，格式：

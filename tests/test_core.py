@@ -167,6 +167,23 @@ class DbFlowTest(unittest.TestCase):
         done = {q['id'] for q in qs[:25]}
         self.assertEqual([i['id'] in done for i in r['items'][:4]], [True, False, True, False])
 
+    def test_wrong_mix_spreads_wrong_among_recovered(self):
+        # 错题混练：每道错题配 2 道陪练，陪练优先“以前错过、后来做对”的，错题不扎堆
+        qs = db.get_questions(limit=40)[0]
+        for q in qs[:20]:
+            db.record_answer(q['id'], True)
+        for q in qs[:3]:                                   # 3 道错题
+            db.record_answer(q['id'], False)
+        for q in qs[3:9]:                                  # 6 道错过又做对、已出错题本的
+            db.record_answer(q['id'], False)
+            db._prog['cards'][q['key']]['in_wrong'] = False
+        items = db.practice_set(scope='wrongmix', seed=1)
+        self.assertEqual(len(items), 9)
+        self.assertEqual(sorted(i['id'] for i in items if i['in_wrong']), sorted(q['id'] for q in qs[:3]))
+        self.assertEqual({i['id'] for i in items if not i['in_wrong']}, {q['id'] for q in qs[3:9]})
+        pos = [k for k, i in enumerate(items) if i['in_wrong']]
+        self.assertEqual([p // 3 for p in pos], [0, 1, 2])  # 每 3 道里一道错题
+
     def test_exam_flow_records_wrong(self):
         e = db.exam_start('politics')
         self.assertEqual(sum(len(s['items']) for s in e['sections']), 35)

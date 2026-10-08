@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """智学题库 本地服务(纯标准库,Python 3.6+ 可运行)
 启动:  python server.py   然后浏览器打开 http://127.0.0.1:8788
 """
@@ -14,6 +16,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs, unquote
 
 import db
+import version
 import docparse
 from skills import service as skill_service
 
@@ -73,6 +76,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Zhixue-Authors', version.AUTHORS_ASCII)
         self.end_headers()
         self.wfile.write(body)
 
@@ -221,7 +225,7 @@ class Handler(BaseHTTPRequestHandler):
             items = db.practice_set(iarg('paper_id') or None, arg('scope', 'all'),
                                     shuffle=arg('order', 'random') == 'random',
                                     subject=arg('subject') or None, qtype=arg('type') or None)
-            return self.send_json({'ok': True, 'items': items})
+            return self.send_json({'ok': True, 'items': items, 'mix': arg('scope') == 'wrongmix'})
 
         if method == 'GET' and path == '/api/review':
             new = arg('new')
@@ -295,7 +299,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'version': version.APP_VERSION, 'content_version': appdir.content_version(),
                                    'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
                                    'window': SHOW_WINDOW is not None, 'open_data': sys.platform == 'win32',
-                                   'repo': 'https://github.com/%s' % version.REPO})
+                                   'repo': 'https://github.com/%s' % version.REPO,
+                                   'authors': version.AUTHORS, 'copyright': version.COPYRIGHT})
 
         # 设置页点「我的数据」：在资源管理器里打开数据文件夹
         if method == 'POST' and path == '/api/open-data':

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """打包托盘版 exe：用 _build/venv 里的 PyInstaller（Anaconda 自带的旧 pathlib 包和 PyInstaller 冲突）。
 运行 build_exe.bat（或 release.py app）即可，生成 _build/dist/智学题库.exe，并尽量复制一份到本目录。
 
@@ -32,6 +34,33 @@ def make_content():
     return out
 
 
+def write_version_file():
+    """exe 的文件属性：右键 → 属性 → 详细信息 里能看到作者和版权"""
+    import version
+    nums = tuple(int(x) for x in version.APP_VERSION.split('.')) + (0,)
+    path = os.path.join(BUILD, 'version_info.txt')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write('''VSVersionInfo(
+  ffi=FixedFileInfo(filevers=%(n)r, prodvers=%(n)r, mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0, date=(0, 0)),
+  kids=[
+    StringFileInfo([StringTable('080404b0', [
+      StringStruct('CompanyName', '十三、chen_pi'),
+      StringStruct('FileDescription', '智学题库 · 江苏中职学测刷题'),
+      StringStruct('FileVersion', %(v)r),
+      StringStruct('InternalName', 'zhixue-tiku'),
+      StringStruct('LegalCopyright', %(c)r),
+      StringStruct('OriginalFilename', '智学题库.exe'),
+      StringStruct('ProductName', '智学题库'),
+      StringStruct('ProductVersion', %(v)r),
+      StringStruct('Comments', %(a)r)])]),
+    VarFileInfo([VarStruct('Translation', [2052, 1200])])
+  ]
+)
+''' % {'n': nums, 'v': version.APP_VERSION, 'c': version.COPYRIGHT,
+       'a': '作者：' + version.AUTHORS + '  https://github.com/' + version.REPO})
+    return path
+
+
 def main():
     os.chdir(HERE)
     import tray
@@ -39,9 +68,10 @@ def main():
     ico = os.path.join(BUILD, 'icon.ico')
     tray.make_icon_image(256).save(ico, sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
     bundled = make_content()
+    verfile = write_version_file()
     subprocess.check_call([
         sys.executable, '-m', 'PyInstaller', '--noconfirm', '--onefile', '--windowed',
-        '--name', NAME, '--icon', ico,
+        '--name', NAME, '--icon', ico, '--version-file', verfile,
         '--distpath', os.path.join(BUILD, 'dist'), '--workpath', os.path.join(BUILD, 'work'),
         '--specpath', BUILD,
         '--add-data', '%s%scontent' % (bundled, os.pathsep),

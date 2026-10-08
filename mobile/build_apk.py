@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """打包安卓 App（不用 Gradle，直接调 Android SDK 的 aapt2 / d8 / apksigner）。
 
     python mobile/build_apk.py        生成 _build/mobile/zhixue-tiku.apk（中间文件在 %TEMP%\zhixue-apk）

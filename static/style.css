@@ -1,3 +1,9 @@
+/*!
+ * 智学题库 · 江苏中职学测刷题系统
+ * 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+ * 项目：https://github.com/chen-pi-2007/zhixue-tiku
+ * © 2026 十三、chen_pi，保留所有权利。转载、修改后发布请注明原作者和项目地址。
+ */
 /* 智学题库 样式 —— 参照力扣（leetcode.cn）题库页
    顶部细导航 + 左侧边栏；中间胶囊标签筛选 + 斑马纹圆角列表行；右侧卡片（今日复习、学习日历）。
    数值取自力扣：系统字体 14px、胶囊 40px/全圆角、列表行 44px/8px 圆角、侧栏项 5px 圆角、
@@ -122,7 +128,11 @@ html { -webkit-tap-highlight-color: transparent; }
 #nav a { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 5px; color: var(--ink-2); font-size: 15px; }
 #nav a:hover { background: var(--layer-2); color: var(--ink); opacity: 1; }
 #nav a.active { background: var(--layer-2); color: var(--ink); font-weight: 600; }
-main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1280px; }
+main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1600px; }
+/* 大屏（全屏 / 最大化）整体放大，字和按钮跟着变大，不留一大片空白 */
+@media (min-width: 1680px) { body { zoom: 1.12; } }
+@media (min-width: 1900px) { body { zoom: 1.25; } }
+@media (min-width: 2400px) { body { zoom: 1.5; } }
 
 /* ---------------------------------------------------------------- 通用件 */
 .crumb { font-size: 13px; color: var(--ink-3); margin-bottom: 14px; }
@@ -206,6 +216,7 @@ main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1280px; }
 
 .list-tools { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; }
 .search-pill { display: inline-flex; align-items: center; gap: 6px; width: 240px; height: 32px; padding: 0 12px; border-radius: 9999px; background: var(--layer-2); color: var(--ink-3); }
+.subj-go, .list-tools .icon-btn { flex: none; white-space: nowrap; }
 .search-pill input { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); font: inherit; outline: none; }
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 9999px; background: var(--layer-2); color: var(--ink-2); cursor: pointer; }
 .icon-btn:hover { background: var(--layer-3); color: var(--ink); }
@@ -489,7 +500,10 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   body.subpage .top-set { display: none; }              /* 已经在设置里了，齿轮也收起来 */
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
-  .search-pill { width: 100%; }
+  .search-pill { width: auto; flex: 1; min-width: 0; }
+  .list-tools .spacer { display: none; }
+  .sec-title { flex-wrap: wrap; }
+  .sec-title .muted { flex-basis: 100%; margin-top: 4px; font-size: 13px; font-weight: 400; }
   .exam-layout { flex-direction: column; gap: 14px; }
   .answer-card { position: static; width: 100%; grid-template-columns: repeat(8, 1fr); max-height: none; order: -1; }
   .ty-src, .ty-line { font-size: 16px; letter-spacing: 0; }
@@ -639,6 +653,11 @@ main.page-in { animation: page-in .22s ease-out; }
 .sheet .btn.block + .sheet-row { margin-top: 10px; }
 .crumb-acts { float: right; display: flex; gap: 16px; }
 .crumb-acts .crumb-exit { float: none; }
+/* 练习页的位置栏：标题太长就省略，存档 / 读档 / 退出始终在同一行右边 */
+.crumb-row { display: flex; align-items: center; gap: 16px; }
+.crumb-row .crumb-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumb-row .crumb-acts { float: none; flex: none; }
+@media (max-width: 760px) { .crumb-pre { display: none; } }
 @media (max-width: 760px) {
   .sheet-mask { align-items: flex-end; padding: 0; }
   .sheet { max-width: none; border-radius: 16px 16px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }

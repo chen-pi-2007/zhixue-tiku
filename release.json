@@ -1,19 +1,19 @@
 {
- "version": "1.4.9",
- "notes": "数学分数、根号、乘方显示成真正的公式；手机上点卷子没反应、图片放大不出来的问题修好了；今天的复习做完后可以「再加练 20 题」（薄弱旧题掺新题）；错题标签说清楚还要几天答对才移出错题本；新版启动时如果旧版本（含 start.bat 的黑色窗口）占着端口，会询问后关掉旧版本",
- "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.4.9",
+ "version": "1.5.0",
+ "notes": "错题重练改成混在题海里练（每道错题配两道陪练题，错题分散开）；所有练习方式都能存档、读档（全部乱序和模拟考试除外），按题型练习也有了顺序 / 打乱 / 全乱序三种方式；手机上能进科目页按题型练习；大屏全屏时界面整体放大铺满；练习页顶部在手机上不再挤成两行；加上作者署名和版权信息",
+ "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.0",
  "assets": {
   "exe": {
    "name": "zhixue-tiku.exe",
-   "size": 58127518,
-   "sha256": "457107a69a264d4dee66a1811b3193863b1e747bbe4e8f024b6824fd0aab1a25",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.9/zhixue-tiku.exe"
+   "size": 58132305,
+   "sha256": "6edac804d94ecf54fa97bbddbab27eb6f1c08cf01d70aff8ebfa5c03a7bbbd49",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.0/zhixue-tiku.exe"
   },
   "apk": {
    "name": "zhixue-tiku.apk",
    "size": 19287899,
-   "sha256": "6cac5ac2759d484ca5eb8bdd9406a246ae273f59f3d4db83c947cc6b73c74ead",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.9/zhixue-tiku.apk"
+   "sha256": "05a49ae5b0db5ee7bcafbba396e433e2839e25f7939d4f8c04c8d7041a327623",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.0/zhixue-tiku.apk"
   }
  }
 }

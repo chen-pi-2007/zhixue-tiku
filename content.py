@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """内容包：可以热更新（不重装程序）的那部分文件，以及描述它们的清单 content.json。
 
 内容 = 界面 static/ + 手机版本地逻辑 mobile/local.js + 题库 data/bank.json、data/media/、data/skills/。

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 智学题库 · 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
+# https://github.com/chen-pi-2007/zhixue-tiku  © 2026 十三、chen_pi，保留所有权利。
 """在线更新：从 GitHub Releases 检查、下载新版 exe，替换后重启。
 
 只换 exe，不碰用户数据目录（%LOCALAPPDATA%\\智学题库\\data 或 exe 旁边的 data/）；
