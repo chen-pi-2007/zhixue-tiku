@@ -494,7 +494,21 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .ty-src, .ty-line { font-size: 16px; letter-spacing: 0; }
   .ty-src { white-space: normal; }
   .exam-pick { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .exam-pick .subj-name { margin: 0; min-width: 0; }
+  .exam-pick .subj-name { margin: 0; min-width: 0; white-space: nowrap; }
+  /* 手机首页：今日复习放最上面 → 一行科目筛选 → 搜索 → 卷子列表 → 日历等次要卡片放最后。
+     电脑上的科目统计、文化课/专业技能分类和下面的科目筛选是重复的，手机上只留一行筛选 */
+  .home { gap: 0; }
+  .home-side { display: contents; }
+  .home-side .side-card { flex: none; }                 /* 窄屏时卡片横排用的 flex: 1 1 260px，竖排会变成 260px 高 */
+  .home-side .today-card { order: -1; margin-bottom: 14px; }
+  .home-main { order: 0; }
+  .home-side .side-card:not(.today-card) { order: 1; margin-top: 14px; }
+  .home .tag-row, .home .group-tabs { display: none; }
+  .home .pill-row { flex-wrap: nowrap; overflow-x: auto; margin: 0 -12px 12px; padding: 0 12px 12px; scrollbar-width: none; }
+  .home .pill-row::-webkit-scrollbar { display: none; }
+  .home .pill-row .pill-tab { flex: none; }
+  .exam-pick .subj-name .ti { display: none; }          /* 手机上省掉“语/数/英”小图标，科目名才放得下一行 */
+  .exam-pick { padding: 12px 14px; }
   .exam-pick .paper-acts { flex: none; margin: 0; }
 }
 

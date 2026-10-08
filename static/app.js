@@ -24,6 +24,69 @@ function zoomImg(src) {
   document.body.appendChild(d);
 }
 
+// 老内核兜底：安卓系统 WebView 84 以前（很多国产手机没有谷歌商店，WebView 一直不更新）不支持弹性布局的 gap，
+// 元素会挤在一起。检测到不支持时，给弹性容器的子元素补上等量的外边距；新内核上这段什么都不做
+(function flexGapFallback() {
+  const t = document.createElement('div');
+  t.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+  t.appendChild(document.createElement('div'));
+  t.appendChild(document.createElement('div'));
+  document.body.appendChild(t);
+  const ok = t.scrollHeight === 1;
+  t.remove();
+  if (ok) return;
+  document.documentElement.classList.add('no-flexgap');
+  const SKIP = '.theme-pick, .top-upd, .upd-dot';      // 这些靠 margin-left:auto 推到右边，不能改
+  const px = v => parseFloat(v) || 0;
+  function fix() {
+    document.querySelectorAll('body *').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.display !== 'flex' && cs.display !== 'inline-flex') return;
+      const cg = px(cs.columnGap), rg = px(cs.rowGap);
+      if (!cg && !rg) return;
+      // 直接写在容器里的文字（比如“●语文”里的“语文”）也是一个弹性子项，先套一层 span 才能补间距
+      Array.from(el.childNodes).forEach(n => {
+        if (n.nodeType === 3 && n.textContent.trim()) {
+          const s = document.createElement('span');
+          n.replaceWith(s);
+          s.appendChild(n);
+        }
+      });
+      const kids = Array.from(el.children).filter(k => {
+        const s = getComputedStyle(k);
+        return s.display !== 'none' && s.position !== 'absolute' && s.position !== 'fixed';
+      });
+      const dir = cs.flexDirection, wrap = cs.flexWrap !== 'nowrap';
+      // 换行的容器：子元素右边、下边都补了间距，最后一行、最后一个多出来的那份用容器的负外边距抵掉
+      // （容器自己有背景或边框时不抵，免得背景跟着变形）
+      if (wrap && !el.dataset.gapWrap && cs.backgroundColor === 'rgba(0, 0, 0, 0)' && !px(cs.borderBottomWidth) && cs.backgroundImage === 'none') {
+        if (rg) el.style.marginBottom = (px(cs.marginBottom) - rg) + 'px';
+        if (cg) el.style.marginRight = (px(cs.marginRight) - cg) + 'px';
+        el.dataset.gapWrap = '1';
+      }
+      kids.forEach((k, i) => {
+        if (k.dataset.gapFix || k.matches(SKIP)) return;
+        const ks = getComputedStyle(k);
+        if (wrap) {                                    // 换行的：每个子元素右边、下边都留空
+          if (cg) k.style.marginRight = (px(ks.marginRight) + cg) + 'px';
+          if (rg) k.style.marginBottom = (px(ks.marginBottom) + rg) + 'px';
+        } else if (i > 0) {                            // 不换行的：从第二个起，前面留空
+          if (dir === 'row' && cg) k.style.marginLeft = (px(ks.marginLeft) + cg) + 'px';
+          else if (dir === 'row-reverse' && cg) k.style.marginRight = (px(ks.marginRight) + cg) + 'px';
+          else if (dir === 'column' && rg) k.style.marginTop = (px(ks.marginTop) + rg) + 'px';
+          else if (dir === 'column-reverse' && rg) k.style.marginBottom = (px(ks.marginBottom) + rg) + 'px';
+        }
+        k.dataset.gapFix = '1';
+      });
+    });
+  }
+  let queued = false;
+  const run = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; fix(); }); } };
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('resize', run);
+  run();
+})();
+
 // 手机 App 里没有 Python 服务，请求交给 mobile/local.js 在本地处理
 const IS_APP = !!window.LocalAPI;
 function openExternal(url) {
@@ -377,7 +440,7 @@ function examDays(date) {
 function todayCard(d) {
   const t = d.today;
   const todo = t.todo != null ? t.todo : t.due + t.new_left;
-  return '<div class="side-card">' +
+  return '<div class="side-card today-card">' +
     '<div class="sc-head"><b>今日复习</b>' +
     '</div>' +
     '<div class="sc-stats">' +

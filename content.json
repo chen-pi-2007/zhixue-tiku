@@ -1,6 +1,6 @@
 {
- "content_version": 15,
- "created": "2026-10-08 12:09:50",
+ "content_version": 16,
+ "created": "2026-10-08 12:34:09",
  "files": {
   "data/bank.json": [
    "de24bd60210d484627d024d1876040c5d97c7b143611eff2d079f2d1ee220eef",
@@ -1575,8 +1575,8 @@
    36166
   ],
   "static/app.js": [
-   "d70ef21079a0aee99c1488ddc9a076f444da63043ab1da237e9f10beee2f9a87",
-   89959
+   "a4c44699ef39554708ddb0a6c37fe540b83ff5af170d71843e30830e660bec35",
+   93616
   ],
   "static/index.html": [
    "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
@@ -1587,12 +1587,12 @@
    27524
   ],
   "static/style.css": [
-   "e296557bd5b0b3b93c792f60e33c982f287bfc0814e483d8e7fa9712ed1044f8",
-   42734
+   "039a81499506b15fb7e31581b357626d65460d2157fd33c1d19dad44c955faab",
+   43822
   ]
  },
  "min_android_version": "1.4.4",
  "min_app_version": "1.4.4",
- "notes": "设置页改成手机系统设置那样的分组列表（科目用开关、一行一项、说明缩成一句）；手机上设置只留一条「‹ 设置」标题栏；提示改成底部小胶囊，不再是大绿块",
- "tag": "content-15"
+ "notes": "老款安卓手机（系统 WebView 83 及以下）上元素挤在一起的问题修好了；手机首页重新排：今日复习放最上面，三层重复的科目筛选合并成一行；模拟考试页科目名不再折行",
+ "tag": "content-16"
 }
