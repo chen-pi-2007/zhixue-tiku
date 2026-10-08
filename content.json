@@ -1,10 +1,10 @@
 {
- "content_version": 18,
- "created": "2026-10-08 12:55:52",
+ "content_version": 19,
+ "created": "2026-10-08 17:07:08",
  "files": {
   "data/bank.json": [
-   "de24bd60210d484627d024d1876040c5d97c7b143611eff2d079f2d1ee220eef",
-   1896671
+   "d9569204f857edd7433358fa827093189c5d8059e3aac00503e39952c4bc759b",
+   1898157
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,12 +1571,12 @@
    17784
   ],
   "mobile/local.js": [
-   "4928f63333fe428a6030ec1496bfa73618e14fa98e15be1365e12893adcd2b57",
-   36837
+   "18f00e3d4c3af3deb26fe4d5d95816ff46f87a48b815a0e4fc18d3382a0e4d33",
+   38650
   ],
   "static/app.js": [
-   "2641ed9e75d0777bd8e5feef64c5596ef836f8ace247d7af40cc9be7b3227183",
-   91109
+   "cbf6780d6fbec5e7dc8df2c7fcad1616df9d202c0263795e07a17a061a24d0b3",
+   100199
   ],
   "static/index.html": [
    "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
@@ -1587,12 +1587,12 @@
    27524
   ],
   "static/style.css": [
-   "8e01a6758fca286418ae31bfccd90873f7679e6f90b0d3996cb3e0a8b67d4185",
-   44084
+   "575931cfefe87015c0628d2002f70fba6ac1afa84c600905f4cecafdc512a811",
+   46077
   ]
  },
- "min_android_version": "1.4.4",
- "min_app_version": "1.4.4",
- "notes": "去掉单独的「有更新」标签和底部提示条，有更新只在设置入口点小红点；顶栏「智学题库」固定大小不再被挤小或折行；切页面时顶栏不再左右跳；设置页标题栏和顶栏等高对齐",
- "tag": "content-18"
+ "min_android_version": "1.4.0",
+ "min_app_version": "1.4.0",
+ "notes": "修正语文 7 道题的答案（按官方参考答案），补回语文卷全部加点字和下划线；做题改成先选再确认，可以回到上一题，键盘 1234 选 ABCD、回车先确认再下一题；整卷练习分「选项不变（可手动存档、读档）」和「全部乱序」两种；国内连不上 GitHub 时自动走国内线路检查和下载更新",
+ "tag": "content-19"
 }

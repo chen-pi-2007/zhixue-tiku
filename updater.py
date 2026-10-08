@@ -8,6 +8,7 @@
   start_download()  后台线程开始下载（已经在下或已下好就不重复开）
   progress()        当前状态：idle / downloading / done / error，已下载字节、总字节、速度
   install(on_exit)  下载完成后：写批处理等本程序退出 → 覆盖 exe → 重新启动"""
+import hashlib
 import json
 import os
 import subprocess
@@ -21,6 +22,15 @@ import urllib.request
 from version import APP_VERSION, REPO, EXE_NAME
 
 API = 'https://api.github.com/repos/%s/releases/latest' % REPO
+# GitHub 连不上（国内常见）时，从这些地址读 release.json（release.py 发布时写的：版本号、说明、安装包的大小和 SHA-256）
+RELEASE_MIRRORS = [
+    'https://raw.githubusercontent.com/%s/main/release.json' % REPO,
+    'https://cdn.jsdelivr.net/gh/%s@main/release.json' % REPO,
+    'https://fastly.jsdelivr.net/gh/%s@main/release.json' % REPO,
+    'https://gcore.jsdelivr.net/gh/%s@main/release.json' % REPO,
+]
+# 安装包放在 GitHub Release 里；直连不通就经国内的 GitHub 下载加速站下载（第三方站点，所以下完一定核对 SHA-256）
+DOWNLOAD_PROXIES = ['', 'https://ghproxy.net/']
 STALL_SECONDS = 30          # 这么久一个字节都没收到，就算网络断了
 
 _lock = threading.Lock()
@@ -65,19 +75,44 @@ def _open(url, timeout, headers=None, tries=4):
     raise last
 
 
+def _release_json():
+    """从 GitHub 原站或 jsDelivr 读 release.json；都读不到返回 None"""
+    for url in RELEASE_MIRRORS:
+        try:
+            with _open(url, 15, tries=1) as r:
+                return json.loads(r.read().decode('utf-8'))
+        except Exception:
+            continue
+    return None
+
+
 def check():
-    """返回 {current, latest, has_update, notes, url, size}"""
+    """返回 {current, latest, has_update, notes, url, urls, size, sha256, page}"""
+    rel = None
     try:
-        with _open(API, 15, {'Accept': 'application/vnd.github+json'}) as r:
+        with _open(API, 15, {'Accept': 'application/vnd.github+json'}, tries=2) as r:
             rel = json.loads(r.read().decode('utf-8'))
-    except Exception as e:
-        raise ValueError('连不上 GitHub，检查一下网络（试了 4 次，走代理和直连都没成功：%s）' % e)
-    asset = next((a for a in rel.get('assets', []) if a.get('name', '').lower().endswith('.exe')), None)
-    latest = rel.get('tag_name', '')
-    return {'current': APP_VERSION, 'latest': latest.lstrip('vV'),
-            'has_update': bool(asset) and _ver(latest) > _ver(APP_VERSION),
-            'notes': rel.get('body') or '', 'url': asset['browser_download_url'] if asset else None,
-            'size': asset.get('size') if asset else None, 'page': rel.get('html_url')}
+    except Exception:
+        pass
+    info = _release_json()                 # 有它才有 SHA-256；GitHub 连不上时版本信息也从这里来
+    if rel:
+        asset = next((a for a in rel.get('assets', []) if a.get('name', '').lower().endswith('.exe')), None)
+        latest = rel.get('tag_name', '').lstrip('vV')
+        url, size, notes, page = (asset['browser_download_url'] if asset else None, asset.get('size') if asset else None,
+                                  rel.get('body') or '', rel.get('html_url'))
+    elif info:
+        exe = (info.get('assets') or {}).get('exe') or {}
+        latest, url, size, notes, page = (info.get('version', ''), exe.get('url'), exe.get('size'),
+                                          info.get('notes', ''), info.get('page'))
+    else:
+        raise ValueError('连不上 GitHub，也读不到国内镜像上的版本信息，检查一下网络')
+    sha = None
+    if info and info.get('version', '').lstrip('vV') == latest:
+        sha = ((info.get('assets') or {}).get('exe') or {}).get('sha256')
+    return {'current': APP_VERSION, 'latest': latest,
+            'has_update': bool(url) and _ver(latest) > _ver(APP_VERSION),
+            'notes': notes, 'url': url, 'urls': [p + url for p in DOWNLOAD_PROXIES] if url else [],
+            'size': size, 'sha256': sha, 'page': page}
 
 
 def progress():
@@ -113,12 +148,13 @@ def _download():
         new_exe = os.path.join(tempfile.mkdtemp(prefix='zhixue-update-'), EXE_NAME)
         done, t0, last_t, last_done = 0, time.time(), time.time(), 0
         retries = 0
+        urls, ui = info['urls'], 0        # 先试 GitHub，失败就换加速站接着下（Range 续传）
         with open(new_exe, 'wb') as f:
             while True:
                 try:
                     # 断了就带 Range 从已下载的位置接着下；timeout 对每次读都生效，STALL_SECONDS 收不到数据就算断
                     hdr = {'Range': 'bytes=%d-' % done} if done else {}
-                    with _open(info['url'], STALL_SECONDS, hdr, tries=2) as r:
+                    with _open(urls[ui % len(urls)], STALL_SECONDS, hdr, tries=2) as r:
                         if done and r.status != 206:      # 服务器不支持续传，只能从头来
                             f.seek(0)
                             f.truncate()
@@ -140,12 +176,21 @@ def _download():
                     raise IOError('连接提前断开')
                 except Exception as e:
                     retries += 1
-                    if retries > 3:
+                    if retries > 3 * len(urls):
                         raise
-                    _set(error='网络断了一下，正在第 %d 次重连，从 %.1f MB 处接着下…' % (retries, done / 1048576.0), speed=0)
+                    ui += 1                   # 换一条线路
+                    _set(error='网络断了一下，正在换线路第 %d 次重连，从 %.1f MB 处接着下…' % (retries, done / 1048576.0), speed=0)
                     time.sleep(2)
         if info['size'] and os.path.getsize(new_exe) != info['size']:
             raise ValueError('下载不完整（%d / %d 字节），请重试' % (os.path.getsize(new_exe), info['size']))
+        if info.get('sha256'):
+            h = hashlib.sha256()
+            with open(new_exe, 'rb') as f:
+                for block in iter(lambda: f.read(1 << 20), b''):
+                    h.update(block)
+            if h.hexdigest() != info['sha256']:
+                os.remove(new_exe)
+                raise ValueError('下载的安装包校验不通过（可能下载出错或被改动过），已经删掉，请重试')
         _file = new_exe
         _set(state='done', done=done, speed=int(done / max(time.time() - t0, 0.001)))
     except Exception as e:

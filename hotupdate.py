@@ -23,7 +23,9 @@ from version import APP_VERSION, REPO
 
 MIRRORS = [
     'https://raw.githubusercontent.com/%s/{ref}/{path}' % REPO,
-    'https://cdn.jsdelivr.net/gh/%s@{ref}/{path}' % REPO,      # 国内一般能连；main 分支的清单可能晚几小时
+    'https://cdn.jsdelivr.net/gh/%s@{ref}/{path}' % REPO,      # 国内一般能连（发布时会刷新 main 的缓存）
+    'https://fastly.jsdelivr.net/gh/%s@{ref}/{path}' % REPO,   # jsDelivr 的其他节点，某个节点不通时换着试
+    'https://gcore.jsdelivr.net/gh/%s@{ref}/{path}' % REPO,
 ]
 
 _lock = threading.Lock()

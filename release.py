@@ -16,6 +16,7 @@
 发布做的事：改 version.py 的版本号 → 生成内容清单 content.json → 跑测试 → 提交 → 打 Git 标签
 （content-N，app 还有 vX.Y.Z）→ 推到 GitHub；app 还会打包 exe 和 apk、在 GitHub 建 Release 上传。
 需要：git、gh（已登录）、Python；发 app 还要 _build/venv（PyInstaller）和 D:\\tool 下的安卓打包工具。"""
+import json
 import os
 import re
 import shutil
@@ -115,7 +116,7 @@ def write_manifest(v, notes):
 
 
 def push(tags, message):
-    sh('git', 'add', '-A', '--', 'version.py', 'content.json', 'static', 'mobile/local.js', 'data/bank.json',
+    sh('git', 'add', '-A', '--', 'version.py', 'content.json', 'release.json', 'static', 'mobile/local.js', 'data/bank.json',
        'data/media', 'data/skills')
     sh('git', 'add', '-u')                          # 其余已跟踪文件的改动（发 app 时的代码）
     sh('git', 'commit', '-q', '-m', message)
@@ -140,8 +141,40 @@ def release_content(notes):
         undo_versions()
         raise
     push(['content-%d' % v], '内容第 %d 版：%s' % (v, notes))
+    purge_jsdelivr()
     print('\n✓ 已发布内容第 %d 版。用户打开题库后 6 小时内会看到「有更新」提示，或者自己点「检查更新」。' % v)
-    print('  GitHub 原站几分钟内生效；jsDelivr 镜像可能要晚几个小时。')
+
+
+def write_release_json(version, notes, files):
+    """release.json：GitHub 连不上的用户从 jsDelivr 读它，知道最新版本、下载地址和 SHA-256"""
+    import hashlib
+    from version import REPO
+    assets = {}
+    for kind, path in files.items():
+        h = hashlib.sha256()
+        with open(path, 'rb') as f:
+            for block in iter(lambda: f.read(1 << 20), b''):
+                h.update(block)
+        name = os.path.basename(path)
+        assets[kind] = {'name': name, 'size': os.path.getsize(path), 'sha256': h.hexdigest(),
+                        'url': 'https://github.com/%s/releases/download/v%s/%s' % (REPO, version, name)}
+    data = {'version': version, 'notes': notes, 'page': 'https://github.com/%s/releases/tag/v%s' % (REPO, version),
+            'assets': assets}
+    with open(os.path.join(ROOT, 'release.json'), 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+
+
+def purge_jsdelivr():
+    """让 jsDelivr 马上丢掉 main 分支清单的缓存（不然国内用户可能几个小时后才看到新版本）"""
+    import urllib.request
+    from version import REPO
+    for path in ('content.json', 'release.json'):
+        url = 'https://purge.jsdelivr.net/gh/%s@main/%s' % (REPO, path)
+        try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+                print('  刷新 jsDelivr 缓存：%s %s' % (path, r.status))
+        except Exception as e:
+            print('  刷新 jsDelivr 缓存失败（不影响发布，最多晚几小时生效）：%s %s' % (path, e))
 
 
 def bump(ver):
@@ -173,12 +206,14 @@ def release_app(notes, version=None, needs_new_app=False):
         os.makedirs(os.path.dirname(exe), exist_ok=True)
         shutil.copy(os.path.join(ROOT, '_build', 'dist', '智学题库.exe'), exe)
         apk = os.path.join(ROOT, '_build', 'mobile', 'zhixue-tiku.apk')
+        write_release_json(new, notes, {'exe': exe, 'apk': apk})
     except BaseException:
         undo_versions()
         raise
     push(['v' + new, 'content-%d' % cv], 'v%s：%s' % (new, notes))
     sh('gh', 'release', 'create', 'v' + new, exe, apk, '--title', 'v%s %s' % (new, notes.splitlines()[0][:40]),
        '--notes', notes)
+    purge_jsdelivr()
     print('\n✓ 已发布 v%s（内容第 %d 版）。用户点「检查更新」会提示下载新程序。' % (new, cv))
 
 

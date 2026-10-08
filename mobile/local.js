@@ -610,7 +610,17 @@
       clearTimeout(timer);
       if (!rel && i < 2) await new Promise(res => setTimeout(res, 1500));
     }
-    if (!rel) throw new Error('连不上 GitHub，试了 3 次都没成功，检查一下网络');
+    if (!rel) {
+      // GitHub 连不上（国内常见）：从 jsDelivr 读 release.json，安装包经国内的 GitHub 下载加速站下载。
+      // 加速站是第三方的，但 apk 有签名，被改过的包系统根本不让覆盖安装
+      let info = null;
+      try { info = JSON.parse(new TextDecoder().decode(await fetchRepo('main', 'release.json', 15000))); } catch (e) { /* 读不到 */ }
+      if (!info) throw new Error('连不上 GitHub，也读不到国内镜像上的版本信息，检查一下网络');
+      const apk = (info.assets || {}).apk || {};
+      const latest = (info.version || '').replace(/^[vV]/, '');
+      return { current: APP_VERSION, latest: latest, has_update: !!apk.url && cmpTuple(ver(latest), ver(APP_VERSION)) > 0,
+               notes: info.notes || '', url: apk.url ? 'https://ghproxy.net/' + apk.url : null, size: apk.size || null, page: info.page };
+    }
     const asset = (rel.assets || []).find(a => /\.apk$/i.test(a.name || ''));
     const latest = (rel.tag_name || '').replace(/^[vV]/, '');
     return { current: APP_VERSION, latest: latest, has_update: !!asset && cmpTuple(ver(latest), ver(APP_VERSION)) > 0,
@@ -623,7 +633,9 @@
      下载的文件交给 ZXStore 写到 App 私有目录 content/next，全部齐了 contentCommit 换上，刷新页面生效。 */
   const MIRRORS = [
     (ref, p) => 'https://raw.githubusercontent.com/' + REPO + '/' + ref + '/' + p,
-    (ref, p) => 'https://cdn.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,     // 国内一般能连
+    (ref, p) => 'https://cdn.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,     // 国内一般能连（发布时会刷新 main 的缓存）
+    (ref, p) => 'https://fastly.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,  // jsDelivr 的其他节点
+    (ref, p) => 'https://gcore.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,
   ];
   const job = { state: 'idle', done: 0, total: 0, files_done: 0, files_total: 0, speed: 0, error: '', version: 0 };
 

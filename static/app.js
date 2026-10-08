@@ -216,9 +216,15 @@ function materialCn(q) {
   return q.material_cn ? '<div class="material-cn"><div class="material-title">参考译文</div>' + rich(q.material_cn) + '</div>' : '';
 }
 
+// 错题要在不同的日子连续答对 MASTER_STREAK 次才消灭：显示“还要答对几次”，比“已连对 0/3”好懂
+function streakText(streak) {
+  const left = Math.max(MASTER_STREAK - (streak || 0), 0);
+  return left ? '还要答对 ' + left + ' 次' : '马上消灭';
+}
+
 function recBadge(q) {
   if (!q.wrong_count && !q.right_count) return '';
-  if (q.in_wrong) return '<span class="rec-badge bad">错题 · 已连对 ' + q.streak + '/' + MASTER_STREAK + '</span>';
+  if (q.in_wrong) return '<span class="rec-badge bad">错题 · ' + streakText(q.streak) + '</span>';
   return '<span class="rec-badge">对' + q.right_count + ' 错' + q.wrong_count + '</span>';
 }
 
@@ -387,7 +393,7 @@ async function viewHome() {
 
 function paperRow(p, i) {
   const st = p.mastery >= 80 ? ['已掌握', 'st-done'] : (p.seen ? ['练习中', 'st-doing'] : ['未开始', 'st-new']);
-  return '<a class="prow" href="javascript:void(0)" onclick="startPractice({paper_id:' + p.id + ',scope:\'all\',order:\'seq\',title:' + jsq(p.name) + '})">' +
+  return '<a class="prow" href="javascript:void(0)" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ')">' +
     '<span class="prow-t">' + (i + 1) + '. ' + esc(p.name) + '</span>' +
     '<span class="prow-c">' + p.total + ' 题</span>' +
     '<span class="prow-m">' + p.mastery + '%</span>' +
@@ -591,8 +597,7 @@ function paperCard(p) {
       (p.seen ? ' · 做过 ' + p.seen + ' 题 · 正确率 ' + accPct + '%' : '') + '</div>' +
     bar(p.mastery) +
     '<div class="paper-acts">' +
-      '<button class="btn sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'all\',order:\'seq\',title:' + jsq(p.name) + '})">按顺序做</button>' +
-      '<button class="btn ghost sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'all\',title:' + jsq(p.name + '·乱序') + '})">乱序做</button>' +
+      '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ')">开始练习</button>' +
       (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'wrong\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
       '<button class="btn ghost sm" onclick="goBank(' + p.id + ')">浏览</button>' +
       '<button class="btn danger sm" onclick="delPaper(' + p.id + ',' + jsq(p.name) + ')">删除</button>' +
@@ -811,7 +816,7 @@ async function viewWrong() {
             '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
             '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题</span>' +
             '<span class="rec-badge bad">做错 ' + q.wrong_count + ' 次</span>' +
-            (!q.mastered ? '<span class="rec-badge">已连对 ' + q.streak + '/' + MASTER_STREAK + (q.due ? ' · ' + q.due.slice(5) + ' 复习' : '') + '</span>' : '') +
+            (!q.mastered ? '<span class="rec-badge">' + streakText(q.streak) + (q.due ? ' · ' + q.due.slice(5) + ' 复习' : '') + '</span>' : '') +
             '<div style="flex:1"></div>' +
             (q.mastered
               ? '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',false)">重新加入</button>'
@@ -860,14 +865,112 @@ async function startPractice(opts) {
     toast(opts.scope === 'wrong' ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
     return;
   }
-  beginPractice(d.items, opts.title || '练习', 'practice');
+  const list = opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items;
+  beginPractice(list, opts.title || '练习', 'practice');
+  // 选项不变的整卷练习可以手动存档；读档时按存下的题目顺序还原
+  if (opts.paper_id && !opts.shuffleOpts && opts.scope === 'all') {
+    state.practice.saveKey = 'zx.save.' + opts.paper_id;
+    state.practice.saveOpts = { paper_id: opts.paper_id, order: opts.order || 'random', title: opts.title };
+    if (location.hash === '#/practice') route();
+  }
 }
 
 function beginPractice(list, title, mode) {
   state.practice = { list: list, idx: 0, correct: 0, answered: false, results: [], title: title,
-                     mode: mode, requeued: {}, firstTotal: list.length };
+                     mode: mode, requeued: {}, firstTotal: list.length,
+                     done: {} };          // 题目序号 -> 当时的作答（选项字母数组，或自评 {self: true/false}），回看上一题用
   if (location.hash === '#/practice') route();
   else location.hash = '#/practice';
+}
+
+/* ---- 整卷练习的两种方式 + 手动存档 ---- */
+
+// 选项里引用了别的选项（以上都对、A和B……）或图里标号的题，打乱会出错，不打乱（和模拟考试同一条规则）
+const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[A-G]\s*[和与及、,，]\s*[A-G](?![A-Za-z])|^[A-G]{1,4}$|见材料|(?<!可)见图|\b(?:[Aa]ll|[Nn]one|[Bb]oth|[Nn]either) of the above\b|\b[A-G] and [A-G]\b/;
+
+// 全乱序模式：把题目复制一份，选项打乱后重新标 A、B、C，答案、中文释义、每个选项的说明跟着换
+function shuffleQuestion(q) {
+  const opts = q.options || [];
+  if (q.type === 'judge' || opts.length < 2 || opts.some(o => NO_SHUFFLE.test((o[1] || '').trim()))) return q;
+  const perm = opts.map((_, i) => i);
+  for (let i = perm.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
+  const L = i => String.fromCharCode(65 + i);
+  const newKey = {};
+  perm.forEach((j, i) => { newKey[opts[j][0]] = L(i); });
+  const c = Object.assign({}, q, {
+    options: perm.map((j, i) => [L(i), opts[j][1]]),
+    answer: (q.answer || '').split('').map(k => newKey[k] || k).sort().join(''),
+    shuffled: true,
+  });
+  if (q.options_cn) c.options_cn = perm.map(j => q.options_cn[j]);
+  if (q.option_notes) c.option_notes = perm.map(j => q.option_notes[j]);
+  return c;
+}
+
+function openPaperSheet(pid, name) {
+  const save = store.get('zx.save.' + pid);
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  sheet.innerHTML =
+    '<div class="sheet" role="dialog">' +
+      '<div class="sheet-h"><b>' + esc(name) + '</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+      '<div class="sheet-sec"><div class="sheet-t">选项不变</div>' +
+        '<div class="sheet-d">选项顺序和原卷一样。做到一半可以手动存档，以后读档回到那个状态接着做。</div>' +
+        (save ? '<button class="btn block" data-act="resume">从存档继续（第 ' + (save.idx + 1) + '/' + save.ids.length + ' 题，' + esc(save.t.slice(5, 16)) + ' 存）</button>' : '') +
+        '<div class="sheet-row"><button class="btn' + (save ? ' ghost' : '') + '" data-act="seq">按原卷顺序</button>' +
+        '<button class="btn ghost" data-act="rand">题目打乱</button></div></div>' +
+      '<div class="sheet-sec"><div class="sheet-t">全部乱序</div>' +
+        '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。</div>' +
+        '<button class="btn ghost block" data-act="all">开始</button></div>' +
+    '</div>';
+  const close = () => sheet.remove();
+  sheet.addEventListener('click', e => {
+    if (e.target === sheet || e.target.classList.contains('sheet-x')) return close();
+    const act = e.target.dataset && e.target.dataset.act;
+    if (!act) return;
+    close();
+    if (act === 'resume') loadSave(pid);
+    else if (act === 'seq') startPractice({ paper_id: pid, scope: 'all', order: 'seq', title: name });
+    else if (act === 'rand') startPractice({ paper_id: pid, scope: 'all', order: 'random', title: name + '·题目打乱' });
+    else startPractice({ paper_id: pid, scope: 'all', order: 'random', shuffleOpts: true, title: name + '·全部乱序' });
+  });
+  document.body.appendChild(sheet);
+}
+
+function saveProgress() {
+  const p = state.practice;
+  if (!p || !p.saveKey) return;
+  // 当前这道已经答完就存“做完这道”，下次从下一道开始
+  const idx = p.answered ? p.idx + 1 : p.idx;
+  store.set(p.saveKey, {
+    ids: p.list.map(q => q.id), idx: Math.min(idx, p.list.length - 1), done: p.done,
+    results: p.results.map(r => [r.q.id, r.correct]), correct: p.correct,
+    title: p.title, opts: p.saveOpts, t: nowText(),
+  });
+  toast('已存档：做完了 ' + Object.keys(p.done).length + ' 题，以后可以读档回到这里');
+}
+
+async function loadSave(pid) {
+  const sv = store.get('zx.save.' + pid);
+  if (!sv) { toast('这张卷子还没有存档'); return; }
+  let d;
+  try { d = await api('/api/practice?paper_id=' + pid + '&scope=all&order=seq'); } catch (e) { toast(e.message, 'bad'); return; }
+  const byId = {};
+  d.items.forEach(q => { byId[q.id] = q; });
+  const list = sv.ids.map(id => byId[id]).filter(Boolean);
+  if (list.length !== sv.ids.length) { toast('卷子的题目变过了，这个存档用不了', 'bad'); return; }
+  beginPractice(list, sv.title, 'practice');
+  const p = state.practice;
+  Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0,
+                     results: (sv.results || []).map(r => ({ q: byId[r[0]], correct: r[1] })).filter(r => r.q),
+                     saveKey: 'zx.save.' + pid, saveOpts: sv.opts });
+  route();
+  toast('已读档：回到第 ' + (sv.idx + 1) + ' 题');
+}
+
+function nowText() {
+  const d = new Date(), z = n => (n < 10 ? '0' : '') + n;
+  return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes());
 }
 
 function retryWrongOnly() {
@@ -900,7 +1003,10 @@ function renderQ() {
   const again = p.idx >= p.firstTotal;
   app.innerHTML =
     '<div class="crumb">当前位置：<a href="#/home">首页</a> &gt; ' + esc(p.title) +
-      '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></div>' +
+      '<span class="crumb-acts">' +
+        (p.saveKey ? '<a href="javascript:void(0)" onclick="saveProgress()">存档</a>' +
+          (store.get(p.saveKey) ? '<a href="javascript:void(0)" onclick="loadSave(' + p.saveOpts.paper_id + ')">读档</a>' : '') : '') +
+        '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></span></div>' +
     '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
     '<div class="card qcard-main">' +
       '<div class="qhead">' +
@@ -926,43 +1032,55 @@ function renderQ() {
     body.innerHTML =
       '<textarea class="selfarea" id="self-input" placeholder="' + ph + '"></textarea>' +
       '<div class="qactions" id="qact"><button class="btn" onclick="showQaAns()">' + btnText + '</button></div>';
-  } else if (q.type === 'multi') {
-    body.innerHTML =
-      '<div class="opts" id="optsbox">' + opts.map((o, i) =>
-        '<button class="opt" data-k="' + esc(o[0]) + '" onclick="toggleMulti(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>' +
-      '<div class="qactions" id="qact"><span class="muted">多选题：选择多项后确认</span><div class="spacer"></div>' +
-        '<button class="btn" id="multi-ok" disabled onclick="confirmMulti()">确认答案</button></div>';
   } else {
+    // 单选、判断、多选都是：点选项只是选中，按「确认答案」（或回车）才判对错
+    const multi = q.type === 'multi';
     body.innerHTML =
       (q.type === 'judge'
-        ? '<div class="judge-row">' + opts.map(o =>
-          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="submitChoice(\'' + esc(o[0]) + '\')"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
+        ? '<div class="judge-row" id="optsbox">' + opts.map(o =>
+          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="pickOpt(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
         : '<div class="opts" id="optsbox">' + opts.map((o, i) =>
-          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="submitChoice(\'' + esc(o[0]) + '\')"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
-      '<div class="qactions" id="qact"></div>';
+          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="pickOpt(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
+      '<div class="qactions" id="qact">' + prevBtn(p) + '<span class="muted kbd-tip">' + (multi ? '多选题，可选多项。' : '') + keyTip('选好后按回车确认') + '</span><div class="spacer"></div>' +
+        '<button class="btn" id="confirm-btn" disabled onclick="confirmChoice()">确认答案</button></div>';
+  }
+  // 回看已经做过的题：直接显示当时的作答和解析，不再记分
+  const done = p.done[p.idx];
+  if (done) {
+    if (done.self !== undefined) showQaAns(true);
+    else {
+      $$('#optsbox .opt').forEach(b => { if (done.indexOf(b.dataset.k) >= 0) b.classList.add('sel'); });
+      gradeAndShow(done, true);
+    }
   }
 }
 
-function toggleMulti(btn) {
+// 键盘提示只在有键盘的设备上显示
+function keyTip(t) {
+  return window.matchMedia && matchMedia('(hover: none)').matches ? '' : t;
+}
+
+function prevBtn(p) {
+  return p.idx > 0 ? '<button class="btn ghost" onclick="prevQ()">上一题</button>' : '';
+}
+
+function pickOpt(btn) {
   const p = state.practice;
   if (!p || p.answered) return;
-  btn.classList.toggle('sel');
-  const ok = $('#multi-ok');
+  const q = p.list[p.idx];
+  if (q.type === 'multi') btn.classList.toggle('sel');
+  else $$('#optsbox .opt').forEach(b => b.classList.toggle('sel', b === btn));
+  const ok = $('#confirm-btn');
   if (ok) ok.disabled = !$$('#optsbox .opt.sel').length;
 }
 
-function confirmMulti() {
+function confirmChoice() {
   const p = state.practice;
   if (!p || p.answered) return;
   const sel = $$('#optsbox .opt.sel').map(b => b.dataset.k);
   if (sel.length) gradeAndShow(sel);
 }
 
-function submitChoice(key) {
-  const p = state.practice;
-  if (!p || p.answered) return;
-  gradeAndShow([key]);
-}
 
 function recordResult(q, ok) {
   const p = state.practice;
@@ -983,7 +1101,7 @@ function recordResult(q, ok) {
     .catch(e => toast('记录失败：' + e.message, 'bad'));
 }
 
-function gradeAndShow(selKeys) {
+function gradeAndShow(selKeys, replay) {
   const p = state.practice;
   const q = p.list[p.idx];
   const isRight = q.type === 'multi'
@@ -991,7 +1109,10 @@ function gradeAndShow(selKeys) {
     : selKeys[0] === q.answer;
   p.answered = true;
   $('.qcard-main').classList.add('answered');
-  recordResult(q, isRight);
+  if (!replay) {
+    p.done[p.idx] = selKeys.slice();
+    recordResult(q, isRight);
+  }
 
   $$('#qbody .opt').forEach(b => {
     b.disabled = true;
@@ -1000,27 +1121,27 @@ function gradeAndShow(selKeys) {
     if (inAns) b.classList.add('ok');
     else if (selKeys.indexOf(k) >= 0) b.classList.add('bad');
   });
-  const okBtn = $('#multi-ok');
-  if (okBtn) okBtn.style.display = 'none';
 
   const fb = document.createElement('div');
   fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
     '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
     (isRight ? '' : whyBox(q, selKeys)) +
-    (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' : '') +
+    (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' +
+      (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
     pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
 
-  // 触屏上没有回车键：不显示提示，也不把焦点挪到按钮上（否则按钮会带一圈蓝框）
-  const touch = window.matchMedia && matchMedia('(hover: none)').matches;
-  $('#qact').innerHTML = (touch ? '' : '<span class="muted">回车 = 下一题</span>') + '<div class="spacer"></div>' +
-    '<button class="btn" id="nextbtn" onclick="nextQ()">' +
-    (p.idx + 1 >= p.list.length ? '查看结果' : '下一题') + '</button>';
-  if (!touch) $('#nextbtn').focus();
+  $('#qact').innerHTML = nextActions(p);
 }
 
-function showQaAns() {
+// 答完以后的按钮：上一题 / 下一题（或查看结果）
+function nextActions(p) {
+  return prevBtn(p) + '<span class="muted kbd-tip">' + keyTip('回车 = 下一题') + '</span><div class="spacer"></div>' +
+    '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.idx + 1 >= p.list.length ? '查看结果' : '下一题') + '</button>';
+}
+
+function showQaAns(replay) {
   const p = state.practice;
   const q = p.list[p.idx];
   p.answered = true;
@@ -1033,7 +1154,11 @@ function showQaAns() {
     (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
   if (ta) ta.disabled = true;
-  $('#qact').innerHTML =
+  if (replay) {                      // 回看：已经自评过了
+    $('#qact').innerHTML = nextActions(p);
+    return;
+  }
+  $('#qact').innerHTML = prevBtn(p) +
     '<span class="muted">对照参考答案，诚实自评：</span><div class="spacer"></div>' +
     '<button class="btn green" onclick="selfGrade(true)">✓ 我答对了</button>' +
     '<button class="btn danger" onclick="selfGrade(false)">✗ 没答好</button>';
@@ -1041,6 +1166,7 @@ function showQaAns() {
 
 function selfGrade(ok) {
   const p = state.practice;
+  p.done[p.idx] = { self: ok };
   recordResult(p.list[p.idx], ok);
   nextQ();
 }
@@ -1048,9 +1174,18 @@ function selfGrade(ok) {
 function nextQ() {
   const p = state.practice;
   if (!p) return;
+  if (!p.answered && !p.done[p.idx]) return;     // 还没作答，不能跳过去
   p.answered = false;
   p.idx++;
   if (p.idx >= p.list.length) p.finished = true;
+  route();
+}
+
+function prevQ() {
+  const p = state.practice;
+  if (!p || p.idx <= 0) return;
+  p.answered = false;
+  p.idx--;
   route();
 }
 
@@ -1340,11 +1475,16 @@ document.addEventListener('keydown', e => {
   // 焦点在可交互控件上时交给控件自身(避免回车双触发/输入误触)
   const t = e.target;
   const tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+  // 选项按钮点过以后焦点会停在上面，回车照样走「确认 / 下一题」，所以选项按钮不算
   const interactive = (tag === 'input' || tag === 'textarea' || tag === 'select' ||
-                      (tag === 'button' && !t.disabled));
+                      (tag === 'button' && !t.disabled && !t.classList.contains('opt')));
   if (interactive) return;
+  if (e.key === 'ArrowLeft') { prevQ(); return; }
+  if (e.key === 'ArrowRight') { if (p.answered) nextQ(); return; }
   if (e.key === 'Enter') {
-    if (p.answered && SELF_TYPES.indexOf(q.type) < 0) nextQ();
+    e.preventDefault();
+    if (p.answered) nextQ();                                       // 第二次回车：下一题
+    else if (SELF_TYPES.indexOf(q.type) < 0) confirmChoice();      // 第一次回车：确认答案
     return;
   }
   if (p.answered || SELF_TYPES.indexOf(q.type) >= 0) return;
@@ -1354,12 +1494,8 @@ document.addEventListener('keydown', e => {
   let i = map[e.key];
   if (i === undefined) i = km[e.key.toLowerCase()];
   if (i === undefined || !opts[i]) return;
-  if (q.type === 'multi') {
-    const btns = $$('#optsbox .opt');
-    if (btns[i]) toggleMulti(btns[i]);
-  } else {
-    submitChoice(opts[i][0]);
-  }
+  const btns = $$('#optsbox .opt');
+  if (btns[i]) pickOpt(btns[i]);
 });
 
 /* ================================================================ 设置：版本更新、清除数据 */
