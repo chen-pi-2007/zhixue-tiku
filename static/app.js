@@ -1500,7 +1500,7 @@ function setUpdNotice(n) {
 
 function markUpdDots() {
   const n = store.get('zx.updNotice');
-  // 顶栏右侧的「有更新」标签：手机上导航横着滚，「设置」常常在屏幕外，靠它提醒
+  // 顶栏右侧的「有更新」标签（只在电脑上显示；手机上只在右上角齿轮上点个小红点，见 style.css）
   const top = $('#top-upd');
   if (n && !top) {
     const pick = $('.theme-pick');
@@ -1515,13 +1515,16 @@ function markUpdDots() {
   });
 }
 
+function isPhone() { return IS_APP || (window.matchMedia && matchMedia('(max-width: 760px)').matches); }
+
 function showUpdNotice() {
   const old = $('#upd-banner');
   if (old) old.remove();
   const n = store.get('zx.updNotice');
   const h = location.hash;
   // 模拟考答题时不打扰；在设置页里已经能看到，也不用再提示；点过「以后再说」的这一版不再弹
-  if (!n || h.indexOf('#/exam/run') === 0 || h.indexOf('#/settings') === 0 || store.get('zx.updBannerOff') === n.kind + n.latest) return;
+  // 手机上不弹提示条，齿轮上的小红点就够了
+  if (isPhone() || !n || h.indexOf('#/exam/run') === 0 || h.indexOf('#/settings') === 0 || store.get('zx.updBannerOff') === n.kind + n.latest) return;
   const d = document.createElement('div');
   d.id = 'upd-banner';
   d.className = 'upd-banner';

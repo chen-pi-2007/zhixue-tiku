@@ -108,7 +108,7 @@ html { -webkit-tap-highlight-color: transparent; }
 .top-set { display: none; position: relative; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--layer-2); color: var(--ink-2); }
 .top-set:hover { background: var(--layer-3); color: var(--ink); opacity: 1; }
 .top-set.active { background: var(--layer-3); color: var(--ink); }
-.top-set .upd-dot { position: absolute; top: 4px; right: 4px; margin: 0; }
+.top-set .upd-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; margin: 0; box-shadow: 0 0 0 2px var(--layer-2); }
 .sw { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line); }
 .sw-light { background: #f6f7f9; }
 .sw-dark { background: #282828; }
@@ -480,6 +480,8 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   body.subpage #side { display: none; }                 /* 设置页：不显示题库 / 错题本那排导航 */
   body.subpage .page-back { display: inline-flex; }
   body.subpage .top-set { display: none; }              /* 已经在设置里了，齿轮也收起来 */
+  #topbar .top-upd { display: none; }                   /* 手机上的更新提示只留齿轮上的小红点 */
+  #topbar .top-upd + .theme-pick { margin-left: auto; }
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: 100%; }

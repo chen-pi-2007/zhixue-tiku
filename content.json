@@ -1,6 +1,6 @@
 {
- "content_version": 13,
- "created": "2026-10-08 10:09:18",
+ "content_version": 14,
+ "created": "2026-10-08 12:00:22",
  "files": {
   "data/bank.json": [
    "de24bd60210d484627d024d1876040c5d97c7b143611eff2d079f2d1ee220eef",
@@ -1575,8 +1575,8 @@
    36166
   ],
   "static/app.js": [
-   "73153098101d59fcc00262a645f819f2e8f82e5f793d07c2af30f43b2f2b8ad5",
-   89851
+   "6b0ecb18fcc431d2c2f6871794e434f467b5305e62f21bbdd8c5b819b994516e",
+   90055
   ],
   "static/index.html": [
    "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
@@ -1587,12 +1587,12 @@
    27524
   ],
   "static/style.css": [
-   "685ec668853fe671bf2cef11ae494d03b524ebf7e6c7364bdceb85d948031d77",
-   40770
+   "c14f6b9c7ad9ee90eb7ef88cccf9c2001af8cf096969ec1d5768614c6040d916",
+   40422
   ]
  },
  "min_android_version": "1.4.4",
  "min_app_version": "1.4.4",
- "notes": "手机：分享做题记录（发到微信/QQ/文件）；设置改成二级页面（带返回，不再和学习页混在一起）；排版优化（题目更宽、反馈不再框套框、导航均分、触屏不再出现蓝框、模拟考更紧凑）；电脑：设置里一键打开数据文件夹；界面标点统一成中文全角",
- "tag": "content-13"
+ "notes": "手机端更新提示改成只在右上角齿轮上显示小红点，不再弹提示条、不再占顶栏",
+ "tag": "content-14"
 }
