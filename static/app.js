@@ -199,12 +199,22 @@ function route() {
   const name = routes[parts[0]] ? parts[0] : 'home';
   const navOf = { practice: 'home', subject: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
+  const ts = $('#top-set');
+  if (ts) ts.classList.toggle('active', name === 'settings');
   if (name !== 'exam') stopExamTimer();
   window.scrollTo(0, 0);
+  // 换页时淡入一下（同一页内重绘不播放）
+  if (name !== state.lastPage) {
+    state.lastPage = name;
+    app.classList.remove('page-in');
+    void app.offsetWidth;
+    app.classList.add('page-in');
+  }
   routes[name](parts.slice(1));
 }
 window.addEventListener('hashchange', route);
 applyCn();
+api('/api/dashboard').then(r => setTopDays(r.data.settings.exam_date)).catch(() => {});
 
 /* ================================================================ 首页:今日 + 各科 */
 
@@ -235,6 +245,7 @@ async function viewHome() {
   let d, papers, skills = [];
   try {
     d = (await api('/api/dashboard')).data;
+    setTopDays(d.settings.exam_date);
     papers = (await api('/api/papers')).papers;
   } catch (e) {
     app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
@@ -365,11 +376,8 @@ function examDays(date) {
 function todayCard(d) {
   const t = d.today;
   const todo = t.todo != null ? t.todo : t.due + t.new_left;
-  const days = examDays(d.settings.exam_date);
   return '<div class="side-card">' +
     '<div class="sc-head"><b>今日复习</b>' +
-      (days != null ? '<a href="javascript:void(0)" class="sc-link" onclick="editExamDate(' + jsq(d.settings.exam_date) + ')" title="点击修改学测日期">' +
-        (days > 0 ? '距学测 <em>' + days + '</em> 天' : (days === 0 ? '今天学测' : '学测已结束')) + '</a>' : '') +
     '</div>' +
     '<div class="sc-stats">' +
       '<div><em>' + t.due + '</em><span>到期</span></div>' +
@@ -412,6 +420,17 @@ function examsCard(d) {
         (e.score >= 80 ? 'num-green' : (e.score >= 60 ? 'num-orange' : 'num-red')) + '">' + Math.round(e.score) + '</em></a>').join('')
       : '<div class="muted">还没有考试记录</div>') +
   '</div>';
+}
+
+// 顶栏“距学测 N 天”，和“智学题库”放在同一行
+function setTopDays(date) {
+  const el = $('#top-days');
+  if (!el) return;
+  const days = examDays(date);
+  el.hidden = days == null;
+  if (days == null) return;
+  el.innerHTML = days > 0 ? '距学测 <em>' + days + '</em> 天' : (days === 0 ? '今天学测' : '学测已结束');
+  el.onclick = () => editExamDate(date);
 }
 
 async function editExamDate(cur) {
@@ -1297,6 +1316,7 @@ async function viewSettings() {
       '<div id="upd-out"></div>' +
       '<div class="muted set-note">题库和界面的更新只下载改动的文件，几秒钟就好，不用重启；程序本身有更新时' +
         (a.mobile ? '下载新安装包覆盖安装（不要先卸载）' : '下载新程序后自动重启') + '。做题记录、错题本、考试成绩都会保留。</div>' +
+      '<div class="muted set-note set-credit">智学题库由 十三 和 chen_pi 共同开发</div>' +
     '</div>' +
     '<div class="card set-card">' +
       '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在 ' + esc(a.data_dir) + '</div></div></div>' +
@@ -1464,7 +1484,7 @@ function markUpdDots() {
     if (pick) pick.insertAdjacentHTML('beforebegin',
       '<a id="top-upd" class="top-upd" href="#/settings" onclick="setTimeout(checkUpdate,300)" title="' + esc(n.text) + '"><i class="upd-dot"></i>有更新</a>');
   } else if (!n && top) top.remove();
-  [$('#nav a[data-v="settings"]'), $('#upd-check')].forEach(el => {
+  [$('#nav a[data-v="settings"]'), $('#top-set'), $('#upd-check')].forEach(el => {
     if (!el) return;
     const dot = el.querySelector('.upd-dot');
     if (n && !dot) el.insertAdjacentHTML('beforeend', '<i class="upd-dot" title="' + esc(n.text) + '"></i>');

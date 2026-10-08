@@ -27,6 +27,7 @@ if (window.ZXStore) {
 <body>
 <header id="topbar">
   <a class="logo" href="#/home"><span class="seal">题</span><span class="logo-t">智学题库</span></a>
+  <a id="top-days" class="top-days" href="javascript:void(0)" title="点击修改学测日期" hidden></a>
   <span class="top-sep"></span>
   <span class="top-sub">江苏中职学测</span>
   <div class="theme-pick">
@@ -39,6 +40,8 @@ if (window.ZXStore) {
       <button data-t="dark"><span class="sw sw-dark"></span>深色</button>
     </div>
   </div>
+  <!-- 手机上「设置」不放在横向导航里，放顶栏右上角 -->
+  <a id="top-set" class="top-set" href="#/settings" title="设置" aria-label="设置"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></a>
 </header>
 <div class="layout">
   <aside id="side">

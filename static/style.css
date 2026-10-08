@@ -76,6 +76,9 @@ a:hover { opacity: .85; }
 h1, h2, h3 { margin: 0; font-weight: 600; }
 code { font-family: var(--f-code); font-size: 13px; background: var(--layer-2); padding: 1px 6px; border-radius: 4px; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+/* 手机上点按时不闪蓝框：去掉 WebView 的点击高亮，焦点框只在键盘操作时显示 */
+html { -webkit-tap-highlight-color: transparent; }
+:focus:not(:focus-visible) { outline: none; }
 .ico { width: 18px; height: 18px; flex: none; }
 
 /* ---------------------------------------------------------------- 顶栏 */
@@ -87,6 +90,11 @@ code { font-family: var(--f-code); font-size: 13px; background: var(--layer-2); 
 .logo:hover { opacity: 1; }
 .seal { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--fill); color: var(--fill-ink); font-size: 14px; font-weight: 700; }
 .logo-t { font-size: 17px; font-weight: 600; }
+.top-days { display: inline-flex; align-items: baseline; gap: 3px; height: 26px; padding: 0 10px; border-radius: 9999px; background: var(--red-soft);
+  color: var(--ink-2); font-size: 13px; line-height: 26px; white-space: nowrap; }
+.top-days[hidden] { display: none; }
+.top-days em { font-style: normal; font-weight: 700; color: var(--red); font-size: 15px; }
+.top-days:hover { opacity: .85; }
 .top-sep { width: 1px; height: 16px; background: var(--line); }
 .top-sub { color: var(--ink-3); font-size: 13px; }
 .theme-pick { position: relative; margin-left: auto; }
@@ -96,6 +104,10 @@ code { font-family: var(--f-code); font-size: 13px; background: var(--layer-2); 
 .theme-menu button { display: flex; align-items: center; gap: 8px; width: 100%; height: 34px; padding: 0 10px; border: 0; border-radius: 5px; background: none; color: var(--ink); font: inherit; cursor: pointer; }
 .theme-menu button:hover { background: var(--layer-2); }
 .theme-menu button.on { font-weight: 600; background: var(--layer-2); }
+.top-set { display: none; position: relative; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--layer-2); color: var(--ink-2); }
+.top-set:hover { background: var(--layer-3); color: var(--ink); opacity: 1; }
+.top-set.active { background: var(--layer-3); color: var(--ink); }
+.top-set .upd-dot { position: absolute; top: 4px; right: 4px; margin: 0; }
 .sw { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line); }
 .sw-light { background: #f6f7f9; }
 .sw-dark { background: #282828; }
@@ -442,13 +454,16 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .home-side .side-card { flex: 1 1 260px; }
 }
 @media (max-width: 760px) {
-  #topbar { padding: 0 12px; }
+  #topbar { padding: 0 12px; gap: 10px; }
+  .logo-t { font-size: 16px; }
   .top-sub, .top-sep { display: none; }
   .layout { flex-direction: column; }
   #side { position: sticky; top: var(--top); z-index: 40; width: 100%; height: auto; padding: 6px 8px; border-right: 0; border-bottom: 1px solid var(--line); }
   #nav { flex-direction: row; overflow-x: auto; }
   #nav a { height: 34px; padding: 0 10px; font-size: 14px; white-space: nowrap; }
   #nav a .ico { display: none; }
+  #nav a[data-v="settings"] { display: none; }
+  .top-set { display: inline-flex; }
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: 100%; }
@@ -465,6 +480,7 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .set-row + .set-row { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
 .set-row b { font-weight: 600; }
 .set-note { margin-top: 10px; }
+.set-credit { padding-top: 10px; border-top: 1px solid var(--line); }
 .upd-box { margin-top: 12px; padding: 12px 14px; border-radius: 8px; background: var(--green-soft); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .upd-notes { white-space: pre-wrap; color: var(--ink-2); font-size: 13px; }
 
@@ -497,6 +513,10 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .upd-acts { display: flex; gap: 8px; flex-wrap: wrap; }
 .upd-bar.busy i { width: 30%; animation: upd-busy 1.4s ease-in-out infinite; }
 @keyframes upd-busy { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
+/* 换页淡入 */
+main.page-in { animation: page-in .22s ease-out; }
+@keyframes page-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { main.page-in { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .upd-bar.busy i { animation: none; width: 100%; opacity: .5; } }
 /* 有更新时页面底部的提示条 */
 .upd-banner { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 10px;
