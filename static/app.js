@@ -7,13 +7,48 @@ const app = $('#app');
 const esc = v => String(v == null ? '' : v)
   .replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// 题目文本:转义后把 [[img:x]] 换成图片,「」换成下划线,〔〕换成加点字
+// 题目文本:转义后把 [[img:x]] 换成图片,「」换成下划线,〔〕换成加点字,\( … \) 画成数学公式
 function rich(s) {
   return esc(s)
     .replace(/\[\[img:([^\]]+)\]\]/g, (m, p) =>
       '<img class="qimg" loading="lazy" src="/media/' + p.split('/').map(encodeURIComponent).join('/') + '" onclick="zoomImg(this.src)">')
     .replace(/「([^「」]*)」/g, '<u>$1</u>')
-    .replace(/〔([^〔〕]*)〕/g, '<span class="emph">$1</span>');
+    .replace(/〔([^〔〕]*)〕/g, '<span class="emph">$1</span>')
+    .replace(/\\\((.+?)\\\)/g, (m, t) => '<span class="math">' + mathHtml(t) + '</span>');
+}
+
+// 数学公式（题库里写成 \( … \)，由 学测/_脚本/mathfmt.py 生成）：\frac{分子}{分母} 画成上下两层的分数，
+// \sqrt{…} 画成带横线的根号，^{…} 上标，_{…} 下标。不用公式库，手机离线也能显示
+function mathHtml(t) {
+  let out = '', i = 0;
+  const group = () => {                          // t[i] 是 '{'：取出配对的 {…} 里面的内容，画好返回
+    let depth = 0, j = i;
+    for (; j < t.length; j++) {
+      if (t[j] === '{') depth++;
+      else if (t[j] === '}' && --depth === 0) break;
+    }
+    const inner = t.slice(i + 1, j);
+    i = j + 1;
+    return mathHtml(inner);
+  };
+  while (i < t.length) {
+    if (t.startsWith('\\frac{', i)) {
+      i += 5;
+      const num = group();
+      const den = t[i] === '{' ? group() : '';
+      out += '<span class="mfrac"><span class="mfn">' + num + '</span><span class="mfd">' + den + '</span></span>';
+    } else if (t.startsWith('\\sqrt{', i)) {
+      i += 5;
+      out += '<span class="msqrt"><span class="msign">√</span><span class="mrad">' + group() + '</span></span>';
+    } else if ((t[i] === '^' || t[i] === '_') && t[i + 1] === '{') {
+      const tag = t[i] === '^' ? 'sup' : 'sub';
+      i += 1;
+      out += '<' + tag + '>' + group() + '</' + tag + '>';
+    } else {
+      out += t[i++];
+    }
+  }
+  return out;
 }
 
 function zoomImg(src) {
@@ -219,12 +254,12 @@ function materialCn(q) {
 // 错题要在不同的日子连续答对 MASTER_STREAK 次才消灭：显示“还要答对几次”，比“已连对 0/3”好懂
 function streakText(streak) {
   const left = Math.max(MASTER_STREAK - (streak || 0), 0);
-  return left ? '还要答对 ' + left + ' 次' : '马上消灭';
+  return left ? '还要分 ' + left + ' 天答对才移出错题本' : '再答对一次就移出错题本';
 }
 
 function recBadge(q) {
   if (!q.wrong_count && !q.right_count) return '';
-  if (q.in_wrong) return '<span class="rec-badge bad">错题 · ' + streakText(q.streak) + '</span>';
+  if (q.in_wrong) return '<span class="rec-badge bad" title="这题以前做错过，在错题本里">以前做错过 · ' + streakText(q.streak) + '</span>';
   return '<span class="rec-badge">对' + q.right_count + ' 错' + q.wrong_count + '</span>';
 }
 
@@ -456,7 +491,7 @@ function todayCard(d) {
       '<div><em>' + (t.done ? Math.round(100 * t.right / t.done) + '%' : '-') + '</em><span>正确率</span></div>' +
     '</div>' +
     (todo ? '<button class="btn block" onclick="startReview(\'\')">开始复习 ' + todo + ' 题</button>'
-          : '<div class="sc-done">今天的复习已完成</div>') +
+          : '<div class="sc-done">今天的复习已完成</div><button class="btn ghost block" onclick="startReview(\'\')">再加练 20 题</button>') +
     '<label class="sc-set">每天新题 <input class="inp" id="newper" type="number" min="0" max="200" value="' + d.settings.new_per_day + '"> 道</label>' +
   '</div>';
 }
@@ -847,9 +882,19 @@ async function markWrong(qid, mastered) {
 async function startReview(subject) {
   let d;
   try { d = await api('/api/review' + (subject ? '?subject=' + subject : '')); } catch (e) { toast(e.message, 'bad'); return; }
-  if (!d.items.length) { toast('今天没有要复习的题了，新题额度也用完了'); return; }
-  beginPractice(d.items, (subject ? SUBJECT_NAME[subject] + ' · ' : '') + '今日复习', 'review');
-  toast('到期 ' + d.due + ' 题 + 新题 ' + d.new + ' 题');
+  const title = (subject ? SUBJECT_NAME[subject] + ' · ' : '');
+  if (d.items.length) {
+    beginPractice(d.items, title + '今日复习', 'review');
+    toast('到期 ' + d.due + ' 题 + 新题 ' + d.new + ' 题');
+    return;
+  }
+  // 今天该复习的做完了、新题额度也用完了：还想练就加练一轮——最薄弱的旧题掺一些新题
+  try { d = await api('/api/review?extra=1' + (subject ? '&subject=' + subject : '')); } catch (e) { toast(e.message, 'bad'); return; }
+  if (d.ahead == null) { toast('今天的复习已完成。加练要更新到最新版程序（设置 → 检查更新）'); return; }   // 老版程序不认 extra
+  if (!d.items.length) { toast('这里还没有做过的题，先去做几套卷子吧'); return; }
+  beginPractice(d.items, title + '加练', 'review');
+  toast('今天的复习已完成，再加练 ' + d.items.length + ' 题：' +
+    [d.ahead ? '薄弱旧题 ' + d.ahead : '', d.new ? '新题 ' + d.new : ''].filter(Boolean).join(' + '));
 }
 
 async function startPractice(opts) {
@@ -925,8 +970,10 @@ function openPaperSheet(pid, name) {
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
-    if (e.target === sheet || e.target.classList.contains('sheet-x')) return close();
-    const act = e.target.dataset && e.target.dataset.act;
+    // 用 closest：老手机上 gap 兜底脚本会把按钮里的文字包进 <span>，点到的是 span 不是按钮
+    if (e.target === sheet || e.target.closest('.sheet-x')) return close();
+    const btn = e.target.closest('[data-act]');
+    const act = btn && btn.dataset.act;
     if (!act) return;
     close();
     if (act === 'resume') loadSave(pid);

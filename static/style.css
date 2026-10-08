@@ -232,6 +232,7 @@ main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1280px; }
 .sc-stats em { display: block; font-style: normal; font-size: 18px; font-weight: 600; color: var(--ink); }
 .sc-stats span { font-size: 12px; color: var(--ink-3); }
 .sc-done { text-align: center; padding: 8px; border-radius: 8px; background: var(--green-soft); color: var(--green); }
+.sc-done + .btn { margin-top: 8px; }
 .sc-set { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-size: 12px; color: var(--ink-3); }
 .sc-set input { width: 56px; height: 26px; text-align: center; }
 .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px 0; text-align: center; font-size: 13px; }
@@ -325,7 +326,7 @@ details.material-box[open] summary { margin-bottom: 8px; }
 .opt .qimg { max-height: 160px; }
 .stem u, .opt u, .material-body u { text-underline-offset: 3px; }
 .emph { text-emphasis: dot; -webkit-text-emphasis: dot; text-emphasis-position: under right; -webkit-text-emphasis-position: under; }
-.zoom { position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, .8); display: flex; align-items: center; justify-content: center; cursor: zoom-out; padding: 20px; }
+.zoom { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 200; background: rgba(0, 0, 0, .8); display: flex; align-items: center; justify-content: center; cursor: zoom-out; padding: 20px; }
 .zoom img { max-width: 100%; max-height: 100%; background: var(--img-bg); border-radius: 6px; }
 
 /* ---------------------------------------------------------------- 刷题 */
@@ -345,7 +346,7 @@ textarea.selfarea:focus { outline: 1px solid var(--line); }
 
 .finish { text-align: center; padding: 22px 0 12px; }
 .ring { width: 128px; height: 128px; border-radius: 50%; margin: 6px auto 10px; display: flex; align-items: center; justify-content: center; position: relative; }
-.ring::after { content: ''; position: absolute; inset: 9px; background: var(--layer-1); border-radius: 50%; }
+.ring::after { content: ''; position: absolute; top: 9px; right: 9px; bottom: 9px; left: 9px; background: var(--layer-1); border-radius: 50%; }
 .ring .v { position: relative; z-index: 1; font-size: 36px; font-weight: 600; }
 .finish h2 { margin: 8px 0 4px; font-size: 18px; }
 .finish .acts { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
@@ -625,7 +626,7 @@ main.page-in { animation: page-in .22s ease-out; }
 .phrase em { font-style: normal; font-weight: 600; color: var(--ink); }
 
 /* 选择练习方式的弹层（电脑居中，手机从底部弹出） */
-.sheet-mask { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .45); }
+.sheet-mask { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .45); }
 .sheet { width: 100%; max-width: 420px; padding: 18px 20px 20px; border-radius: 14px; background: var(--layer-1); box-shadow: var(--pop); }
 .sheet-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 16px; }
 .sheet-x { width: 32px; height: 32px; border: 0; border-radius: 8px; background: var(--layer-2); color: var(--ink-2); font-size: 20px; line-height: 1; cursor: pointer; }
@@ -642,3 +643,14 @@ main.page-in { animation: page-in .22s ease-out; }
   .sheet-mask { align-items: flex-end; padding: 0; }
   .sheet { max-width: none; border-radius: 16px 16px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* 数学公式：分数上下两层、根号带横线（app.js 的 mathHtml） */
+.math { white-space: nowrap; }
+.mfrac { display: inline-flex; flex-direction: column; align-items: stretch; vertical-align: middle; margin: 0 .12em; text-align: center; font-size: .92em; line-height: 1.15; }
+.mfn { padding: 0 .2em .08em; border-bottom: 1px solid currentColor; }
+.mfd { padding: .08em .2em 0; }
+.mfrac .mfrac { font-size: .9em; }
+.msqrt { display: inline-flex; align-items: stretch; vertical-align: middle; line-height: 1.2; }
+.msign { padding-right: .04em; font-size: 1.05em; }
+.mrad { padding: .08em .12em 0 .08em; border-top: 1px solid currentColor; }
+.math sup, .math sub { font-size: .72em; }

@@ -1,10 +1,10 @@
 {
- "content_version": 20,
- "created": "2026-10-08 19:22:15",
+ "content_version": 21,
+ "created": "2026-10-08 21:17:53",
  "files": {
   "data/bank.json": [
-   "d9569204f857edd7433358fa827093189c5d8059e3aac00503e39952c4bc759b",
-   1898157
+   "9f121a416f072de661c08d2ab102e5d59af4edd9af60c83b39012dfa3811ea9b",
+   1901575
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,12 +1571,12 @@
    17784
   ],
   "mobile/local.js": [
-   "18f00e3d4c3af3deb26fe4d5d95816ff46f87a48b815a0e4fc18d3382a0e4d33",
-   38650
+   "601845d11fa8e83a513690ea3f7fe81ecfcf243fb20efc14fe3e5f5b1a3ab1f7",
+   39548
   ],
   "static/app.js": [
-   "78fd4122188348926a965404582e8d480dba20dbad1a88afd3be7c5d4bc18a60",
-   102205
+   "c49cf2cb1ff952cbda16e3fa5be1c80898bec261a63da27452d2ec00efd343b4",
+   104779
   ],
   "static/index.html": [
    "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
@@ -1587,12 +1587,12 @@
    27524
   ],
   "static/style.css": [
-   "575931cfefe87015c0628d2002f70fba6ac1afa84c600905f4cecafdc512a811",
-   46077
+   "7d73eea8d5e24b3ecdaf004b0b9f9887074493ffd9b60124b7ff675e2f20881c",
+   46914
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "修复：程序常驻托盘后再开代理，更新仍连不上 GitHub 的问题（现在每次联网都重新读代理设置）；程序下载卡住或失败时，可以改用国内线路用浏览器下载新版",
- "tag": "content-20"
+ "notes": "数学分数、根号、乘方显示成真正的公式；手机上点卷子没反应、图片放大不出来的问题修好了；今天的复习做完后可以「再加练 20 题」（薄弱旧题掺新题）；错题标签说清楚还要几天答对才移出错题本；新版启动时如果旧版本（含 start.bat 的黑色窗口）占着端口，会询问后关掉旧版本",
+ "tag": "content-21"
 }

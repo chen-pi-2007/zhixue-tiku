@@ -262,18 +262,21 @@
     return 0;
   }
 
-  function reviewQueue(subject, limit) {
+  const EXTRA_SIZE = 20;     // 加练一轮的题数（同 db.py）
+
+  function reviewQueue(subject, limit, extra) {
     const today = todayStr();
     const papers = papersById();
     if (limit == null) limit = newLeft(today);
     const acc = typeAccuracy(subject);
-    const due = [], fresh = {};
+    const due = [], fresh = {}, ahead = [];
     filter(null, subject).forEach(q => {
       if (!q.answer) return;
       const c = prog.cards[q.key];
       if (c) {
         if (isDue(c, today)) due.push([c.in_wrong ? 0 : 1, c.due, c.box, q]);
-      } else if (SELF.indexOf(q.type) < 0) {
+        else if (SELF.indexOf(q.type) < 0) ahead.push([c.in_wrong ? 0 : 1, c.box, c.due, q]);
+      } else if (SELF.indexOf(q.type) < 0 && !(extra && q.material)) {   // 加练不带整组的材料题
         const s = (papers[q.paper_id] || {}).subject;
         const a = acc[s + '|' + q.type];
         const weak = (a == null ? 1 : a) < 0.7;
@@ -281,6 +284,7 @@
       }
     });
     due.sort((x, y) => cmpTuple(x.slice(0, 3), y.slice(0, 3)));
+    if (extra) limit = EXTRA_SIZE - Math.min(ahead.length, EXTRA_SIZE / 2);   // 薄弱旧题最多占一半，新题补满
     const queues = Object.keys(fresh).sort().map(s => fresh[s].sort((x, y) => cmpTuple(x.slice(0, 3), y.slice(0, 3))).map(t => t[3]));
     const newQs = [];
     while (newQs.length < limit && queues.some(qq => qq.length)) {
@@ -293,6 +297,16 @@
       const q = t[3];
       if (q.material && keys.has(q.paper_id + '\u0001' + q.material) && !ids.has(q.id)) { newQs.push(q); ids.add(q.id); }
     }));
+    if (extra) {
+      ahead.sort((x, y) => cmpTuple(x.slice(0, 3), y.slice(0, 3)));
+      const oldQs = ahead.slice(0, Math.max(EXTRA_SIZE - newQs.length, 0)).map(t => t[3]);
+      const mixed = [];
+      for (let i = 0; i < Math.max(oldQs.length, newQs.length); i++) {
+        if (oldQs[i]) mixed.push(oldQs[i]);
+        if (newQs[i]) mixed.push(newQs[i]);
+      }
+      return { due: 0, ahead: oldQs.length, new: newQs.length, items: groupMaterial(mixed.map(q => view(q, papers))) };
+    }
     const items = due.map(t => view(t[3], papers)).concat(newQs.map(q => view(q, papers)));
     return { due: due.length, new: newQs.length, items: groupMaterial(items) };
   }
@@ -543,7 +557,7 @@
       return { items: practiceSet(iarg('paper_id') || null, arg('scope', 'all'), arg('order', 'random') === 'random', arg('subject') || null, arg('type') || null) };
     if (method === 'GET' && path === '/api/review') {
       const n = arg('new');
-      return reviewQueue(arg('subject') || null, n ? parseInt(n, 10) : null);
+      return reviewQueue(arg('subject') || null, n ? parseInt(n, 10) : null, arg('extra') === '1');
     }
     if (method === 'GET' && path === '/api/dashboard') return { data: dashboard() };
     if (method === 'POST' && path === '/api/settings') {

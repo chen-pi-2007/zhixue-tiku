@@ -154,6 +154,19 @@ class DbFlowTest(unittest.TestCase):
         self.assertEqual(r['new'], 5)
         self.assertEqual(r['items'][0]['id'], q1['id'])
 
+    def test_extra_review_mixes_weak_old_and_new(self):
+        # 今天的复习做完、新题额度也用完时，「加练」：错题本里的旧题排最前，旧题和新题交替
+        qs = db.get_questions(limit=30)[0]
+        for q in qs[:25]:
+            db.record_answer(q['id'], True)
+        db.record_answer(qs[3]['id'], False)              # 错过一次，进错题本
+        self.assertEqual(db.review_queue()['items'], [])  # 正常复习：没到期，额度（20）也用完
+        r = db.review_queue(extra=True)
+        self.assertEqual((r['due'], r['ahead'], r['new'], len(r['items'])), (0, 10, 10, 20))
+        self.assertEqual(r['items'][0]['id'], qs[3]['id'])
+        done = {q['id'] for q in qs[:25]}
+        self.assertEqual([i['id'] in done for i in r['items'][:4]], [True, False, True, False])
+
     def test_exam_flow_records_wrong(self):
         e = db.exam_start('politics')
         self.assertEqual(sum(len(s['items']) for s in e['sections']), 35)

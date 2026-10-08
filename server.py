@@ -226,7 +226,8 @@ class Handler(BaseHTTPRequestHandler):
         if method == 'GET' and path == '/api/review':
             new = arg('new')
             return self.send_json(dict(ok=True, **db.review_queue(arg('subject') or None,
-                                                                  int(new) if new else None)))
+                                                                  int(new) if new else None,
+                                                                  extra=arg('extra') == '1')))
 
         if method == 'GET' and path == '/api/dashboard':
             return self.send_json({'ok': True, 'data': db.dashboard()})

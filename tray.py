@@ -9,6 +9,7 @@ import datetime
 import os
 import sys
 import threading
+import urllib.parse
 import urllib.request
 import webbrowser
 import winreg
@@ -121,6 +122,72 @@ def ask_show(url):
         return False
 
 
+def running_version(url):
+    """正在运行的那个智学题库是什么版本；很老的版本没有这个接口，返回 None"""
+    try:
+        import json
+        with urllib.request.urlopen(url + 'api/app', timeout=2) as r:
+            return json.loads(r.read().decode('utf-8')).get('version')
+    except Exception:
+        return None
+
+
+def _ver(s):
+    return tuple(int(x) if x.isdigit() else 0 for x in (s or '0').split('.')) + (0, 0, 0)
+
+
+def take_over_old(url, old_version):
+    """旧版本（没有独立窗口、调不出窗口）还开着、占着端口：问一下，同意就关掉它，由新版本接着运行。
+    以前这种情况会直接用浏览器打开——打开的还是旧版本，看起来像“更新了也没用”。返回 True 表示旧版本已关掉"""
+    import subprocess
+    import time
+    from version import APP_VERSION
+    port = urllib.parse.urlparse(url).port or 80
+    no_window = 0x08000000
+    try:
+        out = subprocess.run(['netstat', '-ano', '-p', 'TCP'], capture_output=True, text=True,
+                             creationflags=no_window).stdout
+    except OSError:
+        return False
+    pid = next((ln.split()[-1] for ln in out.splitlines()
+                if 'LISTENING' in ln and ln.split()[1].endswith(':%d' % port)), None)
+    if not pid or not pid.isdigit() or int(pid) == os.getpid():
+        return False
+    try:
+        name = subprocess.run(['tasklist', '/FI', 'PID eq %s' % pid, '/FO', 'CSV', '/NH'], capture_output=True,
+                              text=True, creationflags=no_window).stdout.split(',')[0].strip('"')
+    except OSError:
+        return False
+    lname = name.lower()
+    by_bat = False
+    if lname in ('python.exe', 'pythonw.exe'):
+        # 早期版本用 start.bat 启动：一个黑色命令行窗口里跑 python server.py，没有托盘图标，
+        # 用户找不到也关不掉。只认运行的是 server.py 的那个 Python，别的 Python 程序不动
+        try:
+            cmd = subprocess.run(['powershell', '-NoProfile', '-Command',
+                                  '(Get-CimInstance Win32_Process -Filter "ProcessId=%s").CommandLine' % pid],
+                                 capture_output=True, text=True, creationflags=no_window).stdout
+        except OSError:
+            return False
+        if 'server.py' not in cmd:
+            return False
+        by_bat = True
+    elif not lname.endswith('.exe') or not ('智学' in name or 'zhixue' in lname):
+        return False                         # 端口被别的程序占着，不动它
+    text = ('检测到旧版本的智学题库（%s）还在运行%s，新版本 %s 打不开它的窗口。\n\n'
+            '是否关闭旧版本，改用新版本？做题记录不受影响。' % (
+                'v' + old_version if old_version else '很早的版本',
+                '（用 start.bat 打开的黑色命令行窗口）' if by_bat else '', APP_VERSION))
+    if ctypes.windll.user32.MessageBoxW(None, text, APP_NAME, 0x4 | 0x20) != 6:     # 是 / 否；6 = 是
+        return False
+    subprocess.run(['taskkill', '/PID', pid, '/F'], capture_output=True, creationflags=no_window)
+    for _ in range(20):                      # 等端口空出来
+        if not already_running(url):
+            return True
+        time.sleep(0.3)
+    return False
+
+
 def main():
     # 无控制台时 stdout/stderr 是 None，服务日志和报错写到 server.log
     os.makedirs(appdir.HOME_DIR, exist_ok=True)
@@ -130,11 +197,16 @@ def main():
         sys.stdout = sys.stderr = log
 
     import server
+    from version import APP_VERSION
     url = server.configured_url()
     if already_running(url):
-        if not ask_show(url):
+        if ask_show(url):
+            return
+        old = running_version(url)
+        # 开着的是更旧的版本（调不出窗口）：征得同意后关掉它，由这个新版本接着启动
+        if not (_ver(old) < _ver(APP_VERSION) and take_over_old(url, old)):
             webbrowser.open(url)
-        return
+            return
     try:
         srv, url = server.make_server()
     except Exception as e:

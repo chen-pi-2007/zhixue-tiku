@@ -98,7 +98,7 @@ def preflight(kind):
             '  在题库网站里删掉它们再发布（导入试卷时会进这个文件，因为这台电脑的数据就放在仓库里）' % '、'.join(private))
     print('  跑测试…')
     if subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-q'], cwd=ROOT,
-                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, encoding='utf-8').returncode:
+                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace').returncode:
         die('测试没通过，先修好（python -m unittest discover -s tests 看详情）')
     if kind == 'app':
         if not os.path.exists(r'D:\tool\android-keys\zhixue.jks'):

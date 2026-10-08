@@ -8,6 +8,7 @@ data/media/         题目图片，题干里写成 [[img:<卷子key>/NNN.png]]
 题目用稳定的 key（<卷子key>#<序号>）关联进度。重新导入同一份题库包时，
 卷子 key 不变、题目顺序不变，做题记录就还在。
 """
+from itertools import zip_longest
 import json
 import random
 import os
@@ -429,8 +430,13 @@ def _type_accuracy(subject=None, recent=60):
     return {k: sum(v) / float(len(v)) for k, v in hist.items() if v}
 
 
-def review_queue(subject=None, new_limit=None):
-    """今日复习：到期的旧题（错题优先、过期越久越先）+ 若干客观新题（各科轮流，科目内薄弱题型优先）。"""
+EXTRA_SIZE = 20     # 加练一轮的题数
+
+
+def review_queue(subject=None, new_limit=None, extra=False):
+    """今日复习：到期的旧题（错题优先、过期越久越先）+ 若干客观新题（各科轮流，科目内薄弱题型优先）。
+    extra=True 是今天的复习做完以后的「加练」：没到期的旧题里挑最薄弱的（错题本里的、记得最不牢的），
+    旧题最多占一半，其余是额度以外的新题，一共 EXTRA_SIZE 道，两种交替排开"""
     with _lock:
         _load()
         today = srs.today_str()
@@ -439,7 +445,7 @@ def review_queue(subject=None, new_limit=None):
         if new_limit is None:
             new_limit = _new_left(today)
         acc = _type_accuracy(subject)
-        due, fresh = [], {}
+        due, fresh, ahead = [], {}, []
         for q in _filter(subject=subject):
             if not q['answer']:
                 continue
@@ -447,11 +453,16 @@ def review_queue(subject=None, new_limit=None):
             if c:
                 if srs.is_due(c, today):
                     due.append((not c['in_wrong'], c['due'], c['box'], q))
-            elif q['type'] not in SELF_TYPES:      # 主观题不自动推新题，去科目页按题型练
+                elif q['type'] not in SELF_TYPES:
+                    ahead.append((not c['in_wrong'], c['box'], c['due'], q))
+            elif q['type'] not in SELF_TYPES and not (extra and q['material']):
+                # 主观题不自动推新题，去科目页按题型练；加练不带阅读这类整组的材料题，免得一组就占满
                 subj = papers.get(q['paper_id'], {}).get('subject')
                 weak = acc.get((subj, q['type']), 1.0) < 0.7
                 fresh.setdefault(subj, []).append((not weak, q['paper_id'], q['qno'], q))
         due.sort(key=lambda x: x[:3])
+        if extra:      # 薄弱旧题最多占一半，不够的用新题补满
+            new_limit = EXTRA_SIZE - min(len(ahead), EXTRA_SIZE // 2)
         # 新题：各科轮流出，科目内薄弱题型优先、再按卷子顺序推进
         queues = [[t[3] for t in sorted(v, key=lambda x: x[:3])] for _, v in sorted(fresh.items())]
         new_qs = []
@@ -461,6 +472,12 @@ def review_queue(subject=None, new_limit=None):
                     new_qs.append(qq.pop(0))
         # 阅读等材料题整组带出，不拆开
         new_qs = _complete_groups(new_qs, [t[3] for v in fresh.values() for t in v])
+        if extra:
+            ahead.sort(key=lambda x: x[:3])
+            old_qs = [t[3] for t in ahead[:max(EXTRA_SIZE - len(new_qs), 0)]]
+            mixed = [q for pair in zip_longest(old_qs, new_qs) for q in pair if q]
+            items = [_view(q, papers) for q in mixed]
+            return {'due': 0, 'ahead': len(old_qs), 'new': len(new_qs), 'items': _group_material(items)}
         items = [_view(t[3], papers) for t in due] + [_view(q, papers) for q in new_qs]
         return {'due': len(due), 'new': len(new_qs), 'items': _group_material(items)}
 

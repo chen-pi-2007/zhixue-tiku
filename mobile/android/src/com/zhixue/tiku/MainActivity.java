@@ -172,6 +172,8 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(false);
         s.setTextZoom(100);
+        // 安卓 8 起 WebView 会给获得焦点的按钮画一圈系统焦点框（橙色），网页里关不掉，在这里关
+        if (Build.VERSION.SDK_INT >= 26) web.setDefaultFocusHighlightEnabled(false);
         web.addJavascriptInterface(new Store(), "ZXStore");
         web.setWebViewClient(new Client());
         setContentView(web);
