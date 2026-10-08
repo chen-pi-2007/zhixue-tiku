@@ -377,23 +377,24 @@
 
   /* ---------------------------------------------------------------- 模拟考试（exam.py） */
   const OBJECTIVE = ['single', 'multi', 'judge', 'reading', 'poem'];
+  // 和 exam.py 一致：[小节名, 卷子key前缀, 题型, 题数, 每题分值(默认 1), 筛选('match' 配对题 / 'comp' 其余阅读题)]
   const BLUEPRINTS = {
     politics: { standard: { title: '思想政治 模拟卷', minutes: 45, sections: [
-      ['单项选择题', '', ['single'], 20], ['多项选择题', '', ['multi'], 5], ['判断题', '', ['judge'], 10]] } },
+      ['单项选择题', '', ['single'], 20, 2.825], ['多项选择题', '', ['multi'], 5, 2.9], ['判断题', '', ['judge'], 10, 2.9]] } },
     chinese: { standard: { title: '语文 模拟卷（客观题）', minutes: 40, sections: [
       ['基础知识', '', ['single'], 6], ['现代文阅读', '', ['reading'], 10], ['古诗文阅读', '', ['poem'], 4]] } },
     math: { standard: { title: '数学 模拟卷（选择题）', minutes: 30, sections: [['单项选择题', '', ['single'], 13]] } },
     english: { standard: { title: '英语 模拟卷', minutes: 60, sections: [
-      ['语音辨析', 'english-phonetics', ['single'], 5], ['词汇与语法', 'english-vocab', ['single'], 15],
-      ['交际对话', 'english-dialogue', ['single'], 5], ['完形填空', 'english-cloze', ['single'], 10],
-      ['阅读理解', 'english-reading', ['single', 'judge'], 10], ['图文理解', 'english-picture', ['single'], 5],
-      ['书面表达', 'english-writing', ['single'], 5]] } },
+      ['语音辨析', 'english-phonetics', ['single'], 5, 1], ['词汇与语法', 'english-vocab', ['single'], 20, 1],
+      ['图文理解', 'english-picture', ['single'], 10, 1], ['交际对话', 'english-dialogue', ['single'], 10, 1],
+      ['书面表达', 'english-writing', ['single'], 5, 1], ['阅读匹配', 'english-reading', ['single'], 5, 1, 'match'],
+      ['完形填空', 'english-cloze', ['single'], 10, 1], ['阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp']] } },
     media: { standard: { title: '数字媒体理论 模拟卷', minutes: 60, sections: [
       ['单项选择题', '', ['single'], 30], ['多项选择题', '', ['multi'], 10], ['判断题', '', ['judge'], 20]] } },
   };
 
   function blueprint(subject, preset) {
-    if (preset === 'quick') return { title: '快速小测', minutes: 15, sections: [['小测', '', OBJECTIVE, 20]] };
+    if (preset === 'quick') return { title: '快速小测', minutes: 15, sections: [['小测', '', OBJECTIVE, 20, 1]] };
     const bp = (BLUEPRINTS[subject] || {})[preset];
     if (!bp) throw new Error('该科目没有这个组卷方案');
     return bp;
@@ -425,11 +426,13 @@
     papers.forEach(p => { pkey[p.id] = p.key || ''; });
     const used = new Set();
     const sections = [];
-    bp.sections.forEach(([name, prefix, types, count]) => {
-      const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) && (pkey[q.paper_id] || '').indexOf(prefix) === 0);
+    const isMatch = q => (q.options || []).length >= 5;
+    bp.sections.forEach(([name, prefix, types, count, points, filt]) => {
+      const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) && (pkey[q.paper_id] || '').indexOf(prefix) === 0 &&
+                                          (!filt || (filt === 'match') === isMatch(q)));
       const got = pick(pool, count);
       got.forEach(q => used.add(q.id));
-      if (got.length) sections.push([name, got]);
+      if (got.length) sections.push([name, got, points || 1]);
     });
     if (!sections.length) throw new Error('题库里没有可用于组卷的客观题');
     return [bp.title, bp.minutes, sections];
@@ -468,7 +471,7 @@
     sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));
     const e = { id: nextId(prog.exams), subject: subject, preset: preset, title: title, minutes: minutes,
                 started: nowStr(), finished: '', perms: perms,
-                sections: sections.map(([n, g]) => ({ name: n, keys: g.map(q => q.key) })) };
+                sections: sections.map(([n, g, pts]) => ({ name: n, keys: g.map(q => q.key), points: pts })) };
     prog.exams.push(e);
     save();
     return examView(e, true);
@@ -484,7 +487,7 @@
       if (hide && pm) v.options = shuffledOptions(q, pm);
       if (!hide && e.answers) { v.given = e.answers[k] || ''; v.correct = isRight(q, v.given); }
       return v;
-    }) }));
+    }), points: s.points || 1 }));
     const d = examSummary(e);
     d.sections = secs;
     if (!hide) { d.by_section = e.by_section; d.by_type = e.by_type; }
@@ -500,10 +503,11 @@
     const given = {};
     Object.keys(answers || {}).forEach(i => { if (id2key[i]) { const k = id2key[i]; given[k] = toOriginal(answers[i] || '', perms[k]); } });
     const t = nowStr();
-    let total = 0, correct = 0;
+    let total = 0, correct = 0, gotPts = 0, fullPts = 0;     // 按分值算成绩（老的考试记录没有分值，每题 1 分）
     const bySection = [], byType = {};
     e.sections.forEach(s => {
       let sc = 0, st = 0;
+      const pts = s.points || 1;
       s.keys.forEach(k => {
         const q = byKey[k];
         if (!q) return;
@@ -514,11 +518,11 @@
         prog.cards[k] = srsApply(prog.cards[k], ok, t)[0];
         prog.attempts.push({ k: k, ok: ok, t: t, m: 'exam' });
       });
-      bySection.push({ name: s.name, correct: sc, total: st });
-      total += st; correct += sc;
+      bySection.push({ name: s.name, correct: sc, total: st, points: pts });
+      total += st; correct += sc; gotPts += sc * pts; fullPts += st * pts;
     });
     Object.assign(e, { answers: given, finished: t, total: total, correct: correct,
-                       score: total ? Math.round(1000 * correct / total) / 10 : 0,
+                       score: fullPts ? Math.round(1000 * gotPts / fullPts) / 10 : 0,
                        used_seconds: parseInt(used || 0, 10), by_section: bySection, by_type: byType });
     save();
     return examView(e, false);

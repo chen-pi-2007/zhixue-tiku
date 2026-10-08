@@ -624,7 +624,7 @@ def exam_start(subject, preset='standard'):
         title, minutes, sections = exam_mod.compose(qs, papers, subject, preset)
         rng = random.Random()
         perms = {}                       # 选项打乱：题目key -> 显示顺序
-        for _, g in sections:
+        for _, g, _pts in sections:
             for q in g:
                 pm = exam_mod.shuffle_perm(q, rng)
                 if pm:
@@ -632,7 +632,7 @@ def exam_start(subject, preset='standard'):
         eid = _next_id(_prog['exams'])
         e = {'id': eid, 'subject': subject, 'preset': preset, 'title': title, 'minutes': minutes,
              'started': now(), 'finished': '', 'perms': perms,
-             'sections': [{'name': n, 'keys': [q['key'] for q in g]} for n, g in sections]}
+             'sections': [{'name': n, 'keys': [q['key'] for q in g], 'points': pts} for n, g, pts in sections]}
         _prog['exams'].append(e)
         _save_prog()
         return _exam_view(e, hide=True)
@@ -656,7 +656,7 @@ def _exam_view(e, hide):
                 v['given'] = e['answers'].get(k, '')
                 v['correct'] = exam_mod.is_right(q, v['given'])
             items.append(v)
-        secs.append({'name': s['name'], 'items': items})
+        secs.append({'name': s['name'], 'items': items, 'points': s.get('points', 1)})
     d = _exam_summary(e)
     d['sections'] = secs
     if not hide:
@@ -684,9 +684,11 @@ def exam_submit(eid, answers, used_seconds=0):
                 given[k] = exam_mod.to_original(v or '', perms.get(k))
         t = now()
         total = correct = 0
+        got_pts = full_pts = 0.0         # 按分值算成绩（老的考试记录没有分值，每题 1 分）
         by_section, by_type = [], {}
         for s in e['sections']:
             sc = st = 0
+            pts = s.get('points', 1)
             for k in s['keys']:
                 q = by_key.get(k)
                 if not q:
@@ -701,11 +703,13 @@ def exam_submit(eid, answers, used_seconds=0):
                 card, _ = srs.apply(_prog['cards'].get(k), ok, t)
                 _prog['cards'][k] = card
                 _prog['attempts'].append({'k': k, 'ok': ok, 't': t, 'm': 'exam'})
-            by_section.append({'name': s['name'], 'correct': sc, 'total': st})
+            by_section.append({'name': s['name'], 'correct': sc, 'total': st, 'points': pts})
             total += st
             correct += sc
+            got_pts += sc * pts
+            full_pts += st * pts
         e.update({'answers': given, 'finished': t, 'total': total, 'correct': correct,
-                  'score': round(100.0 * correct / total, 1) if total else 0,
+                  'score': round(100.0 * got_pts / full_pts, 1) if full_pts else 0,
                   'used_seconds': int(used_seconds or 0), 'by_section': by_section,
                   'by_type': {k: {'correct': v[0], 'total': v[1]} for k, v in by_type.items()}})
         _save_prog()

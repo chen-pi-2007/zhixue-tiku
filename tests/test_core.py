@@ -71,10 +71,20 @@ class ExamTest(unittest.TestCase):
         papers = [{'id': 1, 'key': 'english-vocab'}, {'id': 2, 'key': 'english-phonetics'}]
         qs = [q(i, pid=1) for i in range(1, 31)] + [q(i, pid=2) for i in range(31, 41)]
         title, minutes, secs = exam.compose(qs, papers, 'english')
-        d = dict((n, g) for n, g in secs)
+        d = dict((n, g) for n, g, _ in secs)
         self.assertEqual(len(d['语音辨析']), 5)
         self.assertTrue(all(x['paper_id'] == 2 for x in d['语音辨析']))
-        self.assertEqual(len(d['词汇与语法']), 15)
+        self.assertEqual(len(d['词汇与语法']), 20)
+
+    def test_compose_reading_match_and_comp_split(self):
+        papers = [{'id': 1, 'key': 'english-reading'}]
+        five = [['A', 'a'], ['B', 'b'], ['C', 'c'], ['D', 'd'], ['E', 'e']]
+        qs = [dict(q(i, pid=1, mat='M%d' % (i // 5)), options=five) for i in range(0, 10)] +              [dict(q(i, pid=1, mat='N%d' % (i // 5)), options=five[:3]) for i in range(10, 40)]
+        title, minutes, secs = exam.compose(qs, papers, 'english')
+        d = dict((n, (g, p)) for n, g, p in secs)
+        self.assertTrue(all(len(x['options']) == 5 for x in d['阅读匹配'][0]))
+        self.assertTrue(all(len(x['options']) == 3 for x in d['阅读理解'][0]))
+        self.assertEqual((d['阅读匹配'][1], d['阅读理解'][1]), (1, 1.75))
 
     def test_shuffle_skips_unsafe_options(self):
         import random
@@ -156,7 +166,8 @@ class DbFlowTest(unittest.TestCase):
         self.assertEqual((rf['given'], rf['options'][0]), ('A', ['A', '1']))   # 报告按原卷顺序
         self.assertEqual(r['total'], 35)
         self.assertEqual(len(db.wrong_list(0)), 34)
-        self.assertEqual(db.dashboard()['exams'][0]['score'], round(100.0 / 35, 1))
+        # 按老师卷子的分值：单选每题 2.825 分，满分 100
+        self.assertEqual(db.dashboard()['exams'][0]['score'], round(2.825, 1))
 
     def test_hidden_subjects_leave_review_and_wrong_book(self):
         db.upsert_paper('english-1', '英语1', 'english',

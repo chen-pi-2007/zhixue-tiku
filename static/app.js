@@ -509,6 +509,9 @@ function goBack() {
   history.length > 1 ? history.back() : (location.hash = '#/home');
 }
 
+// 分值显示：2.825 → 2.83，整数不带小数
+function fmtPts(v) { return String(Math.round(v * 100) / 100); }
+
 async function openDataDir() {
   try { await api('/api/open-data', { method: 'POST', body: {} }); } catch (e) { toast(e.message, 'bad'); }
 }
@@ -1178,7 +1181,8 @@ function renderExamRun() {
     '<div class="exam-layout"><div class="exam-main">' +
     e.sections.map(sec => {
       let lastMat = null;
-      return '<div class="sec-title">' + esc(sec.name) + '<span class="muted"> · ' + sec.items.length + ' 题</span></div>' +
+      return '<div class="sec-title">' + esc(sec.name) + '<span class="muted"> · ' + sec.items.length + ' 题' +
+        (sec.points && sec.points !== 1 ? '，每题 ' + fmtPts(sec.points) + ' 分' : '') + '</span></div>' +
         sec.items.map(q => {
           n++;
           allItems.push({ q: q, n: n });
@@ -1294,7 +1298,9 @@ async function viewExamReport(id) {
       '<div class="report-grid">' +
         (e.by_section || []).map(s => {
           const p = s.total ? Math.round(100 * s.correct / s.total) : 0;
-          return '<div class="report-cell"><div class="rc-name">' + esc(s.name) + '</div><div class="rc-num">' + s.correct + '/' + s.total + '</div>' + bar(p, p < 60 ? 'red' : '') + '</div>';
+          const pts = s.points || 1;
+          return '<div class="report-cell"><div class="rc-name">' + esc(s.name) + '</div><div class="rc-num">' + s.correct + '/' + s.total +
+            (pts !== 1 ? '<span class="muted"> · ' + fmtPts(s.correct * pts) + '/' + fmtPts(s.total * pts) + ' 分</span>' : '') + '</div>' + bar(p, p < 60 ? 'red' : '') + '</div>';
         }).join('') +
       '</div>' +
       '<div class="muted" style="margin-top:8px">按题型：' + Object.keys(bt).map(t =>

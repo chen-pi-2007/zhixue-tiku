@@ -9,14 +9,19 @@ import re
 
 OBJECTIVE = ('single', 'multi', 'judge', 'reading', 'poem')
 
-# 科目 -> 预设 -> {title, minutes, sections: [(小节名, 卷子key前缀, 题型列表, 题数)]}
-# 卷子key前缀为 '' 表示该科目全部卷子
+# 科目 -> 预设 -> {title, minutes, sections: [(小节名, 卷子key前缀, 题型列表, 题数[, 每题分值[, 筛选]])]}
+# 卷子key前缀为 '' 表示该科目全部卷子；每题分值不写就是 1 分；成绩 = 得分 / 总分 × 100
+# 英语、思政的结构和分值照老师在学习通上组的练习卷（学测/_学习通/）：
+#   英语：单选 35（语音 5、词汇语法 20、图文 10）每题 1 分；对话 2 组、书面表达 1 组、阅读匹配 1 组每空 1 分；
+#         完形 1 篇 10 空每空 1 分；阅读理解 4 篇共 35 分（每题 1.75 分），合计 100 分
+#   思政：单选 20 共 56.5 分，多选 5 共 14.5 分，判断 10 共 29 分
+# 筛选：'match' 只要 5 个选项的配对题（阅读里“为每个人选择合适的……”那种），'comp' 只要其余的阅读题
 BLUEPRINTS = {
     'politics': {
         'standard': {'title': '思想政治 模拟卷', 'minutes': 45, 'sections': [
-            ('单项选择题', '', ['single'], 20),
-            ('多项选择题', '', ['multi'], 5),
-            ('判断题', '', ['judge'], 10)]},
+            ('单项选择题', '', ['single'], 20, 2.825),
+            ('多项选择题', '', ['multi'], 5, 2.9),
+            ('判断题', '', ['judge'], 10, 2.9)]},
     },
     'chinese': {
         'standard': {'title': '语文 模拟卷（客观题）', 'minutes': 40, 'sections': [
@@ -30,13 +35,14 @@ BLUEPRINTS = {
     },
     'english': {
         'standard': {'title': '英语 模拟卷', 'minutes': 60, 'sections': [
-            ('语音辨析', 'english-phonetics', ['single'], 5),
-            ('词汇与语法', 'english-vocab', ['single'], 15),
-            ('交际对话', 'english-dialogue', ['single'], 5),
-            ('完形填空', 'english-cloze', ['single'], 10),
-            ('阅读理解', 'english-reading', ['single', 'judge'], 10),
-            ('图文理解', 'english-picture', ['single'], 5),
-            ('书面表达', 'english-writing', ['single'], 5)]},
+            ('语音辨析', 'english-phonetics', ['single'], 5, 1),
+            ('词汇与语法', 'english-vocab', ['single'], 20, 1),
+            ('图文理解', 'english-picture', ['single'], 10, 1),
+            ('交际对话', 'english-dialogue', ['single'], 10, 1),
+            ('书面表达', 'english-writing', ['single'], 5, 1),
+            ('阅读匹配', 'english-reading', ['single'], 5, 1, 'match'),
+            ('完形填空', 'english-cloze', ['single'], 10, 1),
+            ('阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp')]},
     },
     'media': {
         'standard': {'title': '数字媒体理论 模拟卷', 'minutes': 60, 'sections': [
@@ -51,7 +57,7 @@ QUICK = {'title': '快速小测', 'minutes': 15, 'count': 20}
 def blueprint(subject, preset):
     if preset == 'quick':
         return {'title': '%s' % QUICK['title'], 'minutes': QUICK['minutes'],
-                'sections': [('小测', '', list(OBJECTIVE), QUICK['count'])]}
+                'sections': [('小测', '', list(OBJECTIVE), QUICK['count'], 1)]}
     bp = BLUEPRINTS.get(subject, {}).get(preset)
     if not bp:
         raise ValueError('该科目没有这个组卷方案')
@@ -90,21 +96,30 @@ def pick(pool, count, rng):
     return out
 
 
+def is_match(q):
+    """配对题：5 个选项（A～E）共用一组，比如“为每个人选择合适的天气”"""
+    return len(q.get('options') or []) >= 5
+
+
 def compose(questions, papers, subject, preset='standard', seed=None):
-    """questions/papers 为该科目全部题和卷子。返回 (标题, 分钟, [(小节名, [题...])])"""
+    """questions/papers 为该科目全部题和卷子。返回 (标题, 分钟, [(小节名, [题...], 每题分值)])"""
     bp = blueprint(subject, preset)
     rng = random.Random(seed)
     pkey = {p['id']: p.get('key', '') for p in papers}
     used = set()
     sections = []
-    for name, prefix, types, count in bp['sections']:
+    for sec in bp['sections']:
+        name, prefix, types, count = sec[:4]
+        points = sec[4] if len(sec) > 4 else 1
+        filt = sec[5] if len(sec) > 5 else None
         pool = [q for q in questions
                 if q['type'] in types and q['answer'] and q['id'] not in used
-                and pkey.get(q['paper_id'], '').startswith(prefix)]
+                and pkey.get(q['paper_id'], '').startswith(prefix)
+                and (filt is None or (filt == 'match') == is_match(q))]
         got = pick(pool, count, rng)
         used.update(q['id'] for q in got)
         if got:
-            sections.append((name, got))
+            sections.append((name, got, points))
     if not sections:
         raise ValueError('题库里没有可用于组卷的客观题')
     return bp['title'], bp['minutes'], sections
