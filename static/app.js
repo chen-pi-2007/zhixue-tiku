@@ -1574,13 +1574,9 @@ function setUpdNotice(n) {
 
 function markUpdDots() {
   const n = store.get('zx.updNotice');
-  // 顶栏右侧的「有更新」标签（只在电脑上显示；手机上只在右上角齿轮上点个小红点，见 style.css）
+  // 有更新只在「设置」入口（电脑左侧导航、手机右上角齿轮）和「检查更新」上点个小红点，不另外显示「有更新」标签
   const top = $('#top-upd');
-  if (n && !top) {
-    const pick = $('.theme-pick');
-    if (pick) pick.insertAdjacentHTML('beforebegin',
-      '<a id="top-upd" class="top-upd" href="#/settings" onclick="setTimeout(checkUpdate,300)" title="' + esc(n.text) + '"><i class="upd-dot"></i>有更新</a>');
-  } else if (!n && top) top.remove();
+  if (top) top.remove();                       // 旧版界面留下的标签
   [$('#nav a[data-v="settings"]'), $('#top-set'), $('#upd-check')].forEach(el => {
     if (!el) return;
     const dot = el.querySelector('.upd-dot');
@@ -1589,25 +1585,11 @@ function markUpdDots() {
   });
 }
 
-function isPhone() { return IS_APP || (window.matchMedia && matchMedia('(max-width: 760px)').matches); }
-
+// 不再弹「有更新」提示条，只留小红点；别处还在调用这个函数，顺便清掉旧版界面弹出来的条
 function showUpdNotice() {
   const old = $('#upd-banner');
   if (old) old.remove();
-  const n = store.get('zx.updNotice');
-  const h = location.hash;
-  // 模拟考答题时不打扰；在设置页里已经能看到，也不用再提示；点过「以后再说」的这一版不再弹
-  // 手机上不弹提示条，齿轮上的小红点就够了
-  if (isPhone() || !n || h.indexOf('#/exam/run') === 0 || h.indexOf('#/settings') === 0 || store.get('zx.updBannerOff') === n.kind + n.latest) return;
-  const d = document.createElement('div');
-  d.id = 'upd-banner';
-  d.className = 'upd-banner';
-  d.innerHTML = '<i class="upd-dot"></i><span>' + esc(n.text) + '</span>' +
-    '<button class="btn sm" onclick="location.hash=\'#/settings\';setTimeout(checkUpdate,300)">去更新</button>' +
-    '<button class="btn ghost sm" onclick="store.set(\'zx.updBannerOff\',' + jsq(n.kind + n.latest) + ');this.parentNode.remove()">以后再说</button>';
-  document.body.appendChild(d);
 }
-window.addEventListener('hashchange', showUpdNotice);
 
 async function applyUpdate() {
   if (IS_APP) return applyUpdateApp();

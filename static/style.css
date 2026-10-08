@@ -70,6 +70,7 @@
 /* ---------------------------------------------------------------- 基础 */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+html { overflow-y: scroll; }               /* 始终留出滚动条的位置：内容长短不同的页面之间切换时，顶栏和布局不会左右跳 */
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.6; }
 a { color: var(--blue); text-decoration: none; }
 a:hover { opacity: .85; }
@@ -87,11 +88,11 @@ html { -webkit-tap-highlight-color: transparent; }
   position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 14px; height: var(--top); padding: 0 20px;
   background: var(--layer-1); border-bottom: 1px solid var(--line);
 }
-.logo { display: flex; align-items: center; gap: 8px; color: var(--ink); }
+.logo { display: flex; flex: none; align-items: center; gap: 8px; color: var(--ink); }   /* 标题不许被右边的东西挤小、挤折行 */
 .logo:hover { opacity: 1; }
 .seal { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--fill); color: var(--fill-ink); font-size: 14px; font-weight: 700; }
-.logo-t { font-size: 17px; font-weight: 600; }
-.top-days { display: inline-flex; align-items: baseline; gap: 3px; height: 26px; padding: 0 10px; border-radius: 9999px; background: var(--red-soft);
+.logo-t { font-size: 17px; font-weight: 600; white-space: nowrap; }
+.top-days { display: inline-flex; flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; align-items: baseline; gap: 3px; height: 26px; padding: 0 10px; border-radius: 9999px; background: var(--red-soft);
   color: var(--ink-2); font-size: 13px; line-height: 26px; white-space: nowrap; }
 .top-days[hidden] { display: none; }
 .top-days em { font-style: normal; font-weight: 700; color: var(--red); font-size: 15px; }
@@ -479,13 +480,12 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .top-set { display: inline-flex; }
   body.subpage #side { display: none; }                 /* 设置页：不显示题库 / 错题本那排导航 */
   body.subpage #topbar { display: none; }               /* 只留一条「‹ 设置」标题栏 */
-  body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: 52px; margin: -14px -12px 14px; padding: 0 8px; gap: 2px;
+  /* 和顶栏一样高、一样的左边距，切到设置时上面那条不跳 */
+  body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: var(--top); margin: -14px -12px 14px; padding: 0 12px 0 4px; gap: 2px; font-weight: 600;
     background: var(--layer-1); border-bottom: 1px solid var(--line); font-size: 17px; }
   body.subpage .page-back { margin-left: 0; }
   body.subpage .page-back { display: inline-flex; }
   body.subpage .top-set { display: none; }              /* 已经在设置里了，齿轮也收起来 */
-  #topbar .top-upd { display: none; }                   /* 手机上的更新提示只留齿轮上的小红点 */
-  #topbar .top-upd + .theme-pick { margin-left: auto; }
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: 100%; }
