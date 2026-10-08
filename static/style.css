@@ -78,6 +78,7 @@ code { font-family: var(--f-code); font-size: 13px; background: var(--layer-2); 
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 /* 手机上点按时不闪蓝框：去掉 WebView 的点击高亮，焦点框只在键盘操作时显示 */
 html { -webkit-tap-highlight-color: transparent; }
+.app :focus, .app :focus-visible { outline: none; }    /* 手机 App 没有键盘操作，焦点框一律不显示 */
 :focus:not(:focus-visible) { outline: none; }
 .ico { width: 18px; height: 18px; flex: none; }
 
@@ -308,6 +309,11 @@ details.material-box[open] summary { margin-bottom: 8px; }
 .feedback.good { background: var(--green-soft); }
 .feedback.bad { background: var(--red-soft); }
 .feedback .ans-line { font-weight: 600; margin-bottom: 4px; }
+.feedback .ans-key { margin-left: 10px; font-weight: 500; color: var(--ink-2); }
+.feedback .ans-key b { color: var(--green); }
+/* 反馈框里的小节不再套一层灰底，只用分隔线和标题区分，避免框套框 */
+.feedback .why-box, .feedback .point-box { background: none; border-radius: 0; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line); }
+.feedback .point-box { border-left: 0; }
 .feedback.good .ans-line { color: var(--green); }
 .feedback.bad .ans-line { color: var(--red); }
 .analysis { margin-top: 6px; white-space: pre-wrap; color: var(--ink-2); word-break: break-word; line-height: 1.8; }
@@ -360,6 +366,8 @@ textarea.selfarea:focus { outline: 1px solid var(--line); }
 .timer.urgent { color: var(--red); }
 .exam-layout { display: flex; gap: 20px; align-items: flex-start; }
 .exam-main { flex: 1; min-width: 0; }
+.exam-main .sec-title { justify-content: flex-start; gap: 2px; }
+.exam-main > .sec-title:first-child { margin-top: 0; }
 .answer-card { position: sticky; top: calc(var(--top) + 76px); width: 220px; flex: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px; border-radius: 8px; background: var(--layer-1); max-height: calc(100vh - 150px); overflow: auto; align-content: start; }
 .answer-card a { display: flex; align-items: center; justify-content: center; height: 32px; border-radius: 6px; background: var(--layer-2); color: var(--ink-2); font-size: 13px; }
 .answer-card a:hover { background: var(--layer-3); opacity: 1; }
@@ -462,19 +470,33 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   #nav { flex-direction: row; overflow-x: auto; }
   #nav a { height: 34px; padding: 0 10px; font-size: 14px; white-space: nowrap; }
   #nav a .ico { display: none; }
+  #nav a { flex: 1 0 auto; justify-content: center; }
+  .card { padding: 14px; }
+  .qcard-main { padding: 14px; }
+  .feedback { padding: 12px; }
+  .set-row .btn { flex: none; }
   #nav a[data-v="settings"] { display: none; }
   .top-set { display: inline-flex; }
+  body.subpage #side { display: none; }                 /* 设置页：不显示题库 / 错题本那排导航 */
+  body.subpage .page-back { display: inline-flex; }
+  body.subpage .top-set { display: none; }              /* 已经在设置里了，齿轮也收起来 */
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: 100%; }
-  .exam-layout { flex-direction: column; }
+  .exam-layout { flex-direction: column; gap: 14px; }
   .answer-card { position: static; width: 100%; grid-template-columns: repeat(8, 1fr); max-height: none; order: -1; }
   .ty-src, .ty-line { font-size: 16px; letter-spacing: 0; }
   .ty-src { white-space: normal; }
+  .exam-pick { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .exam-pick .subj-name { margin: 0; min-width: 0; }
+  .exam-pick .paper-acts { flex: none; margin: 0; }
 }
 
 /* 设置页 */
-.page-h { font-size: 20px; margin-bottom: 16px; }
+.page-h { display: flex; align-items: center; gap: 6px; font-size: 20px; margin-bottom: 16px; }
+.page-back { display: none; align-items: center; justify-content: center; width: 34px; height: 34px; margin-left: -8px; border-radius: 8px; color: var(--ink); }
+.page-back .ico { width: 22px; height: 22px; }
+.page-back:active { background: var(--layer-2); }
 .set-card { max-width: 760px; }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 0; }
 .set-row + .set-row { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }

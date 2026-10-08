@@ -577,7 +577,7 @@
     }
     if (method === 'GET' && path === '/api/app')
       return { version: APP_VERSION, content_version: ((await currentManifest()) || {}).content_version || 0,
-               frozen: false, mobile: true, data_dir: '手机本地（卸载 App 会一起删除）', repo: 'https://github.com/' + REPO };
+               frozen: false, mobile: true, data_dir: '本机，卸载 App 会一起删除', data_note: window.ZXStore && ZXStore.shareProgress ? '换手机或重装前，先分享一份到微信或文件里备份' : '', repo: 'https://github.com/' + REPO };
     if (method === 'GET' && path === '/api/content/check') return contentCheck();
     if (method === 'POST' && path === '/api/content/update') return contentStart();
     if (method === 'GET' && path === '/api/content/progress') return Object.assign({}, job);

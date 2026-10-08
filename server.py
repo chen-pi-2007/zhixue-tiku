@@ -293,8 +293,15 @@ class Handler(BaseHTTPRequestHandler):
             import version
             return self.send_json({'ok': True, 'version': version.APP_VERSION, 'content_version': appdir.content_version(),
                                    'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
-                                   'window': SHOW_WINDOW is not None,
+                                   'window': SHOW_WINDOW is not None, 'open_data': sys.platform == 'win32',
                                    'repo': 'https://github.com/%s' % version.REPO})
+
+        # 设置页点「我的数据」：在资源管理器里打开数据文件夹
+        if method == 'POST' and path == '/api/open-data':
+            if sys.platform != 'win32':
+                return self.send_error_json('只能在 Windows 上打开文件夹')
+            os.startfile(db.DATA_DIR)
+            return self.send_json({'ok': True})
 
         # 已经开着时又双击了 exe：新启动的那个调这个接口，让这边把窗口调到前面，然后自己退出
         if method == 'POST' and path == '/api/window/show':

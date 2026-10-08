@@ -1,6 +1,6 @@
 {
- "content_version": 12,
- "created": "2026-10-08 09:51:38",
+ "content_version": 13,
+ "created": "2026-10-08 10:09:18",
  "files": {
   "data/bank.json": [
    "de24bd60210d484627d024d1876040c5d97c7b143611eff2d079f2d1ee220eef",
@@ -1571,28 +1571,28 @@
    17784
   ],
   "mobile/local.js": [
-   "388adf227083d641c5e187d6146e3ab1db4b47c7732f74f55f47eeec5132aa93",
-   36047
+   "6de05c085170529d937fabc9098ba27987de7931af8541098c202726a08138cc",
+   36166
   ],
   "static/app.js": [
-   "0d6d9df6c80cc9eb4c6024338ad8817976a5ef2c69a1fd84790cf2fb8e9ed108",
-   88293
+   "73153098101d59fcc00262a645f819f2e8f82e5f793d07c2af30f43b2f2b8ad5",
+   89851
   ],
   "static/index.html": [
    "ed73648760b43881d1ac3023b0ef2aa6f00a40b173e1129598d054fecda55564",
    6417
   ],
   "static/skills.js": [
-   "abd0cec79f1c3b0c77a97c4cd449be5388a8a596d9bb743b1cabd150c67a8bf7",
-   27900
+   "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
+   27524
   ],
   "static/style.css": [
-   "f11cf05f67b0cbe3c978574c72cf13cc25cc2e497797f2804a6ec896fbed2888",
-   38566
+   "685ec668853fe671bf2cef11ae494d03b524ebf7e6c7364bdceb85d948031d77",
+   40770
   ]
  },
  "min_android_version": "1.4.4",
  "min_app_version": "1.4.4",
- "notes": "手机版：距学测天数放到顶栏标题旁；设置移到右上角齿轮；去掉点按时的蓝框；换页淡入；设置页加开发者署名",
- "tag": "content-12"
+ "notes": "手机：分享做题记录（发到微信/QQ/文件）；设置改成二级页面（带返回，不再和学习页混在一起）；排版优化（题目更宽、反馈不再框套框、导航均分、触屏不再出现蓝框、模拟考更紧凑）；电脑：设置里一键打开数据文件夹；界面标点统一成中文全角",
+ "tag": "content-13"
 }

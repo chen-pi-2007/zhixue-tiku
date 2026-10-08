@@ -141,7 +141,7 @@ function optNotesBox(q) {
 function materialBox(q, fold) {
   if (!q.material || !q.material.trim()) return '';
   if (fold && q.material.length > 160) {
-    return '<details class="material-box"><summary class="material-title">材料(点开查看)· ' +
+    return '<details class="material-box"><summary class="material-title">材料（点开查看）· ' +
       esc(q.material.split('\n')[0].slice(0, 40)) + '…</summary>' +
       '<div class="material-body">' + rich(q.material) + '</div>' + materialCn(q) + '</details>';
   }
@@ -161,7 +161,7 @@ function recBadge(q) {
 
 function ansHtml(q) {
   return '正确答案 <b>' + rich(q.answer) + '</b>' +
-    (q.analysis ? '<div class="analysis">解析:' + rich(q.analysis) + '</div>' : '') + pointBox(q) + optNotesBox(q) + phraseBox(q);
+    (q.analysis ? '<div class="analysis">解析：' + rich(q.analysis) + '</div>' : '') + pointBox(q) + optNotesBox(q) + phraseBox(q);
 }
 
 function optsStatic(q, given) {
@@ -199,6 +199,7 @@ function route() {
   const name = routes[parts[0]] ? parts[0] : 'home';
   const navOf = { practice: 'home', subject: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
+  document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
   const ts = $('#top-set');
   if (ts) ts.classList.toggle('active', name === 'settings');
   if (name !== 'exam') stopExamTimer();
@@ -280,7 +281,7 @@ async function viewHome() {
   app.innerHTML =
     '<div class="home">' +
       '<section class="home-main">' +
-        (unfinished ? '<div class="notice">有一场模拟考还没交卷:' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
+        (unfinished ? '<div class="notice">有一场模拟考还没交卷：' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
         tagRow('culture') + tagRow('pro') +
         '<div class="group-tabs">' + [['', '全部'], ['culture', GROUP_NAME.culture], ['pro', GROUP_NAME.pro]].map(g =>
           '<button class="group-tab' + (h.group === g[0] ? ' on' : '') + '" data-g="' + g[0] + '">' + g[1] + '</button>').join('') +
@@ -433,8 +434,24 @@ function setTopDays(date) {
   el.onclick = () => editExamDate(date);
 }
 
+// 手机 App：把做题记录发到微信 / QQ / 文件管理（1.4.5 起的 App 才有）
+function canShareProgress() { return !!(window.ZXStore && ZXStore.shareProgress); }
+function shareProgress() {
+  let err = '';
+  try { err = ZXStore.shareProgress(); } catch (e) { err = e.message; }
+  if (err) toast(err, 'bad');
+}
+
+function goBack() {
+  history.length > 1 ? history.back() : (location.hash = '#/home');
+}
+
+async function openDataDir() {
+  try { await api('/api/open-data', { method: 'POST', body: {} }); } catch (e) { toast(e.message, 'bad'); }
+}
+
 async function editExamDate(cur) {
-  const v = prompt('学测日期(格式 2026-11-07):', cur);
+  const v = prompt('学测日期（格式 2026-11-07）：', cur);
   if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v.trim())) return;
   try { await api('/api/settings', { method: 'POST', body: { exam_date: v.trim() } }); viewHome(); } catch (e) { toast(e.message, 'bad'); }
 }
@@ -483,7 +500,7 @@ async function viewSubject(args) {
       '</div>' +
     '</div>' +
 
-    '<div class="sec-title">按题型练习' + (weak.length ? ' <span class="muted">· 标红的是薄弱题型(最近正确率低于 70%)</span>' : '') + '</div>' +
+    '<div class="sec-title">按题型练习' + (weak.length ? ' <span class="muted">· 标红的是薄弱题型（最近正确率低于 70%）</span>' : '') + '</div>' +
     '<div class="typegrid">' + s.types.map(t =>
       '<button class="typebtn' + (weak.indexOf(t.type) >= 0 ? ' weak' : '') + '" onclick="startPractice({subject:\'' + subj +
         '\',type:\'' + t.type + '\',scope:\'all\',title:\'' + name + '·' + TYPE_NAME[t.type] + '\'})">' +
@@ -517,7 +534,7 @@ function paperCard(p) {
 }
 
 async function delPaper(pid, name) {
-  if (!confirm('删除卷子「' + name + '」及其全部题目和练习记录?')) return;
+  if (!confirm('删除卷子「' + name + '」及其全部题目和练习记录？')) return;
   try {
     await api('/api/papers/' + pid, { method: 'DELETE' });
     toast('已删除');
@@ -537,7 +554,7 @@ function viewUpload() {
     '<div class="card">' +
       '<div class="sec-title" style="margin-top:0">导入试卷</div>' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">' +
-        '<b style="font-size:14px">科目:</b>' +
+        '<b style="font-size:14px">科目：</b>' +
         '<select class="inp" id="up-subject" style="padding:5px 10px">' +
           Object.keys(SUBJECT_NAME).map(k => '<option value="' + k + '"' + (k === 'general' ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
         '</select>' +
@@ -549,7 +566,7 @@ function viewUpload() {
       '</div>' +
       '<input type="file" id="file" multiple accept=".docx,.txt,.md" style="display:none">' +
       '<div id="upload-out"></div>' +
-      '<div class="muted" style="margin-top:10px">含图片、公式的大题库请用题库包导入:在 学测/_脚本 运行 build_packs.py,' +
+      '<div class="muted" style="margin-top:10px">含图片、公式的大题库请用题库包导入：在 学测/_脚本 运行 build_packs.py,' +
         '再关掉本服务运行 <code>python import_packs.py ..\\学测\\题库包</code>。</div>' +
     '</div>';
   bindUpload();
@@ -572,7 +589,7 @@ function bindUpload() {
       const line = document.createElement('div');
       line.className = 'card upload-result';
       line.style.marginTop = '10px';
-      line.textContent = '正在识别:' + f.name + ' …';
+      line.textContent = '正在识别：' + f.name + ' …';
       out.appendChild(line);
       try {
         const buf = await f.arrayBuffer();
@@ -585,7 +602,7 @@ function bindUpload() {
         line.innerHTML =
           '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">' +
             '<div><b>✓ ' + esc(d.paper.name) + '</b> 识别出 <b>' + d.paper.total + '</b> 题(' + parts.join(' · ') + ')' +
-              (d.no_answer ? '<div class="muted" style="color:var(--amber)">' + d.no_answer + ' 题未识别到答案,仅收入题库浏览</div>' : '') +
+              (d.no_answer ? '<div class="muted" style="color:var(--amber)">' + d.no_answer + ' 题未识别到答案，仅收入题库浏览</div>' : '') +
             '</div>' +
             '<button class="btn sm" onclick="startPractice({paper_id:' + d.paper.id + ',scope:\'all\',order:\'seq\',title:' + jsq(d.paper.name) + '})">立即刷题</button>' +
           '</div>';
@@ -660,7 +677,7 @@ async function loadMore() {
       (b.items.length < b.total
         ? '<div class="loadmore"><button class="btn ghost" onclick="loadMore()">加载更多(' + b.items.length + '/' + b.total + ')</button></div>'
         : '<div class="muted" style="text-align:center;padding:10px">共 ' + b.total + ' 题</div>')
-    : '<div class="empty">没有符合条件的题目,换个题型或关键词试试。</div>';
+    : '<div class="empty">没有符合条件的题目，换个题型或关键词试试。</div>';
 }
 
 function qCard(q) {
@@ -720,7 +737,7 @@ async function viewWrong() {
           (IS_APP ? '' : '<a class="btn ghost sm" href="/api/export/wrong">导出</a>')
         : '') +
     '</div>' +
-    (!tab ? '<div class="muted" style="margin:-4px 0 12px">错题要在<b>不同的日子</b>里连续答对 ' + MASTER_STREAK + ' 次才会消灭,今日复习会按时把它们排出来。</div>' : '') +
+    (!tab ? '<div class="muted" style="margin:-4px 0 12px">错题要在<b>不同的日子</b>里连续答对 ' + MASTER_STREAK + ' 次才会消灭，今日复习会按时把它们排出来。</div>' : '') +
     (list.length
       ? list.map(q =>
         '<div class="card">' +
@@ -732,7 +749,7 @@ async function viewWrong() {
             '<div style="flex:1"></div>' +
             (q.mastered
               ? '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',false)">重新加入</button>'
-              : '<button class="btn green sm" onclick="markWrong(' + q.id + ',true)">标记已掌握</button>') +
+              : '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',true)">标记已掌握</button>') +
           '</div>' +
           materialBox(q, true) +
           '<div class="stem">' + rich(q.stem) + '</div>' +
@@ -759,7 +776,7 @@ async function markWrong(qid, mastered) {
 async function startReview(subject) {
   let d;
   try { d = await api('/api/review' + (subject ? '?subject=' + subject : '')); } catch (e) { toast(e.message, 'bad'); return; }
-  if (!d.items.length) { toast('今天没有要复习的题了,新题额度也用完了'); return; }
+  if (!d.items.length) { toast('今天没有要复习的题了，新题额度也用完了'); return; }
   beginPractice(d.items, (subject ? SUBJECT_NAME[subject] + ' · ' : '') + '今日复习', 'review');
   toast('到期 ' + d.due + ' 题 + 新题 ' + d.new + ' 题');
 }
@@ -804,9 +821,9 @@ function viewPractice() {
 
 function statsHtml(p) {
   const doneN = p.results.length;
-  return '<span class="muted">答对:</span><span class="num-green">' + p.correct + ' 题</span>' +
-    '<span class="muted">答错:</span><span class="num-red">' + (doneN - p.correct) + ' 题</span>' +
-    '<span class="muted">正确率:</span>' + (doneN ? Math.round(100 * p.correct / doneN) : 0) + '%';
+  return '<span class="muted">答对：</span><span class="num-green">' + p.correct + ' 题</span>' +
+    '<span class="muted">答错：</span><span class="num-red">' + (doneN - p.correct) + ' 题</span>' +
+    '<span class="muted">正确率：</span>' + (doneN ? Math.round(100 * p.correct / doneN) : 0) + '%';
 }
 
 function renderQ() {
@@ -816,14 +833,14 @@ function renderQ() {
   const pct = Math.round(100 * p.idx / p.list.length);
   const again = p.idx >= p.firstTotal;
   app.innerHTML =
-    '<div class="crumb">当前位置:<a href="#/home">首页</a> &gt; ' + esc(p.title) +
+    '<div class="crumb">当前位置：<a href="#/home">首页</a> &gt; ' + esc(p.title) +
       '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></div>' +
     '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
     '<div class="card qcard-main">' +
       '<div class="qhead">' +
         '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
-        (again ? '<span class="rec-badge bad">刚才做错,再来一次</span>' : recBadge(q)) +
+        (again ? '<span class="rec-badge bad">刚才做错，再来一次</span>' : recBadge(q)) +
         '<span class="spacer"></span>' + cnBtn(q) +
       '</div>' +
       materialBox(q) +
@@ -834,12 +851,12 @@ function renderQ() {
 
   const body = $('#qbody');
   if (SELF_TYPES.indexOf(q.type) >= 0) {
-    const ph = { dictation: '在纸上或这里默写诗句,再对照答案(选填)…',
-                 essay: '可以先列提纲,写完再对照参考思路自评(选填)…',
-                 solution: '在草稿纸上推演,做完再来对照(此栏可记关键步骤,选填)…',
-                 blank: '在纸上写出结果,再来对照(选填)…' }[q.type] || '可以在这里写下你的思路(选填)…';
+    const ph = { dictation: '在纸上或这里默写诗句，再对照答案（选填）…',
+                 essay: '可以先列提纲，写完再对照参考思路自评（选填）…',
+                 solution: '在草稿纸上推演，做完再来对照（此栏可记关键步骤，选填）…',
+                 blank: '在纸上写出结果，再来对照（选填）…' }[q.type] || '可以在这里写下你的思路（选填）…';
     const btnText = { dictation: '查看默写答案', essay: '查看写作思路',
-                      solution: '做完了,对照解答', blank: '做完了,对照答案' }[q.type] || '查看参考答案';
+                      solution: '做完了，对照解答', blank: '做完了，对照答案' }[q.type] || '查看参考答案';
     body.innerHTML =
       '<textarea class="selfarea" id="self-input" placeholder="' + ph + '"></textarea>' +
       '<div class="qactions" id="qact"><button class="btn" onclick="showQaAns()">' + btnText + '</button></div>';
@@ -847,7 +864,7 @@ function renderQ() {
     body.innerHTML =
       '<div class="opts" id="optsbox">' + opts.map((o, i) =>
         '<button class="opt" data-k="' + esc(o[0]) + '" onclick="toggleMulti(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>' +
-      '<div class="qactions" id="qact"><span class="muted">多选题:选择多项后确认</span><div class="spacer"></div>' +
+      '<div class="qactions" id="qact"><span class="muted">多选题：选择多项后确认</span><div class="spacer"></div>' +
         '<button class="btn" id="multi-ok" disabled onclick="confirmMulti()">确认答案</button></div>';
   } else {
     body.innerHTML =
@@ -894,10 +911,10 @@ function recordResult(q, ok) {
   }
   api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: p.mode } })
     .then(d => {
-      if (d.event === 'released') toast('连续答对 ' + MASTER_STREAK + ' 次,这道错题已消灭', 'good');
+      if (d.event === 'released') toast('连续答对 ' + MASTER_STREAK + ' 次，这道错题已消灭', 'good');
       else if (d.event === 'entered') toast('已加入错题本');
     })
-    .catch(e => toast('记录失败:' + e.message, 'bad'));
+    .catch(e => toast('记录失败：' + e.message, 'bad'));
 }
 
 function gradeAndShow(selKeys) {
@@ -923,16 +940,18 @@ function gradeAndShow(selKeys) {
   const fb = document.createElement('div');
   fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
-    ' 正确答案:<b>' + esc(q.answer) + '</b></div>' +
+    '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
     (isRight ? '' : whyBox(q, selKeys)) +
     (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' : '') +
     pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
 
-  $('#qact').innerHTML = '<span class="muted">回车 = 下一题</span><div class="spacer"></div>' +
+  // 触屏上没有回车键：不显示提示，也不把焦点挪到按钮上（否则按钮会带一圈蓝框）
+  const touch = window.matchMedia && matchMedia('(hover: none)').matches;
+  $('#qact').innerHTML = (touch ? '' : '<span class="muted">回车 = 下一题</span>') + '<div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' +
     (p.idx + 1 >= p.list.length ? '查看结果' : '下一题') + '</button>';
-  $('#nextbtn').focus();
+  if (!touch) $('#nextbtn').focus();
 }
 
 function showQaAns() {
@@ -949,7 +968,7 @@ function showQaAns() {
   $('#qbody').insertBefore(fb, $('#qact'));
   if (ta) ta.disabled = true;
   $('#qact').innerHTML =
-    '<span class="muted">对照参考答案,诚实自评:</span><div class="spacer"></div>' +
+    '<span class="muted">对照参考答案，诚实自评：</span><div class="spacer"></div>' +
     '<button class="btn green" onclick="selfGrade(true)">✓ 我答对了</button>' +
     '<button class="btn danger" onclick="selfGrade(false)">✗ 没答好</button>';
 }
@@ -971,7 +990,7 @@ function nextQ() {
 
 function quitPractice() {
   if (!state.practice || state.practice.finished || !state.practice.results.length ||
-      confirm('退出练习?已作答的题都已记录。')) {
+      confirm('退出练习？已作答的题都已记录。')) {
     state.practice = null;
     history.length > 1 ? history.back() : (location.hash = '#/home');
   }
@@ -989,7 +1008,7 @@ function renderFinish() {
   const pct = total ? Math.round(100 * right / total) : 0;
   const color = pct >= 80 ? 'var(--green)' : (pct >= 60 ? 'var(--amber)' : 'var(--red)');
   const comment = pct >= 90 ? '这一轮几乎全对。' : pct >= 70 ? '错的题明天会再排出来。' :
-    pct >= 50 ? '先把这次的错题重练一遍。' : '建议先把错题本过一遍,再做新题。';
+    pct >= 50 ? '先把这次的错题重练一遍。' : '建议先把错题本过一遍，再做新题。';
   app.innerHTML =
     '<div class="card finish">' +
       '<div class="ring" style="background:conic-gradient(' + color + ' 0 ' + pct + '%, var(--track) ' + pct + '% 100%)">' +
@@ -1004,7 +1023,7 @@ function renderFinish() {
       '</div>' +
     '</div>' +
     (wrongs.length
-      ? '<div class="sec-title">本次错题(正确答案已标绿)</div>' +
+      ? '<div class="sec-title">本次错题（正确答案已标绿）</div>' +
         wrongs.map(r => {
           const q = r.q;
           return '<div class="card">' +
@@ -1046,11 +1065,11 @@ async function viewExamNew(subject) {
   state.hidden = d.settings.hidden_subjects || [];
   const subs = d.subjects.filter(s => s.subject !== 'general' && !s.hidden);
   app.innerHTML =
-    (unfinished ? '<div class="card notice">还没交卷:<b>' + esc(unfinished.exam.title) + '</b><div class="spacer"></div>' +
+    (unfinished ? '<div class="card notice">还没交卷：<b>' + esc(unfinished.exam.title) + '</b><div class="spacer"></div>' +
       '<a class="btn sm" href="#/exam/run">继续作答</a><button class="btn danger sm" onclick="abandonExam()">放弃</button></div>' : '') +
     '<div class="card">' +
       '<div class="sec-title" style="margin-top:0">开始一场模拟考</div>' +
-      '<div class="muted" style="margin-bottom:12px">和正式考试一样:从该科所有卷子里随机抽题拼成一张新卷,选项顺序也打乱(引用“以上都对”或图中标号的题除外);限时作答,交卷后统一判分,报告按原卷选项顺序显示,方便对照解析。做错和没做的题自动进错题本和复习计划。</div>' +
+      '<div class="muted" style="margin-bottom:12px">从该科所有卷子里随机抽题、打乱选项，限时作答，交卷后统一判分。做错和没做的题会自动进错题本。</div>' +
       '<div class="exam-grid">' + subs.map(s =>
         '<div class="exam-pick' + (s.subject === subject ? ' on' : '') + '">' +
           '<div class="subj-name"><span class="ti">' + SUBJECT_ICON[s.subject] + '</span>' + SUBJECT_NAME[s.subject] + '</div>' +
@@ -1066,7 +1085,7 @@ async function viewExamNew(subject) {
 }
 
 async function startExam(subject, preset) {
-  if (store.get('quiz.exam') && !confirm('还有一场没交卷的考试,放弃它并开始新的?')) return;
+  if (store.get('quiz.exam') && !confirm('还有一场没交卷的考试，放弃它并开始新的？')) return;
   let d;
   try { d = await api('/api/exam/start', { method: 'POST', body: { subject: subject, preset: preset } }); } catch (e) { toast(e.message, 'bad'); return; }
   const now = Date.now();
@@ -1075,7 +1094,7 @@ async function startExam(subject, preset) {
 }
 
 function abandonExam() {
-  if (!confirm('放弃这场考试?作答不会被记录。')) return;
+  if (!confirm('放弃这场考试？作答不会被记录。')) return;
   store.del('quiz.exam');
   route();
 }
@@ -1111,7 +1130,7 @@ function renderExamRun() {
                   '<button class="opt" data-q="' + q.id + '" data-k="' + o[0] + '" onclick="examPick(' + q.id + ',\'' + o[0] + '\',false)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + o[1] + '</span></button>').join('') + '</div>'
               : '<div class="opts">' + opts.map(o =>
                   '<button class="opt" data-q="' + q.id + '" data-k="' + esc(o[0]) + '" onclick="examPick(' + q.id + ',\'' + esc(o[0]) + '\',' + (q.type === 'multi') + ')"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + '</span></button>').join('') + '</div>' +
-                (q.type === 'multi' ? '<div class="muted" style="margin-top:6px">多选题,可选多项</div>' : '')) +
+                (q.type === 'multi' ? '<div class="muted" style="margin-top:6px">多选题，可选多项</div>' : '')) +
           '</div>';
         }).join('');
     }).join('') +
@@ -1133,7 +1152,7 @@ function renderExamRun() {
     if (!el) { stopExamTimer(); return; }
     el.textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0');
     el.classList.toggle('urgent', left <= 300);
-    if (left <= 0) { stopExamTimer(); toast('时间到,自动交卷'); submitExam(true); }
+    if (left <= 0) { stopExamTimer(); toast('时间到，自动交卷'); submitExam(true); }
   }
 }
 
@@ -1173,7 +1192,7 @@ async function submitExam(auto) {
   if (!auto) {
     const total = st.exam.sections.reduce((a, s) => a + s.items.length, 0);
     const done = Object.values(st.answers).filter(Boolean).length;
-    if (!confirm(done < total ? '还有 ' + (total - done) + ' 题没答,确定交卷?' : '确定交卷?')) return;
+    if (!confirm(done < total ? '还有 ' + (total - done) + ' 题没答，确定交卷？' : '确定交卷？')) return;
   }
   submitting = true;
   try {
@@ -1183,7 +1202,7 @@ async function submitExam(auto) {
     stopExamTimer();
     location.hash = '#/exam/' + d.exam.id;
   } catch (e) {
-    toast('交卷失败:' + e.message, 'bad');
+    toast('交卷失败：' + e.message, 'bad');
   } finally {
     submitting = false;
   }
@@ -1215,7 +1234,7 @@ async function viewExamReport(id) {
           return '<div class="report-cell"><div class="rc-name">' + esc(s.name) + '</div><div class="rc-num">' + s.correct + '/' + s.total + '</div>' + bar(p, p < 60 ? 'red' : '') + '</div>';
         }).join('') +
       '</div>' +
-      '<div class="muted" style="margin-top:8px">按题型:' + Object.keys(bt).map(t =>
+      '<div class="muted" style="margin-top:8px">按题型：' + Object.keys(bt).map(t =>
         (TYPE_NAME[t] || t) + ' ' + bt[t].correct + '/' + bt[t].total).join(' · ') + '</div>' +
       '<div class="acts">' +
         '<button class="btn" onclick="startExam(\'' + e.subject + '\',\'standard\')">再考一场</button>' +
@@ -1223,7 +1242,7 @@ async function viewExamReport(id) {
         '<a class="btn ghost" href="#/home">返回首页</a>' +
       '</div>' +
     '</div>' +
-    (wrongs.length ? '<div class="sec-title">错题(红色是你的选择,绿色是正确答案)</div>' +
+    (wrongs.length ? '<div class="sec-title">错题（红色是你的选择，绿色是正确答案）</div>' +
       wrongs.map(q =>
         '<div class="card">' +
           '<div class="qhead"><span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
@@ -1303,7 +1322,8 @@ async function viewSettings() {
         esc(o.name) + '<span class="muted">' + esc(o.note) + '</span></label>').join('') + '</div>' : '';
   };
   app.innerHTML =
-    '<h2 class="page-h">设置</h2>' +
+    '<h2 class="page-h"><a class="page-back" href="javascript:void(0)" onclick="goBack()" aria-label="返回">' +
+      '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
     '<div class="card set-card">' +
       '<div class="set-row"><div><b>我要学的科目</b><div class="muted">不用考的科目取消勾选，它就不会出现在首页、今日复习、错题本、搜索和模拟考里。做题记录会保留，以后再勾上就回来了。</div></div></div>' +
       subjBox('culture') + subjBox('pro') + subjBox('other') +
@@ -1319,7 +1339,10 @@ async function viewSettings() {
       '<div class="muted set-note set-credit">智学题库由 十三 和 chen_pi 共同开发</div>' +
     '</div>' +
     '<div class="card set-card">' +
-      '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在 ' + esc(a.data_dir) + '</div></div></div>' +
+      '<div class="set-row"><div><b>我的数据</b><div class="muted">保存在' + (a.mobile ? '' : ' ') + esc(a.data_dir) + '</div>' +
+        (a.data_note ? '<div class="muted">' + esc(a.data_note) + '</div>' : '') + '</div>' +
+        (a.open_data ? '<button class="btn ghost" onclick="openDataDir()">打开文件夹</button>' : '') +
+        (canShareProgress() ? '<button class="btn ghost" onclick="shareProgress()">分享做题记录</button>' : '') + '</div>' +
       '<div class="set-row"><div><b>清除做题记录</b><div class="muted">' + (a.mobile
         ? '清空复习进度、错题本和模拟考记录。题库和设置不受影响。清除前会在手机上留一份备份。'
         : '清空复习进度、错题本、模拟考记录、技能实操成绩和练习文件。题库和设置不受影响。<br>清除前会自动备份到数据文件夹的 backups 里。') + '</div></div>' +
@@ -1627,11 +1650,11 @@ function updFail(msg, page, kind) {
 }
 
 async function clearMyData() {
-  const v = prompt('确定要清除所有做题记录吗?清除后错题本、复习进度、考试记录都会清空。\n确认请输入:清除');
-  if (v !== '清除') { if (v != null) toast('输入不对,没有清除'); return; }
+  const v = prompt('确定要清除所有做题记录吗？清除后错题本、复习进度、考试记录都会清空。\n确认请输入：清除');
+  if (v !== '清除') { if (v != null) toast('输入不对，没有清除'); return; }
   try {
     const d = await api('/api/data/clear', { method: 'POST', body: { confirm: '清除' } });
-    toast(IS_APP ? '已清除，手机上留了一份备份' : '已清除,备份在 ' + d.backup.split(/[\\/]/).slice(-2).join('/'), 'good');
+    toast(IS_APP ? '已清除，手机上留了一份备份' : '已清除，备份在 ' + d.backup.split(/[\\/]/).slice(-2).join('/'), 'good');
     location.hash = '#/home';
   } catch (e) { toast(e.message, 'bad'); }
 }

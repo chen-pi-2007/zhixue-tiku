@@ -21,5 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- 「分享做题记录」：只在分享那一刻临时授权对方读那一个文件 -->
+        <provider
+            android:name=".ShareProvider"
+            android:authorities="com.zhixue.tiku.share"
+            android:exported="false"
+            android:grantUriPermissions="true" />
     </application>
 </manifest>

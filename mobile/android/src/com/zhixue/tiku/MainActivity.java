@@ -290,6 +290,38 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** 把做题记录复制一份到 cache/share，弹出系统分享面板（发到微信、QQ、存到文件管理……）。
+         *  返回空串表示成功，否则是出错原因 */
+        @JavascriptInterface
+        public String shareProgress() {
+            File src = file();
+            if (!src.isFile()) return "还没有做题记录";
+            try {
+                File dir = ShareProvider.dir(MainActivity.this);
+                deleteTree(dir);                 // 只留这一次的，旧的分享文件不攒着
+                dir.mkdirs();
+                String name = "智学题库-做题记录-" + new SimpleDateFormat("yyyyMMdd-HHmm", Locale.ROOT).format(new Date()) + ".json";
+                File f = new File(dir, name);
+                copy(new FileInputStream(src), f);
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType("application/json");
+                send.putExtra(Intent.EXTRA_STREAM, ShareProvider.uriFor(f));
+                send.putExtra(Intent.EXTRA_SUBJECT, name);
+                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent chooser = Intent.createChooser(send, "分享做题记录");
+                runOnUiThread(() -> {
+                    try {
+                        startActivity(chooser);
+                    } catch (Exception e) {
+                        // 没有能接收的 App
+                    }
+                });
+                return "";
+            } catch (IOException e) {
+                return "准备文件失败：" + e.getMessage();
+            }
+        }
+
         @JavascriptInterface
         public void openUrl(String url) {
             runOnUiThread(() -> MainActivity.this.openUrl(url));
