@@ -50,8 +50,17 @@ def _ver(s):
 
 # 连 GitHub 的两条路：按系统设置（开了代理就走代理）、直连。国内网络或代理偶尔握手超时，
 # 一条路失败就换另一条再试，比让用户反复点「检查更新」靠谱
-_ROUTES = [urllib.request.build_opener(), urllib.request.build_opener(urllib.request.ProxyHandler({}))]
+_ROUTES = None              # 测试时可以塞固定的线路；平时每次联网现建，见 _routes()
 _good_route = 0             # 上次成功的那条路先试
+
+
+def _routes():
+    """每次联网都重新读一遍系统代理设置。程序常驻托盘，启动时代理可能还没开；
+    以前只在启动时读一次，之后开了代理也不走，更新一直卡在“正在连接 GitHub”"""
+    if _ROUTES:
+        return _ROUTES
+    return [urllib.request.build_opener(urllib.request.ProxyHandler(urllib.request.getproxies())),
+            urllib.request.build_opener(urllib.request.ProxyHandler({}))]
 
 
 def _open(url, timeout, headers=None, tries=4):
@@ -59,10 +68,11 @@ def _open(url, timeout, headers=None, tries=4):
     global _good_route
     last = None
     for i in range(tries):
-        k = (_good_route + i) % len(_ROUTES)
+        routes = _routes()
+        k = (_good_route + i) % len(routes)
         req = urllib.request.Request(url, headers=dict({'User-Agent': 'zhixue-tiku'}, **(headers or {})))
         try:
-            r = _ROUTES[k].open(req, timeout=timeout)
+            r = routes[k].open(req, timeout=timeout)
             _good_route = k
             return r
         except urllib.error.HTTPError as e:

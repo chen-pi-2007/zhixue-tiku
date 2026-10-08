@@ -1,19 +1,19 @@
 {
- "version": "1.4.7",
- "notes": "修正语文 7 道题的答案（按官方参考答案），补回语文卷全部加点字和下划线；做题改成先选再确认，可以回到上一题，键盘 1234 选 ABCD、回车先确认再下一题；整卷练习分「选项不变（可手动存档、读档）」和「全部乱序」两种；国内连不上 GitHub 时自动走国内线路检查和下载更新",
- "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.4.7",
+ "version": "1.4.8",
+ "notes": "修复：程序常驻托盘后再开代理，更新仍连不上 GitHub 的问题（现在每次联网都重新读代理设置）；程序下载卡住或失败时，可以改用国内线路用浏览器下载新版",
+ "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.4.8",
  "assets": {
   "exe": {
    "name": "zhixue-tiku.exe",
-   "size": 58122174,
-   "sha256": "a874b2c9a61838b8610bf21075c32f02fc44e7dd3afd21af5516834f8e1a5a92",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.7/zhixue-tiku.exe"
+   "size": 58123227,
+   "sha256": "f908a1c9ce601f3301150846bd1046b99659e368b53ea2abee71e459acfe1b79",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.8/zhixue-tiku.exe"
   },
   "apk": {
    "name": "zhixue-tiku.apk",
    "size": 19283803,
-   "sha256": "0890de501216fca01b8dad58c27d01712efc252f544edbb1a2d15a25adaa745b",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.7/zhixue-tiku.apk"
+   "sha256": "c488fe9b797ca9fb21697656766b314e26d543774359eb5567f26228da6b9da0",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.4.8/zhixue-tiku.apk"
   }
  }
 }

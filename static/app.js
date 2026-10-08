@@ -1737,8 +1737,12 @@ async function applyUpdate() {
     if (/接口不存在/.test(e.message)) return applyUpdateLegacy();
     return updFail(e.message);
   }
+  const t0 = Date.now();
   while (p.state === 'downloading') {
-    updShow(updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启'));
+    // 1.4.6 以前的程序只会连 GitHub，国内不开代理会一直卡在 0 MB：15 秒没动静就给出国内线路
+    const stuck = !p.done && Date.now() - t0 > 15000;
+    updShow(updProgress(p, '正在下载 v' + (p.version || '新版本') + '，下载完会自动安装并重启') +
+      (stuck ? domesticBox() : ''));
     await new Promise(r => setTimeout(r, 500));
     try { p = await api('/api/update/progress'); } catch (e) { return updFail('和题库程序的连接断了：' + e.message); }
   }
@@ -1841,7 +1845,30 @@ function updFail(msg, page, kind) {
   updSetBusy('');
   updShow('<div class="upd-box upd-err"><b>更新没有完成</b><div>' + esc(msg) + '</div>' +
     '<div class="upd-acts"><button class="btn" onclick="' + (kind === 'content' ? 'applyContentUpdate()' : 'applyUpdate()') + '">重试</button>' +
-    (page ? '<button class="btn ghost" onclick="openExternal(' + jsq(page) + ')">去 GitHub 手动下载</button>' : '') + '</div></div>');
+    (page ? '<button class="btn ghost" onclick="openExternal(' + jsq(page) + ')">去 GitHub 手动下载</button>' : '') + '</div></div>' +
+    (kind === 'content' ? '' : domesticBox()));
+}
+
+// 国内线路：GitHub 连不上时，经国内的 GitHub 下载加速站下载新版安装包，用浏览器下载、手动换上。
+// 这段在界面里（随题库热更新发布，走 jsDelivr），所以只会连 GitHub 的老版本程序也能用上
+const RELEASE_JSON = ['https://cdn.jsdelivr.net/gh/chen-pi-2007/zhixue-tiku@main/release.json',
+                      'https://fastly.jsdelivr.net/gh/chen-pi-2007/zhixue-tiku@main/release.json',
+                      'https://gcore.jsdelivr.net/gh/chen-pi-2007/zhixue-tiku@main/release.json'];
+function domesticBox() {
+  return '<div class="upd-box"><b>连不上 GitHub？改用国内线路</b>' +
+    '<div class="muted">用浏览器从国内加速站下载新版' + (IS_APP ? '安装包，下载完点开安装（覆盖安装，做题记录不会丢）。' :
+      '程序。下载完先关掉智学题库（托盘图标右键退出），再用新下载的文件替换原来的「智学题库.exe」，然后打开即可，做题记录不会丢。') + '</div>' +
+    '<div class="upd-acts"><button class="btn" onclick="openDomestic()">国内线路下载</button></div></div>';
+}
+async function openDomestic() {
+  let info = null;
+  for (const u of RELEASE_JSON) {
+    try { const r = await fetch(u, { cache: 'no-store' }); if (r.ok) { info = await r.json(); break; } } catch (e) { /* 换下一个 */ }
+  }
+  const a = info && (info.assets || {})[IS_APP ? 'apk' : 'exe'];
+  if (!a || !a.url) { toast('读不到新版本信息，检查一下网络', 'bad'); return; }
+  openExternal('https://ghproxy.net/' + a.url);
+  toast('已在浏览器打开 v' + info.version + ' 的下载（' + (a.size / 1048576).toFixed(1) + ' MB）');
 }
 
 async function clearMyData() {
