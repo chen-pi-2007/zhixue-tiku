@@ -1703,6 +1703,13 @@ async function viewSettings() {
   if (btn) btn.addEventListener('click', checkUpdate);
   markUpdDots();
   updRestore();
+  // 热更新了后端代码、还没重启：提醒一下（重启后 a.py.active 会追上来）
+  const nr = store.get('zx.needRestart');
+  if (nr && a.py) {
+    if ((a.py.active || 0) >= nr) store.del('zx.needRestart');
+    else if (!upd.busy && !upd.html) updShow('<div class="upd-box"><b>后台程序的更新还没生效</b><div class="muted">重启题库后生效，几秒钟，做题记录不受影响。</div>' +
+      '<button class="btn" onclick="restartApp()">现在重启</button></div>');
+  }
   $$('.subj-check input').forEach(c => c.addEventListener('change', () => {
     c.closest('.subj-check').classList.toggle('off', !c.checked);     // 关掉的科目名变灰（老 WebView 不支持 :has，用 class）
     saveHidden();
@@ -1767,15 +1774,21 @@ async function checkUpdate() {
   }
   syncUpdNotice(app, cont, app.error, cont.error);
   let html = '';
-  if (app.has_update) {
-    html += '<div class="upd-box"><b>有新版程序 v' + esc(app.latest) + '</b>' +
-      (app.notes ? '<div class="upd-notes">' + esc(app.notes) + '</div>' : '') +
-      '<button class="btn" onclick="applyUpdate()">下载并安装' + (app.size ? '（' + fmtMB(app.size) + '）' : '') + '</button></div>';
-  }
+  // 先列内容更新：只下载改动的文件，几秒就好；程序整包放后面，可以以后再装
   if (cont.has_update) {
     html += '<div class="upd-box"><b>题库和界面有更新（第 ' + cont.latest + ' 版，' + cont.files + ' 个文件，' + fmtMB(cont.bytes) + '）</b>' +
       (cont.notes ? '<div class="upd-notes">' + esc(cont.notes) + '</div>' : '') +
       '<button class="btn" onclick="applyContentUpdate()">现在更新</button></div>';
+  }
+  if (app.has_update) {
+    html += '<div class="upd-box"><b>有新版程序 v' + esc(app.latest) + '</b>' +
+      (app.notes ? '<div class="upd-notes">' + esc(app.notes) + '</div>' : '') +
+      (cont.has_update ? '<div class="muted">要重新下载整个程序；上面的更新不用等它，可以先装。</div>' : '') +
+      '<button class="btn' + (cont.has_update ? ' ghost' : '') + '" onclick="applyUpdate()">下载并安装' +
+        (app.size ? '（' + fmtMB(app.size) + '）' : '') + '</button></div>';
+  }
+  if (cont.has_update) {
+    /* 上面已经列了 */
   } else if (cont.latest > cont.current && !cont.compatible && !app.has_update) {
     html += '<div class="set-note num-orange">有新的题库和界面，但需要程序 v' + esc(cont.min_app_version) + ' 以上，等新版程序发布后先更新程序。</div>';
   }
@@ -1800,8 +1813,41 @@ async function applyContentUpdate() {
   }
   if (p.state !== 'done') return updFail(p.error || '更新失败', '', 'content');
   store.del('zx.updNotice');
+  if (p.restart && !IS_APP) {
+    // 这次也更新了电脑版的后端代码（hotpy.py），要重启题库才用上
+    store.set('zx.needRestart', p.version);
+    updSetBusy('');
+    updShow('<div class="upd-box"><b>更新好了</b><div class="muted">界面和题库已经换上；后台程序也有改动，重启题库后生效（几秒钟，做题记录不受影响）。</div>' +
+      '<div class="upd-acts"><button class="btn" onclick="restartApp()">现在重启</button>' +
+      '<button class="btn ghost" onclick="location.reload()">以后再说</button></div></div>');
+    return;
+  }
   updShow(updProgress(Object.assign({}, p, { done: p.total || 1, total: p.total || 1 }), '更新好了，正在刷新…'));
   setTimeout(() => location.reload(), 800);        // 刷新前一直保持“正在更新”，按钮不能再点
+}
+
+// 重启题库（电脑版）：程序退出后自动再打开；独立窗口会整个关掉重开，浏览器里的页面等新进程起来后自己刷新
+async function restartApp() {
+  updSetBusy('app');
+  let before;
+  try { before = (await api('/api/app')).started; await api('/api/app/restart', { method: 'POST' }); } catch (e) {
+    updSetBusy('');
+    return updShow('<div class="set-note num-red">重启没成功：' + esc(e.message) + '。可以在右下角托盘图标上右键「退出」，再重新打开智学题库。</div>');
+  }
+  store.del('zx.needRestart');
+  updShow('<div class="upd-box upd-prog"><b>正在重启…</b><div class="upd-bar busy"><i></i></div></div>');
+  const t0 = Date.now();
+  const poll = setInterval(async () => {
+    try {
+      const a = await api('/api/app');
+      if (a.started !== before) { clearInterval(poll); location.reload(); }
+    } catch (e) { /* 正在重启 */ }
+    if (Date.now() - t0 > 60000) {
+      clearInterval(poll);
+      updSetBusy('');
+      updShow('<div class="set-note">重启时间有点长，稍后从开始菜单或桌面打开智学题库即可。</div>');
+    }
+  }, 1200);
 }
 
 // 每天第一次打开时在后台查一下有没有更新，有就在页面顶上提示（不打扰做题）
@@ -1818,8 +1864,9 @@ function cmpVer(a, b) {
 }
 
 function noticeFrom(app, cont) {
-  if (app.has_update) return { kind: 'app', latest: app.latest, text: '有新版程序 v' + app.latest };
+  // 内容更新（只下改动的文件）优先提示；装完内容还有新程序的话，下次检查再提示程序
   if (cont.has_update) return { kind: 'content', latest: cont.latest, text: '题库和界面有更新（' + fmtMB(cont.bytes) + '）' };
+  if (app.has_update) return { kind: 'app', latest: app.latest, text: '有新版程序 v' + app.latest };
   return null;
 }
 
@@ -1971,7 +2018,7 @@ async function applyUpdateApp(restart) {
   if (!S.installApk(id)) updFail('打不开安装界面，请下拉通知栏，点「智学题库 更新」那条下载完成的通知安装', u.page);
 }
 
-function fmtMB(b) { return (b / 1048576).toFixed(1) + ' MB'; }
+function fmtMB(b) { return b < 1048576 ? Math.round(b / 1024) + ' KB' : (b / 1048576).toFixed(1) + ' MB'; }   // 热更新常常只有几十 KB
 
 function updProgress(p, title) {
   const pct = p.total ? Math.min(100, Math.round(100 * p.done / p.total)) : 0;

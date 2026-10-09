@@ -5,6 +5,7 @@
 启动:  python server.py   然后浏览器打开 http://127.0.0.1:8788
 """
 import json
+import time
 import os
 import re
 import socketserver
@@ -30,6 +31,17 @@ def skills_service():
     return _skills
 
 import appdir
+
+STARTED = time.time()           # 这次启动的时间：界面等重启时，看它变了就知道新进程起来了
+
+
+def _hot_state():
+    """后端代码用的是哪一版（hotpy.py）：active 是内容版本号，0 是 exe 自带的"""
+    try:
+        import hotpy
+        return dict(hotpy.state)
+    except ImportError:
+        return {'active': 0, 'error': ''}
 MAX_UPLOAD = 30 * 1024 * 1024
 SHOW_WINDOW = None          # 独立窗口模式下由 tray.py 设成“把窗口调出来”的函数
 
@@ -300,7 +312,13 @@ class Handler(BaseHTTPRequestHandler):
                                    'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
                                    'window': SHOW_WINDOW is not None, 'open_data': sys.platform == 'win32',
                                    'repo': 'https://github.com/%s' % version.REPO,
-                                   'authors': version.AUTHORS, 'copyright': version.COPYRIGHT})
+                                   'authors': version.AUTHORS, 'copyright': version.COPYRIGHT,
+                                   'started': STARTED, 'py': _hot_state()})
+
+        # 热更新下载了新的后端代码：重启题库生效（exe 才行）
+        if method == 'POST' and path == '/api/app/restart':
+            import updater
+            return self.send_json(dict(ok=True, **updater.relaunch(on_exit=lambda: os._exit(0))))
 
         # 设置页点「我的数据」：在资源管理器里打开数据文件夹
         if method == 'POST' and path == '/api/open-data':

@@ -12,7 +12,9 @@
 
 什么时候发哪种：
   - 只改了 static/、data/（题库、图片、技能卷素材）、mobile/local.js → content
-  - 改了任何 .py 文件、安卓的 Java 代码 → app
+  - 只改了后端逻辑（content.HOT_PY：server.py、db.py、srs.py、exam.py、docparse.py、llm.py、skills/）→ content 也行，
+    电脑版 1.5.1 起会热更新这些 .py（重启题库生效）；外壳和后端的接口变了要先把 version.SHELL_API 加 1、发 app
+  - 改了外壳 .py（tray、appdir、content、hotupdate、hotpy、updater、version……）、安卓的 Java 代码 → app
 脚本会检查：改了程序代码却想发 content，会拦下来。
 
 发布做的事：改 version.py 的版本号 → 生成内容清单 content.json → 跑测试 → 提交 → 打 Git 标签
@@ -118,8 +120,8 @@ def write_manifest(v, notes):
 
 
 def push(tags, message):
-    sh('git', 'add', '-A', '--', 'version.py', 'content.json', 'release.json', 'static', 'mobile/local.js', 'data/bank.json',
-       'data/media', 'data/skills')
+    # 内容里的路径（含热更新的后端代码，新加的文件也要加进去）
+    sh('git', 'add', '-A', '--', 'version.py', 'content.json', 'release.json', *[p.rstrip('/') for p in content.INCLUDE])
     sh('git', 'add', '-u')                          # 其余已跟踪文件的改动（发 app 时的代码）
     sh('git', 'commit', '-q', '-m', message)
     for t in tags:

@@ -234,3 +234,21 @@ def install(on_exit):
     subprocess.Popen(['cmd', '/c', bat], env=env, creationflags=0x08000000)   # CREATE_NO_WINDOW
     threading.Timer(0.5, on_exit).start()
     return {'version': progress()['version']}
+
+
+def relaunch(on_exit):
+    """不换 exe，只是重启题库（热更新的后端代码要重启才生效）：等本程序退出 → 再打开。"""
+    if not getattr(sys, 'frozen', False):
+        raise ValueError('源码运行时请自己重新运行 python server.py')
+    exe = os.path.abspath(sys.executable)
+    bat = os.path.join(tempfile.mkdtemp(prefix='zhixue-restart-'), 'restart.bat')
+    with open(bat, 'w', encoding='ascii') as f:
+        f.write('@echo off\r\n'
+                ':wait\r\n'
+                'tasklist /FI "PID eq %OLD_PID%" 2>nul | find "%OLD_PID%" >nul && (timeout /t 1 /nobreak >nul & goto wait)\r\n'
+                'start "" "%OLD_EXE%" --updated\r\n')
+    env = {k: v for k, v in os.environ.items() if not k.upper().startswith(('_MEI', '_PYI'))}
+    env.update(OLD_PID=str(os.getppid()), OLD_EXE=exe)
+    subprocess.Popen(['cmd', '/c', bat], env=env, creationflags=0x08000000)
+    threading.Timer(0.5, on_exit).start()
+    return {}

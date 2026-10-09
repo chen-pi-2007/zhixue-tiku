@@ -32,7 +32,7 @@ MIRRORS = [
 
 _lock = threading.Lock()
 _state = {'state': 'idle', 'done': 0, 'total': 0, 'files_done': 0, 'files_total': 0, 'speed': 0,
-          'error': '', 'version': 0, 'notes': ''}
+          'error': '', 'version': 0, 'notes': '', 'restart': False}
 
 
 def _url(base, ref, path):
@@ -82,7 +82,7 @@ def start():
     with _lock:
         if _state['state'] == 'downloading':
             return dict(_state)
-        _state.update(state='downloading', done=0, total=0, files_done=0, files_total=0, speed=0, error='')
+        _state.update(state='downloading', done=0, total=0, files_done=0, files_total=0, speed=0, error='', restart=False)
     threading.Thread(target=_run, daemon=True).start()
     return progress()
 
@@ -94,8 +94,8 @@ def _run():
             raise ValueError('新内容需要程序 v%s 以上，请先更新程序' % latest.get('min_app_version'))
         if latest.get('content_version', 0) <= appdir.content_version():
             raise ValueError('界面和题库已经是最新的')
-        install(latest, _fetch)
-        _set(state='done', speed=0, version=latest['content_version'], notes=latest.get('notes', ''))
+        restart = install(latest, _fetch)
+        _set(state='done', speed=0, version=latest['content_version'], notes=latest.get('notes', ''), restart=restart)
     except Exception as e:
         msg = str(e)
         if 'timed out' in msg or 'timeout' in msg.lower():
@@ -118,6 +118,9 @@ def install(latest, fetch):
     """按清单 latest 凑出完整的新内容并换上。fetch(ref, path) 返回文件内容（测试时可替换）。"""
     root, cur = appdir.active()
     changed = content.diff(latest, cur)
+    # 后端代码（content.HOT_PY）变了、并且这个外壳能用：要重启题库才生效（hotpy.py 启动时加载）
+    from version import SHELL_API
+    restart = latest.get('py_shell_api') == SHELL_API and any(content.is_hot_py(c[0]) for c in changed)
     nxt = os.path.join(appdir.CONTENT_DIR, 'next')
     shutil.rmtree(nxt, ignore_errors=True)
     os.makedirs(nxt)
@@ -185,3 +188,4 @@ def install(latest, fetch):
     appdir.refresh()
     import db
     db.reload()
+    return restart

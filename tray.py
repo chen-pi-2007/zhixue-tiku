@@ -198,7 +198,15 @@ def main():
         log = open(LOG_PATH, 'w', encoding='utf-8', buffering=1)
         sys.stdout = sys.stderr = log
 
-    import server
+    # 后端代码有热更新下载的新版就用新版（hotpy.py）；新版加载不了就退回 exe 自带的
+    import hotpy
+    hotpy.install()
+    try:
+        import server
+    except Exception as e:
+        if not hotpy.fallback(e):
+            raise
+        import server
     from version import APP_VERSION
     url = server.configured_url()
     if already_running(url):
@@ -212,8 +220,15 @@ def main():
     try:
         srv, url = server.make_server()
     except Exception as e:
-        message('启动失败：%s\n\n详细信息见 %s' % (e, LOG_PATH), error=True)
-        raise
+        if not hotpy.fallback(e):
+            message('启动失败：%s\n\n详细信息见 %s' % (e, LOG_PATH), error=True)
+            raise
+        import server                              # 热更新的后端起不来：换回 exe 自带的再试一次
+        try:
+            srv, url = server.make_server()
+        except Exception as e2:
+            message('启动失败：%s\n\n详细信息见 %s' % (e2, LOG_PATH), error=True)
+            raise
     threading.Thread(target=srv.serve_forever, daemon=True).start()
 
     # 独立窗口（WebView2，和 Edge 同一个内核）。电脑上没有 WebView2 或 pywebview 出错时，退回浏览器打开

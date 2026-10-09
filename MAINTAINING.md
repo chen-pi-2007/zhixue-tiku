@@ -16,10 +16,18 @@
 
 | | 是什么 | 改了以后怎么发 | 用户那边 |
 |---|---|---|---|
-| **内容** | 界面 `static/`、题库 `data/bank.json`、图片 `data/media/`、技能卷素材 `data/skills/`、手机端逻辑 `mobile/local.js` | `python release.py content "改了什么"` | 点「检查更新」只下载改了的文件，几秒钟，不用重启（热更新） |
-| **程序** | 所有 `.py` 文件、安卓的 Java 代码（`mobile/android/`） | `python release.py app "改了什么"` | 下载新 exe 自动替换并重启；手机下载新 apk 覆盖安装 |
+| **内容** | 界面 `static/`、题库 `data/bank.json`、图片 `data/media/`、技能卷素材 `data/skills/`、手机端逻辑 `mobile/local.js`，以及**电脑版后端逻辑**（`content.HOT_PY`：`server.py`、`db.py`、`srs.py`、`exam.py`、`docparse.py`、`llm.py`、`skills/`） | `python release.py content "改了什么"` | 点「检查更新」只下载改了的文件，几秒钟（热更新）；后端代码变了会提示「现在重启」，重启后生效 |
+| **程序（外壳）** | `tray.py`、`appdir.py`、`content.py`、`hotupdate.py`、`hotpy.py`、`updater.py`、`version.py`、`build_exe.py`，安卓的 Java 代码（`mobile/android/`） | `python release.py app "改了什么"` | 下载新 exe 自动替换并重启；手机下载新 apk 覆盖安装 |
 
-改题、改答案、改翻译、改界面，大多只是内容，发 content 就行。发布脚本会检查：改了 `.py` 却想发 content，它会拦下来。
+改题、改答案、改翻译、改界面、改后端逻辑，都发 content 就行。发布脚本会检查：改了外壳 `.py` 却想发 content，它会拦下来。
+
+### 后端代码热更新（1.5.1 起，`hotpy.py`）
+
+- exe 启动时，如果正在用的是热更新下载的内容、清单里的 `py_shell_api` 等于 `version.SHELL_API`，就把内容里的后端 `.py` 复制到 `content/py/<内容版本>/`，从那里加载，代替 exe 里自带的。
+- 加载或启动失败（语法错误、exe 里没打包新代码要用的标准库模块……）会自动退回 exe 自带的后端，并在那一版目录里放 `bad` 标记，以后不再试；`/api/app` 的 `py` 字段能看到正在用哪一版、出了什么错。
+- **后端要调用外壳的新函数、或者外壳改了调用后端的方式**（比如 `server.make_server()` 的参数），要把 `SHELL_API` 加 1 并发 app；旧外壳看到号不一样就不加载新后端，继续用自带的。
+- 新后端代码 `import` 了 exe 里没有的标准库模块，在电脑上会退回自带后端（功能就是旧的），所以新加标准库依赖时要发 app。
+- 1.5.0 及以前的 exe 不认这些 `.py`：会照样下载（几十 KB）但不用；它们的界面用到新接口时要像以前一样做兼容（见 `startPractice` 里 wrongmix 的退回）。
 
 ### 什么时候要加 `--needs-new-app`
 

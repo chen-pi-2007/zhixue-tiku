@@ -1,19 +1,19 @@
 {
- "version": "1.5.0",
- "notes": "错题重练改成混在题海里练（每道错题配两道陪练题，错题分散开）；所有练习方式都能存档、读档（全部乱序和模拟考试除外），按题型练习也有了顺序 / 打乱 / 全乱序三种方式；手机上能进科目页按题型练习；大屏全屏时界面整体放大铺满；练习页顶部在手机上不再挤成两行；加上作者署名和版权信息",
- "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.0",
+ "version": "1.5.1",
+ "notes": "电脑版的后台程序也能增量更新了：以后改功能、修问题大多只下载几十 KB，重启题库就生效，不用再下整个安装包；检查更新时先给增量更新；搜索题目能搜到分数和根号（比如 1/2、√3）",
+ "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.1",
  "assets": {
   "exe": {
    "name": "zhixue-tiku.exe",
-   "size": 58132305,
-   "sha256": "6edac804d94ecf54fa97bbddbab27eb6f1c08cf01d70aff8ebfa5c03a7bbbd49",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.0/zhixue-tiku.exe"
+   "size": 58218724,
+   "sha256": "0b4408a22bdf45c2edce2d57b7d56008cdaeba6b42e9af62e96e8f53d09b9ec4",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.1/zhixue-tiku.exe"
   },
   "apk": {
    "name": "zhixue-tiku.apk",
-   "size": 19287899,
-   "sha256": "05a49ae5b0db5ee7bcafbba396e433e2839e25f7939d4f8c04c8d7041a327623",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.0/zhixue-tiku.apk"
+   "size": 19291995,
+   "sha256": "5ff718f1be3a8cd28bbafd2ba844c014a074e61c2912e3ac76187e78ae3551fa",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.1/zhixue-tiku.apk"
   }
  }
 }

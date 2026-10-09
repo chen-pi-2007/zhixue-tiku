@@ -184,6 +184,15 @@ class DbFlowTest(unittest.TestCase):
         pos = [k for k, i in enumerate(items) if i['in_wrong']]
         self.assertEqual([p // 3 for p in pos], [0, 1, 2])  # 每 3 道里一道错题
 
+    def test_search_matches_plain_math(self):
+        # 数学题干存成公式标记，搜“1/2”“√3”照样能搜到
+        db.upsert_paper('math-1', '数学1', 'math', [
+            {'type': 'single', 'stem': r'q=\(\frac{1}{2}\)，c=\(\sqrt{3}\)，求 \(\frac{−2−2}{2}\)',
+             'options': [['A', '1'], ['B', '2']], 'answer': 'A'}])
+        for kw in ('q=1/2', 'c=√3', '(−2−2)/2'):
+            self.assertEqual(db.get_questions(search=kw, subject='math')[1], 1, kw)
+        self.assertEqual(db.plain_text(r'\(\frac{\sqrt{3}}{2}\)'), '√3/2')
+
     def test_exam_flow_records_wrong(self):
         e = db.exam_start('politics')
         self.assertEqual(sum(len(s['items']) for s in e['sections']), 35)

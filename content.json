@@ -1,6 +1,6 @@
 {
- "content_version": 23,
- "created": "2026-10-09 10:57:21",
+ "content_version": 24,
+ "created": "2026-10-09 11:40:12",
  "files": {
   "data/bank.json": [
    "9f121a416f072de661c08d2ab102e5d59af4edd9af60c83b39012dfa3811ea9b",
@@ -1570,13 +1570,73 @@
    "f2d038923cc30a68a4360b34fdae3b762119653f63feb7c996029b384566d177",
    17784
   ],
+  "db.py": [
+   "0fe15d7a599d22f0500d36ea17968aa8c668e53095d99310a65a201f2f967407",
+   33244
+  ],
+  "docparse.py": [
+   "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
+   15673
+  ],
+  "exam.py": [
+   "4790d5a2359a4d67b956cf2aa56e22d63c5ce16aeab33b36184eef48b0e3ee15",
+   7405
+  ],
+  "llm.py": [
+   "3a73611c437237d01d5d89a1d2524a8a01201acd2fb7999cbeefdbfe762184ff",
+   3586
+  ],
   "mobile/local.js": [
-   "1e432525d3f8a81b619b829c6a22b19423e5a05a89ff5bed8b8b83bac059aed0",
-   41270
+   "b889504319a7375de91e69de9ea551131df2c0f815ad454e3b4f1860e9975fc7",
+   42050
+  ],
+  "server.py": [
+   "dda125dbd1a5c65b9263a0693ff1d4057b1712bd63a1705c2e25f2341dc2c850",
+   23979
+  ],
+  "skills/__init__.py": [
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   0
+  ],
+  "skills/checks.py": [
+   "749b5b3fd85fe1ef7b91e6e14afb91648761887e14ba86496fbd8707dee0e24f",
+   54955
+  ],
+  "skills/grader.py": [
+   "8e47af08185c79fdc9d89cf8691a254fab7406aff46ddcb541d10874f897bf7b",
+   1664
+  ],
+  "skills/net_answers.py": [
+   "4197186f901c46fbbfdca890efadb71eacd76038565cc8415822c30f31879a22",
+   6980
+  ],
+  "skills/netcheck.py": [
+   "a41f1e399e87e06bb627c9dabafffcf887c947191626d182e796006364c66774",
+   16756
+  ],
+  "skills/ooxml.py": [
+   "1399ccdd68a67a4181dfd0b6d3f4acc1b5dbcdb730f6f538991df782e2cf76aa",
+   36241
+  ],
+  "skills/service.py": [
+   "cf8885d511fa7690128bfffc9547fce9575af9925a5e2ceae96251292c9967f9",
+   15724
+  ],
+  "skills/specs_comp.py": [
+   "0f4256283c5b81861fe723c72cc7e86393e96cae2f350f449a7edbea78a2dfec",
+   23675
+  ],
+  "skills/web.py": [
+   "c80b4684871d9aa41b599b6b6211f9bcd4815001d4e2ab019a49d54b671be79e",
+   5959
+  ],
+  "srs.py": [
+   "513776a1d40dbb98029980bb9ed4bbf0de457e8f221b576225c9e3963b826c1c",
+   3659
   ],
   "static/app.js": [
-   "91442f93455abb7240cd7361613ad4d35effeb391524c399822b562999e9a3e4",
-   110536
+   "08168c4d036b2a28e97b430a10d9a9feda2f9a9ec8fd7019efd335525fb1a24f",
+   113405
   ],
   "static/index.html": [
    "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
@@ -1593,6 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "选了科目后首页直接显示按题型练习（单选题、填空题…），手机上也能单练一种题型；搜索题目可以直接「练这些题」；手机上点过的按钮不再出现橙色框",
- "tag": "content-23"
+ "notes": "电脑版的后台程序也能增量更新了：以后改功能、修问题大多只下载几十 KB，重启题库就生效，不用再下整个安装包；检查更新时先给增量更新；搜索题目能搜到分数和根号（比如 1/2、√3）",
+ "py_shell_api": 1,
+ "tag": "content-24"
 }

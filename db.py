@@ -13,6 +13,7 @@ data/media/         题目图片，题干里写成 [[img:<卷子key>/NNN.png]]
 from itertools import zip_longest
 import json
 import random
+import re
 import os
 import shutil
 import threading
@@ -308,6 +309,29 @@ def hidden_subjects():
     return set(_prog['settings'].get('hidden_subjects') or [])
 
 
+_MATH = [(re.compile(r'\\frac\{([^{}]*)\}\{([^{}]*)\}'), lambda m: _wrap(m.group(1)) + '/' + _wrap(m.group(2))),
+         (re.compile(r'\\sqrt\{([^{}]*)\}'), lambda m: '√' + _wrap(m.group(1))),
+         (re.compile(r'\^\{([^{}]*)\}'), lambda m: '^' + _wrap(m.group(1))),
+         (re.compile(r'_\{([^{}]*)\}'), lambda m: '_' + m.group(1))]
+
+
+def _wrap(x):
+    return '(' + x + ')' if re.search(r'[+−\-×·,\s/]', x) else x
+
+
+def plain_text(t):
+    """数学题里的公式标记 \\(\\frac{1}{2}\\) 换回平常的写法 1/2，搜题时用（搜“1/2”“√3”要能搜到）"""
+    if not t or '\\(' not in t:
+        return t or ''
+    t = t.replace('\\(', '').replace('\\)', '')
+    while True:
+        old = t
+        for pat, fn in _MATH:
+            t = pat.sub(fn, t)
+        if t == old:
+            return t
+
+
 def _filter(paper_id=None, subject=None, qtype=None, search=None):
     """没指定卷子和科目时（今日复习、全部随机练、错题本、搜索）跳过不学的科目"""
     papers = _papers_by_id()
@@ -322,7 +346,7 @@ def _filter(paper_id=None, subject=None, qtype=None, search=None):
             continue
         if qtype and q['type'] != qtype:
             continue
-        if search and search not in q['stem'] and search not in q['material']:
+        if search and search not in plain_text(q['stem']) and search not in plain_text(q['material']):
             continue
         yield q
 

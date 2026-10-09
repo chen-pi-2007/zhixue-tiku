@@ -129,6 +129,24 @@
     return d;
   }
 
+  // 数学题里的公式标记 \(\frac{1}{2}\) 换回平常的写法 1/2，搜题时用（同 db.py 的 plain_text）
+  const MATH_PLAIN = [
+    [/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, (m, a, b) => mathWrap(a) + '/' + mathWrap(b)],
+    [/\\sqrt\{([^{}]*)\}/g, (m, a) => '√' + mathWrap(a)],
+    [/\^\{([^{}]*)\}/g, (m, a) => '^' + mathWrap(a)],
+    [/_\{([^{}]*)\}/g, (m, a) => '_' + a],
+  ];
+  function mathWrap(x) { return /[+−\-×·,\s/]/.test(x) ? '(' + x + ')' : x; }
+  function plainText(t) {
+    if (!t || t.indexOf('\\(') < 0) return t || '';
+    t = t.split('\\(').join('').split('\\)').join('');
+    for (;;) {
+      const old = t;
+      MATH_PLAIN.forEach(r => { t = t.replace(r[0], r[1]); });
+      if (t === old) return t;
+    }
+  }
+
   function filter(paperId, subject, qtype, search) {
     const papers = papersById();
     const hidden = (paperId || subject) ? new Set() : hiddenSubjects();
@@ -138,7 +156,7 @@
       if (subject && s !== subject) return false;
       if (hidden.has(s)) return false;
       if (qtype && q.type !== qtype) return false;
-      if (search && q.stem.indexOf(search) < 0 && (q.material || '').indexOf(search) < 0) return false;
+      if (search && plainText(q.stem).indexOf(search) < 0 && plainText(q.material).indexOf(search) < 0) return false;
       return true;
     });
   }
