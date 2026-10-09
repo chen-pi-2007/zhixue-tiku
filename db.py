@@ -12,6 +12,7 @@ data/media/         题目图片，题干里写成 [[img:<卷子key>/NNN.png]]
 """
 from itertools import zip_longest
 import json
+import math
 import random
 import re
 import os
@@ -272,7 +273,7 @@ def list_papers():
                 'answered': sum(c['right'] + c['wrong'] for c in cs),
                 'correct': sum(c['right'] for c in cs),
                 'wrong_open': sum(1 for c in cs if c['in_wrong']),
-                'mastery': round(100 * sum(srs.mastery(c) for c in cs) / len(qs)) if qs else 0,
+                'mastery': _round(100 * sum(srs.mastery(c) for c in cs) / len(qs)) if qs else 0,
             })
         return out
 
@@ -307,6 +308,13 @@ def _view(q, papers, hide_answer=False):
 def hidden_subjects():
     """设置里不学的科目（科目 key，技能方向是 skill:<方向>）"""
     return set(_prog['settings'].get('hidden_subjects') or [])
+
+
+def _round(x, nd=0):
+    """四舍五入（逢五进一），和手机端 JS 的 Math.round 一致。Python 自带的 round 是“银行家舍入”，
+    6.5 会舍成 6，同样的做题记录在电脑和手机上掌握度会差 1、考试分差 0.1"""
+    v = math.floor(x * 10 ** nd + 0.5) / 10 ** nd
+    return int(v) if nd == 0 else v
 
 
 _MATH = [(re.compile(r'\\frac\{([^{}]*)\}\{([^{}]*)\}'), lambda m: _wrap(m.group(1)) + '/' + _wrap(m.group(2))),
@@ -645,16 +653,16 @@ def dashboard():
         for s in sorted(subj, key=lambda x: SUBJECTS.index(x) if x in SUBJECTS else 99):
             d = subj[s]
             d['hidden'] = s in hidden
-            d['mastery'] = round(100 * d.pop('mastery_sum') / d['total']) if d['total'] else 0
+            d['mastery'] = _round(100 * d.pop('mastery_sum') / d['total']) if d['total'] else 0
             types = []
             for t in d.pop('types').values():
-                t['mastery'] = round(100 * t.pop('mastery_sum') / t['total']) if t['total'] else 0
+                t['mastery'] = _round(100 * t.pop('mastery_sum') / t['total']) if t['total'] else 0
                 a = acc.get((s, t['type']))
-                t['accuracy'] = round(100 * a) if a is not None else None
+                t['accuracy'] = _round(100 * a) if a is not None else None
                 types.append(t)
             d['types'] = sorted(types, key=lambda t: -t['total'])
             n = d['right'] + d['wrong']
-            d['accuracy'] = round(100.0 * d['right'] / n, 1) if n else None
+            d['accuracy'] = _round(100.0 * d['right'] / n, 1) if n else None
             out.append(d)
         days = set(a['t'][:10] for a in _prog['attempts'])
         today_att = [a for a in _prog['attempts'] if a['t'][:10] == today]
@@ -685,7 +693,7 @@ def stats():
     right = sum(s['right'] for s in d['subjects'])
     wrong = sum(s['wrong'] for s in d['subjects'])
     return {'papers': d['papers'], 'questions': d['questions'], 'answered': right + wrong, 'correct': right,
-            'accuracy': round(100.0 * right / (right + wrong), 1) if right + wrong else 0,
+            'accuracy': _round(100.0 * right / (right + wrong), 1) if right + wrong else 0,
             'wrong_open': d['wrong_open']}
 
 
@@ -790,7 +798,7 @@ def exam_submit(eid, answers, used_seconds=0):
             got_pts += sc * pts
             full_pts += st * pts
         e.update({'answers': given, 'finished': t, 'total': total, 'correct': correct,
-                  'score': round(100.0 * got_pts / full_pts, 1) if full_pts else 0,
+                  'score': _round(100.0 * got_pts / full_pts, 1) if full_pts else 0,
                   'used_seconds': int(used_seconds or 0), 'by_section': by_section,
                   'by_type': {k: {'correct': v[0], 'total': v[1]} for k, v in by_type.items()}})
         _save_prog()

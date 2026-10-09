@@ -1,6 +1,6 @@
 {
- "content_version": 27,
- "created": "2026-10-09 16:00:54",
+ "content_version": 28,
+ "created": "2026-10-09 16:28:48",
  "files": {
   "data/bank.json": [
    "5a6cea426a52d9ab4cdb999d88f9c22acc81c349dcec3c5b9d5734534cd4cf6a",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "ecd602296af82d68283bca827dfa03e8b83dc23fbb70bca9d55bbbb5446a6a3d",
-   33353
+   "26a580f1726d7b9e897a5b36c2c7ea7b731246de5b9339dea7bbdd7c7d892d6f",
+   33724
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1653,7 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "根号改成真正的根号（勾和横线连成一笔，随内容变高）；数学练习卷(2)第15题的分段函数按原卷显示成两行大括号",
+ "notes": "电脑版的掌握度、正确率、模拟考试分数改成四舍五入，和手机上算出来的完全一致（以前遇到 .5 时可能差 1）",
  "py_shell_api": 1,
- "tag": "content-27"
+ "tag": "content-28"
 }
