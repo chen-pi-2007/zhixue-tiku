@@ -1,6 +1,6 @@
 {
- "content_version": 22,
- "created": "2026-10-08 22:06:29",
+ "content_version": 23,
+ "created": "2026-10-09 10:57:21",
  "files": {
   "data/bank.json": [
    "9f121a416f072de661c08d2ab102e5d59af4edd9af60c83b39012dfa3811ea9b",
@@ -1575,8 +1575,8 @@
    41270
   ],
   "static/app.js": [
-   "6f29eb379c13cd735d5da0ce84151774e7a5f83d877406b9a0f7199d8657aad1",
-   107819
+   "91442f93455abb7240cd7361613ad4d35effeb391524c399822b562999e9a3e4",
+   110536
   ],
   "static/index.html": [
    "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
@@ -1587,12 +1587,12 @@
    27524
   ],
   "static/style.css": [
-   "81ef1c7daffef14ea618a1526fe22cfa301fcbc9d51372fdf1fca8cc67281b23",
-   48128
+   "f8318a27e0c5199ff1400581def3aa5a03fc12faa9d5fdc151cbac6b6eafb934",
+   48793
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "错题重练改成混在题海里练（每道错题配两道陪练题，错题分散开）；所有练习方式都能存档、读档（全部乱序和模拟考试除外），按题型练习也有了顺序 / 打乱 / 全乱序三种方式；手机上能进科目页按题型练习；大屏全屏时界面整体放大铺满；练习页顶部在手机上不再挤成两行；加上作者署名和版权信息",
- "tag": "content-22"
+ "notes": "选了科目后首页直接显示按题型练习（单选题、填空题…），手机上也能单练一种题型；搜索题目可以直接「练这些题」；手机上点过的按钮不再出现橙色框",
+ "tag": "content-23"
 }

@@ -405,11 +405,10 @@ async function viewHome() {
           entries.filter(inGroup).map(e => '<button class="pill-tab' + (h.subj === e.key ? ' on' : '') + '" data-s="' + e.key + '">' +
             '<span class="dot ' + e.dot + '"></span>' + esc(e.name) + '</button>').join('') +
         '</div>' +
+        homeTypes(d, h.subj) +
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
-          // 手机上顶部没有科目链接：选了科目时，从这里进科目页（按题型练习、错题重练）
-          (h.subj && h.subj.indexOf('skill:') !== 0 ? '<a class="btn ghost sm subj-go" href="#/subject/' + esc(h.subj) + '">题型练习 · 错题</a>' : '') +
           (canShuffle ?
             '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' : '') +
         '</div>' +
@@ -436,6 +435,37 @@ async function viewHome() {
   if (np) np.addEventListener('change', async () => {
     try { await api('/api/settings', { method: 'POST', body: { new_per_day: +np.value } }); viewHome(); } catch (e) { toast(e.message, 'bad'); }
   });
+}
+
+// 某一科的题型卡片：单做一种题型最练记忆，点进去选练习方式（能存档）
+function typeGrid(s, subj) {
+  const name = SUBJECT_NAME[subj] || subj;
+  const weak = s.types.filter(t => t.accuracy != null && t.accuracy < 70).map(t => t.type);
+  return '<div class="typegrid">' + s.types.map(t =>
+    '<button class="typebtn' + (weak.indexOf(t.type) >= 0 ? ' weak' : '') + '" onclick="openModeSheet({subject:' + jsq(subj) +
+      ',type:' + jsq(t.type) + '},' + jsq(name + '·' + (TYPE_NAME[t.type] || t.type)) + ')">' +
+      '<span class="ti">' + (TYPE_ICON[t.type] || '') + '</span>' +
+      '<span class="tn">' + (TYPE_NAME[t.type] || t.type) + '</span>' +
+      '<span class="tc">' + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
+      bar(t.mastery, 'thin') +
+    '</button>').join('') + '</div>';
+}
+
+// 首页选了某一科时，卷子列表上面先放这一科的题型卡片（手机上没有科目页的入口，这里就是入口）
+function homeTypes(d, subj) {
+  if (!subj || subj.indexOf('skill:') === 0) return '';
+  const s = (d.subjects || []).find(x => x.subject === subj);
+  if (!s || !s.types || !s.types.length) return '';
+  return '<div class="home-types">' +
+    '<div class="sec-h"><span>按题型练习</span>' +
+      '<span class="sec-links">' +
+        (s.wrong_open ? '<a href="javascript:void(0)" class="danger-link" onclick="startPractice({subject:' + jsq(subj) +
+          ',scope:\'wrongmix\',title:' + jsq((SUBJECT_NAME[subj] || subj) + '·错题') + '})">错题重练(' + s.wrong_open + ')</a>' : '') +
+        '<a href="#/subject/' + esc(subj) + '">更多 ›</a>' +
+      '</span></div>' +
+    typeGrid(s, subj) +
+    '<div class="sec-h"><span>卷子</span></div>' +
+  '</div>';
 }
 
 function paperRow(p, i) {
@@ -620,14 +650,7 @@ async function viewSubject(args) {
     '</div>' +
 
     '<div class="sec-title">按题型练习' + (weak.length ? ' <span class="muted">· 标红的是薄弱题型（最近正确率低于 70%）</span>' : '') + '</div>' +
-    '<div class="typegrid">' + s.types.map(t =>
-      '<button class="typebtn' + (weak.indexOf(t.type) >= 0 ? ' weak' : '') + '" onclick="openModeSheet({subject:\'' + subj +
-        '\',type:\'' + t.type + '\'},\'' + name + '·' + TYPE_NAME[t.type] + '\')">' +
-        '<span class="ti">' + (TYPE_ICON[t.type] || '') + '</span>' +
-        '<span class="tn">' + (TYPE_NAME[t.type] || t.type) + '</span>' +
-        '<span class="tc">' + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
-        bar(t.mastery, 'thin') +
-      '</button>').join('') + '</div>' +
+    typeGrid(s, subj) +
 
     '<div class="sec-title">卷子 / 题库(' + papers.length + ')</div>' +
     papers.map(paperCard).join('');
@@ -772,6 +795,29 @@ async function viewBank() {
   await loadMore();
 }
 
+// 搜到的题直接拿来练：按列表顺序，能存档
+async function practiceSearch() {
+  const b = state.bank;
+  const base = '/api/questions?paper_id=' + b.paper_id + (b.subject ? '&subject=' + b.subject : '') +
+    (b.type ? '&type=' + b.type : '') + (b.q ? '&q=' + encodeURIComponent(b.q) : '');
+  let all = [];
+  try {
+    for (let off = 0; ; off += 200) {
+      const d = await api(base + '&limit=200&offset=' + off);
+      all = all.concat(d.items);
+      if (!d.items.length || all.length >= d.total) break;
+    }
+  } catch (e) { toast(e.message, 'bad'); return; }
+  const list = all.filter(q => q.answer);
+  if (!list.length) { toast('这些题没有标准答案，只能浏览', 'bad'); return; }
+  const paper = b.paper_id ? b.papers.find(p => p.id === b.paper_id) : null;
+  const parts = [paper ? paper.name : (b.subject ? SUBJECT_NAME[b.subject] : ''), b.type ? TYPE_NAME[b.type] : '', b.q ? '“' + b.q + '”' : ''].filter(Boolean);
+  const title = '搜索 · ' + (parts.join(' · ') || '全部题目');
+  beginPractice(list, title, 'practice');
+  allowSave(Object.assign(b.paper_id ? { paper_id: b.paper_id } : { subject: b.subject, type: b.type }, { scope: 'search' }), title);
+  if (list.length < all.length) toast((all.length - list.length) + ' 道没有标准答案的题没放进来');
+}
+
 async function loadMore() {
   const b = state.bank;
   const box = $('#q-list');
@@ -791,7 +837,9 @@ async function loadMore() {
   b.items = b.items.concat(d.items);
   b.total = d.total;
   box.innerHTML = b.items.length
-    ? b.items.map(qCard).join('') +
+    ? '<div class="bank-bar"><span class="muted">找到 ' + b.total + ' 题</span>' +
+        '<button class="btn sm" onclick="practiceSearch()">练这 ' + b.total + ' 题</button></div>' +
+      b.items.map(qCard).join('') +
       (b.items.length < b.total
         ? '<div class="loadmore"><button class="btn ghost" onclick="loadMore()">加载更多(' + b.items.length + '/' + b.total + ')</button></div>'
         : '<div class="muted" style="text-align:center;padding:10px">共 ' + b.total + ' 题</div>')
@@ -1613,7 +1661,7 @@ async function viewSettings() {
   const subjList = g => {
     const os = subjOpts.filter(o => subjectGroup(o.key) === g);
     return os.length ? '<div class="set-group-t">' + (GROUP_NAME[g] || '其他') + '</div><div class="set-list">' + os.map(o =>
-      '<label class="set-item subj-check"><span class="set-main">' + esc(o.name) + '</span><span class="set-val">' + esc(o.note) + '</span>' +
+      '<label class="set-item subj-check' + (isHidden(o.key) ? ' off' : '') + '"><span class="set-main">' + esc(o.name) + '</span><span class="set-val">' + esc(o.note) + '</span>' +
         '<input type="checkbox" class="switch" data-k="' + esc(o.key) + '"' + (isHidden(o.key) ? '' : ' checked') + '></label>').join('') + '</div>' : '';
   };
   const item = (main, val, attrs, cls) =>
@@ -1655,7 +1703,10 @@ async function viewSettings() {
   if (btn) btn.addEventListener('click', checkUpdate);
   markUpdDots();
   updRestore();
-  $$('.subj-check input').forEach(c => c.addEventListener('change', saveHidden));
+  $$('.subj-check input').forEach(c => c.addEventListener('change', () => {
+    c.closest('.subj-check').classList.toggle('off', !c.checked);     // 关掉的科目名变灰（老 WebView 不支持 :has，用 class）
+    saveHidden();
+  }));
 }
 
 async function saveHidden() {

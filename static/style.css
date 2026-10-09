@@ -85,7 +85,8 @@ code { font-family: var(--f-code); font-size: 13px; background: var(--layer-2); 
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 /* 手机上点按时不闪蓝框：去掉 WebView 的点击高亮，焦点框只在键盘操作时显示 */
 html { -webkit-tap-highlight-color: transparent; }
-.app :focus, .app :focus-visible { outline: none; }    /* 手机 App 没有键盘操作，焦点框一律不显示 */
+.app :focus { outline: none; }    /* 分开写：WebView 83 不认 :focus-visible，写在同一条里整条都会失效 */
+.app :focus-visible { outline: none; }    /* 手机 App 没有键盘操作，焦点框一律不显示 */
 :focus:not(:focus-visible) { outline: none; }
 .ico { width: 18px; height: 18px; flex: none; }
 
@@ -269,6 +270,13 @@ main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1600px; }
 .typebtn .tc { font-size: 12px; color: var(--ink-3); }
 .typebtn .accbar { grid-column: 2; }
 .typebtn.weak .ti { background: var(--red-soft); color: var(--red); }
+.home-types { margin-top: 18px; }
+.home-types .sec-h { margin: 0 0 10px; font-size: 15px; }
+.home-types .typegrid + .sec-h { margin-top: 20px; }
+.bank-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; }
+.sec-links { display: flex; gap: 16px; font-size: 13px; font-weight: 400; }
+.sec-links a { color: var(--ink-2); }
+.sec-links .danger-link { color: var(--red); }
 .typebtn.weak .tn::after { content: "薄弱"; margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--red); }
 .paper .accbar { margin: 4px 0 12px; }
 .paper-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
@@ -502,6 +510,8 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: auto; flex: 1; min-width: 0; }
   .list-tools .spacer { display: none; }
+  .typegrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .typebtn { grid-template-columns: 26px 1fr; column-gap: 8px; padding: 10px; }
   .sec-title { flex-wrap: wrap; }
   .sec-title .muted { flex-basis: 100%; margin-top: 4px; font-size: 13px; font-weight: 400; }
   .exam-layout { flex-direction: column; gap: 14px; }
@@ -556,7 +566,7 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 #upd-out .set-note { margin: 0 4px; font-size: 13px; }
 #upd-out .upd-box { margin-top: 0; padding: 14px 16px; border-radius: 12px; }
 .subj-check { cursor: pointer; user-select: none; }
-.subj-check:has(input:not(:checked)) .set-main { color: var(--ink-3); }
+.subj-check.off .set-main { color: var(--ink-3); }
 /* 开关 */
 input.switch { appearance: none; -webkit-appearance: none; position: relative; flex: none; width: 44px; height: 26px; margin: 0; border-radius: 13px;
   background: rgba(120, 120, 128, .32); cursor: pointer; transition: background .2s; }
