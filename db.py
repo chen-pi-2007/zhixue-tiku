@@ -312,7 +312,8 @@ def hidden_subjects():
 _MATH = [(re.compile(r'\\frac\{([^{}]*)\}\{([^{}]*)\}'), lambda m: _wrap(m.group(1)) + '/' + _wrap(m.group(2))),
          (re.compile(r'\\sqrt\{([^{}]*)\}'), lambda m: '√' + _wrap(m.group(1))),
          (re.compile(r'\^\{([^{}]*)\}'), lambda m: '^' + _wrap(m.group(1))),
-         (re.compile(r'_\{([^{}]*)\}'), lambda m: '_' + m.group(1))]
+         (re.compile(r'_\{([^{}]*)\}'), lambda m: '_' + m.group(1)),
+         (re.compile(r'\\cases\{([^{}]*)\}'), lambda m: m.group(1).replace('&', ' ').replace('\\\\', ' '))]
 
 
 def _wrap(x):

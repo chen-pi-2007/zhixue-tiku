@@ -135,6 +135,7 @@
     [/\\sqrt\{([^{}]*)\}/g, (m, a) => '√' + mathWrap(a)],
     [/\^\{([^{}]*)\}/g, (m, a) => '^' + mathWrap(a)],
     [/_\{([^{}]*)\}/g, (m, a) => '_' + a],
+    [/\\cases\{([^{}]*)\}/g, (m, a) => a.split('&').join(' ').split('\\\\').join(' ')],
   ];
   function mathWrap(x) { return /[+−\-×·,\s/]/.test(x) ? '(' + x + ')' : x; }
   function plainText(t) {

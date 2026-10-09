@@ -29,9 +29,16 @@ function rich(s) {
 
 // 数学公式（题库里写成 \( … \)，由 学测/_脚本/mathfmt.py 生成）：\frac{分子}{分母} 画成上下两层的分数，
 // \sqrt{…} 画成带横线的根号，^{…} 上标，_{…} 下标。不用公式库，手机离线也能显示
+// 根号、大括号用 SVG 画：随里面内容的高度拉伸，线宽不变（vector-effect），根号的勾和上面那条横线接成一笔
+const SQRT_SVG = '<svg class="msign" viewBox="0 0 10 100" preserveAspectRatio="none" aria-hidden="true">' +
+  '<path d="M0.5 64 L3 58 L5.6 97 L9.6 0.6 L10.5 0.6" vector-effect="non-scaling-stroke"/></svg>';
+const BRACE_SVG = '<svg class="mbrace" viewBox="0 0 10 100" preserveAspectRatio="none" aria-hidden="true">' +
+  '<path d="M9.5 1 C5.5 1 5.5 3 5.5 9 L5.5 42 C5.5 47 3.5 50 0.8 50 C3.5 50 5.5 53 5.5 58 L5.5 91 C5.5 97 5.5 99 9.5 99"' +
+  ' vector-effect="non-scaling-stroke"/></svg>';
+
 function mathHtml(t) {
   let out = '', i = 0;
-  const group = () => {                          // t[i] 是 '{'：取出配对的 {…} 里面的内容，画好返回
+  const raw = () => {                            // t[i] 是 '{'：取出配对的 {…} 里面的原文
     let depth = 0, j = i;
     for (; j < t.length; j++) {
       if (t[j] === '{') depth++;
@@ -39,8 +46,9 @@ function mathHtml(t) {
     }
     const inner = t.slice(i + 1, j);
     i = j + 1;
-    return mathHtml(inner);
+    return inner;
   };
+  const group = () => mathHtml(raw());           // 取出 {…} 并画好
   while (i < t.length) {
     if (t.startsWith('\\frac{', i)) {
       i += 5;
@@ -49,7 +57,15 @@ function mathHtml(t) {
       out += '<span class="mfrac"><span class="mfn">' + num + '</span><span class="mfd">' + den + '</span></span>';
     } else if (t.startsWith('\\sqrt{', i)) {
       i += 5;
-      out += '<span class="msqrt"><span class="msign">√</span><span class="mrad">' + group() + '</span></span>';
+      out += '<span class="msqrt">' + SQRT_SVG + '<span class="mrad">' + group() + '</span></span>';
+    } else if (t.startsWith('\\cases{', i)) {
+      // 分段函数 / 方程组：\cases{x+1,&x≥0,\\2x−1,&x<0,}——和 LaTeX 一样，行用 \\ 分开，式子和条件用 & 分开。
+      // 到这里文字已经转义过（& 变成 &amp;），所以按 &amp; 切；不用 ; 分行，免得切坏 &lt; 这类转义
+      i += 6;
+      const rows = raw().split('\\\\').map(r => r.split(/&amp;|&(?![a-z]+;)/));
+      out += '<span class="mcases">' + BRACE_SVG + '<span class="mrows">' +
+        rows.map(r => '<span class="mrow">' + r.map((c, k) => '<span class="mcell' + (k ? ' mcond' : '') + '">' + mathHtml(c) + '</span>').join('') +
+          '</span>').join('') + '</span></span>';
     } else if ((t[i] === '^' || t[i] === '_') && t[i + 1] === '{') {
       const tag = t[i] === '^' ? 'sup' : 'sub';
       i += 1;

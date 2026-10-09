@@ -1,10 +1,10 @@
 {
- "content_version": 26,
- "created": "2026-10-09 15:08:47",
+ "content_version": 27,
+ "created": "2026-10-09 16:00:54",
  "files": {
   "data/bank.json": [
-   "0c308dce921a184ec4c27f87e1d163674f393b21bb47c33c2ecffabb048a3cdd",
-   1901575
+   "5a6cea426a52d9ab4cdb999d88f9c22acc81c349dcec3c5b9d5734534cd4cf6a",
+   1901581
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "0fe15d7a599d22f0500d36ea17968aa8c668e53095d99310a65a201f2f967407",
-   33244
+   "ecd602296af82d68283bca827dfa03e8b83dc23fbb70bca9d55bbbb5446a6a3d",
+   33353
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "b889504319a7375de91e69de9ea551131df2c0f815ad454e3b4f1860e9975fc7",
-   42050
+   "814ad2520e4c5b9e33af19b3fedb9a9eb10c328984af99c253cab3dbeb92f2e0",
+   42139
   ],
   "server.py": [
    "dda125dbd1a5c65b9263a0693ff1d4057b1712bd63a1705c2e25f2341dc2c850",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "08168c4d036b2a28e97b430a10d9a9feda2f9a9ec8fd7019efd335525fb1a24f",
-   113405
+   "01995b0eb3b773479916e274c69d8c984bea08f5be7e3cb3ed6e40a0d4043201",
+   114789
   ],
   "static/index.html": [
    "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
@@ -1647,13 +1647,13 @@
    27524
   ],
   "static/style.css": [
-   "f8318a27e0c5199ff1400581def3aa5a03fc12faa9d5fdc151cbac6b6eafb934",
-   48793
+   "a79b2354c3ebaf9d64a1f6c4174e6136edc74c1311f89172ef42bb7e472e86cd",
+   49661
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "数字媒体答案恢复为官方答案卷的答案（上一版改过的 8 题改回来）",
+ "notes": "根号改成真正的根号（勾和横线连成一笔，随内容变高）；数学练习卷(2)第15题的分段函数按原卷显示成两行大括号",
  "py_shell_api": 1,
- "tag": "content-26"
+ "tag": "content-27"
 }

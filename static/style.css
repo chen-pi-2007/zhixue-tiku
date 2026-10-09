@@ -679,7 +679,16 @@ main.page-in { animation: page-in .22s ease-out; }
 .mfn { padding: 0 .2em .08em; border-bottom: 1px solid currentColor; }
 .mfd { padding: .08em .2em 0; }
 .mfrac .mfrac { font-size: .9em; }
-.msqrt { display: inline-flex; align-items: stretch; vertical-align: middle; line-height: 1.2; }
-.msign { padding-right: .04em; font-size: 1.05em; }
-.mrad { padding: .08em .12em 0 .08em; border-top: 1px solid currentColor; }
+/* 根号：左边的勾是 SVG，高度跟着被开方式；被开方式顶上的横线和勾的最高点接在一起 */
+.msqrt { display: inline-block; position: relative; padding-left: .62em; vertical-align: middle; line-height: 1.2; }
+.msign { position: absolute; left: 0; top: 0; width: .66em; height: 100%; overflow: visible; }
+.msign path, .mbrace path { fill: none; stroke: currentColor; stroke-width: 1.15px; stroke-linejoin: round; }
+.mrad { display: inline-block; padding: .1em .12em 0 .06em; border-top: 1.15px solid currentColor; }
+/* 分段函数、方程组：左边一个跨两行的大括号，右边式子和条件各成一列对齐 */
+.mcases { display: inline-block; position: relative; padding-left: .7em; vertical-align: middle; margin: 0 .15em; }
+.mbrace { position: absolute; left: 0; top: 0; width: .55em; height: 100%; overflow: visible; }
+.mrows { display: inline-table; border-collapse: separate; border-spacing: 0 .1em; }
+.mrow { display: table-row; }
+.mcell { display: table-cell; text-align: left; white-space: nowrap; }
+.mcond { padding-left: 1.2em; }
 .math sup, .math sub { font-size: .72em; }
