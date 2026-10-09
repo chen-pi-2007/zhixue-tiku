@@ -1,10 +1,10 @@
 {
- "content_version": 25,
- "created": "2026-10-09 11:51:29",
+ "content_version": 26,
+ "created": "2026-10-09 15:08:47",
  "files": {
   "data/bank.json": [
-   "64f11047cb5f912b88ea9180032c916bfb87d9442c65746d0961d14b207594a0",
-   1903120
+   "0c308dce921a184ec4c27f87e1d163674f393b21bb47c33c2ecffabb048a3cdd",
+   1901575
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1653,7 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "数字媒体逐题核对：改正 8 道官方答案有误的题（环保与法规第 9、30 题，职业健康与安全第 3、5、9 题，图像处理常用工具第 25、45、74 题），每题解析里写了依据",
+ "notes": "数字媒体答案恢复为官方答案卷的答案（上一版改过的 8 题改回来）",
  "py_shell_api": 1,
- "tag": "content-25"
+ "tag": "content-26"
 }
