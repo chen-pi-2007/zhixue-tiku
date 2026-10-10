@@ -313,8 +313,9 @@ details.material-box[open] summary { margin-bottom: 8px; }
   display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 11px 14px; border: 1px solid transparent; border-radius: 8px;
   background: var(--layer-2); color: var(--ink); font: inherit; font-size: 15px; line-height: 1.6; text-align: left; cursor: pointer; word-break: break-word;
 }
-.opt:hover:not(:disabled) { background: var(--layer-3); }
+@media (hover: hover) { .opt:hover:not(:disabled):not(.ok) { background: var(--layer-3); } }   /* 手机点完会一直“悬停”，不加这个限制会盖住正确答案的绿色 */
 .opt:disabled { cursor: default; }
+.opt { touch-action: manipulation; }          /* 手机浏览器里双击选项不放大页面 */
 .opt .key { flex: none; width: 22px; color: var(--ink-3); font-weight: 600; }
 .opt.sel { border-color: var(--ink); }
 .opt.sel .key { color: var(--ink); }

@@ -1191,10 +1191,10 @@ function renderQ() {
     body.innerHTML =
       (q.type === 'judge'
         ? '<div class="judge-row" id="optsbox">' + opts.map(o =>
-          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="pickOpt(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
+          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="optTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
         : '<div class="opts" id="optsbox">' + opts.map((o, i) =>
-          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="pickOpt(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
-      '<div class="qactions" id="qact">' + prevBtn(p) + '<span class="muted kbd-tip">' + (multi ? '多选题，可选多项。' : '') + keyTip('选好后按回车确认') + '</span><div class="spacer"></div>' +
+          '<button class="opt" data-k="' + esc(o[0]) + '" onclick="optTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
+      '<div class="qactions" id="qact">' + prevBtn(p) + '<span class="muted kbd-tip">' + (multi ? '多选题，可选多项。' : '') + keyTip('选好后按回车确认') + (TOUCH ? '双击选项直接确认' : '') + '</span><div class="spacer"></div>' +
         '<button class="btn" id="confirm-btn" disabled onclick="confirmChoice()">确认答案</button></div>';
   }
   // 回看已经做过的题：直接显示当时的作答和解析，不再记分
@@ -1215,6 +1215,24 @@ function keyTip(t) {
 
 function prevBtn(p) {
   return p.idx > 0 ? '<button class="btn ghost" onclick="prevQ()">上一题</button>' : '';
+}
+
+// 手机 / 触屏：双击一个选项 = 选中并确认；确认以后点绿色的正确答案 = 下一题。电脑上还是点选 + 回车
+const TOUCH = IS_APP || !!(window.matchMedia && matchMedia('(hover: none) and (pointer: coarse)').matches);
+let lastTap = { btn: null, t: 0 };
+function optTap(btn) {
+  const p = state.practice;
+  if (!p) return;
+  if (p.answered) {
+    if (TOUCH && btn.classList.contains('ok')) nextQ();
+    return;
+  }
+  const now = Date.now();
+  const dbl = TOUCH && lastTap.btn === btn && now - lastTap.t < 400;
+  lastTap = { btn: dbl ? null : btn, t: now };
+  if (!dbl) return pickOpt(btn);
+  btn.classList.add('sel');                       // 双击的第二下：不再切换（多选题第一下可能刚好取消了它），直接确认
+  confirmChoice();
 }
 
 function pickOpt(btn) {
@@ -1268,9 +1286,9 @@ function gradeAndShow(selKeys, replay) {
   }
 
   $$('#qbody .opt').forEach(b => {
-    b.disabled = true;
     const k = b.dataset.k;
     const inAns = q.type === 'multi' ? q.answer.indexOf(k) >= 0 : k === q.answer;
+    b.disabled = !(TOUCH && inAns);              // 手机：正确答案还能点，点它进入下一题
     if (inAns) b.classList.add('ok');
     else if (selKeys.indexOf(k) >= 0) b.classList.add('bad');
   });
@@ -1290,7 +1308,7 @@ function gradeAndShow(selKeys, replay) {
 
 // 答完以后的按钮：上一题 / 下一题（或查看结果）
 function nextActions(p) {
-  return prevBtn(p) + '<span class="muted kbd-tip">' + keyTip('回车 = 下一题') + '</span><div class="spacer"></div>' +
+  return prevBtn(p) + '<span class="muted kbd-tip">' + keyTip('回车 = 下一题') + (TOUCH ? '点绿色的正确答案也能下一题' : '') + '</span><div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.idx + 1 >= p.list.length ? '查看结果' : '下一题') + '</button>';
 }
 

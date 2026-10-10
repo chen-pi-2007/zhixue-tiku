@@ -1,6 +1,6 @@
 {
- "content_version": 28,
- "created": "2026-10-09 16:28:48",
+ "content_version": 29,
+ "created": "2026-10-10 10:28:45",
  "files": {
   "data/bank.json": [
    "5a6cea426a52d9ab4cdb999d88f9c22acc81c349dcec3c5b9d5734534cd4cf6a",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "01995b0eb3b773479916e274c69d8c984bea08f5be7e3cb3ed6e40a0d4043201",
-   114789
+   "e3642ff2175379b378332a3e1ab15d92e6381b22d4e5f33845124e09deaa77ee",
+   115785
   ],
   "static/index.html": [
    "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
@@ -1647,13 +1647,13 @@
    27524
   ],
   "static/style.css": [
-   "a79b2354c3ebaf9d64a1f6c4174e6136edc74c1311f89172ef42bb7e472e86cd",
-   49661
+   "e3e82e56b9489b81e1da7e219e3dcb7a9a66d4001fe39b33f2da12e7ec45c292",
+   49888
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "电脑版的掌握度、正确率、模拟考试分数改成四舍五入，和手机上算出来的完全一致（以前遇到 .5 时可能差 1）",
+ "notes": "手机上做题更顺手：双击选项直接确认答案；确认后点绿色的正确答案进入下一题",
  "py_shell_api": 1,
- "tag": "content-28"
+ "tag": "content-29"
 }
