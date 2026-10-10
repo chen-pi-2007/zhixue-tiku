@@ -1,19 +1,19 @@
 {
- "version": "1.5.1",
- "notes": "电脑版的后台程序也能增量更新了：以后改功能、修问题大多只下载几十 KB，重启题库就生效，不用再下整个安装包；检查更新时先给增量更新；搜索题目能搜到分数和根号（比如 1/2、√3）",
- "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.1",
+ "version": "1.5.2",
+ "notes": "电脑版 exe 挪了位置也不会丢做题记录：以前把 exe 从带 data 文件夹的地方挪走，会换到新的数据目录、看起来记录全没了；现在会自动找回以前的记录（合并前先备份）。设置里的版本号不再显示「内容第几版」",
+ "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.2",
  "assets": {
   "exe": {
    "name": "zhixue-tiku.exe",
-   "size": 58218724,
-   "sha256": "0b4408a22bdf45c2edce2d57b7d56008cdaeba6b42e9af62e96e8f53d09b9ec4",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.1/zhixue-tiku.exe"
+   "size": 58327251,
+   "sha256": "286a57ab01b770a94b5f523eb19f94ee12f16c2f0dc97b205ec90b84eb6f4b9a",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.2/zhixue-tiku.exe"
   },
   "apk": {
    "name": "zhixue-tiku.apk",
-   "size": 19291995,
-   "sha256": "5ff718f1be3a8cd28bbafd2ba844c014a074e61c2912e3ac76187e78ae3551fa",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.1/zhixue-tiku.apk"
+   "size": 19398491,
+   "sha256": "f47d5a70dbca4695a89f708f82b930810c8bdb93728e794c1c2ffac7b5b0a87f",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.2/zhixue-tiku.apk"
   }
  }
 }
