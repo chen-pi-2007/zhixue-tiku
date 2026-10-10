@@ -1,0 +1,41 @@
+# 每天统计一次下载和使用次数，画成图放在 stats 分支（README 里显示）。脚本见 .github/stats/update.py
+name: 使用统计
+
+on:
+  schedule:
+    - cron: '17 1 * * *'        # 每天北京时间 9:17
+  workflow_dispatch:            # 也可以在 Actions 页面手动点「Run workflow」
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats
+  cancel-in-progress: false
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: main
+      - name: 取出 stats 分支（没有就新建）
+        run: |
+          if git ls-remote --exit-code --heads "https://github.com/${GITHUB_REPOSITORY}.git" stats >/dev/null; then
+            git clone --depth 1 --branch stats "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" out
+          else
+            mkdir out && cd out && git init -q -b stats && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+          fi
+      - name: 统计并画图
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 main/.github/stats/update.py out
+      - name: 保存
+        run: |
+          cd out
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -q -m "统计 $(date -u +%F)"
+          git push -q origin stats

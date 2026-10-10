@@ -2,6 +2,8 @@
 
 上传"带答案的选择题试卷"(docx / txt / md),自动识别拆题,生成可以逐题作答的复习题库,自动收集错题本。
 
+<p align="center"><a href="https://github.com/chen-pi-2007/zhixue-tiku/tree/stats"><img src="https://raw.githubusercontent.com/chen-pi-2007/zhixue-tiku/stats/stats.svg" alt="智学题库使用情况" width="840"></a></p>
+
 **零依赖**:只需 Python 3.6+(纯标准库,无需安装任何第三方包、无需数据库,数据就是一个 JSON 文件)。
 
 ## 快速开始
