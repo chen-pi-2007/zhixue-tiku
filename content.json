@@ -1,10 +1,10 @@
 {
- "content_version": 35,
- "created": "2026-10-10 17:38:18",
+ "content_version": 36,
+ "created": "2026-10-10 17:51:29",
  "files": {
   "data/bank.json": [
-   "e8063855191e7cc6a26a1e35e7c44fdd428c8ad93ec0bdd03006a1c3b7016ed4",
-   2724506
+   "e0cb0157f5b4b745ea4ede0072d4bae9e190054d1f889ec0dbdec4752d4e6f8e",
+   2832428
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1653,7 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增英语 试卷1；答对了也显示「为什么选这个」（选不正确一项的题说明它错在哪）；双击确认后点绿色答案立即进下一题，不再等待；阅读题支持在原文中标出答案依据",
+ "notes": "英语阅读理解 240 题加解析：每个选项说明对在哪、错在哪；阅读短文题作答后在原文中标黄答案依据，并列出原句",
  "py_shell_api": 1,
- "tag": "content-35"
+ "tag": "content-36"
 }
