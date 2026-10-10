@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="380" viewBox="0 0 840 380" role="img" aria-label="智学题库使用情况">
+<style>
+  text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}
+  .bg{fill:#ffffff;stroke:#d8dee4}
+  .h{font-size:18px;font-weight:600;fill:#1f2328}
+  .m{font-size:12px;fill:#656d76}
+  .k{font-size:13px;fill:#656d76}
+  .big{font-size:34px;font-weight:700;fill:#1f2328}
+  .unit{font-size:14px;fill:#656d76}
+  .ax{font-size:11px;fill:#8c959f}
+  .tile{fill:#f6f8fa}
+  .grid{stroke:#eaeef2;stroke-width:1;stroke-dasharray:3 4}
+  .base{stroke:#d0d7de;stroke-width:1}
+  .ln{stroke:#2a78d6;stroke-width:2.5;fill:none;stroke-linejoin:round;stroke-linecap:round}
+  .dot{fill:#2a78d6;stroke:#ffffff;stroke-width:2.5}
+  .accent{fill:#2a78d6}
+  .stop1{stop-color:#2a78d6;stop-opacity:.22}.stop2{stop-color:#2a78d6;stop-opacity:0}
+  .lab{font-size:12px;font-weight:600;fill:#1f2328}
+  @media (prefers-color-scheme: dark){
+    .bg{fill:#0d1117;stroke:#30363d}
+    .h,.big,.lab{fill:#e6edf3}.m,.k,.unit{fill:#8d96a0}.ax{fill:#6e7681}
+    .tile{fill:#161b22}.grid{stroke:#21262d}.base{stroke:#30363d}
+    .ln{stroke:#3987e5}.dot{fill:#3987e5;stroke:#0d1117}.accent{fill:#3987e5}
+    .stop1{stop-color:#3987e5;stop-opacity:.30}.stop2{stop-color:#3987e5;stop-opacity:0}
+  }
+</style>
+<defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="stop1"/><stop offset="1" class="stop2"/></linearGradient></defs>
+<rect class="bg" x="0.5" y="0.5" width="839" height="379" rx="12"/>
+<rect class="accent" x="28" y="28" width="4" height="20" rx="2"/>
+<text class="h" x="42" y="44">智学题库 · 使用情况</text>
+<text class="m" x="812" y="44" text-anchor="end">每天自动更新 · 2026-10-10</text>
+<rect class="tile" x="28.0" y="68" width="250.7" height="96" rx="10"/>
+<text class="k" x="46.0" y="94">安装包下载</text>
+<text x="46.0" y="134"><tspan class="big">41</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text class="m" x="46.0" y="154">电脑版 27 · 手机版 14</text>
+<rect class="tile" x="294.7" y="68" width="250.7" height="96" rx="10"/>
+<text class="k" x="312.7" y="94">近 7 天打开使用</text>
+<text x="312.7" y="134"><tspan class="big">85</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text class="m" x="312.7" y="154">检查更新、下载新题库都算</text>
+<rect class="tile" x="561.3" y="68" width="250.7" height="96" rx="10"/>
+<text class="k" x="579.3" y="94">近 30 天打开使用</text>
+<text x="579.3" y="134"><tspan class="big">85</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text class="m" x="579.3" y="154">统计晚一两天，最近的数会补上</text>
+<text class="k" x="28" y="200">每天打开使用次数</text>
+<line class="base" x1="58" x2="800" y1="336.0" y2="336.0"/>
+<text class="ax" x="48" y="340.0" text-anchor="end">0</text>
+<line class="grid" x1="58" x2="800" y1="275.0" y2="275.0"/>
+<text class="ax" x="48" y="279.0" text-anchor="end">40</text>
+<line class="grid" x1="58" x2="800" y1="214.0" y2="214.0"/>
+<text class="ax" x="48" y="218.0" text-anchor="end">80</text>
+<path d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 293.3 552.7 293.3 C614.5 293.3 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 249.1 800.0 249.1 L800.0 336.0 L58.0 336.0 Z" fill="url(#fill)"/>
+<path class="ln" d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 293.3 552.7 293.3 C614.5 293.3 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 249.1 800.0 249.1"/>
+<text class="ax" x="58.0" y="358" text-anchor="middle">10/2</text>
+<text class="ax" x="181.7" y="358" text-anchor="middle">10/3</text>
+<text class="ax" x="305.3" y="358" text-anchor="middle">10/4</text>
+<text class="ax" x="429.0" y="358" text-anchor="middle">10/5</text>
+<text class="ax" x="552.7" y="358" text-anchor="middle">10/6</text>
+<text class="ax" x="676.3" y="358" text-anchor="middle">10/7</text>
+<text class="ax" x="800.0" y="358" text-anchor="middle">10/8</text>
+<circle class="dot" cx="800.0" cy="249.1" r="5"/>
+<text class="lab" x="792.0" y="237.1" text-anchor="end">57 次</text>
+</svg>
