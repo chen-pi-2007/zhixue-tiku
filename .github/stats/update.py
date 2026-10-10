@@ -7,8 +7,10 @@ README 里的图就是这里画的 SVG。
 记的数（history.csv，一天一行）：
   exe / apk   GitHub Release 里电脑版、手机版安装包累计被下载的次数（所有版本加起来；
               经 ghproxy.net 国内加速下载的也算，因为它是从 GitHub 拉的；QQ 群里直接传的文件统计不到）
-  cdn         当天 jsDelivr 上本仓库文件被请求的次数：国内同学检查更新、热更新都走它，
-              可以看成“当天有多少次在用”的粗略指标（同一台设备一天可能检查好几次）
+  cdn         当天 jsDelivr 上 content.json 被请求的次数：程序每检查一次更新就读一次它，
+              所以就是“国内线路上一共检查了几次更新”（同一台设备一天可能检查好几次；
+              直连得上 GitHub 的设备不走 jsDelivr，统计不到）。不算整个仓库的请求数：
+              下载一次热更新会请求很多个文件，算进去会虚高
 只用 Python 标准库。用法：python update.py <输出目录>（目录里已有 history.csv 就接着记）"""
 import csv
 import datetime
@@ -50,10 +52,11 @@ def release_downloads(token):
 
 
 def cdn_daily():
-    """jsDelivr 最近一个月每天的请求数 {日期: 次数}（它的统计一般晚一两天，最近两天的数会被后面的运行补上）"""
+    """jsDelivr 最近一个月每天 content.json 的请求数 {日期: 次数}（统计一般晚一两天，后面的运行会补上）"""
     try:
-        d = get('https://data.jsdelivr.com/v1/stats/packages/gh/%s?period=month' % REPO)
-        return {k: int(v) for k, v in d['hits']['dates'].items()}
+        files = get('https://data.jsdelivr.com/v1/stats/packages/gh/%s@main/files?period=month' % REPO)
+        f = next((x for x in files if x.get('name') == '/content.json'), None)
+        return {k: int(v) for k, v in f['hits']['dates'].items()} if f else {}
     except Exception as e:
         print('jsDelivr 统计读取失败：%s' % e)
         return {}
@@ -152,8 +155,8 @@ def card(rows, path, today):
 
     # 三个数字
     tiles = [('安装包下载', '%d' % (exe + apk), '次', '电脑版 %d · 手机版 %d' % (exe, apk)),
-             ('近 7 天打开使用', '%d' % last7, '次', '检查更新、下载新题库都算'),
-             ('近 30 天打开使用', '%d' % last30, '次', '统计晚一两天，最近的数会补上')]
+             ('近 7 天检查更新', '%d' % last7, '次', '打开题库会自动检查，一天可能好几次'),
+             ('近 30 天检查更新', '%d' % last30, '次', '国内线路统计，晚一两天才补上')]
     tw, gap, ty = (W - 56 - 2 * 16) / 3.0, 16, 68
     for i, (k, v, u, note) in enumerate(tiles):
         x = 28 + i * (tw + gap)
@@ -164,7 +167,7 @@ def card(rows, path, today):
 
     # 趋势
     cx0, cx1, cy0, cy1 = 58, W - 40, 214, H - 44
-    out.append('<text class="k" x="28" y="200">每天打开使用次数</text>')
+    out.append('<text class="k" x="28" y="200">每天检查更新次数</text>')
     span = days[days.index(nz[0]):] if nz else days[-7:]
     if len(span) < 7:
         first = datetime.datetime.strptime(span[-1] if span else today, '%Y-%m-%d')
