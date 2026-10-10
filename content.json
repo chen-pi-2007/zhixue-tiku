@@ -1,10 +1,10 @@
 {
- "content_version": 32,
- "created": "2026-10-10 17:00:55",
+ "content_version": 33,
+ "created": "2026-10-10 17:19:52",
  "files": {
   "data/bank.json": [
-   "04df5b83b27e7f5d144de83b24479245517f7d03ac272dd31ffa1c855e79c4b5",
-   2560964
+   "bc0f8581a837fc001988aad59ec515778998c1aa473e78b7f533fd8688b02db0",
+   2625258
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "24b6e1c9477bebcbd29915ee2ad5e71c736f6a093d6dc8daa2a40ee3b0002302",
-   118408
+   "2d6ea2de3c11df962dd341b817d024bc3f28eb9242bba4a833695808e03c7d98",
+   118692
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1653,7 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "电脑版 exe 挪了位置也不会丢做题记录：以前把 exe 从带 data 文件夹的地方挪走，会换到新的数据目录、看起来记录全没了；现在会自动找回以前的记录（合并前先备份）。设置里的版本号不再显示「内容第几版」",
+ "notes": "思政 175 道选择题、判断题加上解析：答错时说明选的选项错在哪、正确答案为什么对（答案仍按官方答案文档）",
  "py_shell_api": 1,
- "tag": "content-32"
+ "tag": "content-33"
 }

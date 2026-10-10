@@ -234,13 +234,16 @@ function whyBox(q, selKeys) {
   const rows = [];
   selKeys.filter(k => ans.indexOf(k) < 0).forEach(k => {
     const n = optNote(q, k);
-    rows.push('<div class="why-row bad"><span class="why-k">你选的 ' + esc(k) + '</span><span>' + (n ? rich(n) : rich(text(k)) + '（不对）') + '</span></div>');
+    rows.push('<div class="why-row bad"><span class="why-k">你选的 ' + esc(k) + '</span><span>' + (n ? rich(n) : rich(text(k))) + '</span></div>');
   });
   if (q.type === 'multi') ans.filter(k => selKeys.indexOf(k) < 0).forEach(k => {
     const n = optNote(q, k);
     rows.push('<div class="why-row miss"><span class="why-k">漏选 ' + esc(k) + '</span><span>' + (n ? rich(n) : rich(text(k))) + '</span></div>');
   });
   const okNotes = ans.map(k => optNote(q, k)).filter(Boolean);
+  // 没写选项说明的题，至少把正确答案的内容摆在旁边对照，不只说“不对”
+  if (!okNotes.length) rows.push('<div class="why-row ok"><span class="why-k">正确答案 ' + esc(q.answer) + '</span><span>' +
+    ans.map(k => rich(text(k))).join('；') + '</span></div>');
   if (okNotes.length) rows.push('<div class="why-row ok"><span class="why-k">正确答案 ' + esc(q.answer) + '</span><span>' + okNotes.map(rich).join('；') + '</span></div>');
   return rows.length ? '<div class="why-box"><b>为什么错</b>' + rows.join('') + '</div>' : '';
 }
