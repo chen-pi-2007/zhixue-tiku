@@ -1,6 +1,6 @@
 {
- "content_version": 37,
- "created": "2026-10-10 20:16:42",
+ "content_version": 38,
+ "created": "2026-10-10 21:28:36",
  "files": {
   "data/bank.json": [
    "e22d5b8e876e6521553f84aee8d4f4980723d98307cafca6045510fe1952d2cc",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "038725475fa9dc124575bf54cbc38269794b86e256c38547ac64c3fb73664eac",
-   33716
+   "cc574c0e120c556499f9e06398abb06a0b9cb5b4abbdd963bbdbf94cf05c23c0",
+   45530
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,12 +1587,12 @@
    3586
   ],
   "mobile/local.js": [
-   "930bdfd3b22665650fad86b194f941f9444f4b1f40b89498c45c10e779d85bee",
-   42877
+   "b1cbc629f0af8e9d5031587c550c8d9e01bfb8c9baf0aa7ee07918cf391a9703",
+   62069
   ],
   "server.py": [
-   "dda125dbd1a5c65b9263a0693ff1d4057b1712bd63a1705c2e25f2341dc2c850",
-   23979
+   "41bd4bb4c73040856e2ed0e37df7b64d9fc600331258d5667179641a4d936988",
+   25320
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "78406b231eee39d423a232e69370442fe08ce414df4cdb5245e224d5e8979bb4",
-   120137
+   "3e604cdb725bdeb37ad51a9cfa9423b38c8d3a9ede70e8fe71de6f59ec4a3b21",
+   126224
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,13 +1647,17 @@
    27524
   ],
   "static/style.css": [
-   "9afc2a41e1e6e62746c2ab99edba4d1e07d376877be89a9a95a5354b2081c89a",
-   51268
+   "f1f3def81ca7ed78ccddf2517063cd656f511dc50150113569fe07b447bd2b45",
+   51762
+  ],
+  "sync.py": [
+   "a4883c438614d4583a438a1904f897082bd9ad98b0d8a4886c3810dd77e169d4",
+   9240
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语全部选择题加解析：词汇、语音、图文、交际对话、完形、书面表达每个选项都说明对在哪、错在哪（答案仍按官方答案）",
+ "notes": "账号同步（内测）：电脑和手机的做题记录、错题本、复习进度、模拟考、存档自动合并；本地优先，断网照常使用，联网后自动补传并对账。答错、答对都有解析，英语阅读标出原文依据。",
  "py_shell_api": 1,
- "tag": "content-37"
+ "tag": "content-38"
 }

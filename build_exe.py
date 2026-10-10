@@ -69,6 +69,8 @@ def main():
     tray.make_icon_image(256).save(ico, sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
     bundled = make_content()
     verfile = write_version_file()
+    import make_endpoint                         # 同步服务器地址：混淆后编进 exe（地址文件不进仓库）
+    make_endpoint.write_python(os.path.join(HERE, 'zx_endpoint.py'), make_endpoint.read_url())
     subprocess.check_call([
         sys.executable, '-m', 'PyInstaller', '--noconfirm', '--onefile', '--windowed',
         '--name', NAME, '--icon', ico, '--version-file', verfile,
@@ -76,6 +78,7 @@ def main():
         '--specpath', BUILD,
         '--add-data', '%s%scontent' % (bundled, os.pathsep),
         '--hidden-import', 'llm', '--hidden-import', 'updater', '--hidden-import', 'hotupdate',
+        '--hidden-import', 'sync', '--hidden-import', 'zx_endpoint',
         '--hidden-import', 'pystray._win32',
         # 独立窗口：pywebview 用 WebView2（Edge 内核），靠 pythonnet 调 .NET；把它们的 DLL 一起打进去
         '--collect-all', 'webview', '--collect-all', 'clr_loader', '--collect-all', 'pythonnet',

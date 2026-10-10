@@ -28,7 +28,7 @@ from version import SHELL_API
 
 CONTENT_FILE = 'content.json'
 # 可以热更新的后端代码（顶层模块 / 包名）；外壳模块不在这里
-HOT_PY = ('server', 'db', 'srs', 'exam', 'docparse', 'llm', 'skills')
+HOT_PY = ('server', 'db', 'srs', 'exam', 'docparse', 'llm', 'skills', 'sync')
 # 属于内容的路径（仓库根目录下）；目录以 / 结尾
 INCLUDE = ('static/', 'mobile/local.js', 'data/bank.json', 'data/media/', 'data/skills/') +     tuple(m + '.py' for m in HOT_PY if m != 'skills') + ('skills/',)
 SKIP_NAMES = ('Thumbs.db', 'desktop.ini', '.DS_Store')

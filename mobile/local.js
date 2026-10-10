@@ -46,6 +46,8 @@
         prog.exams = prog.exams || [];
         prog.settings = prog.settings || { new_per_day: 20 };
         if (!prog.settings.exam_date) prog.settings.exam_date = '2026-11-07';
+        ensureIds();
+        syncSchedule(3);           // 登录了同步：打开 App 后同步一次
       });
     }
     return loading;
@@ -262,7 +264,7 @@
     const t = nowStr();
     const r = srsApply(prog.cards[ck(q)], !!correct, t);
     prog.cards[ck(q)] = r[0];
-    prog.attempts.push({ k: ck(q), ok: !!correct, t: t, m: mode });
+    addEvent(prog.attempts, { k: ck(q), ok: !!correct, t: t, m: mode });
     save();
     return { record: Object.assign({}, r[0]), event: r[1] };
   }
@@ -271,6 +273,7 @@
     const q = byId(qid);
     if (!q) return;
     prog.cards[ck(q)] = srsMark(prog.cards[ck(q)], mastered, todayStr());
+    addEvent(prog.marks, { k: ck(q), t: nowStr(), mk: !!mastered });     // 别的设备同步过去后重放用
     save();
   }
 
@@ -375,6 +378,8 @@
     if (window.ZXStore && window.ZXStore.backup) window.ZXStore.backup(JSON.stringify(prog));
     const settings = prog.settings;
     prog = { cards: {}, attempts: [], exams: [], settings: settings, skills: {} };
+    ensureIds();
+    syncDropAccount();          // 清除记录同时退出同步账号，不然服务器上的记录下次又同步回来
     save();
     return '手机本地备份';
   }
@@ -564,7 +569,7 @@
     const [title, minutes, sections] = compose(qs, papers, subject, preset);
     const perms = {};
     sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));
-    const e = { id: nextId(prog.exams), subject: subject, preset: preset, title: title, minutes: minutes,
+    const e = { id: nextId(prog.exams), uid: newUid(), subject: subject, preset: preset, title: title, minutes: minutes,
                 started: nowStr(), finished: '', perms: perms,
                 sections: sections.map(([n, g, pts]) => ({ name: n, keys: g.map(q => q.key), points: pts })) };
     prog.exams.push(e);
@@ -611,7 +616,7 @@
         const bt = byType[q.type] = byType[q.type] || { correct: 0, total: 0 };
         bt.correct += ok ? 1 : 0; bt.total++;
         prog.cards[k] = srsApply(prog.cards[k], ok, t)[0];
-        prog.attempts.push({ k: k, ok: ok, t: t, m: 'exam' });
+        addEvent(prog.attempts, { k: k, ok: ok, t: t, m: 'exam' });
       });
       bySection.push({ name: s.name, correct: sc, total: st, points: pts });
       total += st; correct += sc; gotPts += sc * pts; fullPts += st * pts;
@@ -619,13 +624,413 @@
     Object.assign(e, { answers: given, finished: t, total: total, correct: correct,
                        score: fullPts ? Math.round(1000 * gotPts / fullPts) / 10 : 0,
                        used_seconds: parseInt(used || 0, 10), by_section: bySection, by_type: byType });
+    dirty('exam:' + e.uid);
     save();
     return examView(e, false);
+  }
+
+  /* ---------------------------------------------------------------- 账号同步（内测，对应 db.py「账号同步」和 sync.py）
+     本地优先：做题只写本机，同步在后台跑，失败不影响使用；事件取并集、卡片按事件重放，规则和电脑版一模一样，
+     事件 id、校验值的算法也一样（同一份记录在电脑和手机上算出的 id 相同）。 */
+  const LS_SYNC = /^zx\.(save|auto)\./;
+  const ACC_KEY = 'zx.sync.account';
+
+  // 纯 JS 的 SHA-1 / SHA-256（记录作答是同步调用，用不了异步的 crypto.subtle）
+  function utf8(s) { return unescape(encodeURIComponent(s)); }
+  function hexw(w) { return ('00000000' + (w >>> 0).toString(16)).slice(-8); }
+  function blocks(s) {
+    s = utf8(s);
+    const n = ((s.length + 8) >> 6) + 1, w = new Array(n * 16).fill(0);
+    for (let i = 0; i < s.length; i++) w[i >> 2] |= s.charCodeAt(i) << (24 - (i % 4) * 8);
+    w[s.length >> 2] |= 0x80 << (24 - (s.length % 4) * 8);
+    w[n * 16 - 1] = s.length * 8;
+    return w;
+  }
+  const rol = (x, n) => (x << n) | (x >>> (32 - n));
+  function sha1(s) {
+    const w = blocks(s);
+    let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+    const x = new Array(80);
+    for (let i = 0; i < w.length; i += 16) {
+      let a = h0, b = h1, c = h2, d = h3, e = h4;
+      for (let j = 0; j < 80; j++) {
+        x[j] = j < 16 ? w[i + j] : rol(x[j - 3] ^ x[j - 8] ^ x[j - 14] ^ x[j - 16], 1);
+        const f = j < 20 ? ((b & c) | (~b & d)) + 0x5A827999 : j < 40 ? (b ^ c ^ d) + 0x6ED9EBA1
+          : j < 60 ? ((b & c) | (b & d) | (c & d)) + 0x8F1BBCDC : (b ^ c ^ d) + 0xCA62C1D6;
+        const t = (rol(a, 5) + f + e + x[j]) | 0;
+        e = d; d = c; c = rol(b, 30); b = a; a = t;
+      }
+      h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0; h4 = (h4 + e) | 0;
+    }
+    return [h0, h1, h2, h3, h4].map(hexw).join('');
+  }
+  const K256 = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
+    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+    0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb,
+    0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f,
+    0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+  function sha256(s) {
+    const w = blocks(s);
+    const h = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    const x = new Array(64);
+    const ror = (v, n) => (v >>> n) | (v << (32 - n));
+    for (let i = 0; i < w.length; i += 16) {
+      let [a, b, c, d, e, f, g, hh] = h;
+      for (let j = 0; j < 64; j++) {
+        if (j < 16) x[j] = w[i + j];
+        else {
+          const s0 = ror(x[j - 15], 7) ^ ror(x[j - 15], 18) ^ (x[j - 15] >>> 3);
+          const s1 = ror(x[j - 2], 17) ^ ror(x[j - 2], 19) ^ (x[j - 2] >>> 10);
+          x[j] = (x[j - 16] + s0 + x[j - 7] + s1) | 0;
+        }
+        const t1 = (hh + (ror(e, 6) ^ ror(e, 11) ^ ror(e, 25)) + ((e & f) ^ (~e & g)) + K256[j] + x[j]) | 0;
+        const t2 = ((ror(a, 2) ^ ror(a, 13) ^ ror(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+        hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      [a, b, c, d, e, f, g, hh].forEach((v, k) => { h[k] = (h[k] + v) | 0; });
+    }
+    return h.map(hexw).join('');
+  }
+
+  const msNow = () => Date.now();
+  const newUid = () => Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  function evHash(e) {
+    const base = 'mk' in e ? 'm|' + e.k + '|' + e.t + '|' + (e.mk ? 1 : 0)
+      : 'a|' + e.k + '|' + e.t + '|' + (e.ok ? 1 : 0) + '|' + (e.m || '');
+    return sha1(base).slice(0, 20);
+  }
+  const allEvents = () => prog.attempts.concat(prog.marks);
+  function addEvent(list, e) {
+    const ids = new Set(allEvents().map(x => x.id));
+    const base = evHash(e);
+    let i = base, n = 1;
+    while (ids.has(i)) i = base + '.' + (n++);
+    e.id = i;
+    if (!e.ms) e.ms = msNow();       // 同一秒里的先后（重放排序用，不参与 id）
+    list.push(e);
+  }
+  function ensureIds() {
+    prog.marks = prog.marks || [];
+    prog.bases = prog.bases || {};
+    prog.kv_ls = prog.kv_ls || {};
+    prog.settings_t = prog.settings_t || {};
+    prog.skills = prog.skills || {};
+    prog.skills_t = prog.skills_t || {};
+    prog.sync = prog.sync || {};
+    const seen = new Set();
+    allEvents().forEach(e => {
+      if (e.id && !seen.has(e.id)) { seen.add(e.id); return; }
+      const base = evHash(e);
+      let i = base, n = 1;
+      while (seen.has(i)) i = base + '.' + (n++);
+      e.id = i;
+      seen.add(i);
+    });
+    prog.exams.forEach(x => { if (!x.uid) x.uid = newUid(); });
+  }
+  function dirty(k) { prog.sync.dirty = prog.sync.dirty || {}; prog.sync.dirty[k] = 1; }
+  function tMs(s) {
+    const m = /^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)$/.exec(s || '');
+    return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime() : 0;
+  }
+  function canon(v) {
+    if (v === null || typeof v !== 'object') return JSON.stringify(v);
+    if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+    return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
+  }
+  const cmpTV = (a, b) => a[0] !== b[0] ? a[0] - b[0] : (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0);
+
+  function kvGet(key) {
+    const i = key.indexOf(':'), kind = key.slice(0, i), name = key.slice(i + 1);
+    if (kind === 'set' && name in prog.settings) return [prog.settings_t[name] || 0, prog.settings[name]];
+    if (kind === 'skill' && name in prog.skills) return [prog.skills_t[name] || 0, prog.skills[name]];
+    if (kind === 'exam') {
+      const e = prog.exams.find(x => x.uid === name && x.finished);
+      if (e) { const v = Object.assign({}, e); delete v.id; return [tMs(e.finished), v]; }
+    }
+    if (kind === 'ls' && prog.kv_ls[name]) return prog.kv_ls[name].slice();
+    if (kind === 'base' && prog.bases[name]) { const b = prog.bases[name]; return [b.ms || 0, { card: b.card, at: b.at }]; }
+    return null;
+  }
+  function kvSet(key, t, v) {
+    const i = key.indexOf(':'), kind = key.slice(0, i), name = key.slice(i + 1);
+    if (kind === 'set') { prog.settings[name] = v; prog.settings_t[name] = t; }
+    else if (kind === 'skill') { prog.skills[name] = v; prog.skills_t[name] = t; }
+    else if (kind === 'exam' && v && typeof v === 'object') {
+      const e = prog.exams.find(x => x.uid === name);
+      if (e) { const id = e.id; Object.keys(e).forEach(k => delete e[k]); Object.assign(e, v, { id: id }); }
+      else {
+        prog.exams.push(Object.assign({}, v, { id: nextId(prog.exams), uid: name }));
+        prog.exams.sort((a, b) => (a.started || '').localeCompare(b.started || ''));
+      }
+    } else if (kind === 'ls') prog.kv_ls[name] = [t, v];
+    else if (kind === 'base' && v && typeof v === 'object') { prog.bases[name] = { card: v.card, at: v.at, ms: t }; return name; }
+    return null;
+  }
+  function kvAllKeys() {
+    return Object.keys(prog.settings).map(k => 'set:' + k)
+      .concat(Object.keys(prog.skills).map(k => 'skill:' + k))
+      .concat(prog.exams.filter(e => e.finished).map(e => 'exam:' + e.uid))
+      .concat(Object.keys(prog.kv_ls).map(k => 'ls:' + k))
+      .concat(Object.keys(prog.bases).map(k => 'base:' + k));
+  }
+  function replay(base, evs) {
+    let card = base ? Object.assign({}, base.card) : null;
+    const at = base ? base.at : '';
+    evs.filter(e => e.t > at).sort((a, b) => a.t < b.t ? -1 : a.t > b.t ? 1
+      : (a.ms || 0) !== (b.ms || 0) ? (a.ms || 0) - (b.ms || 0) : (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+      .forEach(e => {
+        if ('mk' in e) card = srsMark(card, !!e.mk, e.t.slice(0, 10));
+        else card = srsApply(card, !!e.ok, e.t)[0];
+      });
+    return card;
+  }
+  function eventsByKey() {
+    const by = {};
+    allEvents().forEach(e => { (by[e.k] = by[e.k] || []).push(e); });
+    return by;
+  }
+  function ensureBases() {
+    const by = eventsByKey();
+    Object.keys(prog.cards).forEach(k => {
+      if (prog.bases[k]) return;
+      const evs = by[k] || [], card = prog.cards[k];
+      if (canon(replay(null, evs)) !== canon(card)) {
+        const at = evs.map(e => e.t).concat([card.last || '']).reduce((m, x) => x > m ? x : m, '');
+        prog.bases[k] = { card: card, at: at, ms: msNow() };
+        dirty('base:' + k);
+      }
+    });
+  }
+  function rebuild(keys) {
+    if (!keys.size) return;
+    const by = eventsByKey();
+    keys.forEach(k => {
+      const c = replay(prog.bases[k], by[k] || []);
+      if (c) prog.cards[k] = c; else delete prog.cards[k];
+    });
+  }
+  function digest() {
+    const ids = allEvents().map(e => e.id).sort();
+    return [ids.length, sha256(ids.join('\n'))];
+  }
+  function mergeEvents(evs) {
+    const byId = {};
+    allEvents().forEach(e => { byId[e.id] = e; });
+    let added = 0;
+    const keys = new Set();
+    (evs || []).forEach(e => {
+      if (!e || !e.id || !e.k || !e.t) return;
+      if (byId[e.id]) { byId[e.id].s = 1; return; }
+      const x = Object.assign({}, e, { s: 1 });
+      ('mk' in x ? prog.marks : prog.attempts).push(x);
+      byId[x.id] = x;
+      added++;
+      keys.add(x.k);
+    });
+    if (added) {
+      const byT = (a, b) => a.t < b.t ? -1 : a.t > b.t ? 1 : 0;
+      prog.attempts.sort(byT);
+      prog.marks.sort(byT);
+    }
+    return [added, keys];
+  }
+  function syncPending() {
+    return allEvents().filter(e => !e.s).length + Object.keys(prog.sync.dirty || {}).length;
+  }
+  function syncOutbox() {
+    const evs = allEvents().filter(e => !e.s).slice(0, 5000).map(e => { const x = Object.assign({}, e); delete x.s; return x; });
+    const kv = {};
+    Object.keys(prog.sync.dirty || {}).forEach(k => {
+      const cur = kvGet(k);
+      if (cur) kv[k] = cur; else delete prog.sync.dirty[k];
+    });
+    return { events: evs, kv: kv, ecursor: prog.sync.ecursor || 0, kcursor: prog.sync.kcursor || 0 };
+  }
+  function syncApply(sent, resp) {
+    const sentIds = new Set(sent.events.map(e => e.id));
+    allEvents().forEach(e => { if (sentIds.has(e.id)) e.s = 1; });
+    const d = prog.sync.dirty = prog.sync.dirty || {};
+    Object.keys(sent.kv).forEach(k => { const cur = kvGet(k); if (!cur || cur[0] === sent.kv[k][0]) delete d[k]; });
+    const [got, keys] = mergeEvents(resp.events);
+    let nkv = 0;
+    Object.keys(resp.kv || {}).forEach(k => {
+      const t = parseInt(resp.kv[k][0] || 0, 10), v = resp.kv[k][1];
+      const cur = kvGet(k);
+      if (cur) {
+        const c = cmpTV([cur[0], canon(cur[1])], [t, canon(v)]);
+        if (c >= 0) { if (c > 0) d[k] = 1; return; }
+      }
+      const hit = kvSet(k, t, v);
+      delete d[k];
+      nkv++;
+      if (hit) keys.add(hit);
+    });
+    rebuild(keys);
+    if ('ecursor' in resp) prog.sync.ecursor = resp.ecursor;
+    if ('kcursor' in resp) prog.sync.kcursor = resp.kcursor;
+    prog.sync.last = nowStr();
+    const [n, h] = digest();
+    save();
+    return { got: got, kv: nkv, match: n === resp.count && h === resp.hash, more: !!resp.more };
+  }
+
+  // ---- 网络和账号
+  function syncEndpoint() {
+    try { const u = localStorage.getItem('zx.sync.url'); if (u) return u.replace(/\/+$/, ''); } catch (e) { /* ignore */ }
+    try { return ((window.ZXStore && ZXStore.syncEndpoint && ZXStore.syncEndpoint()) || '').replace(/\/+$/, ''); } catch (e) { return ''; }
+  }
+  function syncAccount() { try { const a = JSON.parse(localStorage.getItem(ACC_KEY) || 'null'); return a && a.token ? a : null; } catch (e) { return null; } }
+  function syncDropAccount() { try { localStorage.removeItem(ACC_KEY); } catch (e) { /* ignore */ } }
+  class SyncError extends Error { constructor(msg, code) { super(msg); this.code = code || 0; } }
+  async function syncPost(path, body, token) {
+    const url = syncEndpoint();
+    if (!url) throw new SyncError('这个版本没有配置同步服务器');
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 20000);
+    let r;
+    try {
+      r = await fetch(url + path, { method: 'POST', signal: ctl.signal, body: JSON.stringify(body),
+        headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}) });
+    } catch (e) { throw new SyncError('连不上同步服务器，检查一下网络'); }
+    finally { clearTimeout(timer); }
+    let d = {};
+    try { d = await r.json(); } catch (e) { /* ignore */ }
+    if (!r.ok) throw new SyncError(d.error || '服务器返回 ' + r.status, r.status);
+    return d;
+  }
+  const syncState = { running: false, last_ok: '', last_err: '', last_got: 0, fails: 0, timer: null, busy: null };
+  function syncStartAccount() {
+    prog.sync = { ecursor: 0, kcursor: 0, dirty: {} };
+    allEvents().forEach(e => { delete e.s; });
+    ensureBases();
+    kvAllKeys().forEach(dirty);
+    save();
+  }
+  function syncStopAccount() {
+    prog.sync = {};
+    allEvents().forEach(e => { delete e.s; });
+    save();
+  }
+  async function syncOnce() {
+    const a = syncAccount();
+    if (!a) return { skipped: true };
+    if (syncState.busy) return syncState.busy;           // 同一时间只跑一个
+    syncState.busy = (async () => {
+      syncState.running = true;
+      try {
+        let got = 0, reconciled = false;
+        for (let i = 0; i < 50; i++) {
+          const out = syncOutbox();
+          let resp;
+          try { resp = await syncPost('/v1/sync', out, a.token); }
+          catch (e) {
+            if (e.code === 401) { syncDropAccount(); syncStopAccount(); throw new SyncError('登录已失效，请重新登录'); }
+            throw e;
+          }
+          const r = syncApply(out, resp);
+          got += r.got + r.kv;
+          if (r.more || syncPending()) continue;
+          if (r.match || reconciled) break;
+          reconciled = true;                                  // 两边对不上：全量核对一次
+          const ids = (await syncPost('/v1/ids', {}, a.token)).ids || [];
+          const server = new Set(ids), local = new Set();
+          allEvents().forEach(e => { local.add(e.id); if (server.has(e.id)) e.s = 1; else delete e.s; });
+          save();
+          const missing = ids.filter(x => !local.has(x)).sort();
+          for (let j = 0; j < missing.length; j += 2000) {
+            const evs = (await syncPost('/v1/fetch', { ids: missing.slice(j, j + 2000) }, a.token)).events || [];
+            const [n, keys] = mergeEvents(evs);
+            rebuild(keys);
+            save();
+            got += n;
+          }
+        }
+        Object.assign(syncState, { last_ok: nowStr(), last_err: '', last_got: got, fails: 0 });
+        return { got: got };
+      } finally { syncState.running = false; syncState.busy = null; }
+    })();
+    return syncState.busy;
+  }
+  function syncSchedule(sec) {
+    clearTimeout(syncState.timer);
+    if (!syncAccount() || !syncEndpoint()) return;
+    syncState.timer = setTimeout(async () => {
+      try { await syncOnce(); syncSchedule(300); }
+      catch (e) {
+        syncState.fails++;
+        syncState.last_err = e.message || String(e);
+        syncSchedule(Math.min(900, 30 * Math.pow(2, syncState.fails - 1)));
+      }
+    }, sec * 1000);
+  }
+  function syncKick() { if (syncAccount() && !syncState.fails) syncSchedule(10); }
+  function syncStatus() {
+    const a = syncAccount();
+    return { available: !!syncEndpoint(), user: a ? a.user : '', running: syncState.running, last_ok: syncState.last_ok,
+             last_err: syncState.last_err, last_got: syncState.last_got, pending: a ? syncPending() : 0 };
+  }
+  async function syncHandle(method, path, body) {
+    if (method === 'GET' && path === '/api/sync/status') return syncStatus();
+    if (method === 'GET' && path === '/api/sync/ls') return { items: JSON.parse(JSON.stringify(prog.kv_ls)) };
+    if (path === '/api/sync/ls') {
+      const k = String(body.key || ''), t = parseInt(body.t || 0, 10);
+      if (!LS_SYNC.test(k)) return { saved: false };
+      const cur = prog.kv_ls[k];
+      if (cur && cur[0] >= t) return { saved: false };
+      prog.kv_ls[k] = [t, body.v === undefined ? null : body.v];
+      dirty('ls:' + k);
+      save();
+      syncKick();
+      return { saved: true };
+    }
+    try {
+      if (path === '/api/sync/login') {
+        const user = String(body.user || '').trim(), pw = String(body.pass || '');
+        if (!user || !pw) throw new SyncError('请输入用户名和密码');
+        const dev = 'android-' + newUid().slice(0, 6);
+        const r = await syncPost('/v1/login', { user: user, pass: pw, device: dev });
+        localStorage.setItem(ACC_KEY, JSON.stringify({ user: r.user || user, token: r.token, device: dev }));
+        syncStartAccount();
+        syncSchedule(0);
+        return syncStatus();
+      }
+      if (path === '/api/sync/logout') {
+        const a = syncAccount();
+        if (a) { try { await syncPost('/v1/logout', {}, a.token); } catch (e) { /* 断网也能退出 */ } }
+        syncDropAccount();
+        syncStopAccount();
+        clearTimeout(syncState.timer);
+        Object.assign(syncState, { last_ok: '', last_err: '', fails: 0 });
+        return syncStatus();
+      }
+      if (path === '/api/sync/now') {
+        syncState.fails = 0;
+        try { const r = await syncOnce(); syncSchedule(300); return Object.assign(syncStatus(), { result: r }); }
+        catch (e) { syncState.last_err = e.message; throw e; }
+      }
+      if (path === '/api/sync/password') {
+        const a = syncAccount();
+        if (!a) throw new SyncError('还没登录');
+        await syncPost('/v1/password', { old: body.old || '', new: body.new || '' }, a.token);
+        return {};
+      }
+    } catch (e) { throw new Error(e.message); }
+    throw new Error('手机版没有这个功能');
   }
 
   /* ---------------------------------------------------------------- 路由（对应 server.py） */
   async function handle(method, path, qs, body) {
     await load();
+    if (path.indexOf('/api/sync/') === 0) return syncHandle(method, path, body);
+    const out = await handle2(method, path, qs, body);
+    if (method === 'POST') syncKick();              // 改了数据：过 10 秒同步（没登录什么都不做）
+    return out;
+  }
+
+  async function handle2(method, path, qs, body) {
     const arg = (n, d) => qs.get(n) || d || '';
     const iarg = (n, d) => { const v = parseInt(arg(n, String(d || 0)), 10); if (isNaN(v)) throw new Error('参数不对'); return v; };
     if (method === 'GET' && path === '/api/papers') return { papers: listPapers() };
@@ -651,6 +1056,9 @@
       if (/^\d{4}-\d{2}-\d{2}$/.test(String(body.exam_date || ''))) prog.settings.exam_date = body.exam_date;
       if (Array.isArray(body.hidden_subjects))
         prog.settings.hidden_subjects = Array.from(new Set(body.hidden_subjects.map(String).filter(s => /^[\w:-]{1,40}$/.test(s)))).sort();
+      ['new_per_day', 'exam_date', 'hidden_subjects'].forEach(k => {
+        if (k in body) { prog.settings_t[k] = msNow(); dirty('set:' + k); }
+      });
       save();
       return {};
     }
@@ -864,6 +1272,8 @@
       prog = p;
       prog.exams = prog.exams || [];
       prog.settings = prog.settings || { new_per_day: 20 };
+      ensureIds();
+      if (syncAccount()) syncStartAccount();       // 导入的记录也传上去
       save();
     },
   };

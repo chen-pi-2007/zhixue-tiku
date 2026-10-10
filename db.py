@@ -93,6 +93,7 @@ def _load():
     if bank.get('version') != 2:
         _migrate_v1()
     _merge_seed()
+    _ensure_ids()
     return _bank, _prog
 
 
@@ -465,7 +466,7 @@ def record_answer(qid, correct, mode='practice'):
         t = now()
         card, event = srs.apply(_prog['cards'].get(_ck(q)), bool(correct), t)
         _prog['cards'][_ck(q)] = card
-        _prog['attempts'].append({'k': _ck(q), 'ok': bool(correct), 't': t, 'm': mode})
+        _add_event(_prog['attempts'], {'k': _ck(q), 'ok': bool(correct), 't': t, 'm': mode})
         _save_prog()
         return dict(card), event
 
@@ -477,6 +478,8 @@ def mark_mastered(qid, mastered):
         if not q:
             return
         _prog['cards'][_ck(q)] = srs.mark(_prog['cards'].get(_ck(q)), mastered, srs.today_str())
+        # 手动标记也记一条事件：别的设备同步过去后重放，才能得到一样的卡片
+        _add_event(_prog['marks'], {'k': _ck(q), 't': now(), 'mk': bool(mastered)})
         _save_prog()
 
 
@@ -591,6 +594,8 @@ def skill_put(key, value):
     with _lock:
         _load()
         _prog.setdefault('skills', {})[key] = value
+        _prog.setdefault('skills_t', {})[key] = _ms()
+        _dirty('skill:' + key)
         _save_prog()
 
 
@@ -606,7 +611,9 @@ def clear_progress():
         settings = _prog.get('settings', {})
         _prog.clear()
         _prog.update({'cards': {}, 'attempts': [], 'exams': [], 'settings': settings, 'skills': {}})
+        _ensure_ids()
         _save_prog()
+        _logout_hook()
         shutil.rmtree(os.path.join(DATA_DIR, 'skill_work'), ignore_errors=True)
         return backup
 
@@ -615,7 +622,352 @@ def set_setting(name, value):
     with _lock:
         _load()
         _prog['settings'][name] = value
+        _prog.setdefault('settings_t', {})[name] = _ms()
+        _dirty('set:' + name)
         _save_prog()
+
+
+# ---------------------------------------------------------------- 账号同步（内测）
+#
+# 本地优先：所有功能照旧只读写本机的 progress.json，同步是后台把它和服务器对齐，失败了不影响做题。
+# - 事件：作答（attempts）和手动标记（marks）。每条有稳定的 id（内容哈希，内容完全一样的按出现次数加 .1 .2），
+#   各设备取并集；复习卡片由事件按时间重放得出（srs 是纯函数），所以合并后各端卡片一致。
+#   早年迁移来的、对不上重放结果的卡片，记一份“底稿”（bases）：从底稿时间往后重放。
+# - 键值：设置 set:、技能 skill:、模拟考试 exam:<uid>、练习存档 ls:<localStorage 键>、底稿 base:<题目key>。
+#   每个值带写入时间（毫秒），新的覆盖旧的。
+# - _prog['sync']：游标（ecursor、kcursor）和待上传的键（dirty）；已上传的事件带 s=1。
+
+LS_PREFIXES = ('zx.save.', 'zx.auto.')       # 跟着账号走的浏览器存档（存档 / 自动进度）
+on_progress_cleared = []                      # 清除做题记录时回调（sync 模块在这里退出账号）
+
+
+def _ms():
+    return int(time.time() * 1000)
+
+
+def _new_uid():
+    return os.urandom(8).hex()
+
+
+def _ev_hash(e):
+    import hashlib
+    if 'mk' in e:
+        base = 'm|%s|%s|%d' % (e['k'], e['t'], int(bool(e['mk'])))
+    else:
+        base = 'a|%s|%s|%d|%s' % (e['k'], e['t'], int(bool(e.get('ok'))), e.get('m') or '')
+    return hashlib.sha1(base.encode('utf-8')).hexdigest()[:20]
+
+
+def _events():
+    return _prog['attempts'] + _prog['marks']
+
+
+def _add_event(lst, e):
+    ids = set(x.get('id') for x in _events())
+    base = i = _ev_hash(e)
+    n = 1
+    while i in ids:
+        i = '%s.%d' % (base, n)
+        n += 1
+    e['id'] = i
+    e.setdefault('ms', _ms())       # 同一秒里的先后（重放排序用，不参与 id）
+    lst.append(e)
+
+
+def _ensure_ids():
+    for k, v in (('marks', []), ('bases', {}), ('kv_ls', {}), ('settings_t', {}), ('skills_t', {}), ('sync', {})):
+        _prog.setdefault(k, v)
+    seen = set()
+    for e in _events():
+        if e.get('id') and e['id'] not in seen:
+            seen.add(e['id'])
+            continue
+        base = i = _ev_hash(e)
+        n = 1
+        while i in seen:
+            i = '%s.%d' % (base, n)
+            n += 1
+        e['id'] = i
+        seen.add(i)
+    for ex in _prog['exams']:
+        if not ex.get('uid'):
+            ex['uid'] = _new_uid()
+
+
+def _dirty(key):
+    _prog.setdefault('sync', {}).setdefault('dirty', {})[key] = 1
+
+
+def _logout_hook():
+    _prog['sync'] = {}
+    for f in on_progress_cleared:
+        try:
+            f()
+        except Exception:     # noqa: BLE001
+            pass
+
+
+def _t_ms(s):
+    try:
+        return int(time.mktime(time.strptime(s, '%Y-%m-%d %H:%M:%S')) * 1000)
+    except (ValueError, TypeError):
+        return 0
+
+
+def _canon(v):
+    return json.dumps(v, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+
+
+def _kv_get(key):
+    kind, _, name = key.partition(':')
+    if kind == 'set' and name in _prog['settings']:
+        return _prog['settings_t'].get(name, 0), _prog['settings'][name]
+    if kind == 'skill' and name in _prog.get('skills', {}):
+        return _prog['skills_t'].get(name, 0), _prog['skills'][name]
+    if kind == 'exam':
+        e = next((x for x in _prog['exams'] if x.get('uid') == name and x.get('finished')), None)
+        if e:
+            return _t_ms(e['finished']), {k: v for k, v in e.items() if k != 'id'}
+    if kind == 'ls' and name in _prog['kv_ls']:
+        t, v = _prog['kv_ls'][name]
+        return t, v
+    if kind == 'base' and name in _prog['bases']:
+        b = _prog['bases'][name]
+        return b.get('ms', 0), {'card': b['card'], 'at': b['at']}
+    return None
+
+
+def _kv_set(key, t, v):
+    """别的设备写的值（比本机新）落到本机。返回受影响的题目 key（底稿变了要重算卡片）"""
+    kind, _, name = key.partition(':')
+    if kind == 'set':
+        _prog['settings'][name] = v
+        _prog['settings_t'][name] = t
+    elif kind == 'skill':
+        _prog.setdefault('skills', {})[name] = v
+        _prog['skills_t'][name] = t
+    elif kind == 'exam' and isinstance(v, dict):
+        e = next((x for x in _prog['exams'] if x.get('uid') == name), None)
+        if e:
+            eid = e['id']
+            e.clear()
+            e.update(v)
+            e['id'] = eid
+        else:
+            _prog['exams'].append(dict(v, id=_next_id(_prog['exams']), uid=name))
+            _prog['exams'].sort(key=lambda x: x.get('started') or '')
+    elif kind == 'ls':
+        _prog['kv_ls'][name] = [t, v]
+    elif kind == 'base' and isinstance(v, dict):
+        _prog['bases'][name] = {'card': v['card'], 'at': v['at'], 'ms': t}
+        return name
+    return None
+
+
+def _kv_all_keys():
+    keys = ['set:' + k for k in _prog['settings']]
+    keys += ['skill:' + k for k in _prog.get('skills', {})]
+    keys += ['exam:' + e['uid'] for e in _prog['exams'] if e.get('finished')]
+    keys += ['ls:' + k for k in _prog['kv_ls']]
+    keys += ['base:' + k for k in _prog['bases']]
+    return keys
+
+
+def _replay(base, evs):
+    card = dict(base['card']) if base else None
+    at = base['at'] if base else ''
+    for e in sorted((e for e in evs if e['t'] > at), key=lambda e: (e['t'], e.get('ms') or 0, e['id'])):
+        if 'mk' in e:
+            card = srs.mark(card, bool(e['mk']), e['t'][:10])
+        else:
+            card, _ = srs.apply(card, bool(e['ok']), e['t'])
+    return card
+
+
+def _events_by_key():
+    by = {}
+    for e in _events():
+        by.setdefault(e['k'], []).append(e)
+    return by
+
+
+def _ensure_bases():
+    """重放对不上的卡片（早年迁移来的、以前没记事件的手动标记）记一份底稿，免得同步后被重放覆盖掉"""
+    by = _events_by_key()
+    for k, card in _prog['cards'].items():
+        if k in _prog['bases']:
+            continue
+        evs = by.get(k, [])
+        if _replay(None, evs) != card:
+            at = max([e['t'] for e in evs] + [card.get('last') or ''])
+            _prog['bases'][k] = {'card': card, 'at': at, 'ms': _ms()}
+            _dirty('base:' + k)
+
+
+def _rebuild(keys):
+    if not keys:
+        return
+    by = _events_by_key()
+    for k in keys:
+        c = _replay(_prog['bases'].get(k), by.get(k, []))
+        if c:
+            _prog['cards'][k] = c
+        else:
+            _prog['cards'].pop(k, None)
+
+
+def _digest():
+    import hashlib
+    ids = sorted(e['id'] for e in _events())
+    return len(ids), hashlib.sha256('\n'.join(ids).encode('utf-8')).hexdigest()
+
+
+def _merge_events(evs):
+    """把服务器来的事件并进本机（按 id 去重），返回新加的条数和涉及的题目"""
+    by_id = {e['id']: e for e in _events()}
+    added, keys = 0, set()
+    for e in evs or []:
+        if not isinstance(e, dict) or not e.get('id') or not e.get('k') or not e.get('t'):
+            continue
+        if e['id'] in by_id:
+            by_id[e['id']]['s'] = 1
+            continue
+        e = dict(e, s=1)
+        (_prog['marks'] if 'mk' in e else _prog['attempts']).append(e)
+        by_id[e['id']] = e
+        added += 1
+        keys.add(e['k'])
+    if added:
+        _prog['attempts'].sort(key=lambda a: a['t'])
+        _prog['marks'].sort(key=lambda a: a['t'])
+    return added, keys
+
+
+def sync_start_account():
+    """登录了一个账号：游标清零，本机全部事件和键值都要（再）传一遍，服务器按 id 去重"""
+    with _lock:
+        _load()
+        _prog['sync'] = {'ecursor': 0, 'kcursor': 0, 'dirty': {}}
+        for e in _events():
+            e.pop('s', None)
+        _ensure_bases()
+        for k in _kv_all_keys():
+            _dirty(k)
+        _save_prog()
+
+
+def sync_stop_account():
+    with _lock:
+        _load()
+        _prog['sync'] = {}
+        for e in _events():
+            e.pop('s', None)
+        _save_prog()
+
+
+def sync_outbox(limit=5000):
+    with _lock:
+        _load()
+        s = _prog.setdefault('sync', {})
+        evs = [{k: v for k, v in e.items() if k != 's'} for e in _events() if not e.get('s')][:limit]
+        kv = {}
+        for k in list(s.get('dirty', {})):
+            cur = _kv_get(k)
+            if cur:
+                kv[k] = [cur[0], cur[1]]
+            else:
+                s['dirty'].pop(k, None)
+        return {'events': evs, 'kv': kv, 'ecursor': s.get('ecursor', 0), 'kcursor': s.get('kcursor', 0)}
+
+
+def sync_pending():
+    with _lock:
+        _load()
+        return sum(1 for e in _events() if not e.get('s')) + len(_prog.get('sync', {}).get('dirty', {}))
+
+
+def sync_apply(sent, resp):
+    """一次同步请求成功后：标记已上传的，合并服务器回来的。返回 {got, kv, match}"""
+    with _lock:
+        _load()
+        s = _prog.setdefault('sync', {})
+        sent_ids = set(e['id'] for e in sent['events'])
+        for e in _events():
+            if e['id'] in sent_ids:
+                e['s'] = 1
+        dirty = s.setdefault('dirty', {})
+        for k, (t, v) in sent['kv'].items():
+            cur = _kv_get(k)
+            if not cur or cur[0] == t:         # 发出去以后没再改过，就算传完了
+                dirty.pop(k, None)
+        got, keys = _merge_events(resp.get('events'))
+        nkv = 0
+        for k, tv in (resp.get('kv') or {}).items():
+            t, v = int(tv[0] or 0), tv[1]
+            cur = _kv_get(k)
+            if cur and (cur[0], _canon(cur[1])) >= (t, _canon(v)):
+                if (cur[0], _canon(cur[1])) != (t, _canon(v)):
+                    dirty[k] = 1               # 本机的更新：下次传上去
+                continue
+            hit = _kv_set(k, t, v)
+            dirty.pop(k, None)
+            nkv += 1
+            if hit:
+                keys.add(hit)
+        _rebuild(keys)
+        s['ecursor'] = resp.get('ecursor', s.get('ecursor', 0))
+        s['kcursor'] = resp.get('kcursor', s.get('kcursor', 0))
+        s['last'] = now()
+        n, h = _digest()
+        _save_prog()
+        return {'got': got, 'kv': nkv, 'match': (n, h) == (resp.get('count'), resp.get('hash')),
+                'more': bool(resp.get('more'))}
+
+
+def sync_reconcile(server_ids):
+    """全量核对：服务器没有的本机事件标成待上传；返回本机缺的 id（再去服务器取）"""
+    with _lock:
+        _load()
+        server = set(server_ids)
+        local = set()
+        for e in _events():
+            local.add(e['id'])
+            if e['id'] not in server:
+                e.pop('s', None)
+            else:
+                e['s'] = 1
+        _save_prog()
+        return sorted(server - local)
+
+
+def sync_merge_fetched(evs):
+    with _lock:
+        _load()
+        got, keys = _merge_events(evs)
+        _rebuild(keys)
+        _save_prog()
+        return got
+
+
+def ls_all():
+    """跟着账号走的浏览器存档：{localStorage 键: [时间, 值]}（值为 None 表示删掉了）"""
+    with _lock:
+        _load()
+        return json.loads(json.dumps(_prog['kv_ls']))
+
+
+def ls_put(name, t, v):
+    if not name.startswith(LS_PREFIXES):
+        return False
+    with _lock:
+        _load()
+        cur = _prog['kv_ls'].get(name)
+        if cur and cur[0] >= t:
+            return False
+        _prog['kv_ls'][name] = [int(t), v]
+        _dirty('ls:' + name)
+        _save_prog()
+        return True
 
 
 # ---------------------------------------------------------------- 统计
@@ -733,7 +1085,7 @@ def exam_start(subject, preset='standard'):
                 if pm:
                     perms[q['key']] = pm
         eid = _next_id(_prog['exams'])
-        e = {'id': eid, 'subject': subject, 'preset': preset, 'title': title, 'minutes': minutes,
+        e = {'id': eid, 'uid': _new_uid(), 'subject': subject, 'preset': preset, 'title': title, 'minutes': minutes,
              'started': now(), 'finished': '', 'perms': perms,
              'sections': [{'name': n, 'keys': [q['key'] for q in g], 'points': pts} for n, g, pts in sections]}
         _prog['exams'].append(e)
@@ -805,7 +1157,7 @@ def exam_submit(eid, answers, used_seconds=0):
                 # 没作答的题也算错，进复习队列
                 card, _ = srs.apply(_prog['cards'].get(k), ok, t)
                 _prog['cards'][k] = card
-                _prog['attempts'].append({'k': k, 'ok': ok, 't': t, 'm': 'exam'})
+                _add_event(_prog['attempts'], {'k': k, 'ok': ok, 't': t, 'm': 'exam'})
             by_section.append({'name': s['name'], 'correct': sc, 'total': st, 'points': pts})
             total += st
             correct += sc
@@ -815,6 +1167,7 @@ def exam_submit(eid, answers, used_seconds=0):
                   'score': _round(100.0 * got_pts / full_pts, 1) if full_pts else 0,
                   'used_seconds': int(used_seconds or 0), 'by_section': by_section,
                   'by_type': {k: {'correct': v[0], 'total': v[1]} for k, v in by_type.items()}})
+        _dirty('exam:' + e['uid'])
         _save_prog()
         return _exam_view(e, hide=False)
 

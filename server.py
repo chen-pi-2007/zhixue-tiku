@@ -18,6 +18,10 @@ from urllib.parse import urlparse, parse_qs, unquote
 
 import db
 import version
+try:
+    import sync          # 账号同步（1.6.0 起的 exe 才带；老 exe 热更新到这份 server.py 时没有这个模块，同步不可用）
+except ImportError:
+    sync = None
 import docparse
 from skills import service as skill_service
 
@@ -134,6 +138,8 @@ class Handler(BaseHTTPRequestHandler):
         self._body = None
         try:
             self.route(method)
+            if method == 'POST' and sync and not self.path.startswith('/api/sync/'):
+                sync.kick()
         except (ValueError, KeyError, TypeError) as e:     # 参数格式不对、题目或卷子不存在
             msg = e.args[0] if e.args and isinstance(e.args[0], str) else ''
             if not msg or isinstance(e, TypeError) or msg.isascii():
@@ -202,6 +208,33 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # ---- 账号同步（内测）
+    def api_sync(self, method, path):
+        if not sync:
+            return self.send_error_json('这个版本的程序不支持账号同步，请更新程序', 400)
+        try:
+            if method == 'GET' and path == '/api/sync/status':
+                return self.send_json(dict(sync.status(), ok=True))
+            if method == 'GET' and path == '/api/sync/ls':
+                return self.send_json({'ok': True, 'items': db.ls_all()})
+            data = self.read_json_body() if method == 'POST' else {}
+            if path == '/api/sync/login':
+                return self.send_json(dict(sync.login(data.get('user'), data.get('pass')), ok=True))
+            if path == '/api/sync/logout':
+                return self.send_json(dict(sync.logout(), ok=True))
+            if path == '/api/sync/now':
+                return self.send_json(dict(sync.sync_now(), ok=True))
+            if path == '/api/sync/password':
+                return self.send_json(sync.change_password(data.get('old'), data.get('new')))
+            if path == '/api/sync/ls':
+                ok = db.ls_put(str(data.get('key') or ''), int(data.get('t') or 0), data.get('v'))
+                if ok:
+                    sync.kick()
+                return self.send_json({'ok': True, 'saved': ok})
+        except sync.SyncError as e:
+            return self.send_error_json(str(e), 400)
+        return self.send_error_json('不支持的请求', 404)
+
     # ---- API
     def api(self, method, path, qs):
         m = None
@@ -212,6 +245,9 @@ class Handler(BaseHTTPRequestHandler):
 
         if path.startswith('/api/skills'):
             return self.api_skills(method, path)
+
+        if path.startswith('/api/sync/'):
+            return self.api_sync(method, path)
 
         if method == 'GET' and path == '/api/papers':
             return self.send_json({'ok': True, 'papers': db.list_papers()})
@@ -521,6 +557,8 @@ def configured_url():
 def make_server():
     """返回 (server, url)。端口被占用时改用下一个端口。"""
     db.init()
+    if sync:
+        sync.start()
     cfg = load_server_config()
     port = int(cfg.get('port', 8788))
     host = cfg.get('host', '127.0.0.1')

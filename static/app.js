@@ -172,9 +172,47 @@ async function api(path, opts) {
 
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } },
-  del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+  set(k, v) {
+    if (lsSynced(k) && v && typeof v === 'object') v = Object.assign({}, v, { _st: Date.now() });
+    try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ }
+    if (lsSynced(k)) lsPush(k, v);
+  },
+  del(k) {
+    try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+    if (lsSynced(k)) lsPush(k, null);
+  },
 };
+
+/* ---- 账号同步：练习存档（zx.save.*）和自动进度（zx.auto.*）跟着账号走 ----
+   每个值带 _st（写入时间）。本机写了就交给后台存一份（没登录也存，登录后一起传）；
+   打开页面、进练习前把后台里更新的拉回 localStorage。 */
+function lsSynced(k) { return /^zx\.(save|auto)\./.test(k); }
+function lsPush(k, v) {
+  const t = (v && v._st) || Date.now();
+  api('/api/sync/ls', { method: 'POST', body: { key: k, t: t, v: v } }).catch(() => { /* 老版本没有同步：忽略 */ });
+}
+async function lsPull() {
+  let items;
+  try { items = (await api('/api/sync/ls')).items || {}; } catch (e) { return; }
+  Object.keys(items).forEach(k => {
+    if (!lsSynced(k)) return;
+    const [t, v] = items[k];
+    let cur = null;
+    try { cur = JSON.parse(localStorage.getItem(k)); } catch (e) { /* ignore */ }
+    if (t <= ((cur && cur._st) || 0)) return;
+    try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ }
+  });
+}
+// 第一次登录：本机已有的存档都交上去（没有 _st 的老存档按很早的时间算，别的设备有更新的就用别的）
+function lsPushAll() {
+  try {
+    Object.keys(localStorage).filter(lsSynced).forEach(k => {
+      let v = null;
+      try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { return; }
+      if (v && typeof v === 'object') lsPush(k, Object.assign({ _st: 1 }, v));
+    });
+  } catch (e) { /* ignore */ }
+}
 
 const TYPE_NAME = {
   single: '单选题', multi: '多选题', judge: '判断题', qa: '问答题',
@@ -1097,7 +1135,8 @@ function shuffleQuestion(q) {
 
 function openPaperSheet(pid, name) { openModeSheet({ paper_id: pid }, name); }
 
-function openModeSheet(src, name) {
+async function openModeSheet(src, name) {
+  await lsPull();
   const key = saveKeyOf(src);
   const save = store.get(key);
   const auto = store.get(autoKeyOf(key));
@@ -1785,6 +1824,8 @@ async function viewSettings() {
     d = (await api('/api/dashboard')).data;
   } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
   try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库 */ }
+  let sy = null;
+  try { sy = await api('/api/sync/status'); } catch (e) { /* 老版本程序：没有同步 */ }
   state.hidden = d.settings.hidden_subjects || [];
   // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 专业技能 / 其他分组
   const subjOpts = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, note: s.total + ' 题' }));
@@ -1820,6 +1861,8 @@ async function viewSettings() {
     '<div id="upd-out"></div>' +
     '<div class="set-foot">' + (canUpd ? '题库和界面只下载改动的部分，几秒就好；做题记录不会丢。' : '源码运行，用 git pull 更新。') + '</div>' +
 
+    (sy && sy.available ? '<div class="set-group-t">账号同步（内测）</div><div id="sync-box">' + syncBoxHtml(sy) + '</div>' : '') +
+
     '<div class="set-group-t">我的数据</div><div class="set-list">' +
       (a.mobile ? item('保存位置', '本机') : '<div class="set-item set-col"><span class="set-main">保存位置</span><span class="set-sub">' + esc(a.data_dir) + '</span></div>') +
       (a.open_data ? item('打开数据文件夹', '', ' onclick="openDataDir()"', 'set-link') : '') +
@@ -1852,6 +1895,85 @@ async function viewSettings() {
     c.closest('.subj-check').classList.toggle('off', !c.checked);     // 关掉的科目名变灰（老 WebView 不支持 :has，用 class）
     saveHidden();
   }));
+}
+
+function syncStateText(sy) {
+  if (sy.running) return '正在同步…';
+  if (sy.last_err) return '没同步上：' + sy.last_err;
+  if (sy.last_ok) return '已同步 ' + sy.last_ok.slice(5, 16);
+  return '等待同步';
+}
+
+function syncBoxHtml(sy) {
+  if (!sy.user) {
+    return '<div class="set-list"><div class="set-item set-col sync-form">' +
+        '<input class="input" id="sync-user" autocomplete="username" placeholder="用户名">' +
+        '<input class="input" id="sync-pass" type="password" autocomplete="current-password" placeholder="密码">' +
+        '<button class="btn" onclick="syncLogin()">登录</button></div></div>' +
+      '<div class="set-foot">登录后，电脑和手机上的做题记录、错题本、复习进度、模拟考和存档会自动合并。' +
+        '没网也能照常做题，联网后自动补上；同步不成功不影响使用。账号找管理员要。</div>';
+  }
+  return '<div class="set-list">' +
+      '<div class="set-item"><span class="set-main">账号</span><span class="set-val">' + esc(sy.user) + '</span></div>' +
+      '<div class="set-item"><span class="set-main">状态</span><span class="set-val' + (sy.last_err ? ' sync-err' : '') + '">' + esc(syncStateText(sy)) + '</span></div>' +
+      (sy.pending ? '<div class="set-item"><span class="set-main">等待上传</span><span class="set-val">' + sy.pending + ' 条</span></div>' : '') +
+      '<button class="set-item set-link" onclick="syncNow(this)"><span class="set-main">立即同步</span></button>' +
+      '<button class="set-item set-link" onclick="syncPwForm()"><span class="set-main">修改密码</span></button>' +
+      '<button class="set-item set-link set-danger" onclick="syncLogout()"><span class="set-main">退出登录</span></button>' +
+    '</div><div id="sync-pw"></div>' +
+    '<div class="set-foot">做完题会自动同步，每 5 分钟也会同步一次。退出登录不会删本机的做题记录。</div>';
+}
+
+function syncRender(sy) { const b = $('#sync-box'); if (b) b.innerHTML = syncBoxHtml(sy); }
+
+async function syncLogin() {
+  const u = ($('#sync-user') || {}).value || '', p = ($('#sync-pass') || {}).value || '';
+  if (!u.trim() || !p) { toast('请输入用户名和密码', 'bad'); return; }
+  try {
+    const sy = await api('/api/sync/login', { method: 'POST', body: { user: u, pass: p } });
+    lsPushAll();
+    syncRender(sy);
+    toast('登录成功，正在同步', 'good');
+    syncNow();
+  } catch (e) { toast(e.message, 'bad'); }
+}
+
+async function syncNow(btn) {
+  if (btn) btn.disabled = true;
+  syncRender(Object.assign({}, (await api('/api/sync/status').catch(() => ({}))), { running: true }));
+  try {
+    const sy = await api('/api/sync/now', { method: 'POST', body: {} });
+    await lsPull();
+    syncRender(sy);
+    const got = sy.result && sy.result.got;
+    toast(got ? '同步完成，从别的设备拿到 ' + got + ' 条' : '同步完成', 'good');
+  } catch (e) {
+    toast(e.message, 'bad');
+    try { syncRender(await api('/api/sync/status')); } catch (e2) { /* ignore */ }
+  }
+}
+
+function syncPwForm() {
+  const o = $('#sync-pw');
+  if (!o) return;
+  o.innerHTML = '<div class="set-list"><div class="set-item set-col sync-form">' +
+    '<input class="input" id="sync-old" type="password" placeholder="原密码">' +
+    '<input class="input" id="sync-new" type="password" placeholder="新密码（至少 6 位）">' +
+    '<button class="btn" onclick="syncChangePw()">确认修改</button></div></div>';
+}
+
+async function syncChangePw() {
+  try {
+    await api('/api/sync/password', { method: 'POST', body: { old: $('#sync-old').value, new: $('#sync-new').value } });
+    $('#sync-pw').innerHTML = '';
+    toast('密码已修改', 'good');
+  } catch (e) { toast(e.message, 'bad'); }
+}
+
+async function syncLogout() {
+  if (!confirm('退出同步账号？本机的做题记录会保留。')) return;
+  try { syncRender(await api('/api/sync/logout', { method: 'POST', body: {} })); toast('已退出'); }
+  catch (e) { toast(e.message, 'bad'); }
 }
 
 async function saveHidden() {
@@ -2245,6 +2367,7 @@ function applyTheme(pref) {
 
 window.addEventListener('DOMContentLoaded', () => {
   route();
+  lsPull();                 // 别的设备的练习存档（登录了同步才有）
   // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
   api('/api/app').then(a => { if (a.frozen || a.mobile) setTimeout(() => autoCheckUpdate(a), 1500); }).catch(() => {});
 });

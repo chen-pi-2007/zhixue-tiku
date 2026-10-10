@@ -1,19 +1,19 @@
 {
- "version": "1.5.2",
- "notes": "电脑版 exe 挪了位置也不会丢做题记录：以前把 exe 从带 data 文件夹的地方挪走，会换到新的数据目录、看起来记录全没了；现在会自动找回以前的记录（合并前先备份）。设置里的版本号不再显示「内容第几版」",
- "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.5.2",
+ "version": "1.6.0",
+ "notes": "账号同步（内测）：电脑和手机的做题记录、错题本、复习进度、模拟考、存档自动合并；本地优先，断网照常使用，联网后自动补传并对账。答错、答对都有解析，英语阅读标出原文依据。",
+ "page": "https://github.com/chen-pi-2007/zhixue-tiku/releases/tag/v1.6.0",
  "assets": {
   "exe": {
    "name": "zhixue-tiku.exe",
-   "size": 58327251,
-   "sha256": "286a57ab01b770a94b5f523eb19f94ee12f16c2f0dc97b205ec90b84eb6f4b9a",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.2/zhixue-tiku.exe"
+   "size": 58437504,
+   "sha256": "3ec3d0b7a2bc6f2822cff92a04948921ee92c58a4c5bd2e37375a115b92dca2e",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.6.0/zhixue-tiku.exe"
   },
   "apk": {
    "name": "zhixue-tiku.apk",
-   "size": 19398491,
-   "sha256": "f47d5a70dbca4695a89f708f82b930810c8bdb93728e794c1c2ffac7b5b0a87f",
-   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.5.2/zhixue-tiku.apk"
+   "size": 19492699,
+   "sha256": "b52878b79b805b7aaa90bb165c55993023ae3a142decf463fd220fa83617dda2",
+   "url": "https://github.com/chen-pi-2007/zhixue-tiku/releases/download/v1.6.0/zhixue-tiku.apk"
   }
  }
 }

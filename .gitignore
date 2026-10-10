@@ -27,3 +27,9 @@ content/
 
 # 独立窗口（WebView2）的本地存储：主题、翻译开关等
 webview/
+
+# 账号同步：服务器地址和由它生成的混淆代码，不进仓库（见 make_endpoint.py）
+sync_endpoint.txt
+zx_endpoint.py
+data/sync_account.json
+syncserver/sync.db*

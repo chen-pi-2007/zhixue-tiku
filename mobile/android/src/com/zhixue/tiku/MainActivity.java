@@ -340,6 +340,12 @@ public class MainActivity extends Activity {
             return MainActivity.this.appVersion();
         }
 
+        /** 账号同步服务器地址（打包时混淆写进 Endpoint.java，源码里没有） */
+        @JavascriptInterface
+        public String syncEndpoint() {
+            return Endpoint.url();
+        }
+
         /** 热更新第一步：建 content/next/www，把没变的文件从正在用的内容复制过去。
          *  keepJson 是 [[路径, sha256], ...]；复制时算指纹，复制不了或指纹对不上的（文件丢了、坏了）
          *  返回给页面改成下载（JSON 数组）。整个步骤出错返回 null，页面会停下报错。 */

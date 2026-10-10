@@ -126,7 +126,10 @@ def main():
         '--min-sdk-version', '24', '--target-sdk-version', '34',
         '--version-code', str(version_code(APP_VERSION)), '--version-name', APP_VERSION,
         '--java', os.path.join(OUT, 'gen'), res_zip)
-    # 2. 代码
+    # 2. 代码（同步服务器地址混淆后生成 Endpoint.java，地址文件不进仓库）
+    sys.path.insert(0, ROOT)
+    import make_endpoint
+    make_endpoint.write_java(os.path.join(OUT, 'gen', 'com', 'zhixue', 'tiku', 'Endpoint.java'), make_endpoint.read_url())
     classes = os.path.join(OUT, 'classes')
     os.makedirs(classes)
     srcs = glob.glob(os.path.join(android, 'src', '**', '*.java'), recursive=True) + \
