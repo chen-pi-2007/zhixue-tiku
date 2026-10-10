@@ -219,6 +219,9 @@ def upsert_paper(key, name, subject, questions, media_src=None):
             for f in STUDY_FIELDS:                 # 英语题的中文翻译、知识点（只在平时练习显示）
                 if q.get(f):
                     row[f] = q[f]
+            for f in ('same_as', 'section'):       # 学习通卷：原题是哪道（共用做题记录）、老师卷上的大题名
+                if q.get(f):
+                    row[f] = q[f]
             _bank['questions'].append(row)
         if media_src and os.path.isdir(media_src):
             dst = os.path.join(MEDIA_DIR, key)
@@ -261,7 +264,7 @@ def list_papers():
         for p in sorted(_bank['papers'], key=lambda x: (SUBJECTS.index(x.get('subject', 'general'))
                                                           if x.get('subject') in SUBJECTS else 99, x['key'])):
             qs = qmap.get(p['id'], [])
-            cs = [cards[q['key']] for q in qs if q['key'] in cards]
+            cs = [cards[_ck(q)] for q in qs if _ck(q) in cards]
             nmap = {}
             for q in qs:
                 nmap[q['type']] = nmap.get(q['type'], 0) + 1
@@ -285,7 +288,7 @@ def _papers_by_id():
 
 
 def _view(q, papers, hide_answer=False):
-    c = _prog['cards'].get(q['key']) or {}
+    c = _prog['cards'].get(_ck(q)) or {}
     p = papers.get(q['paper_id'], {})
     d = dict(q)
     d['paper_name'] = p.get('name', '')
@@ -341,12 +344,20 @@ def plain_text(t):
             return t
 
 
+def _ck(q):
+    """这道题的做题记录记在哪个 key 下：学习通卷里的题是题库原题的副本（same_as），和原题共用一份记录，
+    在哪边做都算做过这道题，错题本里也只出现一次"""
+    return q.get('same_as') or q['key']
+
+
 def _filter(paper_id=None, subject=None, qtype=None, search=None):
     """没指定卷子和科目时（今日复习、全部随机练、错题本、搜索）跳过不学的科目"""
     papers = _papers_by_id()
     hidden = hidden_subjects() if not (paper_id or subject) else set()
     for q in _bank['questions']:
         if paper_id and q['paper_id'] != paper_id:
+            continue
+        if not paper_id and q.get('same_as'):     # 副本只在打开那张卷子时出现；按科目统计、复习、错题本、搜索都只算原题
             continue
         s = papers.get(q['paper_id'], {}).get('subject')
         if subject and s != subject:
@@ -393,7 +404,7 @@ def _wrong_mix(pool, cards, rnd):
     还不够就用没做过的新题补。阅读这类整组材料题不当陪练，免得一组就把错题挤到一起。"""
     wrong, back, seen, fresh = [], [], [], []
     for q in pool:
-        c = cards.get(q['key'])
+        c = cards.get(_ck(q))
         if c and c['in_wrong']:
             wrong.append(q)
         elif not q['material'] and q['type'] not in SELF_TYPES:
@@ -430,7 +441,7 @@ def practice_set(paper_id=None, scope='all', shuffle=True, seed=None, subject=No
         for q in _filter(paper_id, subject, qtype):
             if not q['answer']:
                 continue
-            c = cards.get(q['key'])
+            c = cards.get(_ck(q))
             if scope == 'wrong' and not (c and c['in_wrong']):
                 continue
             if scope == 'new' and c:
@@ -452,9 +463,9 @@ def record_answer(qid, correct, mode='practice'):
         if not q:
             raise KeyError('题目不存在')
         t = now()
-        card, event = srs.apply(_prog['cards'].get(q['key']), bool(correct), t)
-        _prog['cards'][q['key']] = card
-        _prog['attempts'].append({'k': q['key'], 'ok': bool(correct), 't': t, 'm': mode})
+        card, event = srs.apply(_prog['cards'].get(_ck(q)), bool(correct), t)
+        _prog['cards'][_ck(q)] = card
+        _prog['attempts'].append({'k': _ck(q), 'ok': bool(correct), 't': t, 'm': mode})
         _save_prog()
         return dict(card), event
 
@@ -465,7 +476,7 @@ def mark_mastered(qid, mastered):
         q = next((x for x in _bank['questions'] if x['id'] == qid), None)
         if not q:
             return
-        _prog['cards'][q['key']] = srs.mark(_prog['cards'].get(q['key']), mastered, srs.today_str())
+        _prog['cards'][_ck(q)] = srs.mark(_prog['cards'].get(_ck(q)), mastered, srs.today_str())
         _save_prog()
 
 
@@ -475,7 +486,7 @@ def wrong_list(mastered=0, subject=None):
         papers = _papers_by_id()
         items = []
         for q in _filter(subject=subject):
-            c = _prog['cards'].get(q['key'])
+            c = _prog['cards'].get(_ck(q))
             if not c or not c['wrong']:
                 continue
             if bool(mastered) == bool(c['in_wrong']):
@@ -521,7 +532,7 @@ def review_queue(subject=None, new_limit=None, extra=False):
         for q in _filter(subject=subject):
             if not q['answer']:
                 continue
-            c = cards.get(q['key'])
+            c = cards.get(_ck(q))
             if c:
                 if srs.is_due(c, today):
                     due.append((not c['in_wrong'], c['due'], c['box'], q))
@@ -630,6 +641,8 @@ def dashboard():
         acc = _type_accuracy()
         subj = {}
         for q in _bank['questions']:
+            if q.get('same_as'):                  # 学习通卷里的副本不重复计数
+                continue
             s = papers.get(q['paper_id'], {}).get('subject', 'general')
             d = subj.setdefault(s, {'subject': s, 'total': 0, 'gradable': 0, 'seen': 0, 'right': 0, 'wrong': 0,
                                     'wrong_open': 0, 'due': 0, 'mastery_sum': 0.0, 'types': {}})
@@ -638,7 +651,7 @@ def dashboard():
             t['total'] += 1
             if q['answer']:
                 d['gradable'] += 1
-            c = cards.get(q['key'])
+            c = cards.get(_ck(q))
             if c:
                 d['seen'] += 1
                 t['seen'] += 1
@@ -709,7 +722,8 @@ def exam_start(subject, preset='standard'):
         _load()
         papers = [p for p in _bank['papers'] if p.get('subject') == subject]
         pids = set(p['id'] for p in papers)
-        qs = [q for q in _bank['questions'] if q['paper_id'] in pids and q['type'] in exam_mod.OBJECTIVE]
+        qs = [q for q in _bank['questions'] if q['paper_id'] in pids and q['type'] in exam_mod.OBJECTIVE
+              and not q.get('same_as')]
         title, minutes, sections = exam_mod.compose(qs, papers, subject, preset)
         rng = random.Random()
         perms = {}                       # 选项打乱：题目key -> 显示顺序

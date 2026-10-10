@@ -693,3 +693,11 @@ main.page-in { animation: page-in .22s ease-out; }
 .mcell { display: table-cell; text-align: left; white-space: nowrap; }
 .mcond { padding-left: 1.2em; }
 .math sup, .math sub { font-size: .72em; }
+/* 模拟考试里排序、连线这种共用 A～E 的一组题：选项列一次，每个空一行字母（照老师在学习通上的卷子） */
+.exam-optlist { display: flex; flex-direction: column; gap: 6px; }
+.exam-optline { line-height: 1.6; }
+.exam-q-mini { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 14px; }
+.exam-q-mini .exam-blank { flex: 1; min-width: 120px; color: var(--ink-2); }
+.mini-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt.mini { width: 40px; height: 36px; padding: 0; align-items: center; justify-content: center; font-weight: 600; line-height: 1; }
+.material-body .qimg { display: block; margin: 8px 0; }     /* 材料里的图单独一行，不挤在文字中间 */

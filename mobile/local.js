@@ -109,7 +109,7 @@
   const subjIndex = s => { const i = SUBJECTS.indexOf(s); return i < 0 ? 99 : i; };
 
   function view(q, papers, hideAnswer) {
-    const c = prog.cards[q.key] || {};
+    const c = prog.cards[ck(q)] || {};
     const p = papers[q.paper_id] || {};
     const d = Object.assign({}, q);
     d.paper_name = p.name || '';
@@ -118,7 +118,7 @@
     d.right_count = c.right || 0;
     d.in_wrong = !!c.in_wrong;
     d.mastered = (c.wrong && !c.in_wrong) ? 1 : 0;
-    d.box = prog.cards[q.key] ? (c.box || 0) : null;
+    d.box = prog.cards[ck(q)] ? (c.box || 0) : null;
     d.streak = c.streak || 0;
     d.due = c.due || '';
     if (hideAnswer) {
@@ -148,10 +148,14 @@
     }
   }
 
+  // 做题记录记在哪个 key 下：学习通卷里的题是原题的副本（same_as），和原题共用一份记录（同 db.py 的 _ck）
+  function ck(q) { return q.same_as || q.key; }
+
   function filter(paperId, subject, qtype, search) {
     const papers = papersById();
     const hidden = (paperId || subject) ? new Set() : hiddenSubjects();
     return bank.questions.filter(q => {
+      if (!paperId && q.same_as) return false;      // 学习通卷里的副本只在打开那张卷子时出现（同 db.py）
       if (paperId && q.paper_id !== paperId) return false;
       const s = (papers[q.paper_id] || {}).subject;
       if (subject && s !== subject) return false;
@@ -168,7 +172,7 @@
     return bank.papers.slice().sort((a, b) => subjIndex(a.subject || 'general') - subjIndex(b.subject || 'general') ||
                                               (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)).map(p => {
       const qs = qmap[p.id] || [];
-      const cs = qs.filter(q => prog.cards[q.key]).map(q => prog.cards[q.key]);
+      const cs = qs.filter(q => prog.cards[ck(q)]).map(q => prog.cards[ck(q)]);
       const counts = {};
       qs.forEach(q => { counts[q.type] = (counts[q.type] || 0) + 1; });
       return {
@@ -211,7 +215,7 @@
     let wrong = [];
     const back = [], seen = [], fresh = [];
     pool.forEach(q => {
-      const c = prog.cards[q.key];
+      const c = prog.cards[ck(q)];
       if (c && c.in_wrong) wrong.push(q);
       else if (!q.material && SELF.indexOf(q.type) < 0) {
         if (!c) fresh.push([0, Math.random(), q]);
@@ -239,7 +243,7 @@
     let items = [];
     filter(paperId, subject, qtype).forEach(q => {
       if (!q.answer) return;
-      const c = prog.cards[q.key];
+      const c = prog.cards[ck(q)];
       if (scope === 'wrong' && !(c && c.in_wrong)) return;
       if (scope === 'new' && c) return;
       items.push(view(q, papers));
@@ -256,9 +260,9 @@
     const q = byId(qid);
     if (!q) throw new Error('题目不存在');
     const t = nowStr();
-    const r = srsApply(prog.cards[q.key], !!correct, t);
-    prog.cards[q.key] = r[0];
-    prog.attempts.push({ k: q.key, ok: !!correct, t: t, m: mode });
+    const r = srsApply(prog.cards[ck(q)], !!correct, t);
+    prog.cards[ck(q)] = r[0];
+    prog.attempts.push({ k: ck(q), ok: !!correct, t: t, m: mode });
     save();
     return { record: Object.assign({}, r[0]), event: r[1] };
   }
@@ -266,7 +270,7 @@
   function markMastered(qid, mastered) {
     const q = byId(qid);
     if (!q) return;
-    prog.cards[q.key] = srsMark(prog.cards[q.key], mastered, todayStr());
+    prog.cards[ck(q)] = srsMark(prog.cards[ck(q)], mastered, todayStr());
     save();
   }
 
@@ -274,7 +278,7 @@
     const papers = papersById();
     const items = [];
     filter(null, subject).forEach(q => {
-      const c = prog.cards[q.key];
+      const c = prog.cards[ck(q)];
       if (!c || !c.wrong) return;
       if (!!mastered === !!c.in_wrong) return;
       const d = view(q, papers);
@@ -327,7 +331,7 @@
     const due = [], fresh = {}, ahead = [];
     filter(null, subject).forEach(q => {
       if (!q.answer) return;
-      const c = prog.cards[q.key];
+      const c = prog.cards[ck(q)];
       if (c) {
         if (isDue(c, today)) due.push([c.in_wrong ? 0 : 1, c.due, c.box, q]);
         else if (SELF.indexOf(q.type) < 0) ahead.push([c.in_wrong ? 0 : 1, c.box, c.due, q]);
@@ -389,13 +393,14 @@
     const acc = typeAccuracy();
     const subj = {};
     bank.questions.forEach(q => {
+      if (q.same_as) return;                         // 学习通卷里的副本不重复计数
       const s = (papers[q.paper_id] || {}).subject || 'general';
       const d = subj[s] = subj[s] || { subject: s, total: 0, gradable: 0, seen: 0, right: 0, wrong: 0, wrong_open: 0, due: 0, mastery_sum: 0, types: {} };
       d.total++;
       const t = d.types[q.type] = d.types[q.type] || { type: q.type, total: 0, seen: 0, mastery_sum: 0 };
       t.total++;
       if (q.answer) d.gradable++;
-      const c = prog.cards[q.key];
+      const c = prog.cards[ck(q)];
       if (c) {
         d.seen++; t.seen++;
         d.right += c.right; d.wrong += c.wrong;
@@ -453,11 +458,14 @@
     chinese: { standard: { title: '语文 模拟卷（客观题）', minutes: 40, sections: [
       ['基础知识', '', ['single'], 6], ['现代文阅读', '', ['reading'], 10], ['古诗文阅读', '', ['poem'], 4]] } },
     math: { standard: { title: '数学 模拟卷（选择题）', minutes: 30, sections: [['单项选择题', '', ['single'], 13]] } },
+    // 英语照老师在学习通上组的试卷6（同 exam.py）：单选题 35（语音 5、词汇语法 20、图文 10 混在一起）、
+    // 排序题 3 组（补全对话、书面表达、信息匹配）、连线题 1 组（问答配对）、完形 1 篇、阅读理解 4 篇 35 分
     english: { standard: { title: '英语 模拟卷', minutes: 60, sections: [
-      ['语音辨析', 'english-phonetics', ['single'], 5, 1], ['词汇与语法', 'english-vocab', ['single'], 20, 1],
-      ['图文理解', 'english-picture', ['single'], 10, 1], ['交际对话', 'english-dialogue', ['single'], 10, 1],
-      ['书面表达', 'english-writing', ['single'], 5, 1], ['阅读匹配', 'english-reading', ['single'], 5, 1, 'match'],
-      ['完形填空', 'english-cloze', ['single'], 10, 1], ['阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp']] } },
+      ['单选题', [['english-phonetics', 5, null], ['english-vocab', 20, null], ['english-picture', 10, null]], ['single'], 35, 1],
+      ['排序题', [['english-dialogue', 5, 'fill'], ['english-writing', 5, null], ['english-reading', 5, 'match']], ['single'], 15, 1],
+      ['连线题', 'english-dialogue', ['single'], 5, 1, 'pair'],
+      ['完形填空', 'english-cloze', ['single'], 10, 1],
+      ['阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp']] } },
     media: { standard: { title: '数字媒体理论 模拟卷', minutes: 60, sections: [
       ['单项选择题', '', ['single'], 30], ['多项选择题', '', ['multi'], 10], ['判断题', '', ['judge'], 20]] } },
   };
@@ -496,11 +504,28 @@
     const used = new Set();
     const sections = [];
     const isMatch = q => (q.options || []).length >= 5;
+    const keep = (q, filt) => {
+      if (!filt) return true;
+      if (filt === 'match' || filt === 'comp') return (filt === 'match') === isMatch(q);
+      if (filt === 'pair') return (q.material || '').indexOf('问答配对') >= 0;
+      if (filt === 'fill') return (q.material || '').indexOf('补全对话') >= 0;
+      return true;
+    };
     bp.sections.forEach(([name, prefix, types, count, points, filt]) => {
-      const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) && (pkey[q.paper_id] || '').indexOf(prefix) === 0 &&
-                                          (!filt || (filt === 'match') === isMatch(q)));
-      const got = pick(pool, count);
-      got.forEach(q => used.add(q.id));
+      const parts = Array.isArray(prefix) ? prefix : [[prefix, count, filt]];
+      let got = [];
+      parts.forEach(([pfx, cnt, flt]) => {
+        const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) &&
+                                            (pkey[q.paper_id] || '').indexOf(pfx) === 0 && keep(q, flt));
+        const part = pick(pool, cnt);
+        part.forEach(q => used.add(q.id));
+        got = got.concat(part);
+      });
+      if (Array.isArray(prefix)) {                    // 几处抽来的混在一起（整组的按组打乱，组内顺序不变）
+        const us = units(got);
+        shuffle(us);
+        got = [].concat.apply([], us);
+      }
       if (got.length) sections.push([name, got, points || 1]);
     });
     if (!sections.length) throw new Error('题库里没有可用于组卷的客观题');
@@ -510,6 +535,7 @@
   function shufflePerm(q) {
     const opts = q.options || [];
     if (q.type === 'judge' || opts.length < 2) return null;
+    if (q.material && opts.length >= 5) return null;     // 一组题共用 A～E（排序、连线）：不打乱（同 exam.py）
     if (opts.some(o => NO_SHUFFLE.test((o[1] || '').trim()))) return null;
     return shuffle(opts.map((_, i) => i));
   }
@@ -534,7 +560,7 @@
   function examStart(subject, preset) {
     const papers = bank.papers.filter(p => p.subject === subject);
     const pids = new Set(papers.map(p => p.id));
-    const qs = bank.questions.filter(q => pids.has(q.paper_id) && OBJECTIVE.indexOf(q.type) >= 0);
+    const qs = bank.questions.filter(q => pids.has(q.paper_id) && OBJECTIVE.indexOf(q.type) >= 0 && !q.same_as);
     const [title, minutes, sections] = compose(qs, papers, subject, preset);
     const perms = {};
     sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));

@@ -1,10 +1,10 @@
 {
- "content_version": 30,
- "created": "2026-10-10 16:01:09",
+ "content_version": 31,
+ "created": "2026-10-10 16:49:51",
  "files": {
   "data/bank.json": [
-   "5a6cea426a52d9ab4cdb999d88f9c22acc81c349dcec3c5b9d5734534cd4cf6a",
-   1901581
+   "04df5b83b27e7f5d144de83b24479245517f7d03ac272dd31ffa1c855e79c4b5",
+   2560964
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,24 +1571,24 @@
    17784
   ],
   "db.py": [
-   "26a580f1726d7b9e897a5b36c2c7ea7b731246de5b9339dea7bbdd7c7d892d6f",
-   33724
+   "43bcfff42a11dc8396d70fd04f09b34660e0a17071c66e9ce66779659b92420a",
+   34516
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
    15673
   ],
   "exam.py": [
-   "4790d5a2359a4d67b956cf2aa56e22d63c5ce16aeab33b36184eef48b0e3ee15",
-   7405
+   "208249d0916095c46a667e9a9bcc0b70683453e66a68ea656f6e39e2ef4446e1",
+   8846
   ],
   "llm.py": [
    "3a73611c437237d01d5d89a1d2524a8a01201acd2fb7999cbeefdbfe762184ff",
    3586
   ],
   "mobile/local.js": [
-   "814ad2520e4c5b9e33af19b3fedb9a9eb10c328984af99c253cab3dbeb92f2e0",
-   42139
+   "b01662ff19f67cf9fedd050057fb8d1105ec64d857d86eb80c0e5bf138986a6c",
+   43735
   ],
   "server.py": [
    "dda125dbd1a5c65b9263a0693ff1d4057b1712bd63a1705c2e25f2341dc2c850",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "71e62ed7865b87d71cca165a36e96171f9bdf9576a32f03fbc60f3563cfed8af",
-   115851
+   "f0e8135f81c2d15a091be3c917e07137937f605b6160fe48f78d8ac86a5aea8c",
+   118483
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,13 +1647,13 @@
    27524
   ],
   "static/style.css": [
-   "2f68b83d373378ab12b086997b8a65d7f03c9d874302b1124270a47f62f2ab64",
-   49986
+   "fd2e4fcb41466f7771f8d9a287adb830cf9eb734e675d39db09cfe78a1608468",
+   50732
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "电脑上也能双击选项确认答案、点绿色的正确答案进入下一题；设置挪到右上角的齿轮（和手机一样），左边导航只留做题的页面",
+ "notes": "英语加入老师在学习通上组的 5 套练习卷（在英语卷子列表里，和原题共用做题记录）；英语模拟考试改成和老师的卷子一样：单选题 35、排序题 3 组、连线题 1 组、完形填空、阅读理解 4 篇，排序/连线的选项只列一次；补上交际对话第 23 组；做题时翻到新题 0.6 秒内点选项不算，防止连点误选",
  "py_shell_api": 1,
- "tag": "content-30"
+ "tag": "content-31"
 }

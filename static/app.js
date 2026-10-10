@@ -1151,6 +1151,7 @@ function statsHtml(p) {
 function renderQ() {
   const p = state.practice;
   const q = p.list[p.idx];
+  if (p.shownIdx !== p.idx) { p.shownIdx = p.idx; p.shownAt = Date.now(); }   // 换到新题的时间（optTap 防误触用）
   const opts = optionList(q);
   const pct = Math.round(100 * p.idx / p.list.length);
   const again = p.idx >= p.firstTotal;
@@ -1225,10 +1226,13 @@ function optTap(btn) {
   const p = state.practice;
   if (!p) return;
   if (p.answered) {
-    if (btn.classList.contains('ok')) nextQ();
+    // 只有点绿色的正确答案才进下一题；刚判完 0.8 秒内不算（双击时多出来的一下、手抖，不至于直接跳走看不到解析）
+    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 800) nextQ();
     return;
   }
   const now = Date.now();
+  // 新题刚出来 0.6 秒内点选项不算：点正确答案翻页时手指多点了一下，不会直接点到下一题的选项上
+  if (now - (p.shownAt || 0) < 600) { lastTap = { btn: null, t: 0 }; return; }
   const dbl = lastTap.btn === btn && now - lastTap.t < 400;
   lastTap = { btn: dbl ? null : btn, t: now };
   if (!dbl) return pickOpt(btn);
@@ -1280,6 +1284,7 @@ function gradeAndShow(selKeys, replay) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
+  p.gradedAt = Date.now();
   $('.qcard-main').classList.add('answered');
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
@@ -1472,6 +1477,11 @@ function abandonExam() {
   route();
 }
 
+// 考试里的材料：去掉题库里的“第N组 / 第N篇”编号（在这张卷子里没意义）
+function examMat(q) {
+  return materialBox(Object.assign({}, q, { material: q.material.replace(/^第\d+[组篇]\s*/, '') }));
+}
+
 function renderExamRun() {
   const st = store.get('quiz.exam');
   if (!st) { location.hash = '#/exam'; return; }
@@ -1486,16 +1496,36 @@ function renderExamRun() {
       '<button class="btn sm" onclick="submitExam(false)">交卷</button>' +
     '</div>' +
     '<div class="exam-layout"><div class="exam-main">' +
-    e.sections.map(sec => {
+    e.sections.map((sec, si) => {
       let lastMat = null;
-      return '<div class="sec-title">' + esc(sec.name) + '<span class="muted"> · ' + sec.items.length + ' 题' +
-        (sec.points && sec.points !== 1 ? '，每题 ' + fmtPts(sec.points) + ' 分' : '') + '</span></div>' +
-        sec.items.map(q => {
+      // 和老师在学习通上组的卷子一样：「一、单选题（共 35 题，35 分）」，共用一段材料的一组算一道题
+      const groups = new Set(sec.items.map(q => q.material ? 'm' + q.material : 'q' + q.id)).size;
+      const total = Math.round(sec.items.length * (sec.points || 1) * 10) / 10;
+      return '<div class="sec-title">' + '一二三四五六七八九十'.charAt(si) + '、' + esc(sec.name) +
+        '<span class="muted">（共 ' + groups + ' 题，' + fmtPts(total) + ' 分' +
+        (groups !== sec.items.length ? '，' + sec.items.length + ' 个空 / 小题' : '') +
+        (sec.points && sec.points !== 1 ? '，每小题 ' + fmtPts(sec.points) + ' 分' : '') + '）</span></div>' +
+        sec.items.map((q, qi) => {
           n++;
           allItems.push({ q: q, n: n });
-          const mat = q.material && q.material !== lastMat ? materialBox(q) : '';
+          const first = q.material && q.material !== lastMat;
           lastMat = q.material;
           const opts = optionList(q);
+          // 排序、连线这种一组题共用同一套 A～E：像老师卷一样，选项只列一次，每个空一行字母
+          const grp = q.material ? sec.items.filter(x => x.material === q.material) : [q];
+          const shared = grp.length > 1 && opts.length >= 5 &&
+            grp.every(x => JSON.stringify(optionList(x)) === JSON.stringify(opts));
+          if (shared) {
+            const inPic = opts.every(o => /见材料/.test(o[1]));       // 选项在材料的图里，不再列一遍
+            return (first ? examMat(q) + (inPic ? '' : '<div class="card exam-optlist">' + opts.map(o =>
+                '<div class="exam-optline"><b>' + esc(o[0]) + '.</b> ' + rich(o[1]) + '</div>').join('') + '</div>') : '') +
+              '<div class="card exam-q exam-q-mini" id="eq' + q.id + '">' +
+                '<span class="qno">' + n + '</span><span class="exam-blank">' + esc(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
+                '<span class="mini-opts">' + opts.map(o =>
+                  '<button class="opt mini" data-q="' + q.id + '" data-k="' + esc(o[0]) + '" onclick="examPick(' + q.id + ',\'' + esc(o[0]) + '\',false)">' + esc(o[0]) + '</button>').join('') +
+                '</span></div>';
+          }
+          const mat = first ? examMat(q) : '';
           return mat + '<div class="card exam-q" id="eq' + q.id + '">' +
             '<div class="qhead"><span class="qno">' + n + '</span><span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span></div>' +
             '<div class="stem">' + rich(q.stem) + '</div>' +

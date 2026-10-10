@@ -67,24 +67,48 @@ class ExamTest(unittest.TestCase):
         self.assertEqual(len(got), 10)
         self.assertEqual(len(set(x['material'] for x in got)), 2)
 
-    def test_compose_english_sections_by_paper_prefix(self):
-        papers = [{'id': 1, 'key': 'english-vocab'}, {'id': 2, 'key': 'english-phonetics'}]
-        qs = [q(i, pid=1) for i in range(1, 31)] + [q(i, pid=2) for i in range(31, 41)]
-        title, minutes, secs = exam.compose(qs, papers, 'english')
-        d = dict((n, g) for n, g, _ in secs)
-        self.assertEqual(len(d['语音辨析']), 5)
-        self.assertTrue(all(x['paper_id'] == 2 for x in d['语音辨析']))
-        self.assertEqual(len(d['词汇与语法']), 20)
-
-    def test_compose_reading_match_and_comp_split(self):
-        papers = [{'id': 1, 'key': 'english-reading'}]
+    def test_compose_english_like_teacher_paper(self):
+        # 照老师在学习通上组的试卷6：单选 35（语音 5 + 词汇 20 + 图文 10 混在一起）、排序 3 组、连线 1 组、完形 1 篇、阅读 4 篇
+        papers = [{'id': i, 'key': k} for i, k in enumerate(
+            ['english-phonetics', 'english-vocab', 'english-picture', 'english-dialogue', 'english-writing',
+             'english-reading', 'english-cloze'], 1)]
         five = [['A', 'a'], ['B', 'b'], ['C', 'c'], ['D', 'd'], ['E', 'e']]
-        qs = [dict(q(i, pid=1, mat='M%d' % (i // 5)), options=five) for i in range(0, 10)] +              [dict(q(i, pid=1, mat='N%d' % (i // 5)), options=five[:3]) for i in range(10, 40)]
-        title, minutes, secs = exam.compose(qs, papers, 'english')
-        d = dict((n, (g, p)) for n, g, p in secs)
-        self.assertTrue(all(len(x['options']) == 5 for x in d['阅读匹配'][0]))
+        qs, n = [], [0]
+
+        def add(pid, count, mat=None, opts=None, t='single'):
+            for k in range(count):
+                n[0] += 1
+                x = q(n[0], pid=pid, t=t, mat=(mat % (k // 5)) if mat else '')
+                if opts:
+                    x['options'] = opts
+                qs.append(x)
+        add(1, 10)
+        add(2, 40)
+        add(3, 20)
+        add(4, 20, mat='问答配对 %d')
+        add(4, 20, mat='补全对话 %d')
+        add(5, 15, mat='书面表达 %d', opts=five)
+        add(6, 15, mat='匹配 %d', opts=five)
+        add(6, 40, mat='阅读 %d', opts=five[:3])
+        for k in range(20):
+            n[0] += 1
+            qs.append(q(n[0], pid=7, mat='完形 %d' % (k // 10)))
+        title, minutes, secs = exam.compose(qs, papers, 'english', seed=3)
+        self.assertEqual([s[0] for s in secs], ['单选题', '排序题', '连线题', '完形填空', '阅读理解'])
+        d = dict((name, (g, pts)) for name, g, pts in secs)
+        src = lambda g: sorted(x['paper_id'] for x in g)
+        self.assertEqual(src(d['单选题'][0]), [1] * 5 + [2] * 20 + [3] * 10)
+        self.assertNotEqual([x['paper_id'] for x in d['单选题'][0]], src(d['单选题'][0]))     # 混在一起，不是按来源排
+        sort_g = d['排序题'][0]
+        self.assertEqual(len(sort_g), 15)
+        self.assertEqual(len({x['material'] for x in sort_g}), 3)
+        self.assertTrue(any('补全对话' in x['material'] for x in sort_g))
+        self.assertTrue(all('问答配对' in x['material'] for x in d['连线题'][0]))
+        self.assertEqual(len(d['连线题'][0]), 5)
+        self.assertEqual(len(d['完形填空'][0]), 10)
         self.assertTrue(all(len(x['options']) == 3 for x in d['阅读理解'][0]))
-        self.assertEqual((d['阅读匹配'][1], d['阅读理解'][1]), (1, 1.75))
+        total = sum(len(g) * pts for g, pts in d.values())
+        self.assertEqual(round(total, 2), 100)
 
     def test_shuffle_skips_unsafe_options(self):
         import random
@@ -192,6 +216,28 @@ class DbFlowTest(unittest.TestCase):
         for kw in ('q=1/2', 'c=√3', '(−2−2)/2'):
             self.assertEqual(db.get_questions(search=kw, subject='math')[1], 1, kw)
         self.assertEqual(db.plain_text(r'\(\frac{\sqrt{3}}{2}\)'), '√3/2')
+
+    def test_teacher_paper_copies_share_progress(self):
+        # 学习通卷里的题是原题的副本（same_as）：在哪边做都记在原题上，错题本、统计、搜索、考试只算一次
+        db.upsert_paper('english-vocab', '词汇', 'english',
+                        [{'type': 'single', 'stem': 'v%d' % i, 'options': [['A', '1'], ['B', '2']], 'answer': 'A'}
+                         for i in range(1, 4)])
+        db.upsert_paper('english-xxt-6', '学习通卷6', 'english',
+                        [{'type': 'single', 'stem': 'v%d' % i, 'options': [['A', '1'], ['B', '2']], 'answer': 'A',
+                          'same_as': 'english-vocab#%d' % i, 'section': '单选题'} for i in (3, 1)])
+        papers = {p['key']: p for p in db.list_papers()}
+        copy = db.get_questions(paper_id=papers['english-xxt-6']['id'])[0]
+        self.assertEqual([x['stem'] for x in copy], ['v3', 'v1'])
+        db.record_answer(copy[0]['id'], False)                           # 在学习通卷里做错 v3
+        orig = {x['stem']: x for x in db.get_questions(paper_id=papers['english-vocab']['id'])[0]}
+        self.assertEqual((orig['v3']['wrong_count'], orig['v3']['in_wrong']), (1, True))
+        self.assertEqual([x['stem'] for x in db.wrong_list(0, subject='english')], ['v3'])     # 只出现一次
+        self.assertEqual(db.get_questions(subject='english', search='v3')[1], 1)
+        eng = next(x for x in db.dashboard()['subjects'] if x['subject'] == 'english')
+        self.assertEqual(eng['total'], 3)
+        db.record_answer(orig['v1']['id'], True)                          # 在原题做对 v1，学习通卷里也算做过
+        copy = {x['stem']: x for x in db.get_questions(paper_id=papers['english-xxt-6']['id'])[0]}
+        self.assertEqual(copy['v1']['right_count'], 1)
 
     def test_exam_flow_records_wrong(self):
         e = db.exam_start('politics')

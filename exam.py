@@ -11,13 +11,16 @@ import re
 
 OBJECTIVE = ('single', 'multi', 'judge', 'reading', 'poem')
 
-# 科目 -> 预设 -> {title, minutes, sections: [(小节名, 卷子key前缀, 题型列表, 题数[, 每题分值[, 筛选]])]}
-# 卷子key前缀为 '' 表示该科目全部卷子；每题分值不写就是 1 分；成绩 = 得分 / 总分 × 100
-# 英语、思政的结构和分值照老师在学习通上组的练习卷（学测/_学习通/）：
-#   英语：单选 35（语音 5、词汇语法 20、图文 10）每题 1 分；对话 2 组、书面表达 1 组、阅读匹配 1 组每空 1 分；
-#         完形 1 篇 10 空每空 1 分；阅读理解 4 篇共 35 分（每题 1.75 分），合计 100 分
+# 科目 -> 预设 -> {title, minutes, sections: [(小节名, 来源, 题型列表, 题数[, 每题分值[, 筛选]])]}
+# 来源：卷子key前缀（'' 表示该科目全部卷子），或者 [(前缀, 题数, 筛选), ...] 从几处各抽一些、混在一起（题目顺序打乱）；
+# 每题分值不写就是 1 分；成绩 = 得分 / 总分 × 100
+# 英语、思政的结构和分值照老师在学习通上组的练习卷（学测/_学习通/，英语照最新的试卷6）：
+#   英语：一、单选题 35（语音 5、词汇语法 20、图文理解 10，混在一起）每题 1 分；
+#         二、排序题 3 组（补全对话、书面表达、信息匹配各 1 组）每空 1 分；三、连线题 1 组（问答配对）每空 1 分；
+#         四、完形填空 1 篇 10 空每空 1 分；五、阅读理解 4 篇共 35 分（每题 1.75 分），合计 100 分
 #   思政：单选 20 共 56.5 分，多选 5 共 14.5 分，判断 10 共 29 分
-# 筛选：'match' 只要 5 个选项的配对题（阅读里“为每个人选择合适的……”那种），'comp' 只要其余的阅读题
+# 筛选：'match' 阅读里 5 个选项的配对题（“为每个人选择合适的……”），'comp' 其余的阅读题；
+#       'pair' 交际对话里的问答配对（连线），'fill' 交际对话里的补全对话
 BLUEPRINTS = {
     'politics': {
         'standard': {'title': '思想政治 模拟卷', 'minutes': 45, 'sections': [
@@ -37,12 +40,11 @@ BLUEPRINTS = {
     },
     'english': {
         'standard': {'title': '英语 模拟卷', 'minutes': 60, 'sections': [
-            ('语音辨析', 'english-phonetics', ['single'], 5, 1),
-            ('词汇与语法', 'english-vocab', ['single'], 20, 1),
-            ('图文理解', 'english-picture', ['single'], 10, 1),
-            ('交际对话', 'english-dialogue', ['single'], 10, 1),
-            ('书面表达', 'english-writing', ['single'], 5, 1),
-            ('阅读匹配', 'english-reading', ['single'], 5, 1, 'match'),
+            ('单选题', [('english-phonetics', 5, None), ('english-vocab', 20, None), ('english-picture', 10, None)],
+             ['single'], 35, 1),
+            ('排序题', [('english-dialogue', 5, 'fill'), ('english-writing', 5, None), ('english-reading', 5, 'match')],
+             ['single'], 15, 1),
+            ('连线题', 'english-dialogue', ['single'], 5, 1, 'pair'),
             ('完形填空', 'english-cloze', ['single'], 10, 1),
             ('阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp')]},
     },
@@ -103,6 +105,20 @@ def is_match(q):
     return len(q.get('options') or []) >= 5
 
 
+def keep(q, filt):
+    """筛选（见 BLUEPRINTS 上面的说明）"""
+    if filt is None:
+        return True
+    if filt in ('match', 'comp'):
+        return (filt == 'match') == is_match(q)
+    mat = q.get('material') or ''
+    if filt == 'pair':
+        return '问答配对' in mat
+    if filt == 'fill':
+        return '补全对话' in mat
+    return True
+
+
 def compose(questions, papers, subject, preset='standard', seed=None):
     """questions/papers 为该科目全部题和卷子。返回 (标题, 分钟, [(小节名, [题...], 每题分值)])"""
     bp = blueprint(subject, preset)
@@ -114,12 +130,19 @@ def compose(questions, papers, subject, preset='standard', seed=None):
         name, prefix, types, count = sec[:4]
         points = sec[4] if len(sec) > 4 else 1
         filt = sec[5] if len(sec) > 5 else None
-        pool = [q for q in questions
-                if q['type'] in types and q['answer'] and q['id'] not in used
-                and pkey.get(q['paper_id'], '').startswith(prefix)
-                and (filt is None or (filt == 'match') == is_match(q))]
-        got = pick(pool, count, rng)
-        used.update(q['id'] for q in got)
+        parts = prefix if isinstance(prefix, list) else [(prefix, count, filt)]
+        got = []
+        for pfx, cnt, flt in parts:
+            pool = [q for q in questions
+                    if q['type'] in types and q['answer'] and q['id'] not in used
+                    and pkey.get(q['paper_id'], '').startswith(pfx) and keep(q, flt)]
+            part = pick(pool, cnt, rng)
+            used.update(q['id'] for q in part)
+            got.extend(part)
+        if isinstance(prefix, list):           # 几处抽来的混在一起（整组的材料题按组打乱，组内顺序不变）
+            us = units(got)
+            rng.shuffle(us)
+            got = [q for u in us for q in u]
         if got:
             sections.append((name, got, points))
     if not sections:
@@ -139,6 +162,8 @@ def shuffle_perm(q, rng):
     opts = q.get('options') or []
     if q['type'] == 'judge' or len(opts) < 2:
         return None
+    if q.get('material') and len(opts) >= 5:
+        return None        # 一组题共用 A～E（排序、连线、信息匹配）：和老师卷一样不打乱，每个空的选项顺序才一致
     if any(_NO_SHUFFLE.search((v or '').strip()) for _, v in opts):
         return None
     perm = list(range(len(opts)))
