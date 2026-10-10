@@ -1008,6 +1008,8 @@ async function startPractice(opts) {
 function allowSave(src, title) {
   state.practice.saveKey = saveKeyOf(src);
   state.practice.saveOpts = Object.assign(practiceSrc(src), { title: title });
+  // 从整卷 / 题型入口进来的练习，每答一题自动记下做到哪（和手动存档分开），下次进来可以接着做
+  state.practice.autoKey = src.auto ? autoKeyOf(state.practice.saveKey) : null;
   if (location.hash === '#/practice') route();
 }
 
@@ -1028,6 +1030,8 @@ function saveKeyOf(o) {
   if (o.paper_id) return 'zx.save.' + o.paper_id + scope;           // 整卷：zx.save.<卷子id>（1.4.8 起的存档沿用）
   return 'zx.save.' + (o.subject || 'all') + '.' + (o.type || '') + scope;
 }
+// 自动保存的进度：zx.auto.<同上>。手动存档是回档点，自动进度是“上次退出时做到哪”，两者互不覆盖
+function autoKeyOf(saveKey) { return saveKey.replace('zx.save.', 'zx.auto.'); }
 
 // 选项里引用了别的选项（以上都对、A和B……）或图里标号的题，打乱会出错，不打乱（和模拟考试同一条规则）
 const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[A-G]\s*[和与及、,，]\s*[A-G](?![A-Za-z])|^[A-G]{1,4}$|见材料|(?<!可)见图|\b(?:[Aa]ll|[Nn]one|[Bb]oth|[Nn]either) of the above\b|\b[A-G] and [A-G]\b/;
@@ -1056,16 +1060,22 @@ function openPaperSheet(pid, name) { openModeSheet({ paper_id: pid }, name); }
 function openModeSheet(src, name) {
   const key = saveKeyOf(src);
   const save = store.get(key);
-  const go = o => startPractice(Object.assign(practiceSrc(src), { scope: 'all' }, o));
+  const auto = store.get(autoKeyOf(key));
+  const go = o => startPractice(Object.assign(practiceSrc(src), { scope: 'all', auto: !o.shuffleOpts }, o));
+  const at = s => '第 ' + (s.idx + 1) + '/' + s.ids.length + ' 题，' + esc(s.t.slice(5, 16));
   const sheet = document.createElement('div');
   sheet.className = 'sheet-mask';
   sheet.innerHTML =
     '<div class="sheet" role="dialog">' +
       '<div class="sheet-h"><b>' + esc(name) + '</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
-      '<div class="sheet-sec"><div class="sheet-t">选项不变</div>' +
-        '<div class="sheet-d">选项顺序和原卷一样。做到一半可以手动存档，以后读档回到那个状态接着做。</div>' +
-        (save ? '<button class="btn block" data-act="resume">从存档继续（第 ' + (save.idx + 1) + '/' + save.ids.length + ' 题，' + esc(save.t.slice(5, 16)) + ' 存）</button>' : '') +
-        '<div class="sheet-row"><button class="btn' + (save ? ' ghost' : '') + '" data-act="seq">' + (src.paper_id ? '按原卷顺序' : '按卷子顺序') + '</button>' +
+      (auto ? '<div class="sheet-sec"><div class="sheet-t">上次没做完</div>' +
+        '<div class="sheet-d">上次退出时做到' + at(auto) + '。接着做，或者用下面的方式重新做。</div>' +
+        '<button class="btn block" data-act="continue">接着上次做（' + at(auto) + '）</button></div>' : '') +
+      '<div class="sheet-sec"><div class="sheet-t">' + (auto ? '重新做 · 选项不变' : '选项不变') + '</div>' +
+        '<div class="sheet-d">选项顺序和原卷一样。每答一题自动记下进度，退出后下次进来可以接着做；' +
+          '另外可以手动「存档」留一个回档点，以后「读档」回到那一刻重做。</div>' +
+        (save ? '<button class="btn ghost block" data-act="resume">读档（存档点：' + at(save) + ' 存）</button>' : '') +
+        '<div class="sheet-row"><button class="btn' + (auto ? ' ghost' : '') + '" data-act="seq">' + (src.paper_id ? '按原卷顺序' : '按卷子顺序') + '</button>' +
         '<button class="btn ghost" data-act="rand">题目打乱</button></div></div>' +
       '<div class="sheet-sec"><div class="sheet-t">全部乱序</div>' +
         '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。</div>' +
@@ -1079,31 +1089,47 @@ function openModeSheet(src, name) {
     const act = btn && btn.dataset.act;
     if (!act) return;
     close();
-    if (act === 'resume') loadSave(key);
-    else if (act === 'seq') go({ order: 'seq', title: name });
-    else if (act === 'rand') go({ order: 'random', title: name + '·题目打乱' });
+    if (act === 'continue') loadSave(autoKeyOf(key));
+    else if (act === 'resume') loadSave(key);
+    else if (act === 'seq' || act === 'rand') {
+      store.del(autoKeyOf(key));              // 选了重新做，上次的进度作废（手动存档还留着）
+      if (act === 'seq') go({ order: 'seq', title: name });
+      else go({ order: 'random', title: name + '·题目打乱' });
+    }
     else go({ order: 'random', shuffleOpts: true, title: name + '·全部乱序' });
   });
   document.body.appendChild(sheet);
 }
 
+// 当前这道已经答完就存“做完这道”，下次从下一道开始
+function snapshot(p) {
+  const idx = p.answered ? p.idx + 1 : p.idx;
+  return {
+    ids: p.list.map(q => q.id), idx: Math.min(idx, p.list.length - 1), done: p.done,
+    results: p.results.map(r => [r.q.id, r.correct]), correct: p.correct,
+    title: p.title, opts: p.saveOpts, auto: p.autoKey || null, t: nowText(),
+  };
+}
+
 function saveProgress() {
   const p = state.practice;
   if (!p || !p.saveKey) return;
-  // 当前这道已经答完就存“做完这道”，下次从下一道开始
-  const idx = p.answered ? p.idx + 1 : p.idx;
-  store.set(p.saveKey, {
-    ids: p.list.map(q => q.id), idx: Math.min(idx, p.list.length - 1), done: p.done,
-    results: p.results.map(r => [r.q.id, r.correct]), correct: p.correct,
-    title: p.title, opts: p.saveOpts, t: nowText(),
-  });
+  store.set(p.saveKey, snapshot(p));
   toast('已存档：做完了 ' + Object.keys(p.done).length + ' 题，以后可以读档回到这里');
 }
 
+// 每答完一题自动记进度；最后一题也答完了就清掉（整套做完，下次从头来）
+function autoSave() {
+  const p = state.practice;
+  if (!p || !p.autoKey) return;
+  if (p.answered && p.idx + 1 >= p.list.length) store.del(p.autoKey);
+  else store.set(p.autoKey, snapshot(p));
+}
+
 async function loadSave(key) {
-  if (typeof key === 'number') key = 'zx.save.' + key;
   const sv = store.get(key);
-  if (!sv) { toast('还没有存档'); return; }
+  const isAuto = key.indexOf('zx.auto.') === 0;
+  if (!sv) { toast(isAuto ? '没有上次的进度' : '还没有存档'); return; }
   const o = sv.opts || {};
   let d;
   try {
@@ -1119,9 +1145,10 @@ async function loadSave(key) {
   const p = state.practice;
   Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0,
                      results: (sv.results || []).map(r => ({ q: byId[r[0]], correct: r[1] })).filter(r => r.q),
-                     saveKey: key, saveOpts: sv.opts });
+                     saveKey: isAuto ? key.replace('zx.auto.', 'zx.save.') : key, saveOpts: sv.opts,
+                     autoKey: isAuto ? key : (sv.auto || null) });
   route();
-  toast('已读档：回到第 ' + (sv.idx + 1) + ' 题');
+  toast(isAuto ? '接着上次：第 ' + (sv.idx + 1) + ' 题' : '已读档：回到第 ' + (sv.idx + 1) + ' 题');
 }
 
 function nowText() {
@@ -1292,6 +1319,7 @@ function gradeAndShow(selKeys, replay) {
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
     recordResult(q, isRight);
+    autoSave();
   }
 
   $$('#qbody .opt').forEach(b => {
@@ -1348,6 +1376,8 @@ function selfGrade(ok) {
   const p = state.practice;
   p.done[p.idx] = { self: ok };
   recordResult(p.list[p.idx], ok);
+  p.answered = true;
+  autoSave();
   nextQ();
 }
 

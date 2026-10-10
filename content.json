@@ -1,10 +1,10 @@
 {
- "content_version": 33,
- "created": "2026-10-10 17:19:52",
+ "content_version": 34,
+ "created": "2026-10-10 17:25:13",
  "files": {
   "data/bank.json": [
-   "bc0f8581a837fc001988aad59ec515778998c1aa473e78b7f533fd8688b02db0",
-   2625258
+   "9e3ae661caa87ac9b31ec77ace828143c879735669498167e0c0cbb492b85e60",
+   2625158
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "2d6ea2de3c11df962dd341b817d024bc3f28eb9242bba4a833695808e03c7d98",
-   118692
+   "0410c126b14f08a619cf138fd8fa9fe1c45f6f9053d6dfaf74e8fd35e30b0480",
+   120569
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1653,7 +1653,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "思政 175 道选择题、判断题加上解析：答错时说明选的选项错在哪、正确答案为什么对（答案仍按官方答案文档）",
+ "notes": "练习自动记进度：每答一题自动保存，下次进同一套卷子/题型可选「接着上次做」或重新做；手动存档改为回档点，两者互不覆盖。英语老师卷改名为 试卷2～6",
  "py_shell_api": 1,
- "tag": "content-33"
+ "tag": "content-34"
 }
