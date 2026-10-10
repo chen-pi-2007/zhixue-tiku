@@ -34,22 +34,22 @@
 <text x="46.0" y="134"><tspan class="big">41</tspan><tspan class="unit" dx="6">次</tspan></text>
 <text class="m" x="46.0" y="154">电脑版 27 · 手机版 14</text>
 <rect class="tile" x="294.7" y="68" width="250.7" height="96" rx="10"/>
-<text class="k" x="312.7" y="94">近 7 天打开使用</text>
-<text x="312.7" y="134"><tspan class="big">85</tspan><tspan class="unit" dx="6">次</tspan></text>
-<text class="m" x="312.7" y="154">检查更新、下载新题库都算</text>
+<text class="k" x="312.7" y="94">近 7 天检查更新</text>
+<text x="312.7" y="134"><tspan class="big">47</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text class="m" x="312.7" y="154">打开题库会自动检查，一天可能好几次</text>
 <rect class="tile" x="561.3" y="68" width="250.7" height="96" rx="10"/>
-<text class="k" x="579.3" y="94">近 30 天打开使用</text>
-<text x="579.3" y="134"><tspan class="big">85</tspan><tspan class="unit" dx="6">次</tspan></text>
-<text class="m" x="579.3" y="154">统计晚一两天，最近的数会补上</text>
-<text class="k" x="28" y="200">每天打开使用次数</text>
+<text class="k" x="579.3" y="94">近 30 天检查更新</text>
+<text x="579.3" y="134"><tspan class="big">47</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text class="m" x="579.3" y="154">国内线路统计，晚一两天才补上</text>
+<text class="k" x="28" y="200">每天检查更新次数</text>
 <line class="base" x1="58" x2="800" y1="336.0" y2="336.0"/>
 <text class="ax" x="48" y="340.0" text-anchor="end">0</text>
 <line class="grid" x1="58" x2="800" y1="275.0" y2="275.0"/>
-<text class="ax" x="48" y="279.0" text-anchor="end">40</text>
+<text class="ax" x="48" y="279.0" text-anchor="end">25</text>
 <line class="grid" x1="58" x2="800" y1="214.0" y2="214.0"/>
-<text class="ax" x="48" y="218.0" text-anchor="end">80</text>
-<path d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 293.3 552.7 293.3 C614.5 293.3 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 249.1 800.0 249.1 L800.0 336.0 L58.0 336.0 Z" fill="url(#fill)"/>
-<path class="ln" d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 293.3 552.7 293.3 C614.5 293.3 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 249.1 800.0 249.1"/>
+<text class="ax" x="48" y="218.0" text-anchor="end">50</text>
+<path d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 331.1 552.7 331.1 C614.5 331.1 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 226.2 800.0 226.2 L800.0 336.0 L58.0 336.0 Z" fill="url(#fill)"/>
+<path class="ln" d="M58.0 336.0 C119.8 336.0 119.8 336.0 181.7 336.0 C243.5 336.0 243.5 336.0 305.3 336.0 C367.2 336.0 367.2 336.0 429.0 336.0 C490.8 336.0 490.8 331.1 552.7 331.1 C614.5 331.1 614.5 336.0 676.3 336.0 C738.2 336.0 738.2 226.2 800.0 226.2"/>
 <text class="ax" x="58.0" y="358" text-anchor="middle">10/2</text>
 <text class="ax" x="181.7" y="358" text-anchor="middle">10/3</text>
 <text class="ax" x="305.3" y="358" text-anchor="middle">10/4</text>
@@ -57,6 +57,6 @@
 <text class="ax" x="552.7" y="358" text-anchor="middle">10/6</text>
 <text class="ax" x="676.3" y="358" text-anchor="middle">10/7</text>
 <text class="ax" x="800.0" y="358" text-anchor="middle">10/8</text>
-<circle class="dot" cx="800.0" cy="249.1" r="5"/>
-<text class="lab" x="792.0" y="237.1" text-anchor="end">57 次</text>
+<circle class="dot" cx="800.0" cy="226.2" r="5"/>
+<text class="lab" x="792.0" y="214.2" text-anchor="end">45 次</text>
 </svg>
