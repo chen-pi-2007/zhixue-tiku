@@ -15,7 +15,7 @@
   const REPO = 'chen-pi-2007/zhixue-tiku';
   const SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general'];
   const SELF = ['qa', 'dictation', 'essay', 'blank', 'solution'];
-  const STUDY_FIELDS = ['stem_cn', 'options_cn', 'material_cn', 'point', 'option_notes', 'phrases'];
+  const STUDY_FIELDS = ['stem_cn', 'options_cn', 'material_cn', 'point', 'option_notes', 'phrases', 'evidence'];
 
   /* ---------------------------------------------------------------- 存储 */
   const PROG_KEY = 'zx.progress';

@@ -1,10 +1,10 @@
 {
- "content_version": 34,
- "created": "2026-10-10 17:25:13",
+ "content_version": 35,
+ "created": "2026-10-10 17:38:18",
  "files": {
   "data/bank.json": [
-   "9e3ae661caa87ac9b31ec77ace828143c879735669498167e0c0cbb492b85e60",
-   2625158
+   "e8063855191e7cc6a26a1e35e7c44fdd428c8ad93ec0bdd03006a1c3b7016ed4",
+   2724506
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "43bcfff42a11dc8396d70fd04f09b34660e0a17071c66e9ce66779659b92420a",
-   34516
+   "038725475fa9dc124575bf54cbc38269794b86e256c38547ac64c3fb73664eac",
+   33716
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "b01662ff19f67cf9fedd050057fb8d1105ec64d857d86eb80c0e5bf138986a6c",
-   43735
+   "930bdfd3b22665650fad86b194f941f9444f4b1f40b89498c45c10e779d85bee",
+   42877
   ],
   "server.py": [
    "dda125dbd1a5c65b9263a0693ff1d4057b1712bd63a1705c2e25f2341dc2c850",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "0410c126b14f08a619cf138fd8fa9fe1c45f6f9053d6dfaf74e8fd35e30b0480",
-   120569
+   "78406b231eee39d423a232e69370442fe08ce414df4cdb5245e224d5e8979bb4",
+   120137
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,13 +1647,13 @@
    27524
   ],
   "static/style.css": [
-   "fd2e4fcb41466f7771f8d9a287adb830cf9eb734e675d39db09cfe78a1608468",
-   50732
+   "9afc2a41e1e6e62746c2ab99edba4d1e07d376877be89a9a95a5354b2081c89a",
+   51268
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "练习自动记进度：每答一题自动保存，下次进同一套卷子/题型可选「接着上次做」或重新做；手动存档改为回档点，两者互不覆盖。英语老师卷改名为 试卷2～6",
+ "notes": "新增英语 试卷1；答对了也显示「为什么选这个」（选不正确一项的题说明它错在哪）；双击确认后点绿色答案立即进下一题，不再等待；阅读题支持在原文中标出答案依据",
  "py_shell_api": 1,
- "tag": "content-34"
+ "tag": "content-35"
 }

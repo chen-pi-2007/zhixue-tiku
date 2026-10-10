@@ -248,6 +248,46 @@ function whyBox(q, selKeys) {
   return rows.length ? '<div class="why-box"><b>为什么错</b>' + rows.join('') + '</div>' : '';
 }
 
+// 答对了也说清楚为什么：选“不正确的一项”这类题，说明选的这项错在哪
+function rightBox(q) {
+  if (q.type === 'judge') return '';
+  const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
+  const opts = optionList(q);
+  const note = k => { const i = opts.findIndex(o => o[0] === k); return (q.option_notes && q.option_notes[i]) || ''; };
+  const rows = ans.map(k => [k, note(k)]).filter(r => r[1]).map(r =>
+    '<div class="why-row ok"><span class="why-k">' + esc(r[0]) + '</span><span>' + rich(r[1]) + '</span></div>');
+  return rows.length ? '<div class="why-box"><b>为什么选这个</b>' + rows.join('') + '</div>' : '';
+}
+
+// 阅读题的原文依据：evidence 是材料里原样摘出来的句子（可以几处），作答后列出来，并在材料里标黄
+function evidenceBox(q) {
+  if (!q.evidence || !q.evidence.length) return '';
+  return '<div class="evidence-box"><b>原文依据</b>' + q.evidence.map(s => '<div class="evidence-q">' + esc(s) + '</div>').join('') +
+    (q.material ? '<div class="muted">材料里标黄的就是这几句</div>' : '') + '</div>';
+}
+
+function markEvidence(q) {
+  if (!q.evidence || !q.evidence.length) return;
+  const body = $('.qcard-main .material-body');
+  if (!body) return;
+  q.evidence.forEach(ev => {
+    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const i = n.data.indexOf(ev);
+      if (i < 0 || n.parentNode.classList.contains('evidence')) continue;
+      const hit = n.splitText(i);
+      hit.splitText(ev.length);
+      const mark = document.createElement('mark');
+      mark.className = 'evidence';
+      hit.parentNode.replaceChild(mark, hit);
+      mark.appendChild(hit);
+      break;
+    }
+  });
+  const box = body.closest('details');
+  if (box) box.open = true;
+}
+
 // 英语题相关的词组，作答后显示，方便顺手记
 function phraseBox(q) {
   if (!q.phrases || !q.phrases.length) return '';
@@ -1256,8 +1296,8 @@ function optTap(btn) {
   const p = state.practice;
   if (!p) return;
   if (p.answered) {
-    // 只有点绿色的正确答案才进下一题；刚判完 0.8 秒内不算（双击时多出来的一下、手抖，不至于直接跳走看不到解析）
-    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 800) nextQ();
+    // 只有点绿色的正确答案才进下一题（判完马上就能点，不用等）
+    if (btn.classList.contains('ok')) nextQ();
     return;
   }
   const now = Date.now();
@@ -1314,7 +1354,6 @@ function gradeAndShow(selKeys, replay) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
-  p.gradedAt = Date.now();
   $('.qcard-main').classList.add('answered');
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
@@ -1334,11 +1373,12 @@ function gradeAndShow(selKeys, replay) {
   fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
     '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
-    (isRight ? '' : whyBox(q, selKeys)) +
+    (isRight ? rightBox(q) : whyBox(q, selKeys)) +
     (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' +
       (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
-    pointBox(q) + phraseBox(q);
+    evidenceBox(q) + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
+  markEvidence(q);
 
   $('#qact').innerHTML = nextActions(p);
 }

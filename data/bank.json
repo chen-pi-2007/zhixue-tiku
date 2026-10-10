@@ -7,7 +7,7 @@
    "total": 36,
    "subject": "politics",
    "key": "politics-1",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 2,
@@ -16,7 +16,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-1",
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 3,
@@ -25,7 +25,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-2",
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 4,
@@ -34,7 +34,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-3",
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 5,
@@ -43,7 +43,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-4",
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 6,
@@ -52,7 +52,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-5",
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 7,
@@ -61,7 +61,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-1",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 8,
@@ -70,7 +70,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-2",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 9,
@@ -79,7 +79,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-3",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 10,
@@ -88,7 +88,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-4",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 11,
@@ -97,7 +97,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-5",
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 12,
@@ -106,7 +106,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 13,
@@ -115,7 +115,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 14,
@@ -124,7 +124,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 15,
@@ -133,7 +133,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:08"
   },
   {
    "id": 16,
@@ -142,7 +142,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 240,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 17,
@@ -151,7 +151,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 18,
@@ -160,7 +160,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 19,
@@ -169,7 +169,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 65,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 20,
@@ -178,7 +178,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 21,
@@ -187,7 +187,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 22,
@@ -196,7 +196,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 48,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 23,
@@ -205,7 +205,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 24,
@@ -214,7 +214,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 30,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 25,
@@ -223,7 +223,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 160,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 26,
@@ -232,7 +232,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 23,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 27,
@@ -241,7 +241,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 202,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 28,
@@ -250,7 +250,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 29,
@@ -259,7 +259,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 30,
@@ -268,7 +268,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-10 17:24:25"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 31,
@@ -277,7 +277,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-10 17:24:25"
+   "updated_at": "2026-10-10 17:37:10"
   },
   {
    "id": 32,
@@ -286,7 +286,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-10 17:24:25"
+   "updated_at": "2026-10-10 17:37:11"
   },
   {
    "id": 33,
@@ -295,7 +295,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 60,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 34,
@@ -304,7 +304,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:23"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 35,
@@ -313,7 +313,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 36,
@@ -322,7 +322,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
   },
   {
    "id": 37,
@@ -331,7 +331,15 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-10 17:24:24"
+   "updated_at": "2026-10-10 17:37:09"
+  },
+  {
+   "id": 38,
+   "key": "english-xxt-1",
+   "name": "英语 试卷1",
+   "subject": "english",
+   "created_at": "2026-10-10 17:37:09",
+   "total": 60
   }
  ],
  "questions": [
@@ -34382,6 +34390,2760 @@
      "早日回复"
     ]
    ]
+  },
+  {
+   "id": 2273,
+   "key": "english-xxt-1#1",
+   "paper_id": 38,
+   "qno": 1,
+   "type": "single",
+   "stem": "____failing three times, Wang Liang didn't give up and finally succeeded in passing the driving test.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "As a result of"
+    ],
+    [
+     "B",
+     "Because of"
+    ],
+    [
+     "C",
+     "Thanks to"
+    ],
+    [
+     "D",
+     "In spite of"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "尽管失败了三次，王亮没有放弃，最后通过了驾照考试。",
+   "options_cn": [
+    "由于……的结果",
+    "因为",
+    "多亏",
+    "尽管"
+   ],
+   "point": "in spite of = despite，\"尽管\"，后接名词或动名词。because of / thanks to / as a result of 都表原因。succeed in doing 成功做某事。",
+   "phrases": [
+    [
+     "in spite of",
+     "尽管"
+    ],
+    [
+     "give up",
+     "放弃"
+    ],
+    [
+     "succeed in doing",
+     "成功做成"
+    ],
+    [
+     "driving test",
+     "驾照考试"
+    ]
+   ],
+   "same_as": "english-vocab#38",
+   "section": "单选题"
+  },
+  {
+   "id": 2274,
+   "key": "english-xxt-1#2",
+   "paper_id": 38,
+   "qno": 2,
+   "type": "single",
+   "stem": "找出划线部分读音与其他三项不同的一项",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "gr「ea」t"
+    ],
+    [
+     "B",
+     "br「ea」k"
+    ],
+    [
+     "C",
+     "st「ea」k"
+    ],
+    [
+     "D",
+     "s「ea」t"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "options_cn": [
+    "伟大的 /eɪ/",
+    "打破 /eɪ/",
+    "牛排 /eɪ/",
+    "座位 /iː/"
+   ],
+   "point": "ea 最常见读 /iː/（seat、eat、tea），但 great、break、steak 这三个是特例，ea 读 /eɪ/，要单独记。",
+   "same_as": "english-phonetics#2",
+   "section": "单选题"
+  },
+  {
+   "id": 2275,
+   "key": "english-xxt-1#3",
+   "paper_id": 38,
+   "qno": 3,
+   "type": "single",
+   "stem": "[[img:english-picture/014.png]]This poster asks us to __________.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "give up our seat to those who need it"
+    ],
+    [
+     "B",
+     "turn down the music when we are on the bus"
+    ],
+    [
+     "C",
+     "not to drink too much"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "（公益海报：\"把座位让给怀着更重要东西的人\"，孕妇站着，听音乐的男人坐着）这张海报要求我们______。",
+   "options_cn": [
+    "把座位让给需要的人",
+    "在公交车上把音乐调小",
+    "不要喝太多"
+   ],
+   "point": "give up one's seat to sb 给某人让座。图中男人肚子里是啤酒，孕妇肚子里是宝宝，所以\"更重要\"。",
+   "phrases": [
+    [
+     "give up one's seat to",
+     "给……让座"
+    ],
+    [
+     "those who need it",
+     "需要的人"
+    ],
+    [
+     "turn down",
+     "调低（音量）"
+    ]
+   ],
+   "same_as": "english-picture#14",
+   "section": "单选题"
+  },
+  {
+   "id": 2276,
+   "key": "english-xxt-1#4",
+   "paper_id": 38,
+   "qno": 4,
+   "type": "single",
+   "stem": "[[img:english-picture/015.png]]If we start from Kowloon Tong station, we will have ________stops to get to Jordan station.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "3"
+    ],
+    [
+     "B",
+     "4"
+    ],
+    [
+     "C",
+     "5"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "（港铁线路图）如果从九龙塘站出发，要坐______站到达佐敦站。",
+   "options_cn": [
+    "3",
+    "4",
+    "5"
+   ],
+   "point": "九龙塘 → 石硖尾 → 太子 → 旺角 → 油麻地 → 佐敦，共 5 站。",
+   "phrases": [
+    [
+     "start from",
+     "从……出发"
+    ],
+    [
+     "stop",
+     "（车）站"
+    ],
+    [
+     "get to",
+     "到达"
+    ]
+   ],
+   "same_as": "english-picture#15",
+   "section": "单选题"
+  },
+  {
+   "id": 2277,
+   "key": "english-xxt-1#5",
+   "paper_id": 38,
+   "qno": 5,
+   "type": "single",
+   "stem": "Mike: I was thinking of combining four of the small offices to one large office. What do you think about it?Leo: Well, I'm afraid not. How about turning the meeting room into offices.\nWhat's the most possible relationship between Mike and Leo?",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "Teacher and student."
+    ],
+    [
+     "B",
+     "Colleagues."
+    ],
+    [
+     "C",
+     "Parent and child."
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "stem_cn": "迈克：我在考虑把四间小办公室合并成一间大办公室，你觉得怎么样？利奥：嗯，恐怕不行。把会议室改成办公室怎么样？\n迈克和利奥最可能是什么关系？",
+   "options_cn": [
+    "师生。",
+    "同事。",
+    "父母和孩子。"
+   ],
+   "point": "讨论办公室、会议室的安排，是工作关系 → colleagues 同事。combine… to / into… 把……合并成……",
+   "phrases": [
+    [
+     "combine … to / into …",
+     "把……合并成……"
+    ],
+    [
+     "turn … into …",
+     "把……变成……"
+    ],
+    [
+     "colleague",
+     "同事"
+    ]
+   ],
+   "same_as": "english-picture#30",
+   "section": "单选题"
+  },
+  {
+   "id": 2278,
+   "key": "english-xxt-1#6",
+   "paper_id": 38,
+   "qno": 6,
+   "type": "single",
+   "stem": "The policeman caught the thief ______ and took him away.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "in his arm"
+    ],
+    [
+     "B",
+     "by his arm"
+    ],
+    [
+     "C",
+     "in the arm"
+    ],
+    [
+     "D",
+     "by the arm"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "警察抓住小偷的胳膊，把他带走了。",
+   "options_cn": [
+    "（介词、冠词都不对）",
+    "（要用 the）",
+    "（in 用于打、刺等）",
+    "抓住胳膊"
+   ],
+   "point": "\"动词 + sb + 介词 + the + 身体部位\"：catch / take / hold sb by the arm（抓）；hit / pat sb on the head（打、拍）；hit sb in the face（打脸）。",
+   "phrases": [
+    [
+     "catch sb by the arm",
+     "抓住某人的胳膊"
+    ],
+    [
+     "take sb away",
+     "把某人带走"
+    ]
+   ],
+   "same_as": "english-vocab#62",
+   "section": "单选题"
+  },
+  {
+   "id": 2279,
+   "key": "english-xxt-1#7",
+   "paper_id": 38,
+   "qno": 7,
+   "type": "single",
+   "stem": "Of the two students, she is ______ .",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "slim"
+    ],
+    [
+     "B",
+     "slimmer"
+    ],
+    [
+     "C",
+     "the slimmest"
+    ],
+    [
+     "D",
+     "the slimmer"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "这两个学生中，她更苗条。",
+   "options_cn": [
+    "苗条的",
+    "更苗条的（缺 the）",
+    "最苗条的",
+    "两者中更苗条的那个"
+   ],
+   "point": "of the two… 两者之中，用 \"the + 比较级\"：She is the slimmer of the two。三者以上才用最高级。",
+   "phrases": [
+    [
+     "the + 比较级 + of the two",
+     "两者中较……的"
+    ],
+    [
+     "slim",
+     "苗条的"
+    ]
+   ],
+   "same_as": "english-vocab#82",
+   "section": "单选题"
+  },
+  {
+   "id": 2280,
+   "key": "english-xxt-1#8",
+   "paper_id": 38,
+   "qno": 8,
+   "type": "single",
+   "stem": "找出划线部分读音与其他三项不同的一项",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "tr「u」th"
+    ],
+    [
+     "B",
+     "tr「u」st"
+    ],
+    [
+     "C",
+     "dr「u」g"
+    ],
+    [
+     "D",
+     "l「u」ng"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "真相、事实 /uː/",
+    "信任 /ʌ/",
+    "药物 /ʌ/",
+    "肺 /ʌ/"
+   ],
+   "point": "u 在重读闭音节里一般读 /ʌ/（trust、drug、lung）；truth 里 u 跟在 r 后面读长音 /uː/。",
+   "same_as": "english-phonetics#1",
+   "section": "单选题"
+  },
+  {
+   "id": 2281,
+   "key": "english-xxt-1#9",
+   "paper_id": 38,
+   "qno": 9,
+   "type": "single",
+   "stem": "[[img:english-picture/002.png]]\nIt’s half past five and Sally has about an hour to prepare her evening meal. When can Sally probabbly have her evening meal?",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "A"
+    ],
+    [
+     "B",
+     "B"
+    ],
+    [
+     "C",
+     "C"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "现在是五点半，莎莉大约有一个小时准备晚饭。莎莉大概什么时候能吃晚饭？",
+   "options_cn": [
+    "钟 A（约 7:05）",
+    "钟 B（约 7:30）",
+    "钟 C（约 6:30）"
+   ],
+   "point": "half past five = 5:30，再过约一小时是 6:30，时针在 6 和 7 之间、分针指 6 的是 C。",
+   "phrases": [
+    [
+     "half past five",
+     "五点半"
+    ],
+    [
+     "prepare one's meal",
+     "准备饭菜"
+    ],
+    [
+     "evening meal",
+     "晚饭"
+    ]
+   ],
+   "same_as": "english-picture#2",
+   "section": "单选题"
+  },
+  {
+   "id": 2282,
+   "key": "english-xxt-1#10",
+   "paper_id": 38,
+   "qno": 10,
+   "type": "single",
+   "stem": "Meet people from around the world and become an expert on tourism while working for one of the city's top employers. Need we say more? Get started ona career path today by calling us at 521-443-0128.\nWhat do you think about the note?",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "Job advertisement."
+    ],
+    [
+     "B",
+     "Travel brochure."
+    ],
+    [
+     "C",
+     "Product advertisement."
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "结识来自世界各地的人，在为本市顶级雇主之一工作的同时成为旅游专家。还用我们多说吗？今天就拨打 521-443-0128 开启你的职业道路吧。\n你认为这是什么？",
+   "options_cn": [
+    "招聘广告。",
+    "旅游手册。",
+    "产品广告。"
+   ],
+   "point": "employer 雇主；career path 职业道路。邀请人来工作，是招聘广告。",
+   "phrases": [
+    [
+     "job advertisement",
+     "招聘广告"
+    ],
+    [
+     "get started on",
+     "开始"
+    ],
+    [
+     "career path",
+     "职业道路"
+    ]
+   ],
+   "same_as": "english-picture#31",
+   "section": "单选题"
+  },
+  {
+   "id": 2283,
+   "key": "english-xxt-1#11",
+   "paper_id": 38,
+   "qno": 11,
+   "type": "single",
+   "stem": "---Could I go travelling with my classmates during this winter holiday?---No, _____ the novel corona virus epidemic situation(新冠疫情)has changed.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "if"
+    ],
+    [
+     "B",
+     "before"
+    ],
+    [
+     "C",
+     "since"
+    ],
+    [
+     "D",
+     "unless"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "——这个寒假我能和同学去旅行吗？——不行，除非新冠疫情情况改变了。",
+   "options_cn": [
+    "如果",
+    "在……之前",
+    "自从",
+    "除非"
+   ],
+   "point": "unless = if not，\"除非、如果不\"。根据 No 和 epidemic 判断，表示条件\"除非疫情变了\"。",
+   "phrases": [
+    [
+     "unless = if not",
+     "除非"
+    ],
+    [
+     "winter holiday",
+     "寒假"
+    ]
+   ],
+   "same_as": "english-vocab#59",
+   "section": "单选题"
+  },
+  {
+   "id": 2284,
+   "key": "english-xxt-1#12",
+   "paper_id": 38,
+   "qno": 12,
+   "type": "single",
+   "stem": "---Did you go to the Christmas party last night? ---Yeah. Every boy and every girl in our class_______ invited.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "were"
+    ],
+    [
+     "B",
+     "have been"
+    ],
+    [
+     "C",
+     "has been"
+    ],
+    [
+     "D",
+     "was"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "——你昨晚去圣诞派对了吗？——去了。我们班每个男孩、每个女孩都被邀请了。",
+   "options_cn": [
+    "（复数）",
+    "（复数现在完成时）",
+    "已被（时态不对）",
+    "被（单数过去时）"
+   ],
+   "point": "every / each + 名词 and every / each + 名词 作主语，谓语用单数。时间 last night 用一般过去时，所以是 was invited。",
+   "phrases": [
+    [
+     "every boy and every girl",
+     "每个男孩和女孩（谓语单数）"
+    ],
+    [
+     "be invited",
+     "被邀请"
+    ]
+   ],
+   "same_as": "english-vocab#30",
+   "section": "单选题"
+  },
+  {
+   "id": 2285,
+   "key": "english-xxt-1#13",
+   "paper_id": 38,
+   "qno": 13,
+   "type": "single",
+   "stem": "---_____? You look really upset! ---I'm very disappointed. I didn't pass the driving test again.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "Why bother?"
+    ],
+    [
+     "B",
+     "So what?"
+    ],
+    [
+     "C",
+     "What's up?"
+    ],
+    [
+     "D",
+     "Why not?"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "——怎么了？你看起来很不高兴！——我很失望，驾照考试又没过。",
+   "options_cn": [
+    "何必呢？",
+    "那又怎样？",
+    "怎么了？",
+    "为什么不呢？"
+   ],
+   "point": "What's up? / What's wrong? / What's the matter? 都表示\"怎么了\"。",
+   "phrases": [
+    [
+     "What's up?",
+     "怎么了？"
+    ],
+    [
+     "pass the driving test",
+     "通过驾照考试"
+    ]
+   ],
+   "same_as": "english-vocab#81",
+   "section": "单选题"
+  },
+  {
+   "id": 2286,
+   "key": "english-xxt-1#14",
+   "paper_id": 38,
+   "qno": 14,
+   "type": "single",
+   "stem": "---Did you go to Eric's birthday party yesterday? ---Yes. I did. ______.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "So did Tom"
+    ],
+    [
+     "B",
+     "So Tom did"
+    ],
+    [
+     "C",
+     "Tom did so"
+    ],
+    [
+     "D",
+     "Tom went so"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "——你昨天去埃里克的生日派对了吗？——去了。汤姆也去了。",
+   "options_cn": [
+    "汤姆也去了",
+    "（汤姆确实去了）",
+    "（语法别扭）",
+    "（语序错）"
+   ],
+   "point": "\"So + 助动词 + 主语\"表示\"……也是\"（新主语）；\"So + 主语 + 助动词\"表示\"确实如此\"（同一主语）。",
+   "phrases": [
+    [
+     "So did Tom.",
+     "汤姆也是"
+    ],
+    [
+     "So Tom did.",
+     "汤姆确实是"
+    ]
+   ],
+   "same_as": "english-vocab#61",
+   "section": "单选题"
+  },
+  {
+   "id": 2287,
+   "key": "english-xxt-1#15",
+   "paper_id": 38,
+   "qno": 15,
+   "type": "single",
+   "stem": "---May I speak to Mary? ---Sorry, she ____Hong Kong. But she___back in two days.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "has been to; will come"
+    ],
+    [
+     "B",
+     "has gone to; will come"
+    ],
+    [
+     "C",
+     "has been to; came"
+    ],
+    [
+     "D",
+     "has gone to; came"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "stem_cn": "——我能和玛丽通话吗？——抱歉，她去香港了。但两天后会回来。",
+   "options_cn": [
+    "去过；会回来",
+    "去了（还没回来）；会回来",
+    "去过；回来了",
+    "去了；回来了"
+   ],
+   "point": "has gone to 去了某地（还没回来，人不在这里）；has been to 去过某地（已经回来）。in + 时间段 用将来时。",
+   "phrases": [
+    [
+     "have gone to",
+     "去了（人不在这儿）"
+    ],
+    [
+     "have been to",
+     "去过（已回来）"
+    ],
+    [
+     "in two days",
+     "两天后"
+    ]
+   ],
+   "same_as": "english-vocab#78",
+   "section": "单选题"
+  },
+  {
+   "id": 2288,
+   "key": "english-xxt-1#16",
+   "paper_id": 38,
+   "qno": 16,
+   "type": "single",
+   "stem": "找出划线部分读音与其他三项不同的一项",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "「th」ose"
+    ],
+    [
+     "B",
+     "fa「th」er"
+    ],
+    [
+     "C",
+     "wi「th」in"
+    ],
+    [
+     "D",
+     "「th」row"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "options_cn": [
+    "那些 /ð/",
+    "父亲 /ð/",
+    "在……之内 /ð/",
+    "扔 /θ/"
+   ],
+   "point": "th 在虚词开头（those）和元音之间（father、within）读 /ð/；throw 是实词，读 /θ/。",
+   "same_as": "english-phonetics#27",
+   "section": "单选题"
+  },
+  {
+   "id": 2289,
+   "key": "english-xxt-1#17",
+   "paper_id": 38,
+   "qno": 17,
+   "type": "single",
+   "stem": "It used to be hard to find a table for ten in this restaurant, for they were all ______.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "given up"
+    ],
+    [
+     "B",
+     "put up"
+    ],
+    [
+     "C",
+     "taken up"
+    ],
+    [
+     "D",
+     "kept up"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "以前在这家餐厅很难找到十人桌，因为都被占满了。",
+   "options_cn": [
+    "放弃",
+    "张贴、搭建",
+    "占据",
+    "保持"
+   ],
+   "point": "take up 占据（时间、空间）；be taken up 被占用；give up 放弃；put up 张贴、搭建；keep up 保持。",
+   "phrases": [
+    [
+     "take up",
+     "占用（时间、空间）"
+    ],
+    [
+     "a table for ten",
+     "十人桌"
+    ]
+   ],
+   "same_as": "english-vocab#60",
+   "section": "单选题"
+  },
+  {
+   "id": 2290,
+   "key": "english-xxt-1#18",
+   "paper_id": 38,
+   "qno": 18,
+   "type": "single",
+   "stem": "找出划线部分读音与其他三项不同的一项",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "「th」row"
+    ],
+    [
+     "B",
+     "「th」ink"
+    ],
+    [
+     "C",
+     "wea「th」er"
+    ],
+    [
+     "D",
+     "「th」ree"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "扔 /θ/",
+    "想 /θ/",
+    "天气 /ð/",
+    "三 /θ/"
+   ],
+   "point": "th 有两种读法：实词开头多读清音 /θ/（think、three）；在两个元音之间多读浊音 /ð/（weather、father、mother）。",
+   "same_as": "english-phonetics#7",
+   "section": "单选题"
+  },
+  {
+   "id": 2291,
+   "key": "english-xxt-1#19",
+   "paper_id": 38,
+   "qno": 19,
+   "type": "single",
+   "stem": "To make our country stronger and richer, the young are ______ to work where they are most needed.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "called on"
+    ],
+    [
+     "B",
+     "called for"
+    ],
+    [
+     "C",
+     "called up"
+    ],
+    [
+     "D",
+     "called off"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "为了让国家更富强，年轻人被号召到最需要的地方去工作。",
+   "options_cn": [
+    "号召",
+    "要求、需要",
+    "征召、打电话",
+    "取消"
+   ],
+   "point": "call on sb to do 号召某人做某事（被动：be called on to do）；call for 要求、需要；call off 取消；call up 打电话、征召。",
+   "phrases": [
+    [
+     "call on sb to do",
+     "号召某人做"
+    ],
+    [
+     "call off",
+     "取消"
+    ],
+    [
+     "call for",
+     "要求"
+    ]
+   ],
+   "same_as": "english-vocab#83",
+   "section": "单选题"
+  },
+  {
+   "id": 2292,
+   "key": "english-xxt-1#20",
+   "paper_id": 38,
+   "qno": 20,
+   "type": "single",
+   "stem": "找出划线部分读音与其他三项不同的一项",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "lau「gh」"
+    ],
+    [
+     "B",
+     "thou「gh」"
+    ],
+    [
+     "C",
+     "wei「gh」t"
+    ],
+    [
+     "D",
+     "thorou「gh」"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "笑 /f/",
+    "虽然（不发音）",
+    "重量（不发音）",
+    "彻底的（不发音）"
+   ],
+   "point": "同第 12 题：gh 多数不发音；laugh、enough、cough 里读 /f/。",
+   "same_as": "english-phonetics#35",
+   "section": "单选题"
+  },
+  {
+   "id": 2293,
+   "key": "english-xxt-1#21",
+   "paper_id": 38,
+   "qno": 21,
+   "type": "single",
+   "stem": "What sports do you like best?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Yes, I also think so."
+    ],
+    [
+     "B",
+     "I like basketball best."
+    ],
+    [
+     "C",
+     "I went there by train."
+    ],
+    [
+     "D",
+     "No, she's my father's sister."
+    ],
+    [
+     "E",
+     "Yes, apples are on sale today."
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "stem_cn": "你最喜欢什么运动？",
+   "options_cn": [
+    "是的，我也这么认为。",
+    "我最喜欢篮球。",
+    "我坐火车去的。",
+    "不，她是我爸爸的姐妹。",
+    "是的，苹果今天打折。"
+   ],
+   "point": "What … do you like best? 问最喜欢的，回答 I like … best。",
+   "phrases": [
+    [
+     "like … best",
+     "最喜欢……"
+    ],
+    [
+     "What sports …?",
+     "什么运动……？"
+    ]
+   ],
+   "same_as": "english-dialogue#11",
+   "section": "连线题"
+  },
+  {
+   "id": 2294,
+   "key": "english-xxt-1#22",
+   "paper_id": 38,
+   "qno": 22,
+   "type": "single",
+   "stem": "How did you get to Shanghai?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Yes, I also think so."
+    ],
+    [
+     "B",
+     "I like basketball best."
+    ],
+    [
+     "C",
+     "I went there by train."
+    ],
+    [
+     "D",
+     "No, she's my father's sister."
+    ],
+    [
+     "E",
+     "Yes, apples are on sale today."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "你是怎么去上海的？",
+   "options_cn": [
+    "是的，我也这么认为。",
+    "我最喜欢篮球。",
+    "我坐火车去的。",
+    "不，她是我爸爸的姐妹。",
+    "是的，苹果今天打折。"
+   ],
+   "point": "How 问交通方式，回答 by train / by bus / on foot。",
+   "phrases": [
+    [
+     "How did you get to …?",
+     "你是怎么去……的？"
+    ],
+    [
+     "by train / bus / plane",
+     "坐火车 / 公交 / 飞机"
+    ],
+    [
+     "on foot",
+     "步行"
+    ]
+   ],
+   "same_as": "english-dialogue#12",
+   "section": "连线题"
+  },
+  {
+   "id": 2295,
+   "key": "english-xxt-1#23",
+   "paper_id": 38,
+   "qno": 23,
+   "type": "single",
+   "stem": "Is she your mother's sister?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Yes, I also think so."
+    ],
+    [
+     "B",
+     "I like basketball best."
+    ],
+    [
+     "C",
+     "I went there by train."
+    ],
+    [
+     "D",
+     "No, she's my father's sister."
+    ],
+    [
+     "E",
+     "Yes, apples are on sale today."
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "她是你妈妈的姐妹吗？",
+   "options_cn": [
+    "是的，我也这么认为。",
+    "我最喜欢篮球。",
+    "我坐火车去的。",
+    "不，她是我爸爸的姐妹。",
+    "是的，苹果今天打折。"
+   ],
+   "point": "mother's sister 姨妈；father's sister 姑妈，英语都叫 aunt。",
+   "phrases": [
+    [
+     "mother's / father's sister",
+     "姨妈 / 姑妈（aunt）"
+    ]
+   ],
+   "same_as": "english-dialogue#13",
+   "section": "连线题"
+  },
+  {
+   "id": 2296,
+   "key": "english-xxt-1#24",
+   "paper_id": 38,
+   "qno": 24,
+   "type": "single",
+   "stem": "Is anything on sale today?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Yes, I also think so."
+    ],
+    [
+     "B",
+     "I like basketball best."
+    ],
+    [
+     "C",
+     "I went there by train."
+    ],
+    [
+     "D",
+     "No, she's my father's sister."
+    ],
+    [
+     "E",
+     "Yes, apples are on sale today."
+    ]
+   ],
+   "answer": "E",
+   "analysis": "",
+   "stem_cn": "今天有什么东西打折吗？",
+   "options_cn": [
+    "是的，我也这么认为。",
+    "我最喜欢篮球。",
+    "我坐火车去的。",
+    "不，她是我爸爸的姐妹。",
+    "是的，苹果今天打折。"
+   ],
+   "point": "on sale 打折出售、在售。",
+   "phrases": [
+    [
+     "be on sale",
+     "打折出售"
+    ]
+   ],
+   "same_as": "english-dialogue#14",
+   "section": "连线题"
+  },
+  {
+   "id": 2297,
+   "key": "english-xxt-1#25",
+   "paper_id": 38,
+   "qno": 25,
+   "type": "single",
+   "stem": "I believe that it will rain today.",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Yes, I also think so."
+    ],
+    [
+     "B",
+     "I like basketball best."
+    ],
+    [
+     "C",
+     "I went there by train."
+    ],
+    [
+     "D",
+     "No, she's my father's sister."
+    ],
+    [
+     "E",
+     "Yes, apples are on sale today."
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "我相信今天会下雨。",
+   "options_cn": [
+    "是的，我也这么认为。",
+    "我最喜欢篮球。",
+    "我坐火车去的。",
+    "不，她是我爸爸的姐妹。",
+    "是的，苹果今天打折。"
+   ],
+   "point": "同意对方看法：I think so too / I also think so / I agree。",
+   "phrases": [
+    [
+     "I also think so. / I think so too.",
+     "我也这么认为"
+    ],
+    [
+     "I believe that …",
+     "我相信……"
+    ]
+   ],
+   "same_as": "english-dialogue#15",
+   "section": "连线题"
+  },
+  {
+   "id": 2298,
+   "key": "english-xxt-1#26",
+   "paper_id": 38,
+   "qno": 26,
+   "type": "single",
+   "stem": "Have you ever been to Sanya?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Since I was a kid."
+    ],
+    [
+     "B",
+     "Perfect. It goes with your suit."
+    ],
+    [
+     "C",
+     "Altogether, it's $580."
+    ],
+    [
+     "D",
+     "I'm looking for a library."
+    ],
+    [
+     "E",
+     "No, I wish I have had."
+    ]
+   ],
+   "answer": "E",
+   "analysis": "",
+   "stem_cn": "你去过三亚吗？",
+   "options_cn": [
+    "从我小时候起。",
+    "很完美，和你的西装很配。",
+    "一共 580 美元。",
+    "我在找图书馆。",
+    "没有，我希望我去过。"
+   ],
+   "point": "Have you ever been to…? 问是否去过某地。",
+   "phrases": [
+    [
+     "Have you ever been to …?",
+     "你去过……吗？"
+    ],
+    [
+     "I wish I had.",
+     "我希望我去过"
+    ]
+   ],
+   "same_as": "english-dialogue#16",
+   "section": "连线题"
+  },
+  {
+   "id": 2299,
+   "key": "english-xxt-1#27",
+   "paper_id": 38,
+   "qno": 27,
+   "type": "single",
+   "stem": "How long have you known each other?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Since I was a kid."
+    ],
+    [
+     "B",
+     "Perfect. It goes with your suit."
+    ],
+    [
+     "C",
+     "Altogether, it's $580."
+    ],
+    [
+     "D",
+     "I'm looking for a library."
+    ],
+    [
+     "E",
+     "No, I wish I have had."
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "stem_cn": "你们认识多久了？",
+   "options_cn": [
+    "从我小时候起。",
+    "很完美，和你的西装很配。",
+    "一共 580 美元。",
+    "我在找图书馆。",
+    "没有，我希望我去过。"
+   ],
+   "point": "How long have you…? 问持续时间，回答 for + 时间段 或 since + 时间点。",
+   "phrases": [
+    [
+     "How long have you …?",
+     "你……多久了？"
+    ],
+    [
+     "since I was a kid",
+     "从我小时候起"
+    ]
+   ],
+   "same_as": "english-dialogue#17",
+   "section": "连线题"
+  },
+  {
+   "id": 2300,
+   "key": "english-xxt-1#28",
+   "paper_id": 38,
+   "qno": 28,
+   "type": "single",
+   "stem": "Can I help you?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Since I was a kid."
+    ],
+    [
+     "B",
+     "Perfect. It goes with your suit."
+    ],
+    [
+     "C",
+     "Altogether, it's $580."
+    ],
+    [
+     "D",
+     "I'm looking for a library."
+    ],
+    [
+     "E",
+     "No, I wish I have had."
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "stem_cn": "需要帮忙吗？",
+   "options_cn": [
+    "从我小时候起。",
+    "很完美，和你的西装很配。",
+    "一共 580 美元。",
+    "我在找图书馆。",
+    "没有，我希望我去过。"
+   ],
+   "point": "Can I help you? 是服务人员、路人主动提供帮助时说的，回答说明自己的需要。",
+   "phrases": [
+    [
+     "Can I help you?",
+     "需要帮忙吗？"
+    ],
+    [
+     "I'm looking for …",
+     "我在找……"
+    ]
+   ],
+   "same_as": "english-dialogue#18",
+   "section": "连线题"
+  },
+  {
+   "id": 2301,
+   "key": "english-xxt-1#29",
+   "paper_id": 38,
+   "qno": 29,
+   "type": "single",
+   "stem": "What's the price of them?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Since I was a kid."
+    ],
+    [
+     "B",
+     "Perfect. It goes with your suit."
+    ],
+    [
+     "C",
+     "Altogether, it's $580."
+    ],
+    [
+     "D",
+     "I'm looking for a library."
+    ],
+    [
+     "E",
+     "No, I wish I have had."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "stem_cn": "它们多少钱？",
+   "options_cn": [
+    "从我小时候起。",
+    "很完美，和你的西装很配。",
+    "一共 580 美元。",
+    "我在找图书馆。",
+    "没有，我希望我去过。"
+   ],
+   "point": "What's the price of…? = How much is / are…? 问价格。altogether 总共。",
+   "phrases": [
+    [
+     "What's the price of …?",
+     "……多少钱？"
+    ],
+    [
+     "altogether",
+     "总共"
+    ]
+   ],
+   "same_as": "english-dialogue#19",
+   "section": "连线题"
+  },
+  {
+   "id": 2302,
+   "key": "english-xxt-1#30",
+   "paper_id": 38,
+   "qno": 30,
+   "type": "single",
+   "stem": "How about this tie?",
+   "material": "问答配对：为每个问句选出恰当的答语。",
+   "options": [
+    [
+     "A",
+     "Since I was a kid."
+    ],
+    [
+     "B",
+     "Perfect. It goes with your suit."
+    ],
+    [
+     "C",
+     "Altogether, it's $580."
+    ],
+    [
+     "D",
+     "I'm looking for a library."
+    ],
+    [
+     "E",
+     "No, I wish I have had."
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "stem_cn": "这条领带怎么样？",
+   "options_cn": [
+    "从我小时候起。",
+    "很完美，和你的西装很配。",
+    "一共 580 美元。",
+    "我在找图书馆。",
+    "没有，我希望我去过。"
+   ],
+   "point": "How about…? 征求意见。go with 和……相配。",
+   "phrases": [
+    [
+     "How about …?",
+     "……怎么样？"
+    ],
+    [
+     "go with",
+     "和……相配"
+    ]
+   ],
+   "same_as": "english-dialogue#20",
+   "section": "连线题"
+  },
+  {
+   "id": 2303,
+   "key": "english-xxt-1#31",
+   "paper_id": 38,
+   "qno": 31,
+   "type": "single",
+   "stem": "第1空 / 第1句",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n[[img:english-writing/003.png]][[img:english-writing/004.png]][[img:english-writing/005.png]]",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "E",
+   "analysis": "",
+   "options_cn": [
+    "产品工作不正常，完全不显示画面。",
+    "（希望）换一台同等或更好型号的，或退款 580 元",
+    "（请通过）电话 13912200111（联系我）",
+    "湖南路 47 号，南京，210009",
+    "詹姆斯·约翰"
+   ],
+   "material_cn": "服务经理收到顾客投诉信，请根据信件内容完成顾客投诉记录表。\n投诉信大意：詹姆斯·约翰（地址：南京湖南路 47 号，210009）2019 年 2 月 15 日在百货商店花 580 元买了一台液晶彩色显示器，产品工作不正常，完全不显示画面。他希望换一台同等或更好型号的显示器，或者退款 580 元，并保留进一步投诉的权利。联系电话 13912200111。\n投诉记录表：收到日期 2019 年 3 月 5 日；收到方式：信件；顾客姓名（1）；顾客地址（2）；问题（3）；要求（4）；联系方式（5）。",
+   "point": "Customer's name 顾客姓名：落款 James John。",
+   "phrases": [
+    [
+     "customer's name",
+     "顾客姓名"
+    ],
+    [
+     "Yours faithfully / sincerely",
+     "落款敬语"
+    ]
+   ],
+   "same_as": "english-writing#11",
+   "section": "排序题"
+  },
+  {
+   "id": 2304,
+   "key": "english-xxt-1#32",
+   "paper_id": 38,
+   "qno": 32,
+   "type": "single",
+   "stem": "第2空 / 第2句",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n[[img:english-writing/003.png]][[img:english-writing/004.png]][[img:english-writing/005.png]]",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "options_cn": [
+    "产品工作不正常，完全不显示画面。",
+    "（希望）换一台同等或更好型号的，或退款 580 元",
+    "（请通过）电话 13912200111（联系我）",
+    "湖南路 47 号，南京，210009",
+    "詹姆斯·约翰"
+   ],
+   "material_cn": "服务经理收到顾客投诉信，请根据信件内容完成顾客投诉记录表。\n投诉信大意：詹姆斯·约翰（地址：南京湖南路 47 号，210009）2019 年 2 月 15 日在百货商店花 580 元买了一台液晶彩色显示器，产品工作不正常，完全不显示画面。他希望换一台同等或更好型号的显示器，或者退款 580 元，并保留进一步投诉的权利。联系电话 13912200111。\n投诉记录表：收到日期 2019 年 3 月 5 日；收到方式：信件；顾客姓名（1）；顾客地址（2）；问题（3）；要求（4）；联系方式（5）。",
+   "point": "Customer's address 顾客地址：信的右上角是写信人地址 47 Hunan Road。左边 No.1 Department Store 是收信人地址。",
+   "phrases": [
+    [
+     "customer's address",
+     "顾客地址"
+    ],
+    [
+     "department store",
+     "百货商店"
+    ]
+   ],
+   "same_as": "english-writing#12",
+   "section": "排序题"
+  },
+  {
+   "id": 2305,
+   "key": "english-xxt-1#33",
+   "paper_id": 38,
+   "qno": 33,
+   "type": "single",
+   "stem": "第3空 / 第3句",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n[[img:english-writing/003.png]][[img:english-writing/004.png]][[img:english-writing/005.png]]",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "产品工作不正常，完全不显示画面。",
+    "（希望）换一台同等或更好型号的，或退款 580 元",
+    "（请通过）电话 13912200111（联系我）",
+    "湖南路 47 号，南京，210009",
+    "詹姆斯·约翰"
+   ],
+   "material_cn": "服务经理收到顾客投诉信，请根据信件内容完成顾客投诉记录表。\n投诉信大意：詹姆斯·约翰（地址：南京湖南路 47 号，210009）2019 年 2 月 15 日在百货商店花 580 元买了一台液晶彩色显示器，产品工作不正常，完全不显示画面。他希望换一台同等或更好型号的显示器，或者退款 580 元，并保留进一步投诉的权利。联系电话 13912200111。\n投诉记录表：收到日期 2019 年 3 月 5 日；收到方式：信件；顾客姓名（1）；顾客地址（2）；问题（3）；要求（4）；联系方式（5）。",
+   "point": "Problem(s) 问题：显示器不显示画面。function 运转。",
+   "phrases": [
+    [
+     "function properly",
+     "正常运转"
+    ],
+    [
+     "not … at all",
+     "完全不"
+    ],
+    [
+     "display",
+     "显示"
+    ]
+   ],
+   "same_as": "english-writing#13",
+   "section": "排序题"
+  },
+  {
+   "id": 2306,
+   "key": "english-xxt-1#34",
+   "paper_id": 38,
+   "qno": 34,
+   "type": "single",
+   "stem": "第4空 / 第4句",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n[[img:english-writing/003.png]][[img:english-writing/004.png]][[img:english-writing/005.png]]",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "产品工作不正常，完全不显示画面。",
+    "（希望）换一台同等或更好型号的，或退款 580 元",
+    "（请通过）电话 13912200111（联系我）",
+    "湖南路 47 号，南京，210009",
+    "詹姆斯·约翰"
+   ],
+   "material_cn": "服务经理收到顾客投诉信，请根据信件内容完成顾客投诉记录表。\n投诉信大意：詹姆斯·约翰（地址：南京湖南路 47 号，210009）2019 年 2 月 15 日在百货商店花 580 元买了一台液晶彩色显示器，产品工作不正常，完全不显示画面。他希望换一台同等或更好型号的显示器，或者退款 580 元，并保留进一步投诉的权利。联系电话 13912200111。\n投诉记录表：收到日期 2019 年 3 月 5 日；收到方式：信件；顾客姓名（1）；顾客地址（2）；问题（3）；要求（4）；联系方式（5）。",
+   "point": "Request 要求：换货或退款。exchange 交换；refund 退款。",
+   "phrases": [
+    [
+     "exchange … for …",
+     "用……换……"
+    ],
+    [
+     "refund",
+     "退款"
+    ],
+    [
+     "of the same or better model",
+     "同等或更好型号的"
+    ]
+   ],
+   "same_as": "english-writing#14",
+   "section": "排序题"
+  },
+  {
+   "id": 2307,
+   "key": "english-xxt-1#35",
+   "paper_id": 38,
+   "qno": 35,
+   "type": "single",
+   "stem": "第5空 / 第5句",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n[[img:english-writing/003.png]][[img:english-writing/004.png]][[img:english-writing/005.png]]",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "产品工作不正常，完全不显示画面。",
+    "（希望）换一台同等或更好型号的，或退款 580 元",
+    "（请通过）电话 13912200111（联系我）",
+    "湖南路 47 号，南京，210009",
+    "詹姆斯·约翰"
+   ],
+   "material_cn": "服务经理收到顾客投诉信，请根据信件内容完成顾客投诉记录表。\n投诉信大意：詹姆斯·约翰（地址：南京湖南路 47 号，210009）2019 年 2 月 15 日在百货商店花 580 元买了一台液晶彩色显示器，产品工作不正常，完全不显示画面。他希望换一台同等或更好型号的显示器，或者退款 580 元，并保留进一步投诉的权利。联系电话 13912200111。\n投诉记录表：收到日期 2019 年 3 月 5 日；收到方式：信件；顾客姓名（1）；顾客地址（2）；问题（3）；要求（4）；联系方式（5）。",
+   "point": "How to contact 联系方式：电话。",
+   "phrases": [
+    [
+     "contact sb by phone",
+     "打电话联系某人"
+    ],
+    [
+     "How to contact",
+     "联系方式"
+    ]
+   ],
+   "same_as": "english-writing#15",
+   "section": "排序题"
+  },
+  {
+   "id": 2308,
+   "key": "english-xxt-1#36",
+   "paper_id": 38,
+   "qno": 36,
+   "type": "single",
+   "stem": "对话第1空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nWilliam: Good morning, sir. （__1__）\nInterviewer: Nice to meet you. Take a seat, please.\nWilliam: Thank you very much. （__2__）\nInterviewer: OK. Have you been working?\nWilliam: Yes, （__3__）\nInterviewer: （__4__）\nWilliam: I would like to further develop my skills and get more opportunities.\nInterviewer: What starting salary do you expect?\nWilliam: （__5__）\nInterviewer: What are your career goals?\nWilliam: Eventually, I'd like to open my own company.",
+   "options": [
+    [
+     "A",
+     "I've been working for an American company for two years."
+    ],
+    [
+     "B",
+     "This is my resume."
+    ],
+    [
+     "C",
+     "I'd like to start around $2000 a month."
+    ],
+    [
+     "D",
+     "I'm here applying for the position in programming."
+    ],
+    [
+     "E",
+     "What made you decide to change your job?"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "",
+   "options_cn": [
+    "我在一家美国公司工作了两年。",
+    "这是我的简历。",
+    "我希望起薪每月 2000 美元左右。",
+    "我是来应聘编程岗位的。",
+    "是什么让你决定换工作？"
+   ],
+   "material_cn": "威廉：早上好，先生。（1）\n面试官：很高兴见到你。请坐。\n威廉：非常感谢。（2）\n面试官：好的。你工作过吗？\n威廉：是的，（3）\n面试官：（4）\n威廉：我想进一步提升技能，获得更多机会。\n面试官：你期望的起薪是多少？\n威廉：（5）\n面试官：你的职业目标是什么？\n威廉：最终，我想开自己的公司。",
+   "point": "面试开场先说明来意：I'm here applying for the position in… position 职位。",
+   "phrases": [
+    [
+     "I'm here applying for …",
+     "我来应聘……"
+    ],
+    [
+     "programming",
+     "编程"
+    ]
+   ],
+   "same_as": "english-dialogue#61",
+   "section": "排序题"
+  },
+  {
+   "id": 2309,
+   "key": "english-xxt-1#37",
+   "paper_id": 38,
+   "qno": 37,
+   "type": "single",
+   "stem": "对话第2空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nWilliam: Good morning, sir. （__1__）\nInterviewer: Nice to meet you. Take a seat, please.\nWilliam: Thank you very much. （__2__）\nInterviewer: OK. Have you been working?\nWilliam: Yes, （__3__）\nInterviewer: （__4__）\nWilliam: I would like to further develop my skills and get more opportunities.\nInterviewer: What starting salary do you expect?\nWilliam: （__5__）\nInterviewer: What are your career goals?\nWilliam: Eventually, I'd like to open my own company.",
+   "options": [
+    [
+     "A",
+     "I've been working for an American company for two years."
+    ],
+    [
+     "B",
+     "This is my resume."
+    ],
+    [
+     "C",
+     "I'd like to start around $2000 a month."
+    ],
+    [
+     "D",
+     "I'm here applying for the position in programming."
+    ],
+    [
+     "E",
+     "What made you decide to change your job?"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "我在一家美国公司工作了两年。",
+    "这是我的简历。",
+    "我希望起薪每月 2000 美元左右。",
+    "我是来应聘编程岗位的。",
+    "是什么让你决定换工作？"
+   ],
+   "material_cn": "威廉：早上好，先生。（1）\n面试官：很高兴见到你。请坐。\n威廉：非常感谢。（2）\n面试官：好的。你工作过吗？\n威廉：是的，（3）\n面试官：（4）\n威廉：我想进一步提升技能，获得更多机会。\n面试官：你期望的起薪是多少？\n威廉：（5）\n面试官：你的职业目标是什么？\n威廉：最终，我想开自己的公司。",
+   "point": "坐下后递简历：This is my resume。resume 简历。",
+   "phrases": [
+    [
+     "This is my resume.",
+     "这是我的简历"
+    ]
+   ],
+   "same_as": "english-dialogue#62",
+   "section": "排序题"
+  },
+  {
+   "id": 2310,
+   "key": "english-xxt-1#38",
+   "paper_id": 38,
+   "qno": 38,
+   "type": "single",
+   "stem": "对话第3空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nWilliam: Good morning, sir. （__1__）\nInterviewer: Nice to meet you. Take a seat, please.\nWilliam: Thank you very much. （__2__）\nInterviewer: OK. Have you been working?\nWilliam: Yes, （__3__）\nInterviewer: （__4__）\nWilliam: I would like to further develop my skills and get more opportunities.\nInterviewer: What starting salary do you expect?\nWilliam: （__5__）\nInterviewer: What are your career goals?\nWilliam: Eventually, I'd like to open my own company.",
+   "options": [
+    [
+     "A",
+     "I've been working for an American company for two years."
+    ],
+    [
+     "B",
+     "This is my resume."
+    ],
+    [
+     "C",
+     "I'd like to start around $2000 a month."
+    ],
+    [
+     "D",
+     "I'm here applying for the position in programming."
+    ],
+    [
+     "E",
+     "What made you decide to change your job?"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "我在一家美国公司工作了两年。",
+    "这是我的简历。",
+    "我希望起薪每月 2000 美元左右。",
+    "我是来应聘编程岗位的。",
+    "是什么让你决定换工作？"
+   ],
+   "material_cn": "威廉：早上好，先生。（1）\n面试官：很高兴见到你。请坐。\n威廉：非常感谢。（2）\n面试官：好的。你工作过吗？\n威廉：是的，（3）\n面试官：（4）\n威廉：我想进一步提升技能，获得更多机会。\n面试官：你期望的起薪是多少？\n威廉：（5）\n面试官：你的职业目标是什么？\n威廉：最终，我想开自己的公司。",
+   "point": "问\"你工作过吗\"，回答 Yes 后说明工作经历。",
+   "phrases": [
+    [
+     "work for a company",
+     "在公司工作"
+    ],
+    [
+     "for two years",
+     "两年了"
+    ]
+   ],
+   "same_as": "english-dialogue#63",
+   "section": "排序题"
+  },
+  {
+   "id": 2311,
+   "key": "english-xxt-1#39",
+   "paper_id": 38,
+   "qno": 39,
+   "type": "single",
+   "stem": "对话第4空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nWilliam: Good morning, sir. （__1__）\nInterviewer: Nice to meet you. Take a seat, please.\nWilliam: Thank you very much. （__2__）\nInterviewer: OK. Have you been working?\nWilliam: Yes, （__3__）\nInterviewer: （__4__）\nWilliam: I would like to further develop my skills and get more opportunities.\nInterviewer: What starting salary do you expect?\nWilliam: （__5__）\nInterviewer: What are your career goals?\nWilliam: Eventually, I'd like to open my own company.",
+   "options": [
+    [
+     "A",
+     "I've been working for an American company for two years."
+    ],
+    [
+     "B",
+     "This is my resume."
+    ],
+    [
+     "C",
+     "I'd like to start around $2000 a month."
+    ],
+    [
+     "D",
+     "I'm here applying for the position in programming."
+    ],
+    [
+     "E",
+     "What made you decide to change your job?"
+    ]
+   ],
+   "answer": "E",
+   "analysis": "",
+   "options_cn": [
+    "我在一家美国公司工作了两年。",
+    "这是我的简历。",
+    "我希望起薪每月 2000 美元左右。",
+    "我是来应聘编程岗位的。",
+    "是什么让你决定换工作？"
+   ],
+   "material_cn": "威廉：早上好，先生。（1）\n面试官：很高兴见到你。请坐。\n威廉：非常感谢。（2）\n面试官：好的。你工作过吗？\n威廉：是的，（3）\n面试官：（4）\n威廉：我想进一步提升技能，获得更多机会。\n面试官：你期望的起薪是多少？\n威廉：（5）\n面试官：你的职业目标是什么？\n威廉：最终，我想开自己的公司。",
+   "point": "下文回答\"想提升技能、获得更多机会\"，是换工作的原因。",
+   "phrases": [
+    [
+     "What made you decide to …?",
+     "是什么让你决定……？"
+    ],
+    [
+     "change one's job",
+     "换工作"
+    ],
+    [
+     "further develop my skills",
+     "进一步提升技能"
+    ]
+   ],
+   "same_as": "english-dialogue#64",
+   "section": "排序题"
+  },
+  {
+   "id": 2312,
+   "key": "english-xxt-1#40",
+   "paper_id": 38,
+   "qno": 40,
+   "type": "single",
+   "stem": "对话第5空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nWilliam: Good morning, sir. （__1__）\nInterviewer: Nice to meet you. Take a seat, please.\nWilliam: Thank you very much. （__2__）\nInterviewer: OK. Have you been working?\nWilliam: Yes, （__3__）\nInterviewer: （__4__）\nWilliam: I would like to further develop my skills and get more opportunities.\nInterviewer: What starting salary do you expect?\nWilliam: （__5__）\nInterviewer: What are your career goals?\nWilliam: Eventually, I'd like to open my own company.",
+   "options": [
+    [
+     "A",
+     "I've been working for an American company for two years."
+    ],
+    [
+     "B",
+     "This is my resume."
+    ],
+    [
+     "C",
+     "I'd like to start around $2000 a month."
+    ],
+    [
+     "D",
+     "I'm here applying for the position in programming."
+    ],
+    [
+     "E",
+     "What made you decide to change your job?"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "我在一家美国公司工作了两年。",
+    "这是我的简历。",
+    "我希望起薪每月 2000 美元左右。",
+    "我是来应聘编程岗位的。",
+    "是什么让你决定换工作？"
+   ],
+   "material_cn": "威廉：早上好，先生。（1）\n面试官：很高兴见到你。请坐。\n威廉：非常感谢。（2）\n面试官：好的。你工作过吗？\n威廉：是的，（3）\n面试官：（4）\n威廉：我想进一步提升技能，获得更多机会。\n面试官：你期望的起薪是多少？\n威廉：（5）\n面试官：你的职业目标是什么？\n威廉：最终，我想开自己的公司。",
+   "point": "问 What starting salary do you expect? 回答期望薪资。salary 薪水。",
+   "phrases": [
+    [
+     "starting salary",
+     "起薪"
+    ],
+    [
+     "around $2000 a month",
+     "每月 2000 美元左右"
+    ],
+    [
+     "career goals",
+     "职业目标"
+    ]
+   ],
+   "same_as": "english-dialogue#65",
+   "section": "排序题"
+  },
+  {
+   "id": 2313,
+   "key": "english-xxt-1#41",
+   "paper_id": 38,
+   "qno": 41,
+   "type": "single",
+   "stem": "第1空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "in"
+    ],
+    [
+     "B",
+     "with"
+    ],
+    [
+     "C",
+     "at"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "在……里",
+    "和……一起",
+    "在"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "live with sb 和某人住在一起。",
+   "phrases": [
+    [
+     "live with sb",
+     "和某人住在一起"
+    ],
+    [
+     "neighborhood",
+     "街坊、社区"
+    ]
+   ],
+   "same_as": "english-cloze#71",
+   "section": "完形填空"
+  },
+  {
+   "id": 2314,
+   "key": "english-xxt-1#42",
+   "paper_id": 38,
+   "qno": 42,
+   "type": "single",
+   "stem": "第2空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "two thousands"
+    ],
+    [
+     "B",
+     "thousands of"
+    ],
+    [
+     "C",
+     "thousand of"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "（thousand 不加 s）",
+    "成千上万的",
+    "（缺 s）"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "具体数字 two thousand 不加 s；表示约数 thousands of 要加 s 和 of。",
+   "phrases": [
+    [
+     "thousands of",
+     "成千上万的"
+    ],
+    [
+     "two thousand",
+     "两千（不加 s）"
+    ]
+   ],
+   "same_as": "english-cloze#72",
+   "section": "完形填空"
+  },
+  {
+   "id": 2315,
+   "key": "english-xxt-1#43",
+   "paper_id": 38,
+   "qno": 43,
+   "type": "single",
+   "stem": "第3空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "likes"
+    ],
+    [
+     "B",
+     "is like"
+    ],
+    [
+     "C",
+     "seem"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "喜欢（三单）",
+    "像",
+    "似乎（主语三单要加 s）"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "be like 像……；likes 是\"喜欢\"。",
+   "phrases": [
+    [
+     "be like",
+     "像"
+    ],
+    [
+     "look like",
+     "看起来像"
+    ]
+   ],
+   "same_as": "english-cloze#73",
+   "section": "完形填空"
+  },
+  {
+   "id": 2316,
+   "key": "english-xxt-1#44",
+   "paper_id": 38,
+   "qno": 44,
+   "type": "single",
+   "stem": "第4空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "doctor"
+    ],
+    [
+     "B",
+     "policeman"
+    ],
+    [
+     "C",
+     "engineer"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "医生",
+    "警察",
+    "工程师"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "下句\"帮别人检查和修电脑\"，是电脑工程师。",
+   "phrases": [
+    [
+     "computer engineer",
+     "计算机工程师"
+    ],
+    [
+     "check and fix",
+     "检查和修理"
+    ]
+   ],
+   "same_as": "english-cloze#74",
+   "section": "完形填空"
+  },
+  {
+   "id": 2317,
+   "key": "english-xxt-1#45",
+   "paper_id": 38,
+   "qno": 45,
+   "type": "single",
+   "stem": "第5空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "your"
+    ],
+    [
+     "B",
+     "our"
+    ],
+    [
+     "C",
+     "their"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "你们的",
+    "我们的",
+    "他们的"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "helps students with their homework，指学生的作业。",
+   "phrases": [
+    [
+     "help sb with sth",
+     "在某方面帮助某人"
+    ],
+    [
+     "college teacher",
+     "大学老师"
+    ]
+   ],
+   "same_as": "english-cloze#75",
+   "section": "完形填空"
+  },
+  {
+   "id": 2318,
+   "key": "english-xxt-1#46",
+   "paper_id": 38,
+   "qno": 46,
+   "type": "single",
+   "stem": "第6空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "watch"
+    ],
+    [
+     "B",
+     "see"
+    ],
+    [
+     "C",
+     "read"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "观看",
+    "看望",
+    "阅读"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "go to see sb 去看望某人。",
+   "phrases": [
+    [
+     "go to see sb",
+     "去看望某人"
+    ],
+    [
+     "do shopping",
+     "购物"
+    ],
+    [
+     "at weekends",
+     "在周末"
+    ]
+   ],
+   "same_as": "english-cloze#76",
+   "section": "完形填空"
+  },
+  {
+   "id": 2319,
+   "key": "english-xxt-1#47",
+   "paper_id": 38,
+   "qno": 47,
+   "type": "single",
+   "stem": "第7空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "helpful"
+    ],
+    [
+     "B",
+     "useful"
+    ],
+    [
+     "C",
+     "different"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "乐于助人的",
+    "有用的（指物）",
+    "不同的"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "下句\"他们乐意帮忙\"，说人乐于助人用 helpful；useful 一般指物有用。",
+   "phrases": [
+    [
+     "kind and helpful",
+     "友好而乐于助人"
+    ],
+    [
+     "be ready to do",
+     "乐意做"
+    ]
+   ],
+   "same_as": "english-cloze#77",
+   "section": "完形填空"
+  },
+  {
+   "id": 2320,
+   "key": "english-xxt-1#48",
+   "paper_id": 38,
+   "qno": 48,
+   "type": "single",
+   "stem": "第8空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "friend"
+    ],
+    [
+     "B",
+     "place"
+    ],
+    [
+     "C",
+     "sport"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "",
+   "options_cn": [
+    "朋友",
+    "地方",
+    "运动"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "下文 We go there，可知\"爱心之家\"是一个地方。",
+   "phrases": [
+    [
+     "favorite place",
+     "最喜欢的地方"
+    ]
+   ],
+   "same_as": "english-cloze#78",
+   "section": "完形填空"
+  },
+  {
+   "id": 2321,
+   "key": "english-xxt-1#49",
+   "paper_id": 38,
+   "qno": 49,
+   "type": "single",
+   "stem": "第9空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "with"
+    ],
+    [
+     "B",
+     "for"
+    ],
+    [
+     "C",
+     "about"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "",
+   "options_cn": [
+    "和、关于",
+    "为了",
+    "关于"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "need help with sth 在某方面需要帮助。",
+   "phrases": [
+    [
+     "need help with",
+     "在……方面需要帮助"
+    ],
+    [
+     "all kinds of",
+     "各种各样的"
+    ]
+   ],
+   "same_as": "english-cloze#79",
+   "section": "完形填空"
+  },
+  {
+   "id": 2322,
+   "key": "english-xxt-1#50",
+   "paper_id": 38,
+   "qno": 50,
+   "type": "single",
+   "stem": "第10空",
+   "material": "完形填空\nI live __1__ my family in a new neighborhood. There are many tall buildings in our community center. Every day __2__ people come and visit it. Our community center __3__ a big family. My family members are social workers. My father is a computer __4__ . He often helps others check and fix computers. My mother is a college teacher. She always helps students with __5__ homework. My sister and I often go to __6__ the old people and do shopping for them at weekend. Our neighbors are all kind and __7__ . When our bicycles are broken, they are ready to help us. Love House is our favorite __8__ . We go there when we need help __9__ all kinds of problems. We love our community center. We think it is __10__ for us to have the community center like this.",
+   "options": [
+    [
+     "A",
+     "special"
+    ],
+    [
+     "B",
+     "sick"
+    ],
+    [
+     "C",
+     "lucky"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "",
+   "options_cn": [
+    "特别的",
+    "生病的",
+    "幸运的"
+   ],
+   "material_cn": "我（1）我的家人住在一个新小区。我们社区中心有很多高楼。每天有（2）人来参观。我们的社区中心（3）一个大家庭。我的家人都是社工。我爸爸是电脑（4），他经常帮别人检查和修电脑。我妈妈是大学老师，她总是帮学生做（5）作业。周末我和妹妹常去（6）老人，帮他们买东西。我们的邻居都很善良、（7）。我们自行车坏了的时候，他们都乐意帮忙。\"爱心之家\"是我们最喜欢的（8）。我们在遇到各种问题需要帮助（9）时就去那里。我们爱我们的社区中心。我们觉得有这样的社区中心是我们的（10）。",
+   "point": "It is lucky for us to… 我们很幸运能……",
+   "phrases": [
+    [
+     "It is lucky for sb to do",
+     "某人做……很幸运"
+    ],
+    [
+     "community center",
+     "社区中心"
+    ]
+   ],
+   "same_as": "english-cloze#80",
+   "section": "完形填空"
+  },
+  {
+   "id": 2323,
+   "key": "english-xxt-1#51",
+   "paper_id": 38,
+   "qno": 51,
+   "type": "judge",
+   "stem": "According to some scientists, driverless cars may make driving become enjoyable.",
+   "material": "Babies born after 2017 may never need to take a driving lesson because of the self--driving cars. Some scientists say that self--driving or driverless cars may hit the road within 15 years, and it is possible that driving may become unnecessary, or more relaxing and enjoyable.\nCompanies like Google, Baidu, Apple and Alibaba are working on driverless cars. This kind of cars may change the way we live in the future. All you have to do is typing in your address! According to Baidu, the driverless technology has the following four advantages. Firstly, driverless cars are actually safer. In China, there are more than 500 deaths caused by accidents. With driverless cars, the number will 「decrease」 by 100 times. Secondly, driverless cars are more efficient than manned cars. Thirdly, driverless cars follow the traffic rules. Therefore, traffic controlling will be easier. At last, the cost of transportation will be reduced as the labor cost becomes less. There are many different technologies needed to make a successful self--driving car. The most difficult technologies of all are environmental perception (感知), behavior prediction, planning control and exact GPS.",
+   "options": [],
+   "answer": "对",
+   "analysis": "",
+   "stem_cn": "根据一些科学家的说法，无人驾驶汽车可能让开车变得愉快。",
+   "material_cn": "因为有了自动驾驶汽车，2017 年以后出生的婴儿可能永远都不需要上驾驶课。一些科学家说，自动驾驶或无人驾驶汽车可能在 15 年内上路，开车可能会变得没有必要，或者更轻松愉快。\n谷歌、百度、苹果和阿里巴巴等公司都在研发无人驾驶汽车。这种车可能改变我们未来的生活方式。你所要做的只是输入地址！据百度介绍，无人驾驶技术有以下四个优点。第一，无人驾驶汽车其实更安全。在中国，事故造成的死亡人数超过 500 人，有了无人驾驶汽车，这个数字将「减少」100 倍。第二，无人驾驶汽车比有人驾驶的汽车效率更高。第三，无人驾驶汽车遵守交通规则，因此交通管理会更容易。最后，随着人工成本降低，运输成本也会降低。制造成功的自动驾驶汽车需要很多不同的技术，其中最难的是环境感知、行为预测、规划控制和精确 GPS。",
+   "point": "原文 more relaxing and enjoyable。",
+   "phrases": [
+    [
+     "self-driving / driverless car",
+     "无人驾驶汽车"
+    ],
+    [
+     "take a driving lesson",
+     "上驾驶课"
+    ],
+    [
+     "hit the road",
+     "上路"
+    ]
+   ],
+   "same_as": "english-reading#136",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2324,
+   "key": "english-xxt-1#52",
+   "paper_id": 38,
+   "qno": 52,
+   "type": "judge",
+   "stem": "Passengers don't need to tell the driverless cars where they want to go.",
+   "material": "Babies born after 2017 may never need to take a driving lesson because of the self--driving cars. Some scientists say that self--driving or driverless cars may hit the road within 15 years, and it is possible that driving may become unnecessary, or more relaxing and enjoyable.\nCompanies like Google, Baidu, Apple and Alibaba are working on driverless cars. This kind of cars may change the way we live in the future. All you have to do is typing in your address! According to Baidu, the driverless technology has the following four advantages. Firstly, driverless cars are actually safer. In China, there are more than 500 deaths caused by accidents. With driverless cars, the number will 「decrease」 by 100 times. Secondly, driverless cars are more efficient than manned cars. Thirdly, driverless cars follow the traffic rules. Therefore, traffic controlling will be easier. At last, the cost of transportation will be reduced as the labor cost becomes less. There are many different technologies needed to make a successful self--driving car. The most difficult technologies of all are environmental perception (感知), behavior prediction, planning control and exact GPS.",
+   "options": [],
+   "answer": "错",
+   "analysis": "",
+   "stem_cn": "乘客不需要告诉无人驾驶汽车他们想去哪里。",
+   "material_cn": "因为有了自动驾驶汽车，2017 年以后出生的婴儿可能永远都不需要上驾驶课。一些科学家说，自动驾驶或无人驾驶汽车可能在 15 年内上路，开车可能会变得没有必要，或者更轻松愉快。\n谷歌、百度、苹果和阿里巴巴等公司都在研发无人驾驶汽车。这种车可能改变我们未来的生活方式。你所要做的只是输入地址！据百度介绍，无人驾驶技术有以下四个优点。第一，无人驾驶汽车其实更安全。在中国，事故造成的死亡人数超过 500 人，有了无人驾驶汽车，这个数字将「减少」100 倍。第二，无人驾驶汽车比有人驾驶的汽车效率更高。第三，无人驾驶汽车遵守交通规则，因此交通管理会更容易。最后，随着人工成本降低，运输成本也会降低。制造成功的自动驾驶汽车需要很多不同的技术，其中最难的是环境感知、行为预测、规划控制和精确 GPS。",
+   "point": "原文 All you have to do is typing in your address，要输入地址。",
+   "phrases": [
+    [
+     "type in",
+     "输入"
+    ],
+    [
+     "work on",
+     "致力于"
+    ]
+   ],
+   "same_as": "english-reading#137",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2325,
+   "key": "english-xxt-1#53",
+   "paper_id": 38,
+   "qno": 53,
+   "type": "judge",
+   "stem": "Driverless cars are safer than man--controlled cars.",
+   "material": "Babies born after 2017 may never need to take a driving lesson because of the self--driving cars. Some scientists say that self--driving or driverless cars may hit the road within 15 years, and it is possible that driving may become unnecessary, or more relaxing and enjoyable.\nCompanies like Google, Baidu, Apple and Alibaba are working on driverless cars. This kind of cars may change the way we live in the future. All you have to do is typing in your address! According to Baidu, the driverless technology has the following four advantages. Firstly, driverless cars are actually safer. In China, there are more than 500 deaths caused by accidents. With driverless cars, the number will 「decrease」 by 100 times. Secondly, driverless cars are more efficient than manned cars. Thirdly, driverless cars follow the traffic rules. Therefore, traffic controlling will be easier. At last, the cost of transportation will be reduced as the labor cost becomes less. There are many different technologies needed to make a successful self--driving car. The most difficult technologies of all are environmental perception (感知), behavior prediction, planning control and exact GPS.",
+   "options": [],
+   "answer": "对",
+   "analysis": "",
+   "stem_cn": "无人驾驶汽车比人驾驶的汽车更安全。",
+   "material_cn": "因为有了自动驾驶汽车，2017 年以后出生的婴儿可能永远都不需要上驾驶课。一些科学家说，自动驾驶或无人驾驶汽车可能在 15 年内上路，开车可能会变得没有必要，或者更轻松愉快。\n谷歌、百度、苹果和阿里巴巴等公司都在研发无人驾驶汽车。这种车可能改变我们未来的生活方式。你所要做的只是输入地址！据百度介绍，无人驾驶技术有以下四个优点。第一，无人驾驶汽车其实更安全。在中国，事故造成的死亡人数超过 500 人，有了无人驾驶汽车，这个数字将「减少」100 倍。第二，无人驾驶汽车比有人驾驶的汽车效率更高。第三，无人驾驶汽车遵守交通规则，因此交通管理会更容易。最后，随着人工成本降低，运输成本也会降低。制造成功的自动驾驶汽车需要很多不同的技术，其中最难的是环境感知、行为预测、规划控制和精确 GPS。",
+   "point": "原文 driverless cars are actually safer。",
+   "phrases": [
+    [
+     "safer than",
+     "比……更安全"
+    ],
+    [
+     "advantage",
+     "优点"
+    ],
+    [
+     "be caused by accidents",
+     "由事故造成"
+    ]
+   ],
+   "same_as": "english-reading#138",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2326,
+   "key": "english-xxt-1#54",
+   "paper_id": 38,
+   "qno": 54,
+   "type": "judge",
+   "stem": "The underlined word \"decrease\" in the third paragraph means \"减少\".",
+   "material": "Babies born after 2017 may never need to take a driving lesson because of the self--driving cars. Some scientists say that self--driving or driverless cars may hit the road within 15 years, and it is possible that driving may become unnecessary, or more relaxing and enjoyable.\nCompanies like Google, Baidu, Apple and Alibaba are working on driverless cars. This kind of cars may change the way we live in the future. All you have to do is typing in your address! According to Baidu, the driverless technology has the following four advantages. Firstly, driverless cars are actually safer. In China, there are more than 500 deaths caused by accidents. With driverless cars, the number will 「decrease」 by 100 times. Secondly, driverless cars are more efficient than manned cars. Thirdly, driverless cars follow the traffic rules. Therefore, traffic controlling will be easier. At last, the cost of transportation will be reduced as the labor cost becomes less. There are many different technologies needed to make a successful self--driving car. The most difficult technologies of all are environmental perception (感知), behavior prediction, planning control and exact GPS.",
+   "options": [],
+   "answer": "对",
+   "analysis": "",
+   "stem_cn": "第三段划线词 decrease 的意思是\"减少\"。",
+   "material_cn": "因为有了自动驾驶汽车，2017 年以后出生的婴儿可能永远都不需要上驾驶课。一些科学家说，自动驾驶或无人驾驶汽车可能在 15 年内上路，开车可能会变得没有必要，或者更轻松愉快。\n谷歌、百度、苹果和阿里巴巴等公司都在研发无人驾驶汽车。这种车可能改变我们未来的生活方式。你所要做的只是输入地址！据百度介绍，无人驾驶技术有以下四个优点。第一，无人驾驶汽车其实更安全。在中国，事故造成的死亡人数超过 500 人，有了无人驾驶汽车，这个数字将「减少」100 倍。第二，无人驾驶汽车比有人驾驶的汽车效率更高。第三，无人驾驶汽车遵守交通规则，因此交通管理会更容易。最后，随着人工成本降低，运输成本也会降低。制造成功的自动驾驶汽车需要很多不同的技术，其中最难的是环境感知、行为预测、规划控制和精确 GPS。",
+   "point": "decrease 减少；increase 增加。根据\"更安全\"，死亡人数会减少。",
+   "phrases": [
+    [
+     "decrease",
+     "减少"
+    ],
+    [
+     "by 100 times",
+     "减少到百分之一"
+    ],
+    [
+     "follow the traffic rules",
+     "遵守交通规则"
+    ]
+   ],
+   "same_as": "english-reading#139",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2327,
+   "key": "english-xxt-1#55",
+   "paper_id": 38,
+   "qno": 55,
+   "type": "judge",
+   "stem": "We can learn from the passage that the technologies for driverless cars have already well developed.",
+   "material": "Babies born after 2017 may never need to take a driving lesson because of the self--driving cars. Some scientists say that self--driving or driverless cars may hit the road within 15 years, and it is possible that driving may become unnecessary, or more relaxing and enjoyable.\nCompanies like Google, Baidu, Apple and Alibaba are working on driverless cars. This kind of cars may change the way we live in the future. All you have to do is typing in your address! According to Baidu, the driverless technology has the following four advantages. Firstly, driverless cars are actually safer. In China, there are more than 500 deaths caused by accidents. With driverless cars, the number will 「decrease」 by 100 times. Secondly, driverless cars are more efficient than manned cars. Thirdly, driverless cars follow the traffic rules. Therefore, traffic controlling will be easier. At last, the cost of transportation will be reduced as the labor cost becomes less. There are many different technologies needed to make a successful self--driving car. The most difficult technologies of all are environmental perception (感知), behavior prediction, planning control and exact GPS.",
+   "options": [],
+   "answer": "错",
+   "analysis": "",
+   "stem_cn": "从文中可知，无人驾驶汽车的技术已经发展得很好了。",
+   "material_cn": "因为有了自动驾驶汽车，2017 年以后出生的婴儿可能永远都不需要上驾驶课。一些科学家说，自动驾驶或无人驾驶汽车可能在 15 年内上路，开车可能会变得没有必要，或者更轻松愉快。\n谷歌、百度、苹果和阿里巴巴等公司都在研发无人驾驶汽车。这种车可能改变我们未来的生活方式。你所要做的只是输入地址！据百度介绍，无人驾驶技术有以下四个优点。第一，无人驾驶汽车其实更安全。在中国，事故造成的死亡人数超过 500 人，有了无人驾驶汽车，这个数字将「减少」100 倍。第二，无人驾驶汽车比有人驾驶的汽车效率更高。第三，无人驾驶汽车遵守交通规则，因此交通管理会更容易。最后，随着人工成本降低，运输成本也会降低。制造成功的自动驾驶汽车需要很多不同的技术，其中最难的是环境感知、行为预测、规划控制和精确 GPS。",
+   "point": "文末说需要很多技术，还有最难的几项，说明技术还不成熟。",
+   "phrases": [
+    [
+     "be well developed",
+     "发展成熟"
+    ],
+    [
+     "the cost of transportation",
+     "运输成本"
+    ],
+    [
+     "be reduced",
+     "被降低"
+    ]
+   ],
+   "same_as": "english-reading#140",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2328,
+   "key": "english-xxt-1#56",
+   "paper_id": 38,
+   "qno": 56,
+   "type": "judge",
+   "stem": "The school bank opens once a week.",
+   "material": "Every Tuesday, Carina goes to work in a bank. She knows all her customers very well, because they are her classmates. In fact, Carina and her customers are all 10 years old. Carina's bank is in a school in Chicago. The bank is a branch(分支) of a national bank, but the children run the bank. It is open for 30 minutes on every Tuesday morning, Carina opens the bank. Her classmates put their money in or take their money out. The bank pays interest to them. The idea for a school bank came from their teacher, Mr. Harry Bassett who took his idea to the national bank. The bank agreed to his plan. \"We want to give the children a chance to learn about money,\" said Mr. Bassett. \"They are trained to look after their money carefully.”",
+   "options": [],
+   "answer": "对",
+   "analysis": "",
+   "stem_cn": "学校银行每周开一次。",
+   "material_cn": "每周二，卡丽娜去一家银行上班。她非常了解她所有的顾客，因为他们都是她的同学。事实上，卡丽娜和她的顾客都是 10 岁。卡丽娜的银行在芝加哥的一所学校里。这家银行是一家国家银行的分行，但由孩子们经营。它每周二上午开放 30 分钟，由卡丽娜开门。同学们来存钱或取钱，银行付给他们利息。办学校银行的主意来自他们的老师哈里·巴西特先生，他把这个想法告诉了国家银行，银行同意了他的计划。\"我们想给孩子们一个了解钱的机会，\"巴西特先生说，\"他们被训练如何仔细管理自己的钱。\"",
+   "point": "原文 open for 30 minutes on every Tuesday morning。",
+   "phrases": [
+    [
+     "once a week",
+     "每周一次"
+    ],
+    [
+     "every Tuesday",
+     "每周二"
+    ]
+   ],
+   "same_as": "english-reading#106",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2329,
+   "key": "english-xxt-1#57",
+   "paper_id": 38,
+   "qno": 57,
+   "type": "judge",
+   "stem": "Mr. Bassett is a teacher who came up with the idea for a school bank.",
+   "material": "Every Tuesday, Carina goes to work in a bank. She knows all her customers very well, because they are her classmates. In fact, Carina and her customers are all 10 years old. Carina's bank is in a school in Chicago. The bank is a branch(分支) of a national bank, but the children run the bank. It is open for 30 minutes on every Tuesday morning, Carina opens the bank. Her classmates put their money in or take their money out. The bank pays interest to them. The idea for a school bank came from their teacher, Mr. Harry Bassett who took his idea to the national bank. The bank agreed to his plan. \"We want to give the children a chance to learn about money,\" said Mr. Bassett. \"They are trained to look after their money carefully.”",
+   "options": [],
+   "answer": "对",
+   "analysis": "",
+   "stem_cn": "巴西特先生是一位老师，他想出了办学校银行的主意。",
+   "material_cn": "每周二，卡丽娜去一家银行上班。她非常了解她所有的顾客，因为他们都是她的同学。事实上，卡丽娜和她的顾客都是 10 岁。卡丽娜的银行在芝加哥的一所学校里。这家银行是一家国家银行的分行，但由孩子们经营。它每周二上午开放 30 分钟，由卡丽娜开门。同学们来存钱或取钱，银行付给他们利息。办学校银行的主意来自他们的老师哈里·巴西特先生，他把这个想法告诉了国家银行，银行同意了他的计划。\"我们想给孩子们一个了解钱的机会，\"巴西特先生说，\"他们被训练如何仔细管理自己的钱。\"",
+   "point": "原文 The idea for a school bank came from their teacher。come up with 想出。",
+   "phrases": [
+    [
+     "come up with",
+     "想出（主意）"
+    ],
+    [
+     "the idea for …",
+     "……的主意"
+    ]
+   ],
+   "same_as": "english-reading#107",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2330,
+   "key": "english-xxt-1#58",
+   "paper_id": 38,
+   "qno": 58,
+   "type": "judge",
+   "stem": "Carina's bank is a branch of a national bank run by some children and teachers.",
+   "material": "Every Tuesday, Carina goes to work in a bank. She knows all her customers very well, because they are her classmates. In fact, Carina and her customers are all 10 years old. Carina's bank is in a school in Chicago. The bank is a branch(分支) of a national bank, but the children run the bank. It is open for 30 minutes on every Tuesday morning, Carina opens the bank. Her classmates put their money in or take their money out. The bank pays interest to them. The idea for a school bank came from their teacher, Mr. Harry Bassett who took his idea to the national bank. The bank agreed to his plan. \"We want to give the children a chance to learn about money,\" said Mr. Bassett. \"They are trained to look after their money carefully.”",
+   "options": [],
+   "answer": "错",
+   "analysis": "",
+   "stem_cn": "卡丽娜的银行是国家银行的分行，由一些孩子和老师经营。",
+   "material_cn": "每周二，卡丽娜去一家银行上班。她非常了解她所有的顾客，因为他们都是她的同学。事实上，卡丽娜和她的顾客都是 10 岁。卡丽娜的银行在芝加哥的一所学校里。这家银行是一家国家银行的分行，但由孩子们经营。它每周二上午开放 30 分钟，由卡丽娜开门。同学们来存钱或取钱，银行付给他们利息。办学校银行的主意来自他们的老师哈里·巴西特先生，他把这个想法告诉了国家银行，银行同意了他的计划。\"我们想给孩子们一个了解钱的机会，\"巴西特先生说，\"他们被训练如何仔细管理自己的钱。\"",
+   "point": "原文 the children run the bank，只有孩子经营，没有老师。",
+   "phrases": [
+    [
+     "run a bank",
+     "经营银行"
+    ],
+    [
+     "branch",
+     "分行、分支"
+    ]
+   ],
+   "same_as": "english-reading#108",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2331,
+   "key": "english-xxt-1#59",
+   "paper_id": 38,
+   "qno": 59,
+   "type": "judge",
+   "stem": "The school pays interest to the children who put their money in the bank.",
+   "material": "Every Tuesday, Carina goes to work in a bank. She knows all her customers very well, because they are her classmates. In fact, Carina and her customers are all 10 years old. Carina's bank is in a school in Chicago. The bank is a branch(分支) of a national bank, but the children run the bank. It is open for 30 minutes on every Tuesday morning, Carina opens the bank. Her classmates put their money in or take their money out. The bank pays interest to them. The idea for a school bank came from their teacher, Mr. Harry Bassett who took his idea to the national bank. The bank agreed to his plan. \"We want to give the children a chance to learn about money,\" said Mr. Bassett. \"They are trained to look after their money carefully.”",
+   "options": [],
+   "answer": "错",
+   "analysis": "",
+   "stem_cn": "学校给把钱存进银行的孩子支付利息。",
+   "material_cn": "每周二，卡丽娜去一家银行上班。她非常了解她所有的顾客，因为他们都是她的同学。事实上，卡丽娜和她的顾客都是 10 岁。卡丽娜的银行在芝加哥的一所学校里。这家银行是一家国家银行的分行，但由孩子们经营。它每周二上午开放 30 分钟，由卡丽娜开门。同学们来存钱或取钱，银行付给他们利息。办学校银行的主意来自他们的老师哈里·巴西特先生，他把这个想法告诉了国家银行，银行同意了他的计划。\"我们想给孩子们一个了解钱的机会，\"巴西特先生说，\"他们被训练如何仔细管理自己的钱。\"",
+   "point": "原文 The bank pays interest，是银行付利息，不是学校。",
+   "phrases": [
+    [
+     "put money in / take money out",
+     "存钱 / 取钱"
+    ],
+    [
+     "pay interest to",
+     "给……付利息"
+    ]
+   ],
+   "same_as": "english-reading#109",
+   "section": "阅读理解"
+  },
+  {
+   "id": 2332,
+   "key": "english-xxt-1#60",
+   "paper_id": 38,
+   "qno": 60,
+   "type": "judge",
+   "stem": "This school bank is set up to train the pupils to earn money.",
+   "material": "Every Tuesday, Carina goes to work in a bank. She knows all her customers very well, because they are her classmates. In fact, Carina and her customers are all 10 years old. Carina's bank is in a school in Chicago. The bank is a branch(分支) of a national bank, but the children run the bank. It is open for 30 minutes on every Tuesday morning, Carina opens the bank. Her classmates put their money in or take their money out. The bank pays interest to them. The idea for a school bank came from their teacher, Mr. Harry Bassett who took his idea to the national bank. The bank agreed to his plan. \"We want to give the children a chance to learn about money,\" said Mr. Bassett. \"They are trained to look after their money carefully.”",
+   "options": [],
+   "answer": "错",
+   "analysis": "",
+   "stem_cn": "建这所学校银行是为了训练学生挣钱。",
+   "material_cn": "每周二，卡丽娜去一家银行上班。她非常了解她所有的顾客，因为他们都是她的同学。事实上，卡丽娜和她的顾客都是 10 岁。卡丽娜的银行在芝加哥的一所学校里。这家银行是一家国家银行的分行，但由孩子们经营。它每周二上午开放 30 分钟，由卡丽娜开门。同学们来存钱或取钱，银行付给他们利息。办学校银行的主意来自他们的老师哈里·巴西特先生，他把这个想法告诉了国家银行，银行同意了他的计划。\"我们想给孩子们一个了解钱的机会，\"巴西特先生说，\"他们被训练如何仔细管理自己的钱。\"",
+   "point": "原文是学习管理钱（look after their money），不是挣钱。",
+   "phrases": [
+    [
+     "learn about money",
+     "了解金钱"
+    ],
+    [
+     "look after",
+     "照看、管理"
+    ],
+    [
+     "set up",
+     "建立"
+    ]
+   ],
+   "same_as": "english-reading#110",
+   "section": "阅读理解"
   },
   {
    "id": 1883,
