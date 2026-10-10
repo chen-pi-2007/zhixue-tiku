@@ -9,7 +9,7 @@ CONTENT_MIN_APP      这份内容要求的最低电脑版程序版本：界面�
 CONTENT_MIN_ANDROID  这份内容要求的最低安卓 App 版本：local.js 用到了新的 ZXStore 接口时改。
                      程序太旧的用户不会收到这份内容，会被提示先更新程序。"""
 APP_VERSION = '1.5.1'
-CONTENT_VERSION = 29
+CONTENT_VERSION = 30
 CONTENT_MIN_APP = '1.4.0'      # 1.4.0～1.4.3 配新内容实测能用（只是导入时丢掉选项说明、词组），让连不上 GitHub、装不了新程序的同学也能收到改正后的题库
 CONTENT_MIN_ANDROID = '1.4.0'
 # 外壳（exe 里固定的 tray/appdir/hotupdate/updater 等）和热更新后端（content.HOT_PY）之间的接口版本。

@@ -113,7 +113,9 @@ html { -webkit-tap-highlight-color: transparent; }
 .theme-menu button { display: flex; align-items: center; gap: 8px; width: 100%; height: 34px; padding: 0 10px; border: 0; border-radius: 5px; background: none; color: var(--ink); font: inherit; cursor: pointer; }
 .theme-menu button:hover { background: var(--layer-2); }
 .theme-menu button.on { font-weight: 600; background: var(--layer-2); }
-.top-set { display: none; position: relative; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--layer-2); color: var(--ink-2); }
+/* 设置统一放在顶栏右上角（电脑、手机都一样），左边导航只放做题相关的页面 */
+#nav a[data-v="settings"] { display: none; }
+.top-set { display: inline-flex; margin-left: 8px; position: relative; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--layer-2); color: var(--ink-2); }
 .top-set:hover { background: var(--layer-3); color: var(--ink); opacity: 1; }
 .top-set.active { background: var(--layer-3); color: var(--ink); }
 .top-set .upd-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; margin: 0; box-shadow: 0 0 0 2px var(--layer-2); }
@@ -497,8 +499,6 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .qcard-main { padding: 14px; }
   .feedback { padding: 12px; }
   .set-row .btn { flex: none; }
-  #nav a[data-v="settings"] { display: none; }
-  .top-set { display: inline-flex; }
   body.subpage #side { display: none; }                 /* 设置页：不显示题库 / 错题本那排导航 */
   body.subpage #topbar { display: none; }               /* 只留一条「‹ 设置」标题栏 */
   /* 和顶栏一样高、一样的左边距，切到设置时上面那条不跳 */

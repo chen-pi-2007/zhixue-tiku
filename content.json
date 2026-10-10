@@ -1,6 +1,6 @@
 {
- "content_version": 29,
- "created": "2026-10-10 10:28:45",
+ "content_version": 30,
+ "created": "2026-10-10 16:01:09",
  "files": {
   "data/bank.json": [
    "5a6cea426a52d9ab4cdb999d88f9c22acc81c349dcec3c5b9d5734534cd4cf6a",
@@ -1635,25 +1635,25 @@
    3659
   ],
   "static/app.js": [
-   "e3642ff2175379b378332a3e1ab15d92e6381b22d4e5f33845124e09deaa77ee",
-   115785
+   "71e62ed7865b87d71cca165a36e96171f9bdf9576a32f03fbc60f3563cfed8af",
+   115851
   ],
   "static/index.html": [
-   "5c102713df8f75bc56ec1c79aad15e13a0a9a580a79afb9ea45d9e7781a870a0",
-   6922
+   "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
+   6985
   ],
   "static/skills.js": [
    "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
    27524
   ],
   "static/style.css": [
-   "e3e82e56b9489b81e1da7e219e3dcb7a9a66d4001fe39b33f2da12e7ec45c292",
-   49888
+   "2f68b83d373378ab12b086997b8a65d7f03c9d874302b1124270a47f62f2ab64",
+   49986
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "手机上做题更顺手：双击选项直接确认答案；确认后点绿色的正确答案进入下一题",
+ "notes": "电脑上也能双击选项确认答案、点绿色的正确答案进入下一题；设置挪到右上角的齿轮（和手机一样），左边导航只留做题的页面",
  "py_shell_api": 1,
- "tag": "content-29"
+ "tag": "content-30"
 }
