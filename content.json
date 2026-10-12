@@ -1,10 +1,10 @@
 {
- "content_version": 40,
- "created": "2026-10-12 09:31:10",
+ "content_version": 41,
+ "created": "2026-10-12 19:11:19",
  "files": {
   "data/bank.json": [
-   "f75f291b0f09d1ddc6571896490fa98f75c7ed2a3f67b302be23cf8975bfbacf",
-   3092927
+   "a2fecde461027b4938e7c951c83b6cc1c79cba471ad395d56f0ecd0eb3af5394",
+   3093485
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "43ab827ff428c45fd105a78e425765b56a259d2b80b9aa3ad22577b29044b504",
-   65063
+   "172313902ea41a13159fc4f5bf9028bb531e062ed863e99ea19b0392b59fe39e",
+   64963
   ],
   "server.py": [
    "2697eb788133049d49ecf571e806b2ce9a8122709acbcb712bc8c44d82e792cb",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "6a5d4720036b54108600758e4f8fad4421d0e92de2c416b4f5f0b566d6b500a5",
-   141310
+   "01b2a3a67ed4fa201d2ced612c97036675b2b7bacd533d17d65574ad3a91c8ce",
+   141577
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1651,13 +1651,13 @@
    52743
   ],
   "sync.py": [
-   "05b08dd97fe018a443cf98460b04529e3e425fa8acbb1eda43b6f3f2748080da",
-   10950
+   "e9b777bc72ea481055611923480c91ae798947c6f8f51dbf8243531b083ccd7e",
+   10899
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增背题模式：不用选，直接看题目和答案内容（单选把答案填进句子，完形、对话整篇填好，配对题一问一答），可切换直接显示 / 先盖住，每题点记住了 / 没记住，没记住的进复习",
+ "notes": "账号登录先验证密码，弹出的「这些记录是你的吗」必须选一项才算登录成功（之前点外面关掉会以为登录了）；英语语音、思政里原文档重复印的 15 道题只出现一次",
  "py_shell_api": 1,
- "tag": "content-40"
+ "tag": "content-41"
 }

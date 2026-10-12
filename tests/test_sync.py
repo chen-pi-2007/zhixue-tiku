@@ -202,6 +202,8 @@ class OwnerTest(unittest.TestCase):
     def test_unbound_device_must_choose(self):
         db.record_answer(1, True)
         db.record_answer(2, False)
+        with self.assertRaises(self.sync.SyncError):
+            self.sync.login('alice', 'wrong-pw')                 # 先验证密码：错了直接报错，不弹选择
         r = self.sync.login('alice', 'pw123456')
         self.assertEqual(r.get('need'), 'merge')
         self.assertEqual(self.server_count('alice'), 0)          # 没选之前什么都不传
@@ -232,8 +234,10 @@ class OwnerTest(unittest.TestCase):
         r = self.sync.login('bob', 'pw123456')
         self.assertEqual(r.get('need'), 'switch')
         self.assertEqual(r.get('owner'), 'alice')
-        with self.assertRaises(self.sync.SyncError):
-            self.sync.login('bob', 'pw123456', 'merge')          # 硬要合并也不行
+        r2 = self.sync.login('bob', 'pw123456', 'merge')          # 硬要合并也不行：还是要先选，什么都没合并
+        self.assertEqual(r2.get('need'), 'switch')
+        self.assertEqual(self.server_count('bob'), 1)
+        self.assertIsNone(self.sync.account())
         self.sync.login('bob', 'pw123456', 'fresh')
         self.sync.sync_once()
         self.assertEqual(self.server_count('bob'), 1)            # bob 账号里只有 bob 自己的

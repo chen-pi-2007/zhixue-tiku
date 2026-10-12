@@ -1022,17 +1022,16 @@
         const user = String(body.user || '').trim(), pw = String(body.pass || ''), mode = String(body.mode || '');
         if (!user || !pw) throw new SyncError('请输入用户名和密码');
         const owner = prog.sync_owner || '', count = localCount();
-        if (!mode) {
-          if (owner && owner !== user) return { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
-          if (!owner && count) return { need: 'merge', count: count };
-        }
-        if (mode === 'merge' && owner && owner !== user) throw new SyncError('本机的记录属于账号 ' + owner + '，不能合并进别的账号');
+        // 先到服务器验证用户名密码（同 sync.py login）
         const dev = 'android-' + newUid().slice(0, 6);
         const r = await syncPost('/v1/login', { user: user, pass: pw, device: dev });
         const name = r.user || user;
-        if (owner && owner !== name && mode !== 'fresh') {
+        let need = null;
+        if (owner && owner !== name && mode !== 'fresh') need = { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
+        else if (!owner && count && mode !== 'merge' && mode !== 'fresh') need = { need: 'merge', count: count };
+        if (need) {
           try { await syncPost('/v1/logout', {}, r.token); } catch (e) { /* ignore */ }
-          return { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
+          return Object.assign(need, { user: name });
         }
         let backup = '';
         if (mode === 'fresh' && count) backup = resetForAccount();

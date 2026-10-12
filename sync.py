@@ -123,22 +123,21 @@ def login(user, pw, mode=''):
         raise SyncError('请输入用户名和密码')
     owner = db.sync_owner()
     count = db.sync_local_count()
-    if not mode:
-        if owner and owner != user:
-            return {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
-        if not owner and count:
-            return {'need': 'merge', 'count': count}
-    if mode == 'merge' and owner and owner != user:
-        raise SyncError('本机的记录属于账号 %s，不能合并进别的账号' % owner)
+    # 先到服务器验证用户名密码（错了马上提示，不会先弹“这些记录是你的吗”让人以为已经登录）
     dev = '%s-%s' % (platform.node()[:30], os.urandom(3).hex())
     r = _post('/v1/login', {'user': user, 'pass': pw, 'device': dev})
     name = r.get('user') or user
-    if owner and owner != name and mode != 'fresh':          # 大小写之类和输入的不完全一样：再拦一次
+    need = None
+    if owner and owner != name and mode != 'fresh':
+        need = {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
+    elif not owner and count and mode not in ('merge', 'fresh'):
+        need = {'need': 'merge', 'count': count}
+    if need:                     # 要用户先选：这次的令牌作废，选完再登录一次
         try:
             _post('/v1/logout', {}, r['token'])
         except SyncError:
             pass
-        return {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
+        return dict(need, user=name)
     backup = ''
     if mode == 'fresh' and count:
         backup = db.sync_reset_for_account(owner)

@@ -2143,7 +2143,8 @@ async function syncLogin(mode) {
 function syncAskOwner(sy, user) {
   const sheet = document.createElement('div');
   sheet.className = 'sheet-mask';
-  const head = '<div class="sheet-h"><b>' + (sy.need === 'switch' ? '换账号登录' : '这些记录是你的吗？') + '</b><button class="sheet-x" aria-label="关闭">×</button></div>';
+  const head = '<div class="sheet-h"><b>' + (sy.need === 'switch' ? '换账号登录' : '这些记录是你的吗？') + '</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+    '<div class="sheet-d" style="margin:0 0 6px">密码正确。<b>还差一步</b>：选下面一项才算登录成功。</div>';
   const body = sy.need === 'switch'
     ? '<div class="sheet-sec"><div class="sheet-d">这台设备上的 ' + sy.count + ' 条做题记录属于账号 <b>' + esc(sy.owner) + '</b>，不能合并进 <b>' + esc(user) + '</b>。<br>' +
         '继续登录会先把本机记录<b>备份</b>，再清空本机、下载 ' + esc(user) + ' 的记录。' + esc(sy.owner) + ' 的记录在服务器上一条不少，以后登录 ' + esc(sy.owner) + ' 就能拿回来' +
@@ -2155,7 +2156,11 @@ function syncAskOwner(sy, user) {
         '<button class="btn ghost block" data-act="fresh">不是我的，备份后清空本机</button></div>';
   sheet.innerHTML = '<div class="sheet" role="dialog">' + head + body + '</div>';
   sheet.addEventListener('click', e => {
-    if (e.target === sheet || e.target.closest('.sheet-x')) return sheet.remove();
+    if (e.target.closest('.sheet-x')) {          // 点弹窗外面不关（容易误以为已经登录了）
+      sheet.remove();
+      toast('还没登录：要先选一项才会登录', 'bad');
+      return;
+    }
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     sheet.remove();
