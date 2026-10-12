@@ -716,3 +716,22 @@ main.page-in { animation: page-in .22s ease-out; }
 .mini-opts { display: flex; gap: 6px; flex-wrap: wrap; }
 .opt.mini { width: 40px; height: 36px; padding: 0; align-items: center; justify-content: center; font-weight: 600; line-height: 1; }
 .material-body .qimg { display: block; margin: 8px 0; }     /* 材料里的图单独一行，不挤在文字中间 */
+
+/* 背题模式：答案（填进句子的词、一问一答的答语）高亮；“先盖住”时答案变成灰块、要点藏起来，点卡片才显示 */
+.rc-card { cursor: default; }
+.rc-ans { color: var(--green); font-weight: 600; background: rgba(46, 160, 67, .12); border-radius: 4px; padding: 0 3px; }
+.rc-closed { cursor: pointer; }
+.rc-closed .rc-ans { color: transparent; background: var(--layer-2); user-select: none; }
+.rc-closed .rc-ans * { visibility: hidden; }
+.rc-closed .rc-more { display: none; }
+.rc-tap { margin-top: 12px; text-align: center; color: var(--ink-3); font-size: 13px; }
+.rc-list { margin-top: 10px; }
+.rc-row { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--line); }
+.rc-row:first-child { border-top: 0; }
+.rc-k { color: var(--ink-2); }
+.rc-item { padding: 8px 0; border-top: 1px solid var(--line); }
+.rc-item:first-child { border-top: 0; }
+.rc-item .stem { font-size: 15px; margin-bottom: 4px; }
+.rc-phon .rc-row { padding: 4px 0; }
+.rc-hit .rc-k { font-weight: 600; color: var(--ink); }
+.rc-acts { margin-top: 12px; }

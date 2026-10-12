@@ -1,6 +1,6 @@
 {
- "content_version": 39,
- "created": "2026-10-12 08:05:59",
+ "content_version": 40,
+ "created": "2026-10-12 09:31:10",
  "files": {
   "data/bank.json": [
    "f75f291b0f09d1ddc6571896490fa98f75c7ed2a3f67b302be23cf8975bfbacf",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "09f45dbb10bc0d9103926cd8adbedc5fcff0a2c3e88cb9dcbfdf4458118be045",
-   129796
+   "6a5d4720036b54108600758e4f8fad4421d0e92de2c416b4f5f0b566d6b500a5",
+   141310
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "8ecef7e6c8683c073841ca2c3b9a71fd377d289af3f494bde3758360876120a7",
-   51622
+   "8399fed5b6f1182fa8fca69b202e8172df3e7cdccab0346a11faf9bdb7fc1b68",
+   52743
   ],
   "sync.py": [
    "05b08dd97fe018a443cf98460b04529e3e425fa8acbb1eda43b6f3f2748080da",
@@ -1657,7 +1657,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语题型按专项分开（语音、单选、图文、对话、完形、阅读、书面表达）；打乱时阅读一篇的题连在一起只在篇内打乱；账号同步防串号：本机记录绑定账号，换账号先备份不合并；语文解析只说错的那项；修复深色模式下拉框看不清、大屏页面底部多余空白",
+ "notes": "新增背题模式：不用选，直接看题目和答案内容（单选把答案填进句子，完形、对话整篇填好，配对题一问一答），可切换直接显示 / 先盖住，每题点记住了 / 没记住，没记住的进复习",
  "py_shell_api": 1,
- "tag": "content-39"
+ "tag": "content-40"
 }

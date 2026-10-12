@@ -412,7 +412,7 @@ const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: vi
 function route() {
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
   const name = routes[parts[0]] ? parts[0] : 'home';
-  const navOf = { practice: 'home', subject: 'home' };
+  const navOf = { practice: 'home', subject: 'home', recite: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
   document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
   const ts = $('#top-set');
@@ -1163,6 +1163,10 @@ async function openModeSheet(src, name) {
       '<div class="sheet-sec"><div class="sheet-t">全部乱序</div>' +
         '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。</div>' +
         '<button class="btn ghost block" data-act="all">开始</button></div>' +
+      '<div class="sheet-sec"><div class="sheet-t">背题</div>' +
+        '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
+        '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
+        '<button class="btn ghost" data-act="rc-rand">打乱背</button></div></div>' +
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
@@ -1172,6 +1176,7 @@ async function openModeSheet(src, name) {
     const act = btn && btn.dataset.act;
     if (!act) return;
     close();
+    if (act === 'rc-seq' || act === 'rc-rand') return startRecite(practiceSrc(src), name, act === 'rc-seq' ? 'seq' : 'random');
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
     else if (act === 'seq' || act === 'rand') {
@@ -1815,6 +1820,194 @@ document.addEventListener('keydown', e => {
   const btns = $$('#optsbox .opt');
   if (btns[i]) pickOpt(btns[i]);
 });
+
+/* ================================================================ 背题模式
+   不用选，直接看“题目 + 答案内容”，记住答案本身（老师打乱选项也不怕）。
+   单选把正确答案填进句子；完形、补全对话把整篇的空都填好；配对题一问一答列出来；阅读题列出问题和答案、原文依据标黄。
+   顶部可切换：答案直接显示 / 先盖住点一下再看。每张卡片点「记住了 / 没记住」，记一次作答（mode=recite），没记住的进复习和错题本。
+   共用一段材料的题（一篇阅读、一篇完形、一组配对）是一张卡片。 */
+
+routes.recite = viewRecite;
+const RC_BLANK = /_{2,}|＿{2,}|（\s*▲\s*）|\(\s*▲\s*\)/;
+const RC_A = '\u0001', RC_B = '\u0002';            // 填进去的答案先用这两个控制字符包起来，rich() 之后再换成高亮
+
+function rcHide() { return !!store.get('zx.recite.hide'); }
+function rcMark(s) { return s.split(RC_A).join('<b class="rc-ans">').split(RC_B).join('</b>'); }
+function rcAnsTexts(q) {
+  if (q.type === 'judge') return [q.answer];
+  return optionList(q).filter(o => (q.answer || '').indexOf(o[0]) >= 0).map(o => o[1]);
+}
+function rcAnsLabel(q) {
+  // 答案的“内容”：选项文字；选项文字在材料图里（“见材料”）的，用中文释义
+  return optionList(q).filter(o => (q.answer || '').indexOf(o[0]) >= 0).map(o => {
+    const i = optionList(q).indexOf(o);
+    if (/见材料/.test(o[1])) return (q.options_cn && q.options_cn[i]) || o[1];
+    return o[1];
+  }).join('；') || q.answer;
+}
+// 单选：把答案填进题干的空里（“A; B”两空的按顺序填）。填不进去返回 null
+function rcFillStem(q) {
+  if (q.type !== 'single' || !RC_BLANK.test(q.stem)) return null;
+  const t = rcAnsTexts(q)[0];
+  if (!t || /见材料/.test(t)) return null;
+  const parts = t.split(/\s*[;；]\s*/);
+  let i = 0;
+  const s = q.stem.replace(new RegExp(RC_BLANK.source, 'g'), (m, at, str) =>
+    (i < parts.length ? rcPad(str, at, m.length, RC_A + parts[i++] + RC_B) : m));
+  return i ? s : null;
+}
+// 填进去的词和前后英文之间补空格（原题的空常常紧贴着后面的词：“____failing”）
+function rcPad(str, at, len, text) {
+  const before = str[at - 1] || '', after = str[at + len] || '';
+  return (/[A-Za-z0-9,.;:!?'"’)]/.test(before) ? ' ' : '') + text + (/[A-Za-z0-9('"‘]/.test(after) ? ' ' : '');
+}
+
+async function startRecite(src, name, order) {
+  let d;
+  try {
+    d = await api('/api/practice?paper_id=' + (src.paper_id || 0) + '&scope=all&order=' + order +
+      (src.subject ? '&subject=' + encodeURIComponent(src.subject) : '') + (src.type ? '&type=' + encodeURIComponent(src.type) : ''));
+  } catch (e) { toast(e.message, 'bad'); return; }
+  const items = d.items.filter(q => q.answer);
+  if (!items.length) { toast('这里没有能背的题'); return; }
+  const cards = [];
+  items.forEach(q => {
+    const last = cards[cards.length - 1];
+    if (q.material && last && last[0].material === q.material && last[0].paper_id === q.paper_id) last.push(q);
+    else cards.push([q]);
+  });
+  state.recite = { title: name + '·背题', cards: cards, idx: 0, shown: false, res: {}, src: src, order: order };
+  if (location.hash === '#/recite') route(); else location.hash = '#/recite';
+}
+
+function viewRecite() {
+  const r = state.recite;
+  if (!r) { location.hash = '#/home'; return; }
+  if (r.idx >= r.cards.length) return rcFinish();
+  const g = r.cards[r.idx], q0 = g[0];
+  const hide = rcHide(), open = !hide || r.shown;
+  const cat = TYPE_NAME[q0.cat] || TYPE_NAME[q0.type] || '';
+  const done = Object.keys(r.res).length;
+  app.innerHTML =
+    '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(r.title) + '</span>' +
+      '<span class="crumb-acts"><a href="javascript:void(0)" onclick="rcToggleHide()">' + (hide ? '答案：先盖住' : '答案：直接显示') + '</a>' +
+      '<a class="crumb-exit" href="javascript:void(0)" onclick="rcQuit()">退出背题</a></span></div>' +
+    '<div class="pbar-wrap"><div class="pbar"><i style="width:' + Math.round(100 * r.idx / r.cards.length) + '%"></i></div></div>' +
+    '<div class="card qcard-main rc-card' + (open ? ' rc-open' : ' rc-closed') + '"' + (open ? '' : ' onclick="rcReveal()"') + '>' +
+      '<div class="qhead"><span class="tag t-' + q0.type + '">' + esc(cat) + '</span>' +
+        '<span class="qsrc">' + esc(q0.paper_name) + (g.length > 1 ? ' 第' + g[0].qno + '–' + g[g.length - 1].qno + '题' : ' 第' + q0.qno + '题') + '</span>' +
+        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q0) + '</div>' +
+      rcBody(g) +
+      (open ? '' : '<div class="rc-tap">点一下看答案</div>') +
+    '</div>' +
+    '<div class="qactions rc-acts">' +
+      (r.idx > 0 ? '<button class="btn ghost" onclick="rcPrev()">上一张</button>' : '') +
+      '<span class="muted">' + (open ? '记住了吗？' : '先在心里想答案，再点卡片看') + '</span><div class="spacer"></div>' +
+      (open ? '<button class="btn danger" onclick="rcMarkCard(false)">没记住</button><button class="btn green" onclick="rcMarkCard(true)">记住了</button>'
+            : '<button class="btn" onclick="rcReveal()">看答案</button>') +
+    '</div>' +
+    '<div class="msg-bar">已背 ' + done + ' 题 · 记住 ' + Object.values(r.res).filter(Boolean).length + ' · 没记住 ' + Object.values(r.res).filter(x => !x).length + '</div>';
+  if (open) g.forEach(q => markEvidence(q));
+  applyCn();
+}
+
+function rcBody(g) {
+  const q0 = g[0];
+  const blanks = g.every(q => /第\d+空/.test(q.stem));
+  // 完形、补全对话：把整篇的空填好
+  if (q0.material && blanks) {
+    const ans = {};
+    g.forEach(q => { const m = q.stem.match(/第(\d+)空/); if (m) ans[m[1]] = q; });
+    const used = {};
+    const mat = q0.material.replace(/[（(]?\s*_{1,}\s*(\d+)\s*_{1,}\s*[）)]?/g, (m, n, at, str) => {
+      const q = ans[n];
+      if (!q || /见材料/.test(rcAnsTexts(q)[0] || '')) return m;
+      used[n] = 1;
+      return rcPad(str, at, m.length, RC_A + '(' + n + ') ' + rcAnsTexts(q)[0] + RC_B);
+    });
+    const rest = g.filter(q => !used[(q.stem.match(/第(\d+)空/) || [])[1]]);
+    return '<div class="material-box"><div class="material-body">' + rcMark(rich(mat)) + '</div>' + materialCn(q0) + '</div>' +
+      (rest.length ? '<div class="rc-list">' + rest.map(q => '<div class="rc-row"><span class="rc-k">' + esc(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
+        '<b class="rc-ans">' + rich(q.answer + '　' + rcAnsLabel(q)) + '</b></div>').join('') + '</div>' : '') +
+      rcPoints(g);
+  }
+  // 配对题、阅读匹配：一问一答
+  const shared = g.length > 1 && g.every(q => JSON.stringify(q.options) === JSON.stringify(q0.options)) && q0.options.length;
+  const mat = q0.material ? materialBox(q0) : '';
+  if (shared && q0.type !== 'judge') {
+    return mat + '<div class="rc-list">' + g.map(q => '<div class="rc-row"><span class="rc-k">' + q.qno + '. ' + rich(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
+      '<b class="rc-ans">→ ' + rich(rcAnsLabel(q)) + '</b></div>').join('') + '</div>' + rcPoints(g);
+  }
+  // 阅读理解等：材料 + 每题问题和答案
+  if (g.length > 1 || q0.material) {
+    return mat + '<div class="rc-list">' + g.map(q => '<div class="rc-item">' + rcOne(q, true) + '</div>').join('') + '</div>';
+  }
+  return rcOne(q0, false);
+}
+
+function rcOne(q, inGroup) {
+  const num = inGroup ? q.qno + '. ' : '';
+  // 语音：四个词都列出来，读音不同的那个高亮
+  if (q.cat === 'en_phon') {
+    return '<div class="stem">' + rich(q.stem) + '</div><div class="rc-phon">' + optionList(q).map((o, i) => {
+      const on = (q.answer || '').indexOf(o[0]) >= 0;
+      const cn = (q.options_cn && q.options_cn[i]) || '';
+      return '<div class="rc-row' + (on ? ' rc-hit' : '') + '"><span class="rc-k">' + rich(o[1]) + '</span>' +
+        (on ? '<b class="rc-ans">' + esc(cn) + '（读音不同）</b>' : '<span class="muted rc-more">' + esc(cn) + '</span>') + '</div>';
+    }).join('') + '</div>' + rcPoints([q]);
+  }
+  const filled = rcFillStem(q);
+  if (filled) return '<div class="stem">' + num + rcMark(rich(filled)) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' after', '') + '</div>' + rcPoints([q]);
+  const label = q.type === 'judge' ? q.answer : (q.type === 'multi' || q.type === 'single' ? rcAnsLabel(q) : q.answer);
+  return '<div class="stem">' + num + rich(q.stem) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' after', '') + '</div>' +
+    '<div class="rc-row"><span class="rc-k">答案</span><b class="rc-ans">' + rich(label) + '</b></div>' + rcPoints([q]);
+}
+
+function rcPoints(g) {
+  const ps = g.filter(q => q.point || q.analysis).map(q => (g.length > 1 ? q.qno + '. ' : '') + (q.point || q.analysis));
+  return ps.length ? '<div class="point-box rc-more"><b>要点</b>' + ps.map(p => '<div>' + rich(p) + '</div>').join('') + '</div>' : '';
+}
+
+function rcReveal() {
+  const r = state.recite;
+  if (!r || r.shown) return;
+  r.shown = true;
+  viewRecite();
+}
+function rcToggleHide() { store.set('zx.recite.hide', !rcHide()); viewRecite(); }
+function rcPrev() { const r = state.recite; if (r.idx > 0) { r.idx--; r.shown = false; viewRecite(); window.scrollTo(0, 0); } }
+function rcQuit() { state.recite = null; location.hash = '#/home'; }
+
+function rcMarkCard(ok) {
+  const r = state.recite;
+  const g = r.cards[r.idx];
+  g.forEach(q => {
+    r.res[q.id] = ok;
+    api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: 'recite' } }).catch(e => toast('记录失败：' + e.message, 'bad'));
+  });
+  r.idx++;
+  r.shown = false;
+  viewRecite();
+  window.scrollTo(0, 0);
+}
+
+function rcFinish() {
+  const r = state.recite;
+  const vals = Object.values(r.res), ok = vals.filter(Boolean).length;
+  const missIds = Object.keys(r.res).filter(k => !r.res[k]).map(Number);
+  app.innerHTML = '<div class="card result-card"><h2 style="margin:0 0 10px">背完了</h2>' +
+    '<div class="msg-bar">共 ' + vals.length + ' 题 · 记住 ' + ok + ' · 没记住 ' + (vals.length - ok) + '</div>' +
+    '<div class="muted" style="margin:8px 0 14px">没记住的已经放进复习和错题本，过几天会再出现。</div>' +
+    '<div class="qactions">' + (missIds.length ? '<button class="btn" onclick="rcAgain()">没记住的再背一遍</button>' : '') +
+    '<button class="btn ghost" onclick="rcQuit()">回首页</button></div></div>';
+}
+
+function rcAgain() {
+  const r = state.recite;
+  const miss = r.cards.filter(g => g.some(q => r.res[q.id] === false));
+  state.recite = { title: r.title.replace(/·再背$/, '') + '·再背', cards: miss, idx: 0, shown: false, res: {}, src: r.src, order: r.order };
+  viewRecite();
+}
 
 /* ================================================================ 设置：版本更新、清除数据 */
 
