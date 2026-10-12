@@ -1,6 +1,6 @@
 {
- "content_version": 41,
- "created": "2026-10-12 19:11:19",
+ "content_version": 42,
+ "created": "2026-10-12 19:33:00",
  "files": {
   "data/bank.json": [
    "a2fecde461027b4938e7c951c83b6cc1c79cba471ad395d56f0ecd0eb3af5394",
@@ -1591,8 +1591,8 @@
    64963
   ],
   "server.py": [
-   "2697eb788133049d49ecf571e806b2ce9a8122709acbcb712bc8c44d82e792cb",
-   25344
+   "9b807c30d8684f0db47053387db386f3d5cdeeb591a5bdd85ea621a808853025",
+   25652
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1657,7 +1657,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "账号登录先验证密码，弹出的「这些记录是你的吗」必须选一项才算登录成功（之前点外面关掉会以为登录了）；英语语音、思政里原文档重复印的 15 道题只出现一次",
+ "notes": "账号同步出错时显示具体原因（以前统一显示“参数不对”）",
  "py_shell_api": 1,
- "tag": "content-41"
+ "tag": "content-42"
 }

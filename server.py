@@ -233,6 +233,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json({'ok': True, 'saved': ok})
         except sync.SyncError as e:
             return self.send_error_json(str(e), 400)
+        except Exception as e:      # noqa: BLE001  同步出错直接说出原因（以前统一显示“参数不对”，看不出卡在哪）
+            traceback.print_exc()
+            return self.send_error_json('同步出错（%s: %s），请截图发给管理员' % (e.__class__.__name__, e), 500)
         return self.send_error_json('不支持的请求', 404)
 
     # ---- API
