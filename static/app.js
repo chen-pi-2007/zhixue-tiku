@@ -250,14 +250,25 @@ function optionList(q) {
 
 // 英语题的中文翻译开关（平时练习、错题本、题库浏览显示；模拟考没有这些字段）
 // 译文总是渲染进页面，开关只切换 html.cn-off（做题中途切换不会重画、不丢作答状态）。
-// 带 .after 的译文在练习卡片里要作答后才显示：选项译文（含音标、语法提示）和带空格的题干译文会直接暴露答案。
+// 译文作答前就显示；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标。
+// 题干有空、译文却把空填好了的，作答前盖住（.peek），点一下才看。
 function cnOn() { const v = store.get('quiz.cn'); return v == null ? true : !!v; }
 function applyCn() { document.documentElement.classList.toggle('cn-off', !cnOn()); $$('.cn-btn').forEach(b => b.classList.toggle('on', cnOn())); }
 function toggleCn() { store.set('quiz.cn', !cnOn()); applyCn(); }
 function hasCn(q) { return !!(q.stem_cn || q.material_cn || (q.options_cn && q.options_cn.length)); }
 function cnBtn(q) { return hasCn(q) ? '<button class="cn-btn' + (cnOn() ? ' on' : '') + '" onclick="toggleCn()" title="显示/隐藏中文翻译">译</button>' : ''; }
-function stemCn(q) { return q.stem_cn ? '<div class="stem-cn' + (/_{2,}/.test(q.stem) ? ' after' : '') + '">' + rich(q.stem_cn) + '</div>' : ''; }
-function optCn(q, i) { return q.options_cn && q.options_cn[i] ? '<span class="opt-cn after">' + esc(q.options_cn[i]) + '</span>' : ''; }
+function stemCn(q) {
+  if (!q.stem_cn) return '';
+  const peek = /_{2,}/.test(q.stem) && !/_{2,}/.test(q.stem_cn);
+  return '<div class="stem-cn' + (peek ? ' peek" title="点一下查看翻译（会提示答案）" onclick="this.classList.add(\'show\')' : '') + '">' + rich(q.stem_cn) + '</div>';
+}
+const CN_HINT = /（[^（）]*）|\([^()]*\)|\/[^\/\s]+\//g;     // 选项译文里的语法提示、音标
+function optCn(q, i) {
+  const s = q.options_cn && q.options_cn[i];
+  if (!s) return '';
+  if (!s.replace(CN_HINT, '').trim()) return '<span class="opt-cn after">' + esc(s) + '</span>';
+  return '<span class="opt-cn">' + esc(s).replace(CN_HINT, m => '<span class="after">' + m + '</span>') + '</span>';
+}
 function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b><div>' + rich(q.point) + '</div></div>' : ''; }
 
 // 某个选项的说明：专门写的“为什么对 / 错”（option_notes），英语没写的话用选项的中文翻译（里面带着语法提示）
@@ -1957,9 +1968,9 @@ function rcOne(q, inGroup) {
     }).join('') + '</div>' + rcPoints([q]);
   }
   const filled = rcFillStem(q);
-  if (filled) return '<div class="stem">' + num + rcMark(rich(filled)) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' after', '') + '</div>' + rcPoints([q]);
+  if (filled) return '<div class="stem">' + num + rcMark(rich(filled)) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' peek', ' ') + '</div>' + rcPoints([q]);
   const label = q.type === 'judge' ? q.answer : (q.type === 'multi' || q.type === 'single' ? rcAnsLabel(q) : q.answer);
-  return '<div class="stem">' + num + rich(q.stem) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' after', '') + '</div>' +
+  return '<div class="stem">' + num + rich(q.stem) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' peek', ' ') + '</div>' +
     '<div class="rc-row"><span class="rc-k">答案</span><b class="rc-ans">' + rich(label) + '</b></div>' + rcPoints([q]);
 }
 

@@ -1,6 +1,6 @@
 {
- "content_version": 42,
- "created": "2026-10-12 19:33:00",
+ "content_version": 43,
+ "created": "2026-10-12 21:32:43",
  "files": {
   "data/bank.json": [
    "a2fecde461027b4938e7c951c83b6cc1c79cba471ad395d56f0ecd0eb3af5394",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "01b2a3a67ed4fa201d2ced612c97036675b2b7bacd533d17d65574ad3a91c8ce",
-   141577
+   "d28a53c548ba2ff5f8e39d9fa44c0232de020653a10d42880e2db8f8370e3a90",
+   142090
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "8399fed5b6f1182fa8fca69b202e8172df3e7cdccab0346a11faf9bdb7fc1b68",
-   52743
+   "175bdc9b95ba994b932230aa09f855e53d84d7216ce8af93a2550583d13f94f1",
+   53180
   ],
   "sync.py": [
    "e9b777bc72ea481055611923480c91ae798947c6f8f51dbf8243531b083ccd7e",
@@ -1657,7 +1657,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "账号同步出错时显示具体原因（以前统一显示“参数不对”）",
+ "notes": "英语选择题的中文翻译作答前就显示：选项意思直接显示，语法提示和音标答完再出；题干翻译会透露答案的先盖住，点一下可看",
  "py_shell_api": 1,
- "tag": "content-42"
+ "tag": "content-43"
 }
