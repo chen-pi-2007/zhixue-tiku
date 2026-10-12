@@ -219,7 +219,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json({'ok': True, 'items': db.ls_all()})
             data = self.read_json_body() if method == 'POST' else {}
             if path == '/api/sync/login':
-                return self.send_json(dict(sync.login(data.get('user'), data.get('pass')), ok=True))
+                return self.send_json(dict(sync.login(data.get('user'), data.get('pass'), data.get('mode') or ''), ok=True))
             if path == '/api/sync/logout':
                 return self.send_json(dict(sync.logout(), ok=True))
             if path == '/api/sync/now':

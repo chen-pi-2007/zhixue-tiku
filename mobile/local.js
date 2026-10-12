@@ -47,6 +47,8 @@
         prog.settings = prog.settings || { new_per_day: 20 };
         if (!prog.settings.exam_date) prog.settings.exam_date = '2026-11-07';
         ensureIds();
+        const acc = syncAccount();
+        if (acc && !prog.sync_owner) { prog.sync_owner = acc.user; save(); }
         syncSchedule(3);           // 登录了同步：打开 App 后同步一次
       });
     }
@@ -110,12 +112,20 @@
   const hiddenSubjects = () => new Set(prog.settings.hidden_subjects || []);
   const subjIndex = s => { const i = SUBJECTS.indexOf(s); return i < 0 ? 99 : i; };
 
+  // 英语按出自哪个专项细分题型（同 db.py 的 _cat）
+  const EN_CATS = { 'english-phonetics': 'en_phon', 'english-vocab': 'en_vocab', 'english-picture': 'en_pic',
+                    'english-dialogue': 'en_dia', 'english-cloze': 'en_cloze', 'english-reading': 'en_read',
+                    'english-writing': 'en_write' };
+  const CAT_ORDER = ['en_phon', 'en_vocab', 'en_pic', 'en_dia', 'en_cloze', 'en_read', 'en_write'];
+  const cat = q => EN_CATS[(q.same_as || q.key || '').split('#')[0]] || q.type;
+
   function view(q, papers, hideAnswer) {
     const c = prog.cards[ck(q)] || {};
     const p = papers[q.paper_id] || {};
     const d = Object.assign({}, q);
     d.paper_name = p.name || '';
     d.subject = p.subject || 'general';
+    d.cat = cat(q);
     d.wrong_count = c.wrong || 0;
     d.right_count = c.right || 0;
     d.in_wrong = !!c.in_wrong;
@@ -162,7 +172,7 @@
       const s = (papers[q.paper_id] || {}).subject;
       if (subject && s !== subject) return false;
       if (hidden.has(s)) return false;
-      if (qtype && q.type !== qtype) return false;
+      if (qtype && q.type !== qtype && cat(q) !== qtype) return false;
       if (search && plainText(q.stem).indexOf(search) < 0 && plainText(q.material).indexOf(search) < 0) return false;
       return true;
     });
@@ -193,7 +203,8 @@
     return { items: qs.slice(offset, offset + limit).map(q => view(q, papers)), total: qs.length };
   }
 
-  function groupMaterial(items) {
+  // 共用材料的题挪到一起；doShuffle 时在本篇内部打乱（按“第几空”排的组保持原顺序），同 db.py _group_material
+  function groupMaterial(items, doShuffle) {
     const order = [], groups = {};
     items.forEach(q => {
       const k = q.material ? q.paper_id + '\u0001' + q.material : 'q\u0001' + q.id;
@@ -201,7 +212,11 @@
       groups[k].push(q);
     });
     const out = [];
-    order.forEach(k => { out.push.apply(out, groups[k].sort((a, b) => a.qno - b.qno)); });
+    order.forEach(k => {
+      const g = groups[k].sort((a, b) => a.qno - b.qno);
+      if (doShuffle && g.length > 1 && !g.some(q => /第\d+空/.test(q.stem))) shuffle(g);
+      out.push.apply(out, g);
+    });
     return out;
   }
 
@@ -250,8 +265,8 @@
       if (scope === 'new' && c) return;
       items.push(view(q, papers));
     });
-    if (doShuffle) shuffle(items);
-    else items.sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno);
+    if (doShuffle) { shuffle(items); return groupMaterial(items, true); }
+    items.sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno);
     return groupMaterial(items);
   }
 
@@ -294,7 +309,7 @@
   function typeAccuracy(subject) {
     const papers = papersById();
     const qinfo = {};
-    bank.questions.forEach(q => { qinfo[q.key] = [(papers[q.paper_id] || {}).subject, q.type]; });
+    bank.questions.forEach(q => { qinfo[q.key] = [(papers[q.paper_id] || {}).subject, cat(q)]; });
     const hist = {};
     for (let i = prog.attempts.length - 1; i >= 0; i--) {
       const a = prog.attempts[i];
@@ -340,7 +355,7 @@
         else if (SELF.indexOf(q.type) < 0) ahead.push([c.in_wrong ? 0 : 1, c.box, c.due, q]);
       } else if (SELF.indexOf(q.type) < 0 && !(extra && q.material)) {   // 加练不带整组的材料题
         const s = (papers[q.paper_id] || {}).subject;
-        const a = acc[s + '|' + q.type];
+        const a = acc[s + '|' + cat(q)];
         const weak = (a == null ? 1 : a) < 0.7;
         (fresh[s] = fresh[s] || []).push([weak ? 0 : 1, q.paper_id, q.qno, q]);
       }
@@ -379,7 +394,7 @@
     const settings = prog.settings;
     prog = { cards: {}, attempts: [], exams: [], settings: settings, skills: {} };
     ensureIds();
-    syncDropAccount();          // 清除记录同时退出同步账号，不然服务器上的记录下次又同步回来
+    syncDropAccount();          // sync_owner 也随旧记录一起没了          // 清除记录同时退出同步账号，不然服务器上的记录下次又同步回来
     save();
     return '手机本地备份';
   }
@@ -402,7 +417,7 @@
       const s = (papers[q.paper_id] || {}).subject || 'general';
       const d = subj[s] = subj[s] || { subject: s, total: 0, gradable: 0, seen: 0, right: 0, wrong: 0, wrong_open: 0, due: 0, mastery_sum: 0, types: {} };
       d.total++;
-      const t = d.types[q.type] = d.types[q.type] || { type: q.type, total: 0, seen: 0, mastery_sum: 0 };
+      const t = d.types[cat(q)] = d.types[cat(q)] || { type: cat(q), total: 0, seen: 0, mastery_sum: 0 };
       t.total++;
       if (q.answer) d.gradable++;
       const c = prog.cards[ck(q)];
@@ -426,7 +441,10 @@
         const a = acc[s + '|' + t.type];
         t.accuracy = a != null ? Math.round(100 * a) : null;
         return t;
-      }).sort((x, y) => y.total - x.total);
+      }).sort((x, y) => {
+        const ox = CAT_ORDER.indexOf(x.type), oy = CAT_ORDER.indexOf(y.type);
+        return (ox < 0 ? 99 : ox) - (oy < 0 ? 99 : oy) || y.total - x.total;
+      });
       const n = d.right + d.wrong;
       d.accuracy = n ? Math.round(1000 * d.right / n) / 10 : null;
       return d;
@@ -967,9 +985,22 @@
     }, sec * 1000);
   }
   function syncKick() { if (syncAccount() && !syncState.fails) syncSchedule(10); }
+  // 本机记录属于哪个账号：绝不把一个人的记录并进另一个人的账号（规则同 sync.py login）
+  const localCount = () => allEvents().length + prog.exams.filter(e => e.finished).length;
+  const unsentCount = () => allEvents().filter(e => !e.s).length;
+  function resetForAccount() {
+    const text = JSON.stringify(prog);
+    try { localStorage.setItem('zx.progress.backup', text); } catch (e) { /* 太大就算了 */ }
+    if (window.ZXStore && window.ZXStore.backup) window.ZXStore.backup(text);
+    const examDate = prog.settings.exam_date || '2026-11-07';
+    prog = { cards: {}, attempts: [], exams: [], skills: {}, settings: { new_per_day: 20, exam_date: examDate } };
+    ensureIds();
+    save();
+    return '手机本地备份';
+  }
   function syncStatus() {
     const a = syncAccount();
-    return { available: !!syncEndpoint(), user: a ? a.user : '', running: syncState.running, last_ok: syncState.last_ok,
+    return { available: !!syncEndpoint(), user: a ? a.user : '', owner: prog.sync_owner || '', running: syncState.running, last_ok: syncState.last_ok,
              last_err: syncState.last_err, last_got: syncState.last_got, pending: a ? syncPending() : 0 };
   }
   async function syncHandle(method, path, body) {
@@ -988,17 +1019,32 @@
     }
     try {
       if (path === '/api/sync/login') {
-        const user = String(body.user || '').trim(), pw = String(body.pass || '');
+        const user = String(body.user || '').trim(), pw = String(body.pass || ''), mode = String(body.mode || '');
         if (!user || !pw) throw new SyncError('请输入用户名和密码');
+        const owner = prog.sync_owner || '', count = localCount();
+        if (!mode) {
+          if (owner && owner !== user) return { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
+          if (!owner && count) return { need: 'merge', count: count };
+        }
+        if (mode === 'merge' && owner && owner !== user) throw new SyncError('本机的记录属于账号 ' + owner + '，不能合并进别的账号');
         const dev = 'android-' + newUid().slice(0, 6);
         const r = await syncPost('/v1/login', { user: user, pass: pw, device: dev });
-        localStorage.setItem(ACC_KEY, JSON.stringify({ user: r.user || user, token: r.token, device: dev }));
+        const name = r.user || user;
+        if (owner && owner !== name && mode !== 'fresh') {
+          try { await syncPost('/v1/logout', {}, r.token); } catch (e) { /* ignore */ }
+          return { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
+        }
+        let backup = '';
+        if (mode === 'fresh' && count) backup = resetForAccount();
+        localStorage.setItem(ACC_KEY, JSON.stringify({ user: name, token: r.token, device: dev }));
+        prog.sync_owner = name;
         syncStartAccount();
         syncSchedule(0);
-        return syncStatus();
+        return Object.assign(syncStatus(), { backup: backup });
       }
       if (path === '/api/sync/logout') {
         const a = syncAccount();
+        if (a) { try { await syncOnce(); } catch (e) { /* 断网也能退出，没传的留在本机 */ } }
         if (a) { try { await syncPost('/v1/logout', {}, a.token); } catch (e) { /* 断网也能退出 */ } }
         syncDropAccount();
         syncStopAccount();

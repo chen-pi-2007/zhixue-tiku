@@ -1,10 +1,10 @@
 {
- "content_version": 38,
- "created": "2026-10-10 21:28:36",
+ "content_version": 39,
+ "created": "2026-10-12 08:05:59",
  "files": {
   "data/bank.json": [
-   "e22d5b8e876e6521553f84aee8d4f4980723d98307cafca6045510fe1952d2cc",
-   3096416
+   "f75f291b0f09d1ddc6571896490fa98f75c7ed2a3f67b302be23cf8975bfbacf",
+   3092927
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "cc574c0e120c556499f9e06398abb06a0b9cb5b4abbdd963bbdbf94cf05c23c0",
-   45530
+   "7b88ab9fc3955060106f07b156d671b737329dd5b5fd5113bbbaea2239991210",
+   48632
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,12 +1587,12 @@
    3586
   ],
   "mobile/local.js": [
-   "b1cbc629f0af8e9d5031587c550c8d9e01bfb8c9baf0aa7ee07918cf391a9703",
-   62069
+   "43ab827ff428c45fd105a78e425765b56a259d2b80b9aa3ad22577b29044b504",
+   65063
   ],
   "server.py": [
-   "41bd4bb4c73040856e2ed0e37df7b64d9fc600331258d5667179641a4d936988",
-   25320
+   "2697eb788133049d49ecf571e806b2ce9a8122709acbcb712bc8c44d82e792cb",
+   25344
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "3e604cdb725bdeb37ad51a9cfa9423b38c8d3a9ede70e8fe71de6f59ec4a3b21",
-   126224
+   "09f45dbb10bc0d9103926cd8adbedc5fcff0a2c3e88cb9dcbfdf4458118be045",
+   129796
   ],
   "static/index.html": [
    "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
@@ -1647,17 +1647,17 @@
    27524
   ],
   "static/style.css": [
-   "f1f3def81ca7ed78ccddf2517063cd656f511dc50150113569fe07b447bd2b45",
-   51762
+   "8ecef7e6c8683c073841ca2c3b9a71fd377d289af3f494bde3758360876120a7",
+   51622
   ],
   "sync.py": [
-   "a4883c438614d4583a438a1904f897082bd9ad98b0d8a4886c3810dd77e169d4",
-   9240
+   "05b08dd97fe018a443cf98460b04529e3e425fa8acbb1eda43b6f3f2748080da",
+   10950
   ]
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "账号同步（内测）：电脑和手机的做题记录、错题本、复习进度、模拟考、存档自动合并；本地优先，断网照常使用，联网后自动补传并对账。答错、答对都有解析，英语阅读标出原文依据。",
+ "notes": "英语题型按专项分开（语音、单选、图文、对话、完形、阅读、书面表达）；打乱时阅读一篇的题连在一起只在篇内打乱；账号同步防串号：本机记录绑定账号，换账号先备份不合并；语文解析只说错的那项；修复深色模式下拉框看不清、大屏页面底部多余空白",
  "py_shell_api": 1,
- "tag": "content-38"
+ "tag": "content-39"
 }

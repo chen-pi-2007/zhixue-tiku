@@ -288,12 +288,25 @@ def _papers_by_id():
     return {p['id']: p for p in _bank['papers']}
 
 
+# 英语题库里的题都是单选 / 判断，按出自哪个专项再细分题型（首页题型卡片、题型练习、题目标签都用它）。
+# 学习通卷里的题按原题（same_as）算。其他科目的题型就是 q['type']。
+EN_CATS = {'english-phonetics': 'en_phon', 'english-vocab': 'en_vocab', 'english-picture': 'en_pic',
+           'english-dialogue': 'en_dia', 'english-cloze': 'en_cloze', 'english-reading': 'en_read',
+           'english-writing': 'en_write'}
+CAT_ORDER = ['en_phon', 'en_vocab', 'en_pic', 'en_dia', 'en_cloze', 'en_read', 'en_write']   # 按考试卷面顺序
+
+
+def _cat(q):
+    return EN_CATS.get((q.get('same_as') or q.get('key') or '').split('#')[0], q['type'])
+
+
 def _view(q, papers, hide_answer=False):
     c = _prog['cards'].get(_ck(q)) or {}
     p = papers.get(q['paper_id'], {})
     d = dict(q)
     d['paper_name'] = p.get('name', '')
     d['subject'] = p.get('subject', 'general')
+    d['cat'] = _cat(q)
     d['wrong_count'] = c.get('wrong', 0)
     d['right_count'] = c.get('right', 0)
     d['in_wrong'] = bool(c.get('in_wrong'))
@@ -365,7 +378,7 @@ def _filter(paper_id=None, subject=None, qtype=None, search=None):
             continue
         if s in hidden:
             continue
-        if qtype and q['type'] != qtype:
+        if qtype and qtype not in (q['type'], _cat(q)):
             continue
         if search and search not in plain_text(q['stem']) and search not in plain_text(q['material']):
             continue
@@ -380,8 +393,13 @@ def get_questions(paper_id=None, qtype=None, search=None, limit=50, offset=0, su
         return [_view(q, papers) for q in qs[offset:offset + limit]], len(qs)
 
 
-def _group_material(items):
-    """打乱后再把共用材料的题挪到一起，按题号排好，做阅读时不来回跳。"""
+BLANK_STEM = re.compile(r'第\d+空')       # 完形、补全对话、书面表达：题号跟着文章里的空走
+
+
+def _group_material(items, rnd=None):
+    """把共用材料的题挪到一起（一篇阅读的题不会被拆开、和别的篇混在一起）。
+    rnd 给了（打乱练习）就在本篇内部打乱；按“第几空”排的组（完形、补全对话、书面表达）保持原顺序，
+    不然题号和文章里的空对不上。"""
     order, groups = [], {}
     for q in items:
         k = (q['paper_id'], q['material']) if q['material'] else ('q', q['id'])
@@ -391,7 +409,10 @@ def _group_material(items):
         groups[k].append(q)
     out = []
     for k in order:
-        out.extend(sorted(groups[k], key=lambda x: x['qno']))
+        g = sorted(groups[k], key=lambda x: x['qno'])
+        if rnd and len(g) > 1 and not any(BLANK_STEM.search(q['stem']) for q in g):
+            rnd.shuffle(g)
+        out.extend(g)
     return out
 
 
@@ -449,9 +470,10 @@ def practice_set(paper_id=None, scope='all', shuffle=True, seed=None, subject=No
                 continue
             items.append(_view(q, papers))
     if shuffle:
-        random.Random(seed).shuffle(items)
-    else:
-        items.sort(key=lambda x: (x['paper_id'], x['qno']))
+        rnd = random.Random(seed)
+        rnd.shuffle(items)
+        return _group_material(items, rnd)
+    items.sort(key=lambda x: (x['paper_id'], x['qno']))
     return _group_material(items)
 
 
@@ -504,7 +526,7 @@ def wrong_list(mastered=0, subject=None):
 def _type_accuracy(subject=None, recent=60):
     """各 (科目, 题型) 最近 recent 次作答的正确率，用于“薄弱题型优先”。"""
     papers = _papers_by_id()
-    qinfo = {q['key']: (papers.get(q['paper_id'], {}).get('subject'), q['type']) for q in _bank['questions']}
+    qinfo = {q['key']: (papers.get(q['paper_id'], {}).get('subject'), _cat(q)) for q in _bank['questions']}
     hist = {}
     for a in reversed(_prog['attempts']):
         k = qinfo.get(a['k'])
@@ -544,7 +566,7 @@ def review_queue(subject=None, new_limit=None, extra=False):
             elif q['type'] not in SELF_TYPES and not (extra and q['material']):
                 # 主观题不自动推新题，去科目页按题型练；加练不带阅读这类整组的材料题，免得一组就占满
                 subj = papers.get(q['paper_id'], {}).get('subject')
-                weak = acc.get((subj, q['type']), 1.0) < 0.7
+                weak = acc.get((subj, _cat(q)), 1.0) < 0.7
                 fresh.setdefault(subj, []).append((not weak, q['paper_id'], q['qno'], q))
         due.sort(key=lambda x: x[:3])
         if extra:      # 薄弱旧题最多占一半，不够的用新题补满
@@ -613,7 +635,7 @@ def clear_progress():
         _prog.update({'cards': {}, 'attempts': [], 'exams': [], 'settings': settings, 'skills': {}})
         _ensure_ids()
         _save_prog()
-        _logout_hook()
+        _logout_hook()          # 同时清掉 sync_owner：记录没了，本机不再属于哪个账号
         shutil.rmtree(os.path.join(DATA_DIR, 'skill_work'), ignore_errors=True)
         return backup
 
@@ -700,6 +722,7 @@ def _dirty(key):
 
 def _logout_hook():
     _prog['sync'] = {}
+    _prog.pop('sync_owner', None)
     for f in on_progress_cleared:
         try:
             f()
@@ -841,6 +864,53 @@ def _merge_events(evs):
         _prog['attempts'].sort(key=lambda a: a['t'])
         _prog['marks'].sort(key=lambda a: a['t'])
     return added, keys
+
+
+# ---- 本机记录属于哪个账号（sync_owner）：绝不把一个人的记录并进另一个人的账号
+# 第一次登录时绑定；之后在这台设备上登录别的账号，必须先把本机记录备份并清空，再下载那个账号的数据。
+
+def sync_owner():
+    with _lock:
+        _load()
+        return _prog.get('sync_owner') or ''
+
+
+def sync_set_owner(name):
+    with _lock:
+        _load()
+        _prog['sync_owner'] = name
+        _save_prog()
+
+
+def sync_local_count():
+    """本机有多少条“属于某个人”的记录：作答、标记、交了卷的模拟考"""
+    with _lock:
+        _load()
+        return len(_events()) + sum(1 for e in _prog['exams'] if e.get('finished'))
+
+
+def sync_unsent():
+    with _lock:
+        _load()
+        return sum(1 for e in _events() if not e.get('s'))
+
+
+def sync_reset_for_account(owner):
+    """换账号 / 不合并：先把本机全部记录备份到 data/backups/，再清空（设置也回到默认，设置也是个人的）。返回备份路径"""
+    global _prog
+    with _lock:
+        _load()
+        os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
+        tag = re.sub(r'[^\w-]', '_', owner or '未绑定')[:30]
+        backup = os.path.join(DATA_DIR, 'backups', 'progress-%s-%s.json' % (time.strftime('%Y%m%d-%H%M%S'), tag))
+        _write_json(backup, _prog)
+        exam_date = _prog['settings'].get('exam_date', '2026-11-07')
+        _prog.clear()
+        _prog.update({'cards': {}, 'attempts': [], 'exams': [], 'skills': {},
+                      'settings': {'new_per_day': 20, 'exam_date': exam_date}})
+        _ensure_ids()
+        _save_prog()
+        return backup
 
 
 def sync_start_account():
@@ -999,7 +1069,7 @@ def dashboard():
             d = subj.setdefault(s, {'subject': s, 'total': 0, 'gradable': 0, 'seen': 0, 'right': 0, 'wrong': 0,
                                     'wrong_open': 0, 'due': 0, 'mastery_sum': 0.0, 'types': {}})
             d['total'] += 1
-            t = d['types'].setdefault(q['type'], {'type': q['type'], 'total': 0, 'seen': 0, 'mastery_sum': 0.0})
+            t = d['types'].setdefault(_cat(q), {'type': _cat(q), 'total': 0, 'seen': 0, 'mastery_sum': 0.0})
             t['total'] += 1
             if q['answer']:
                 d['gradable'] += 1
@@ -1025,7 +1095,7 @@ def dashboard():
                 a = acc.get((s, t['type']))
                 t['accuracy'] = _round(100 * a) if a is not None else None
                 types.append(t)
-            d['types'] = sorted(types, key=lambda t: -t['total'])
+            d['types'] = sorted(types, key=lambda t: (CAT_ORDER.index(t['type']) if t['type'] in CAT_ORDER else 99, -t['total']))
             n = d['right'] + d['wrong']
             d['accuracy'] = _round(100.0 * d['right'] / n, 1) if n else None
             out.append(d)

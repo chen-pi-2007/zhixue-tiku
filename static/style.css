@@ -125,17 +125,19 @@ html { -webkit-tap-highlight-color: transparent; }
 .sw-auto { background: linear-gradient(90deg, #f6f7f9 50%, #282828 50%); }
 
 /* ---------------------------------------------------------------- 侧栏 + 主区 */
-.layout { display: flex; min-height: calc(100vh - var(--top)); }
-#side { position: sticky; top: var(--top); align-self: flex-start; width: var(--side); height: calc(100vh - var(--top)); flex: none; padding: 16px 12px; border-right: 1px solid var(--line); background: var(--bg); }
+.layout { display: flex; min-height: calc(100vh / var(--z) - var(--top)); }
+#side { position: sticky; top: var(--top); align-self: flex-start; width: var(--side); height: calc(100vh / var(--z) - var(--top)); flex: none; padding: 16px 12px; border-right: 1px solid var(--line); background: var(--bg); }
 #nav { display: flex; flex-direction: column; gap: 2px; }
 #nav a { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 5px; color: var(--ink-2); font-size: 15px; }
 #nav a:hover { background: var(--layer-2); color: var(--ink); opacity: 1; }
 #nav a.active { background: var(--layer-2); color: var(--ink); font-weight: 600; }
 main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1600px; }
 /* 大屏（全屏 / 最大化）整体放大，字和按钮跟着变大，不留一大片空白 */
-@media (min-width: 1680px) { body { zoom: 1.12; } }
-@media (min-width: 1900px) { body { zoom: 1.25; } }
-@media (min-width: 2400px) { body { zoom: 1.5; } }
+/* 大屏放大；放大后 100vh 也会跟着被放大，用到“一屏高”的地方都要除以 --z，否则页面比屏幕长、底下一大片空白 */
+:root { --z: 1; }
+@media (min-width: 1680px) { :root { --z: 1.12; } body { zoom: 1.12; } }
+@media (min-width: 1900px) { :root { --z: 1.25; } body { zoom: 1.25; } }
+@media (min-width: 2400px) { :root { --z: 1.5; } body { zoom: 1.5; } }
 
 /* ---------------------------------------------------------------- 通用件 */
 .crumb { font-size: 13px; color: var(--ink-3); margin-bottom: 14px; }
@@ -174,6 +176,9 @@ main { flex: 1; min-width: 0; padding: 22px 28px 60px; max-width: 1600px; }
 .paper-acts { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .inp, select.inp, input.inp { height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: var(--layer-2); color: var(--ink); font: inherit; font-size: 14px; }
+/* 下拉列表弹出来的选项：Windows 上弹层底色是系统白，文字却继承了深色模式的浅色字，几乎看不见。
+   明确给选项写底色和字色，跟着主题走 */
+select option, select optgroup { background-color: var(--layer-1); color: var(--ink); }
 .inp:focus { outline: 1px solid var(--line); background: var(--layer-3); }
 .chip { height: 32px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--layer-2); color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer; }
 .chip:hover { background: var(--layer-3); color: var(--ink); }
@@ -397,7 +402,7 @@ textarea.selfarea:focus { outline: 1px solid var(--line); }
 .exam-main { flex: 1; min-width: 0; }
 .exam-main .sec-title { justify-content: flex-start; gap: 2px; }
 .exam-main > .sec-title:first-child { margin-top: 0; }
-.answer-card { position: sticky; top: calc(var(--top) + 76px); width: 220px; flex: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px; border-radius: 8px; background: var(--layer-1); max-height: calc(100vh - 150px); overflow: auto; align-content: start; }
+.answer-card { position: sticky; top: calc(var(--top) + 76px); width: 220px; flex: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px; border-radius: 8px; background: var(--layer-1); max-height: calc(100vh / var(--z) - 150px); overflow: auto; align-content: start; }
 .answer-card a { display: flex; align-items: center; justify-content: center; height: 32px; border-radius: 6px; background: var(--layer-2); color: var(--ink-2); font-size: 13px; }
 .answer-card a:hover { background: var(--layer-3); opacity: 1; }
 .answer-card a.done { background: var(--green); color: #fff; }
@@ -472,7 +477,7 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .ty-stat { font-size: 13px; color: var(--ink-3); }
 .ty-stat b { color: var(--ink); font-size: 18px; font-weight: 600; }
 .ty-stat.bad b { color: var(--red); }
-.ty-board { max-height: 62vh; overflow-y: auto; padding: 6px; border-radius: 8px; background: var(--layer-2); }
+.ty-board { max-height: calc(62vh / var(--z)); overflow-y: auto; padding: 6px; border-radius: 8px; background: var(--layer-2); }
 .ty-row { padding: 8px 10px 10px; border-radius: 8px; }
 .ty-row.cur { background: var(--layer-1); }
 .ty-src, .ty-line { font-family: var(--f-body); font-size: 20px; letter-spacing: 1px; line-height: 1.6; }

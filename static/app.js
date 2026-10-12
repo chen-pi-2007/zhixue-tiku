@@ -218,12 +218,16 @@ const TYPE_NAME = {
   single: '单选题', multi: '多选题', judge: '判断题', qa: '问答题',
   reading: '阅读单选', poem: '古诗文单选', dictation: '默写', essay: '作文',
   blank: '填空题', solution: '解答题',
+  // 英语按专项细分（后台的 _cat）
+  en_phon: '语音', en_vocab: '单选（词汇语法）', en_pic: '图文理解', en_dia: '交际对话',
+  en_cloze: '完形填空', en_read: '阅读理解', en_write: '书面表达',
 };
 // 自评类题型:纸上/心里作答后点按钮对照参考答案,再自评
 const SELF_TYPES = ['qa', 'dictation', 'essay', 'blank', 'solution'];
 // 题型印章字
 const TYPE_ICON = { single: '单', reading: '阅', poem: '诗', dictation: '默', qa: '问', essay: '文', blank: '填',
-                    solution: '解', multi: '多', judge: '判' };
+                    solution: '解', multi: '多', judge: '判',
+                    en_phon: '音', en_vocab: '单', en_pic: '图', en_dia: '话', en_cloze: '完', en_read: '阅', en_write: '写' };
 const SUBJECT_NAME = { chinese: '语文', math: '数学', english: '英语', politics: '思想政治',
                        media: '数字媒体', general: '其他' };
 // 科目印章字
@@ -946,7 +950,7 @@ async function loadMore() {
 function qCard(q) {
   return '<div class="card" id="qc' + q.id + '">' +
     '<div class="qhead">' +
-      '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
+      '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
       '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题' + (q.answer ? '' : ' · 无答案') + '</span>' +
       recBadge(q) +
     '</div>' +
@@ -1005,7 +1009,7 @@ async function viewWrong() {
       ? list.map(q =>
         '<div class="card">' +
           '<div class="qhead">' +
-            '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
+            '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
             '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题</span>' +
             '<span class="rec-badge bad">做错 ' + q.wrong_count + ' 次</span>' +
             (!q.mastered ? '<span class="rec-badge">' + streakText(q.streak) + (q.due ? ' · ' + q.due.slice(5) + ' 复习' : '') + '</span>' : '') +
@@ -1273,7 +1277,7 @@ function renderQ() {
     '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
     '<div class="card qcard-main">' +
       '<div class="qhead">' +
-        '<span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
+        '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
         (again ? '<span class="rec-badge bad">刚才做错，再来一次</span>' : recBadge(q)) +
         '<span class="spacer"></span>' + cnBtn(q) +
@@ -1517,7 +1521,7 @@ function renderFinish() {
         wrongs.map(r => {
           const q = r.q;
           return '<div class="card">' +
-            '<div class="qhead"><span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
+            '<div class="qhead"><span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
             '<span class="qsrc">' + esc(q.paper_name || '') + ' · 第' + q.qno + '题</span></div>' +
             materialBox(q, true) +
             '<div class="stem">' + rich(q.stem) + '</div>' +
@@ -1763,7 +1767,7 @@ async function viewExamReport(id) {
     (wrongs.length ? '<div class="sec-title">错题（红色是你的选择，绿色是正确答案）</div>' +
       wrongs.map(q =>
         '<div class="card">' +
-          '<div class="qhead"><span class="tag t-' + q.type + '">' + TYPE_NAME[q.type] + '</span>' +
+          '<div class="qhead"><span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
           '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题</span>' +
           '<span class="rec-badge bad">' + (q.given ? '你选 ' + esc(q.given) : '未作答') + '</span></div>' +
           materialBox(q, true) +
@@ -1910,7 +1914,8 @@ function syncBoxHtml(sy) {
         '<input class="input" id="sync-user" autocomplete="username" placeholder="用户名">' +
         '<input class="input" id="sync-pass" type="password" autocomplete="current-password" placeholder="密码">' +
         '<button class="btn" onclick="syncLogin()">登录</button></div></div>' +
-      '<div class="set-foot">登录后，电脑和手机上的做题记录、错题本、复习进度、模拟考和存档会自动合并。' +
+      '<div class="set-foot">' + (sy.owner ? '这台设备上的做题记录属于账号 <b>' + esc(sy.owner) + '</b>。登录别的账号时会先备份并清空本机记录，不会混到别人账号里。<br>' : '') +
+        '登录后，电脑和手机上的做题记录、错题本、复习进度、模拟考和存档会自动合并。' +
         '没网也能照常做题，联网后自动补上；同步不成功不影响使用。账号找管理员要。</div>';
   }
   return '<div class="set-list">' +
@@ -1926,16 +1931,49 @@ function syncBoxHtml(sy) {
 
 function syncRender(sy) { const b = $('#sync-box'); if (b) b.innerHTML = syncBoxHtml(sy); }
 
-async function syncLogin() {
+// 登录：绝不把一个人的记录并进另一个人的账号。本机已经属于别的账号、或者本机有记录但没绑定过账号，
+// 后台不会直接登录，而是回 need，这里让用户选：合并（是自己的记录）/ 备份后清空本机再下载账号里的
+async function syncLogin(mode) {
   const u = ($('#sync-user') || {}).value || '', p = ($('#sync-pass') || {}).value || '';
   if (!u.trim() || !p) { toast('请输入用户名和密码', 'bad'); return; }
   try {
-    const sy = await api('/api/sync/login', { method: 'POST', body: { user: u, pass: p } });
+    const sy = await api('/api/sync/login', { method: 'POST', body: { user: u, pass: p, mode: mode || '' } });
+    if (sy.need) return syncAskOwner(sy, u.trim());
+    if (mode === 'fresh') lsClearLocal();            // 本机的练习存档也是原来那个人的
     lsPushAll();
     syncRender(sy);
-    toast('登录成功，正在同步', 'good');
+    toast(sy.backup ? '登录成功。本机原来的记录已备份并清空，正在下载这个账号的记录' : '登录成功，正在同步', 'good');
     syncNow();
   } catch (e) { toast(e.message, 'bad'); }
+}
+
+function syncAskOwner(sy, user) {
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  const head = '<div class="sheet-h"><b>' + (sy.need === 'switch' ? '换账号登录' : '这些记录是你的吗？') + '</b><button class="sheet-x" aria-label="关闭">×</button></div>';
+  const body = sy.need === 'switch'
+    ? '<div class="sheet-sec"><div class="sheet-d">这台设备上的 ' + sy.count + ' 条做题记录属于账号 <b>' + esc(sy.owner) + '</b>，不能合并进 <b>' + esc(user) + '</b>。<br>' +
+        '继续登录会先把本机记录<b>备份</b>，再清空本机、下载 ' + esc(user) + ' 的记录。' + esc(sy.owner) + ' 的记录在服务器上一条不少，以后登录 ' + esc(sy.owner) + ' 就能拿回来' +
+        (sy.unsent ? '；但其中 <b>' + sy.unsent + ' 条还没传上服务器</b>，只在备份里，建议先登录 ' + esc(sy.owner) + ' 同步一次' : '') + '。</div>' +
+        '<button class="btn block" data-act="fresh">备份本机记录，登录 ' + esc(user) + '</button></div>'
+    : '<div class="sheet-sec"><div class="sheet-d">这台设备上已经有 ' + sy.count + ' 条做题记录，还没绑定过账号。</div>' +
+        '<button class="btn block" data-act="merge">是我自己的，合并进账号 ' + esc(user) + '</button>' +
+        '<div class="sheet-d" style="margin-top:12px">不是你的（比如借用别人的手机、电脑），选下面这个：本机记录会先备份再清空，然后下载你账号里的记录，别人的记录不会进你的账号。</div>' +
+        '<button class="btn ghost block" data-act="fresh">不是我的，备份后清空本机</button></div>';
+  sheet.innerHTML = '<div class="sheet" role="dialog">' + head + body + '</div>';
+  sheet.addEventListener('click', e => {
+    if (e.target === sheet || e.target.closest('.sheet-x')) return sheet.remove();
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    sheet.remove();
+    syncLogin(btn.dataset.act);
+  });
+  document.body.appendChild(sheet);
+}
+
+// 换账号 / 不合并时：本机浏览器里的练习存档、自动进度也清掉（是原来那个人的）
+function lsClearLocal() {
+  try { Object.keys(localStorage).filter(lsSynced).forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
 }
 
 async function syncNow(btn) {

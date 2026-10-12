@@ -115,21 +115,47 @@ def _post(path, body, token=None):
 
 # ---------------------------------------------------------------- 登录 / 退出
 
-def login(user, pw):
+def login(user, pw, mode=''):
+    """mode：''＝先检查；'merge'＝本机记录是自己的，合并进账号；'fresh'＝本机记录不是自己的 / 换账号，先备份清空。
+    绝不把一个人的记录并进另一个人的账号：本机已绑定别的账号，或者本机有记录但没绑定过，都要用户先选。"""
     user = (user or '').strip()
     if not user or not pw:
         raise SyncError('请输入用户名和密码')
+    owner = db.sync_owner()
+    count = db.sync_local_count()
+    if not mode:
+        if owner and owner != user:
+            return {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
+        if not owner and count:
+            return {'need': 'merge', 'count': count}
+    if mode == 'merge' and owner and owner != user:
+        raise SyncError('本机的记录属于账号 %s，不能合并进别的账号' % owner)
     dev = '%s-%s' % (platform.node()[:30], os.urandom(3).hex())
     r = _post('/v1/login', {'user': user, 'pass': pw, 'device': dev})
-    _save_account({'user': r.get('user') or user, 'token': r['token'], 'device': dev})
-    db.sync_start_account()      # 本机已有的记录全部（再）传一遍，服务器按 id 去重
+    name = r.get('user') or user
+    if owner and owner != name and mode != 'fresh':          # 大小写之类和输入的不完全一样：再拦一次
+        try:
+            _post('/v1/logout', {}, r['token'])
+        except SyncError:
+            pass
+        return {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
+    backup = ''
+    if mode == 'fresh' and count:
+        backup = db.sync_reset_for_account(owner)
+    _save_account({'user': name, 'token': r['token'], 'device': dev})
+    db.sync_set_owner(name)
+    db.sync_start_account()      # 本机的记录（这时一定是这个账号自己的）全部（再）传一遍，服务器按 id 去重
     kick(0)
-    return status()
+    return dict(status(), backup=backup)
 
 
 def logout():
     a = account()
     if a:
+        try:
+            sync_once()          # 退出前把还没传的传上去
+        except Exception:        # noqa: BLE001  断网也能退出，没传的留在本机，重新登录这个账号会接着传
+            pass
         try:
             _post('/v1/logout', {}, a['token'])
         except SyncError:
@@ -229,6 +255,9 @@ def kick(delay=AFTER_CHANGE):
 
 def start():
     global _thread
+    a = account()
+    if a and not db.sync_owner():
+        db.sync_set_owner(a['user'])       # 1.6.0 登录的设备还没记归属：就是当前账号
     if _thread is None and endpoint():
         _thread = threading.Thread(target=_loop, name='sync', daemon=True)
         _state['next'] = time.time() + 3
@@ -249,6 +278,7 @@ def sync_now():
 
 def status():
     a = account()
-    return {'available': bool(endpoint()), 'user': a['user'] if a else '', 'running': _state['running'],
+    return {'available': bool(endpoint()), 'user': a['user'] if a else '', 'owner': db.sync_owner(),
+            'running': _state['running'],
             'last_ok': _state['last_ok'], 'last_err': _state['last_err'], 'last_got': _state['last_got'],
             'pending': db.sync_pending() if a else 0}
