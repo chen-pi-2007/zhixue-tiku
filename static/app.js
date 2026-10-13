@@ -2167,8 +2167,9 @@ async function viewSettings() {
   const canUpd = a.frozen || a.mobile;
   app.innerHTML =
     '<h2 class="page-h"><a class="page-back" href="javascript:void(0)" onclick="goBack()" aria-label="返回">' +
-      '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
-    (state.backTo ? '<button class="btn block set-backwork" onclick="goBackToWork()">← 返回' + (state.backTo === '#/recite' ? '背题' : '做题') + '（接着刚才那道题）</button>' : '') +
+      '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置' +
+      // 从做题 / 背题进来的：标题栏右边一个「返回做题」，接着刚才那道题
+      (state.backTo ? '<button class="btn set-backwork" onclick="goBackToWork()">返回' + (state.backTo === '#/recite' ? '背题' : '做题') + '</button>' : '') + '</h2>' +
     '<div class="set-page">' +
     subjList('culture') + subjList('pro') + subjList('other') +
     '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +

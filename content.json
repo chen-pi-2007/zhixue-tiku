@@ -1,6 +1,6 @@
 {
- "content_version": 50,
- "created": "2026-10-13 09:10:54",
+ "content_version": 51,
+ "created": "2026-10-13 12:28:04",
  "files": {
   "data/bank.json": [
    "710567a33c52cfb2f8eaf51f76dcd2230ba740bf7dbab248b5d02c6d66b04c2d",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "b5e84eea3bd83f182c44944417dcf8fe652e4e78644ef6b422a76c6577273788",
-   148883
+   "83a9d00005e35f0fea688fd3907e763199d121af82534d8d9f241e4428c247b3",
+   148956
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "4f598cdf368136bac25d02619e223c759eab1dabdb0f4f0a46c687d69f42dcd1",
-   53740
+   "512ee5a82b8e6f7db2dfb6bc1f52a7d272f325b4165149545853f923139b37b2",
+   53812
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语选项：几个选项意思相同、只是时态/词形不同时，作答前就标出各自的形式（原形、过去式、现在分词、单复数等）",
+ "notes": "设置改成整页：收起顶栏和左边导航，左上角返回，从做题进来右上角有「返回做题」",
  "py_shell_api": 1,
- "tag": "content-50"
+ "tag": "content-51"
 }

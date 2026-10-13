@@ -509,14 +509,8 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .qcard-main { padding: 14px; }
   .feedback { padding: 12px; }
   .set-row .btn { flex: none; }
-  body.subpage #side { display: none; }                 /* 设置页：不显示题库 / 错题本那排导航 */
-  body.subpage #topbar { display: none; }               /* 只留一条「‹ 设置」标题栏 */
   /* 和顶栏一样高、一样的左边距，切到设置时上面那条不跳 */
-  body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: var(--top); margin: -14px -12px 14px; padding: 0 12px 0 4px; gap: 2px; font-weight: 600;
-    background: var(--layer-1); border-bottom: 1px solid var(--line); font-size: 17px; }
-  body.subpage .page-back { margin-left: 0; }
-  body.subpage .page-back { display: inline-flex; }
-  body.subpage .top-set { display: none; }              /* 已经在设置里了，齿轮也收起来 */
+  body.subpage .page-h { margin: -14px -12px 14px; padding: 0 12px 0 4px; font-size: 17px; }
   main { padding: 14px 12px 60px; }
   .prow-c, .prow-w { display: none; }
   .search-pill { width: auto; flex: 1; min-width: 0; }
@@ -556,7 +550,14 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .set-card { max-width: 760px; }
 /* 设置页：分组列表 */
 .set-page { max-width: 640px; }
-.set-backwork { max-width: 640px; margin: 0 0 14px; }
+/* 设置是整页的二级页面（电脑、手机一样）：收起顶栏和左边导航，只留一条「‹ 设置」标题栏 */
+body.subpage #side, body.subpage #topbar { display: none; }
+body.subpage main { max-width: none; }
+body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: var(--top); margin: -22px -28px 22px; padding: 0 28px 0 16px; gap: 2px; font-weight: 600;
+  background: var(--layer-1); border-bottom: 1px solid var(--line); font-size: 18px; }
+body.subpage .page-back { display: inline-flex; margin-left: 0; }
+body.subpage .set-page { margin: 0 auto; }
+.page-h .set-backwork { margin-left: auto; height: 34px; padding: 0 14px; font-size: 14px; font-weight: 500; }
 .set-group-t { margin: 22px 4px 8px; font-size: 13px; color: var(--ink-3); }
 .set-page > .set-group-t:first-child { margin-top: 0; }
 .set-list { background: var(--layer-1); border-radius: 12px; overflow: hidden; }
