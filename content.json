@@ -1,10 +1,10 @@
 {
- "content_version": 52,
- "created": "2026-10-13 12:31:45",
+ "content_version": 53,
+ "created": "2026-10-13 12:43:25",
  "files": {
   "data/bank.json": [
-   "710567a33c52cfb2f8eaf51f76dcd2230ba740bf7dbab248b5d02c6d66b04c2d",
-   3179070
+   "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
+   3213948
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "设置里「当前版本」后面显示内容第几版",
+ "notes": "语文新增模拟试卷(7)，28 题",
  "py_shell_api": 1,
- "tag": "content-52"
+ "tag": "content-53"
 }
