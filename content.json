@@ -1,6 +1,6 @@
 {
- "content_version": 45,
- "created": "2026-10-13 08:30:08",
+ "content_version": 46,
+ "created": "2026-10-13 08:32:27",
  "files": {
   "data/bank.json": [
    "90bb97ceb6abbb6afad6f91d1045cd4fd49b1ba27c932623135220ef7f88eb69",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "e3ee887dedcabe4ddfea2a8c8c0364aff018c6c35072d928d0c0a04a291ffd16",
-   146273
+   "60b194fd671046a9e3047fc3b8ec7a4b3e489d017ae74fb6b336b26f998c8b39",
+   147260
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "379125125e6226a1ebbeed927d50b76dda11c530b3de0e3aae6d9aff00824ef3",
-   53518
+   "abb35ef4a4cb6af32369435f65f51e28552a8e76409b9e30e84a7fe94ffe1150",
+   53572
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语题干翻译：空前后不再留“了”“一下”这类提示字",
+ "notes": "做题、背题时点设置，设置页顶上有「返回做题」，再点一次齿轮也能回到刚才那道题",
  "py_shell_api": 1,
- "tag": "content-45"
+ "tag": "content-46"
 }

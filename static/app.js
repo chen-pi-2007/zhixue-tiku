@@ -472,6 +472,9 @@ function route() {
   const ts = $('#top-set');
   if (ts) ts.classList.toggle('active', name === 'settings');
   if (name !== 'exam') stopExamTimer();
+  if (name === 'settings') {
+    if (WORK_PAGES[state.lastPage] && WORK_PAGES[state.lastPage]()) state.backTo = '#/' + state.lastPage;
+  } else state.backTo = null;
   window.scrollTo(0, 0);
   // 换页时淡入一下（同一页内重绘不播放）
   if (name !== state.lastPage) {
@@ -483,6 +486,14 @@ function route() {
   routes[name](parts.slice(1));
 }
 window.addEventListener('hashchange', route);
+// 做题中途能去设置再回来的页面（练习 / 背题还在进行中才算）
+const WORK_PAGES = { practice: () => !!state.practice, recite: () => !!state.recite };
+// 右上角齿轮：在设置页里再点一次 = 回到刚才做题的地方
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('#top-set');
+  if (a && location.hash === '#/settings' && state.backTo) { e.preventDefault(); location.hash = state.backTo; }
+});
+function goBackToWork() { location.hash = state.backTo || '#/home'; }
 applyCn();
 api('/api/dashboard').then(r => setTopDays(r.data.settings.exam_date)).catch(() => {});
 
@@ -744,6 +755,7 @@ function shareProgress() {
 }
 
 function goBack() {
+  if (location.hash === '#/settings' && state.backTo) return goBackToWork();
   history.length > 1 ? history.back() : (location.hash = '#/home');
 }
 
@@ -2136,6 +2148,7 @@ async function viewSettings() {
   app.innerHTML =
     '<h2 class="page-h"><a class="page-back" href="javascript:void(0)" onclick="goBack()" aria-label="返回">' +
       '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
+    (state.backTo ? '<button class="btn block set-backwork" onclick="goBackToWork()">← 返回' + (state.backTo === '#/recite' ? '背题' : '做题') + '（接着刚才那道题）</button>' : '') +
     '<div class="set-page">' +
     subjList('culture') + subjList('pro') + subjList('other') +
     '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +

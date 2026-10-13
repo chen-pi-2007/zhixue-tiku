@@ -556,6 +556,7 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
 .set-card { max-width: 760px; }
 /* 设置页：分组列表 */
 .set-page { max-width: 640px; }
+.set-backwork { max-width: 640px; margin: 0 0 14px; }
 .set-group-t { margin: 22px 4px 8px; font-size: 13px; color: var(--ink-3); }
 .set-page > .set-group-t:first-child { margin-top: 0; }
 .set-list { background: var(--layer-1); border-radius: 12px; overflow: hidden; }
