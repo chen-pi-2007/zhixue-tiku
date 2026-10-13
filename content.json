@@ -1,6 +1,6 @@
 {
- "content_version": 51,
- "created": "2026-10-13 12:28:04",
+ "content_version": 52,
+ "created": "2026-10-13 12:31:45",
  "files": {
   "data/bank.json": [
    "710567a33c52cfb2f8eaf51f76dcd2230ba740bf7dbab248b5d02c6d66b04c2d",
@@ -1591,8 +1591,8 @@
    65016
   ],
   "server.py": [
-   "9b807c30d8684f0db47053387db386f3d5cdeeb591a5bdd85ea621a808853025",
-   25652
+   "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
+   25679
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "83a9d00005e35f0fea688fd3907e763199d121af82534d8d9f241e4428c247b3",
-   148956
+   "4aebfbedec244c70098f2d9d97a6614772f6c98d8eccf958b8918063a7bbf55d",
+   149121
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "设置改成整页：收起顶栏和左边导航，左上角返回，从做题进来右上角有「返回做题」",
+ "notes": "设置里「当前版本」后面显示内容第几版",
  "py_shell_api": 1,
- "tag": "content-51"
+ "tag": "content-52"
 }

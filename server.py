@@ -347,7 +347,7 @@ class Handler(BaseHTTPRequestHandler):
 
         if method == 'GET' and path == '/api/app':
             import version
-            return self.send_json({'ok': True, 'version': version.APP_VERSION, 'content_version': appdir.content_version(),
+            return self.send_json({'ok': True, 'version': version.APP_VERSION, 'content_version': appdir.content_version() or version.CONTENT_VERSION,
                                    'frozen': bool(getattr(sys, 'frozen', False)), 'data_dir': db.DATA_DIR,
                                    'window': SHOW_WINDOW is not None, 'open_data': sys.platform == 'win32',
                                    'repo': 'https://github.com/%s' % version.REPO,

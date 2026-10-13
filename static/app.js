@@ -2175,7 +2175,7 @@ async function viewSettings() {
     '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +
 
     '<div class="set-group-t">更新</div><div class="set-list">' +
-      item('当前版本', 'v' + esc(a.version)) +
+      item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
       '<button class="set-item set-link" id="upd-check"' + (canUpd ? '' : ' disabled data-off="1"') + '><span class="set-main upd-label">检查更新</span></button>' +
     '</div>' +
     '<div id="upd-out"></div>' +
