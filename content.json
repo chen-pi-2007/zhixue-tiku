@@ -1,10 +1,10 @@
 {
- "content_version": 49,
- "created": "2026-10-13 08:59:46",
+ "content_version": 50,
+ "created": "2026-10-13 09:10:54",
  "files": {
   "data/bank.json": [
-   "7055163e6cd58cf120b63cfc90bbf9ca6301b7f63da28ce7e0520d5f60b061af",
-   3175056
+   "710567a33c52cfb2f8eaf51f76dcd2230ba740bf7dbab248b5d02c6d66b04c2d",
+   3179070
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "4a577987cea335ede5ad4c5dd9f0d4f7d35383d35fbdbc110ee35417d9f61c0d",
-   148530
+   "b5e84eea3bd83f182c44944417dcf8fe652e4e78644ef6b422a76c6577273788",
+   148883
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "语文练习卷(4)第8题答案按2026年修订定稿版改为C；练习卷(2)第23题默写照官方答案作“不愿醒”",
+ "notes": "英语选项：几个选项意思相同、只是时态/词形不同时，作答前就标出各自的形式（原形、过去式、现在分词、单复数等）",
  "py_shell_api": 1,
- "tag": "content-49"
+ "tag": "content-50"
 }

@@ -251,7 +251,7 @@ function optionList(q) {
 // 英语题的中文翻译（平时练习、背题；模拟考没有这些字段）。译文总是渲染进页面，只靠 class 显示 / 隐藏，不重画、不丢作答状态。
 // 默认不显示（做题、搜索题目、错题本都一样）：点卡片上的「译」只显示这一张（卡片加 .cn-show，换下一题自然没了）；
 // 长按「译」锁定，之后每题都显示（html 去掉 .cn-off），锁定时再点一下解除。
-// 译文作答前就能看；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标。
+// 译文作答前就能看；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标；【】里的形式标签作答前就显示。
 // 题干译文和英文一样留空（学测/_脚本/english_cn）；万一有把空填好了的，作答前盖住（.peek），点一下才看。
 function cnLocked() { return !!store.get('quiz.cnlock'); }
 function applyCn() {
@@ -306,11 +306,13 @@ function stemCn(q) {
   return '<div class="stem-cn' + (peek ? ' peek" title="点一下查看翻译（会提示答案）" onclick="this.classList.add(\'show\')' : '') + '">' + rich(q.stem_cn) + '</div>';
 }
 const CN_HINT = /（[^（）]*）|\([^()]*\)|\/[^\/\s]+\//g;     // 选项译文里的语法提示、音标
+// 【…】是形式标签（原形 / 过去式 / 单复数……，几个选项意思一样时用来区分），作答前就显示成（…）
+const cnForm = s => s.replace(/【([^】]*)】/g, '（$1）');
 function optCn(q, i) {
   const s = q.options_cn && q.options_cn[i];
   if (!s) return '';
-  if (!s.replace(CN_HINT, '').trim()) return '<span class="opt-cn after">' + esc(s) + '</span>';
-  return '<span class="opt-cn">' + esc(s).replace(CN_HINT, m => '<span class="after">' + m + '</span>') + '</span>';
+  if (!s.replace(CN_HINT, '').replace(/【[^】]*】/g, '').trim()) return '<span class="opt-cn after">' + esc(cnForm(s)) + '</span>';
+  return '<span class="opt-cn">' + cnForm(esc(s).replace(CN_HINT, m => '<span class="after">' + m + '</span>')) + '</span>';
 }
 function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b><div>' + rich(q.point) + '</div></div>' : ''; }
 
@@ -318,7 +320,7 @@ function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b>
 function optNote(q, key) {
   const i = optionList(q).findIndex(o => o[0] === key);
   if (i < 0) return '';
-  return (q.option_notes && q.option_notes[i]) || (q.options_cn && q.options_cn[i]) || '';
+  return (q.option_notes && q.option_notes[i]) || (q.options_cn && q.options_cn[i] && cnForm(q.options_cn[i])) || '';
 }
 
 // 做错时：你选的错在哪、漏选了什么、正确答案为什么对
@@ -1930,7 +1932,7 @@ function rcAnsLabel(q) {
   // 答案的“内容”：选项文字；选项文字在材料图里（“见材料”）的，用中文释义
   return optionList(q).filter(o => (q.answer || '').indexOf(o[0]) >= 0).map(o => {
     const i = optionList(q).indexOf(o);
-    if (/见材料/.test(o[1])) return (q.options_cn && q.options_cn[i]) || o[1];
+    if (/见材料/.test(o[1])) return (q.options_cn && q.options_cn[i] && cnForm(q.options_cn[i])) || o[1];
     return o[1];
   }).join('；') || q.answer;
 }
