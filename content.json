@@ -1,10 +1,10 @@
 {
- "content_version": 43,
- "created": "2026-10-12 21:32:43",
+ "content_version": 44,
+ "created": "2026-10-13 08:28:23",
  "files": {
   "data/bank.json": [
-   "a2fecde461027b4938e7c951c83b6cc1c79cba471ad395d56f0ecd0eb3af5394",
-   3093485
+   "1bc1936b80071a1cd57084f81c7d217935975098adab55c9d76b84375cda9e60",
+   3095785
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1635,20 +1635,24 @@
    3659
   ],
   "static/app.js": [
-   "d28a53c548ba2ff5f8e39d9fa44c0232de020653a10d42880e2db8f8370e3a90",
-   142090
+   "e3ee887dedcabe4ddfea2a8c8c0364aff018c6c35072d928d0c0a04a291ffd16",
+   146273
   ],
   "static/index.html": [
-   "0c281d9f9d8b69371005a1b4f7b5829cb71b41ab1fe1cd9b9f15857b7e8ccedc",
-   6985
+   "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
+   7018
   ],
   "static/skills.js": [
    "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
    27524
   ],
   "static/style.css": [
-   "175bdc9b95ba994b932230aa09f855e53d84d7216ce8af93a2550583d13f94f1",
-   53180
+   "379125125e6226a1ebbeed927d50b76dda11c530b3de0e3aae6d9aff00824ef3",
+   53518
+  ],
+  "static/word.js": [
+   "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
+   19180
   ],
   "sync.py": [
    "e9b777bc72ea481055611923480c91ae798947c6f8f51dbf8243531b083ccd7e",
@@ -1657,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语选择题的中文翻译作答前就显示：选项意思直接显示，语法提示和音标答完再出；题干翻译会透露答案的先盖住，点一下可看",
+ "notes": "英语：题干翻译和英文一样留空，选项全部有中文意思；翻译默认不显示，点「译」只看这一题，长按锁定每题都显示；练习方式弹窗新增导出 Word（空白卷 / 答案卷，电脑版）",
  "py_shell_api": 1,
- "tag": "content-43"
+ "tag": "content-44"
 }

@@ -248,15 +248,58 @@ function optionList(q) {
   return q.options || [];
 }
 
-// 英语题的中文翻译开关（平时练习、错题本、题库浏览显示；模拟考没有这些字段）
-// 译文总是渲染进页面，开关只切换 html.cn-off（做题中途切换不会重画、不丢作答状态）。
-// 译文作答前就显示；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标。
-// 题干有空、译文却把空填好了的，作答前盖住（.peek），点一下才看。
-function cnOn() { const v = store.get('quiz.cn'); return v == null ? true : !!v; }
-function applyCn() { document.documentElement.classList.toggle('cn-off', !cnOn()); $$('.cn-btn').forEach(b => b.classList.toggle('on', cnOn())); }
-function toggleCn() { store.set('quiz.cn', !cnOn()); applyCn(); }
+// 英语题的中文翻译（平时练习、背题；模拟考没有这些字段）。译文总是渲染进页面，只靠 class 显示 / 隐藏，不重画、不丢作答状态。
+// 做题卡片里默认不显示：点「译」只显示这一题（卡片加 .cn-show，换下一题自然没了）；
+// 长按「译」锁定，之后每题都显示（html 去掉 .cn-off），锁定时再点一下解除。题库浏览、错题本等列表里照常显示。
+// 译文作答前就能看；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标。
+// 题干译文和英文一样留空（学测/_脚本/english_cn）；万一有把空填好了的，作答前盖住（.peek），点一下才看。
+function cnLocked() { return !!store.get('quiz.cnlock'); }
+function applyCn() {
+  const lock = cnLocked();
+  document.documentElement.classList.toggle('cn-off', !lock);
+  $$('.cn-btn').forEach(b => {
+    const card = b.closest('.qcard-main');
+    b.classList.toggle('lock', lock);
+    b.classList.toggle('on', lock || !!(card && card.classList.contains('cn-show')));
+  });
+}
+function cnTap(btn) {
+  if (cnLocked()) { store.set('quiz.cnlock', false); toast('已取消锁定：翻译默认不显示'); }
+  else {
+    const card = btn.closest('.qcard-main');
+    if (card) card.classList.toggle('cn-show');
+    if (!store.get('quiz.cntip')) { store.set('quiz.cntip', 1); toast('长按「译」可以锁定，每题都自动显示翻译'); }
+  }
+  applyCn();
+}
+function cnLongPress() {
+  store.set('quiz.cnlock', !cnLocked());
+  toast(cnLocked() ? '已锁定：每题都显示翻译（再点一下「译」取消）' : '已取消锁定：翻译默认不显示');
+  applyCn();
+}
+// 「译」按钮：点 = 只看这一题，长按（0.5 秒）= 锁定 / 取消锁定。用事件委托，按钮重画了也不用重新绑定
+(function cnButtonEvents() {
+  let timer = null, long = false;
+  const cancel = () => { clearTimeout(timer); timer = null; };
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest && e.target.closest('.cn-btn');
+    if (!b) return;
+    long = false;
+    cancel();
+    timer = setTimeout(() => { timer = null; long = true; cnLongPress(); }, 500);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => document.addEventListener(t, cancel, true));
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.cn-btn');
+    if (!b) return;
+    e.stopPropagation();                  // 背题卡片没翻开时整张卡片可点，别让「译」顺带翻开答案
+    if (long) { long = false; return; }
+    cnTap(b);
+  }, true);
+  document.addEventListener('contextmenu', e => { if (e.target.closest && e.target.closest('.cn-btn')) e.preventDefault(); });
+})();
 function hasCn(q) { return !!(q.stem_cn || q.material_cn || (q.options_cn && q.options_cn.length)); }
-function cnBtn(q) { return hasCn(q) ? '<button class="cn-btn' + (cnOn() ? ' on' : '') + '" onclick="toggleCn()" title="显示/隐藏中文翻译">译</button>' : ''; }
+function cnBtn(q) { return hasCn(q) ? '<button class="cn-btn' + (cnLocked() ? ' on lock' : '') + '" title="点：只看这一题的翻译；长按：锁定，每题都显示">译</button>' : ''; }
 function stemCn(q) {
   if (!q.stem_cn) return '';
   const peek = /_{2,}/.test(q.stem) && !/_{2,}/.test(q.stem_cn);
@@ -1178,6 +1221,10 @@ async function openModeSheet(src, name) {
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
         '<button class="btn ghost" data-act="rc-rand">打乱背</button></div></div>' +
+      '<div class="sheet-sec"><div class="sheet-t">导出 Word</div>' +
+        '<div class="sheet-d">按原卷顺序导出成 Word 文档，可以打印出来做。答案卷用红字标出答案，最后附答案速查（不带解析）。</div>' +
+        '<div class="sheet-row"><button class="btn ghost" data-act="wd-blank">空白卷</button>' +
+        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div></div>' +
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
@@ -1188,6 +1235,7 @@ async function openModeSheet(src, name) {
     if (!act) return;
     close();
     if (act === 'rc-seq' || act === 'rc-rand') return startRecite(practiceSrc(src), name, act === 'rc-seq' ? 'seq' : 'random');
+    if (act === 'wd-blank' || act === 'wd-ans') return exportWord(practiceSrc(src), name, act === 'wd-ans');
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
     else if (act === 'seq' || act === 'rand') {
@@ -1871,6 +1919,36 @@ function rcFillStem(q) {
 function rcPad(str, at, len, text) {
   const before = str[at - 1] || '', after = str[at + len] || '';
   return (/[A-Za-z0-9,.;:!?'"’)]/.test(before) ? ' ' : '') + text + (/[A-Za-z0-9('"‘]/.test(after) ? ' ' : '');
+}
+
+// 导出 Word（static/word.js 生成 .docx）：电脑上直接下载；手机上交给 App 弹分享面板（存到文件、发微信 / QQ）
+async function exportWord(src, name, ans) {
+  if (IS_APP && !(window.ZXStore && ZXStore.shareFile)) { toast('手机上导出 Word 要先更新到新版 App', 'bad'); return; }
+  let d;
+  try {
+    d = await api('/api/practice?paper_id=' + (src.paper_id || 0) + '&scope=all&order=seq' +
+      (src.subject ? '&subject=' + encodeURIComponent(src.subject) : '') + (src.type ? '&type=' + encodeURIComponent(src.type) : ''));
+  } catch (e) { toast(e.message, 'bad'); return; }
+  if (!d.items.length) { toast('这里没有题目'); return; }
+  toast('正在生成 Word……');
+  const fname = name.replace(/[\/:*?"<>|]/g, '') + '（' + (ans ? '答案' : '空白卷') + '）.docx';
+  let blob;
+  try {
+    blob = await WX.build(name, d.items.slice(), ans, q => q.section || TYPE_NAME[q.cat] || TYPE_NAME[q.type] || '题目');
+  } catch (e) { toast('生成失败：' + e.message, 'bad'); return; }
+  if (IS_APP) {
+    const b64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.readAsDataURL(blob); });
+    const err = ZXStore.shareFile(fname, b64, blob.type);
+    if (err) toast(err, 'bad');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+  toast('已导出：' + fname, 'good');
 }
 
 async function startRecite(src, name, order) {
