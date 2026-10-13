@@ -172,7 +172,7 @@
       const s = (papers[q.paper_id] || {}).subject;
       if (subject && s !== subject) return false;
       if (hidden.has(s)) return false;
-      if (qtype && q.type !== qtype && cat(q) !== qtype) return false;
+      if (qtype && cat(q) !== qtype) return false;          // 同 db.py：英语按专项，别的科目就是题型本身
       if (search && plainText(q.stem).indexOf(search) < 0 && plainText(q.material).indexOf(search) < 0) return false;
       return true;
     });

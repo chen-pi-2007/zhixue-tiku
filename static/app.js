@@ -249,8 +249,8 @@ function optionList(q) {
 }
 
 // 英语题的中文翻译（平时练习、背题；模拟考没有这些字段）。译文总是渲染进页面，只靠 class 显示 / 隐藏，不重画、不丢作答状态。
-// 做题卡片里默认不显示：点「译」只显示这一题（卡片加 .cn-show，换下一题自然没了）；
-// 长按「译」锁定，之后每题都显示（html 去掉 .cn-off），锁定时再点一下解除。题库浏览、错题本等列表里照常显示。
+// 默认不显示（做题、搜索题目、错题本都一样）：点卡片上的「译」只显示这一张（卡片加 .cn-show，换下一题自然没了）；
+// 长按「译」锁定，之后每题都显示（html 去掉 .cn-off），锁定时再点一下解除。
 // 译文作答前就能看；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标。
 // 题干译文和英文一样留空（学测/_脚本/english_cn）；万一有把空填好了的，作答前盖住（.peek），点一下才看。
 function cnLocked() { return !!store.get('quiz.cnlock'); }
@@ -258,7 +258,7 @@ function applyCn() {
   const lock = cnLocked();
   document.documentElement.classList.toggle('cn-off', !lock);
   $$('.cn-btn').forEach(b => {
-    const card = b.closest('.qcard-main');
+    const card = b.closest('.card');
     b.classList.toggle('lock', lock);
     b.classList.toggle('on', lock || !!(card && card.classList.contains('cn-show')));
   });
@@ -266,7 +266,7 @@ function applyCn() {
 function cnTap(btn) {
   if (cnLocked()) { store.set('quiz.cnlock', false); toast('已取消锁定：翻译默认不显示'); }
   else {
-    const card = btn.closest('.qcard-main');
+    const card = btn.closest('.card');
     if (card) card.classList.toggle('cn-show');
     if (!store.get('quiz.cntip')) { store.set('quiz.cntip', 1); toast('长按「译」可以锁定，每题都自动显示翻译'); }
   }
@@ -924,6 +924,21 @@ function bindUpload() {
 
 /* ================================================================ 题库浏览 */
 
+// 搜索题目的题型按钮：英语按专项（题型名和首页一致），其他科目按普通题型，只列当前范围里有的
+const EN_TYPES = ['en_phon', 'en_vocab', 'en_pic', 'en_dia', 'en_cloze', 'en_read', 'en_write'];
+const EN_PAPER_CAT = { 'english-phonetics': 'en_phon', 'english-vocab': 'en_vocab', 'english-picture': 'en_pic', 'english-dialogue': 'en_dia',
+                       'english-cloze': 'en_cloze', 'english-reading': 'en_read', 'english-writing': 'en_write' };
+function bankTypes(b, plist) {
+  const ps = b.paper_id ? plist.filter(p => p.id === b.paper_id) : plist;
+  const has = {};
+  ps.forEach(p => {
+    // 英语专项卷只有它自己那一类，学习通试卷什么都有
+    if (p.subject === 'english') (EN_PAPER_CAT[p.key] ? [EN_PAPER_CAT[p.key]] : EN_TYPES).forEach(t => { has[t] = 1; });
+    else Object.keys(p.counts || {}).forEach(t => { has[t] = 1; });
+  });
+  return Object.keys(TYPE_NAME).filter(t => has[t]);
+}
+
 async function viewBank() {
   const b = state.bank;
   await loadHidden();
@@ -931,6 +946,7 @@ async function viewBank() {
     try { b.papers = (await api('/api/papers')).papers; } catch (e) { /* ignore */ }
   }
   const plist = b.subject ? b.papers.filter(p => p.subject === b.subject) : b.papers.filter(p => !isHidden(p.subject));
+  if (b.type && bankTypes(b, plist).indexOf(b.type) < 0) b.type = '';
   app.innerHTML =
     '<div class="filters">' +
       '<select class="inp" id="f-subj"><option value="">全部科目</option>' +
@@ -943,7 +959,7 @@ async function viewBank() {
       '<button class="chip' + (b.showAns ? ' on' : '') + '" id="f-ans">显示答案</button>' +
     '</div>' +
     '<div class="filters">' +
-      [''].concat(Object.keys(TYPE_NAME)).map(t =>
+      [''].concat(bankTypes(b, plist)).map(t =>
         '<button class="chip' + (b.type === t ? ' on' : '') + '" data-t="' + t + '">' + (t ? TYPE_NAME[t] : '全部题型') + '</button>').join('') +
     '</div>' +
     '<div id="q-list"></div>';
@@ -1014,16 +1030,17 @@ async function loadMore() {
 }
 
 function qCard(q) {
-  return '<div class="card" id="qc' + q.id + '">' +
+  const show = state.bank.showAns && q.answer;
+  return '<div class="card' + (show ? '' : ' ans-hidden') + '" id="qc' + q.id + '">' +
     '<div class="qhead">' +
       '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
       '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题' + (q.answer ? '' : ' · 无答案') + '</span>' +
-      recBadge(q) +
+      recBadge(q) + '<span class="spacer"></span>' + cnBtn(q) +
     '</div>' +
     materialBox(q) +
-    '<div class="stem">' + rich(q.stem) + '</div>' +
-    (state.bank.showAns && q.answer ? optsStatic(q) + '<div class="ansbox">' + ansHtml(q) + '</div>'
-      : optsStatic({ type: q.type, options: q.options, answer: '' }) +
+    '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
+    (show ? optsStatic(q) + '<div class="ansbox">' + ansHtml(q) + '</div>'
+      : optsStatic({ type: q.type, options: q.options, options_cn: q.options_cn, answer: '' }) +
         '<div style="margin-top:10px"><button class="btn ghost sm" onclick="revealAns(' + q.id + ',this)">显示答案</button></div>') +
     '</div>';
 }
@@ -1032,6 +1049,7 @@ function revealAns(qid, btn) {
   const q = state.bank.items.find(x => x.id === qid);
   if (!q) return;
   const card = $('#qc' + qid);
+  card.classList.remove('ans-hidden');
   const opts = card.querySelector('.opts');
   if (opts) opts.outerHTML = optsStatic(q);
   const div = document.createElement('div');
@@ -1079,13 +1097,13 @@ async function viewWrong() {
             '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题</span>' +
             '<span class="rec-badge bad">做错 ' + q.wrong_count + ' 次</span>' +
             (!q.mastered ? '<span class="rec-badge">' + streakText(q.streak) + (q.due ? ' · ' + q.due.slice(5) + ' 复习' : '') + '</span>' : '') +
-            '<div style="flex:1"></div>' +
+            '<div style="flex:1"></div>' + cnBtn(q) +
             (q.mastered
               ? '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',false)">重新加入</button>'
               : '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',true)">标记已掌握</button>') +
           '</div>' +
           materialBox(q, true) +
-          '<div class="stem">' + rich(q.stem) + '</div>' +
+          '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
           optsStatic(q) +
           (q.answer ? '<div class="ansbox">' + ansHtml(q) + '</div>' : '') +
         '</div>').join('')
@@ -1598,9 +1616,9 @@ function renderFinish() {
           const q = r.q;
           return '<div class="card">' +
             '<div class="qhead"><span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
-            '<span class="qsrc">' + esc(q.paper_name || '') + ' · 第' + q.qno + '题</span></div>' +
+            '<span class="qsrc">' + esc(q.paper_name || '') + ' · 第' + q.qno + '题</span><span class="spacer"></span>' + cnBtn(q) + '</div>' +
             materialBox(q, true) +
-            '<div class="stem">' + rich(q.stem) + '</div>' +
+            '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
             optsStatic(q) +
             '<div class="ansbox">' + ansHtml(q) + '</div>' +
           '</div>';

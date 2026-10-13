@@ -1,6 +1,6 @@
 {
- "content_version": 46,
- "created": "2026-10-13 08:32:27",
+ "content_version": 47,
+ "created": "2026-10-13 08:38:51",
  "files": {
   "data/bank.json": [
    "90bb97ceb6abbb6afad6f91d1045cd4fd49b1ba27c932623135220ef7f88eb69",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "7b88ab9fc3955060106f07b156d671b737329dd5b5fd5113bbbaea2239991210",
-   48632
+   "5d8264ffaa944060e6cb50bb486905c26b816ef6d49d1805b529f36b866597d7",
+   48693
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "172313902ea41a13159fc4f5bf9028bb531e062ed863e99ea19b0392b59fe39e",
-   64963
+   "de7d6a06c735ec3a85bef33f904fbbc37e3b1be51b90dcb508d4eb86f8c56e06",
+   65016
   ],
   "server.py": [
    "9b807c30d8684f0db47053387db386f3d5cdeeb591a5bdd85ea621a808853025",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "60b194fd671046a9e3047fc3b8ec7a4b3e489d017ae74fb6b336b26f998c8b39",
-   147260
+   "4a577987cea335ede5ad4c5dd9f0d4f7d35383d35fbdbc110ee35417d9f61c0d",
+   148530
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "abb35ef4a4cb6af32369435f65f51e28552a8e76409b9e30e84a7fe94ffe1150",
-   53572
+   "4f598cdf368136bac25d02619e223c759eab1dabdb0f4f0a46c687d69f42dcd1",
+   53740
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "做题、背题时点设置，设置页顶上有「返回做题」，再点一次齿轮也能回到刚才那道题",
+ "notes": "搜索题目、错题本的翻译也默认不显示，每题点「译」才看；题型筛选英语按专项（语音就是语音、单选就是单选），只列当前科目有的题型",
  "py_shell_api": 1,
- "tag": "content-46"
+ "tag": "content-47"
 }

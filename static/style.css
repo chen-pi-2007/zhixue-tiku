@@ -608,7 +608,9 @@ input.switch:checked::before { transform: translateX(18px); }
 .material-cn { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); white-space: pre-wrap; font-size: 14px; line-height: 1.85; color: var(--ink-3); }
 .cn-btn { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .cn-btn.lock::after { content: ''; display: inline-block; width: 5px; height: 5px; margin-left: 4px; border-radius: 50%; background: currentColor; vertical-align: middle; }
-.cn-off .qcard-main:not(.cn-show) .stem-cn, .cn-off .qcard-main:not(.cn-show) .opt-cn, .cn-off .qcard-main:not(.cn-show) .material-cn { display: none; }
+.cn-off .stem-cn, .cn-off .opt-cn, .cn-off .material-cn { display: none; }
+.cn-off .cn-show .stem-cn, .cn-off .cn-show .opt-cn, .cn-off .cn-show .material-cn { display: block; }
+.ans-hidden .after { display: none; }   /* 搜索题目里还没点「显示答案」：选项译文里的语法提示、音标先不显示 */
 .qcard-main:not(.answered) .after { display: none; }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show) { position: relative; cursor: pointer; color: transparent; text-shadow: 0 0 7px var(--ink-3); user-select: none; }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show)::after { content: '点一下看翻译（会提示答案）'; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); text-align: center; color: var(--ink-2); text-shadow: none; font-size: 13px; }

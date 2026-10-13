@@ -378,7 +378,7 @@ def _filter(paper_id=None, subject=None, qtype=None, search=None):
             continue
         if s in hidden:
             continue
-        if qtype and qtype not in (q['type'], _cat(q)):
+        if qtype and qtype != _cat(q):            # 英语按专项（en_*），别的科目 _cat 就是题型本身
             continue
         if search and search not in plain_text(q['stem']) and search not in plain_text(q['material']):
             continue
