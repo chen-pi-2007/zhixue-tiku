@@ -1,10 +1,10 @@
 {
- "content_version": 47,
- "created": "2026-10-13 08:38:51",
+ "content_version": 48,
+ "created": "2026-10-13 08:53:18",
  "files": {
   "data/bank.json": [
-   "90bb97ceb6abbb6afad6f91d1045cd4fd49b1ba27c932623135220ef7f88eb69",
-   3095722
+   "a4daa557b3b8ef36cef1b5a8ed4c5275dbb946cb7a46d6f89f3fd1a16c24c0cf",
+   3174905
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "搜索题目、错题本的翻译也默认不显示，每题点「译」才看；题型筛选英语按专项（语音就是语音、单选就是单选），只列当前科目有的题型",
+ "notes": "新增语文模拟试卷六、八（答案按 2026 年 4 月修订定稿版）；语文卷 1–5 第 26–28 题换成官方示例和评分标准",
  "py_shell_api": 1,
- "tag": "content-47"
+ "tag": "content-48"
 }
