@@ -1,10 +1,10 @@
 {
- "content_version": 48,
- "created": "2026-10-13 08:53:18",
+ "content_version": 49,
+ "created": "2026-10-13 08:59:46",
  "files": {
   "data/bank.json": [
-   "a4daa557b3b8ef36cef1b5a8ed4c5275dbb946cb7a46d6f89f3fd1a16c24c0cf",
-   3174905
+   "7055163e6cd58cf120b63cfc90bbf9ca6301b7f63da28ce7e0520d5f60b061af",
+   3175056
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增语文模拟试卷六、八（答案按 2026 年 4 月修订定稿版）；语文卷 1–5 第 26–28 题换成官方示例和评分标准",
+ "notes": "语文练习卷(4)第8题答案按2026年修订定稿版改为C；练习卷(2)第23题默写照官方答案作“不愿醒”",
  "py_shell_api": 1,
- "tag": "content-48"
+ "tag": "content-49"
 }
