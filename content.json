@@ -1,6 +1,6 @@
 {
- "content_version": 54,
- "created": "2026-10-14 09:48:39",
+ "content_version": 55,
+ "created": "2026-10-14 10:03:13",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "11f499b59c8fb7098cce855e41ccc0098d2ca8c82610be5ca35cf404e10bf71c",
-   157602
+   "2aab7a48f02254593ca5ea5ffea71f0bde038a533afc9a6d1b4db58cff242a76",
+   161859
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "afd40e4c6284efe2fc4483d60d870b08d6755e62384541cfa9d084b6b5724996",
-   54450
+   "883993ea19d1aae86cdb42c3d19054c37bc469523e5ab40fe660e48afacbed71",
+   56735
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "阅读、完形等整篇一张卡片：材料在上、本篇小题全列出来，选完一起提交；进度和题型按篇数显示；打乱时篇内题目顺序不变，只打乱选项",
+ "notes": "阅读、完形改成文章在上、下面一条题号栏，小题一次一道、左右滑动切换，选完自动跳到下一题；样式重新调整",
  "py_shell_api": 1,
- "tag": "content-54"
+ "tag": "content-55"
 }

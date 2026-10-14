@@ -1358,8 +1358,10 @@ function statsHtml(p) {
 }
 
 /* ---- 整篇一张卡片（用户要求，照学习通考试的样子）----
-   共用一段材料的选择题（一篇阅读、一篇完形、一组补全对话……）连在一起时做成一张卡片：材料在上，这一篇的小题按原题号排在下面，
-   每题选好后「提交本篇」一起判。进度按篇数（单独的题一题算一篇）。打乱时只打乱篇的先后和选项，篇里的题目顺序不变。
+   共用一段材料的选择题（一篇阅读、一篇完形、一组补全对话……）连在一起时做成一张卡片。
+   阅读的答案要回材料里找，所以材料一直看得见：文章在上面、框里单独滚动，紧贴着下面一条题号栏，再下面是当前这道小题（电脑、手机一样）。
+   小题一次只显示一道：上面一排题号，左右滑（电脑上点题号或按 ← →）切换；单选选完自动跳到下一道没选的；全部选完「提交本篇」一起判。
+   进度按篇数（单独的题一题算一篇）。打乱时只打乱篇的先后和选项，篇里的题目顺序不变。
    p.idx 始终指向这一篇的第一题；作答记录还是逐题记（p.done[题目序号]、p.results），存档 / 读档不受影响。 */
 function groupKey(q) {
   return q && q.material && q.material.trim() && SELF_TYPES.indexOf(q.type) < 0 ? q.paper_id + '\u0001' + q.material : null;
@@ -1400,9 +1402,10 @@ function renderGroup() {
   const qs = p.list.slice(s, e);
   const q0 = qs[0];
   const cnQ = qs.find(hasCn);
-  p.group = { s: s, e: e };
+  p.group = { s: s, e: e, cur: 0 };
   const pct = Math.round(100 * s / p.list.length);
   const no = unitNo(p).split('/');
+  const short = q => q.type !== 'judge' && optionList(q).every(o => (o[1] || '').length <= 24 && !/<img|\\\(|【图/.test(o[1] || ''));
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
@@ -1413,98 +1416,184 @@ function renderGroup() {
     '<div class="card qcard-main group-card">' +
       '<div class="qhead">' +
         '<span class="tag t-' + q0.type + '">' + (TYPE_NAME[q0.cat] || TYPE_NAME[q0.type]) + '</span>' +
-        '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题</span>' +
+        '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题 · 第 ' + no[0] + ' / ' + no[1] + ' 篇</span>' +
         '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
       '</div>' +
-      '<div class="group-no">第 ' + no[0] + ' / 共 ' + no[1] + ' 篇 · 本篇 ' + qs.length + ' 题</div>' +
-      materialBox(q0) +
-      qs.map((q, k) => '<div class="gq" data-i="' + (s + k) + '">' +
-          '<div class="stem gq-stem"><span class="gq-no">' + (k + 1) + '.</span>' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
-            (q.type === 'multi' ? '<span class="muted">（多选）</span>' : '') + '</div>' + stemCn(q) +
-          (q.type === 'judge'
-            ? '<div class="judge-row">' + optionList(q).map(o =>
-              '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
-            // 选项都很短（完形、补全对话常见）就横着排几列，省得一篇十题拉得很长
-            : '<div class="opts' + (optionList(q).every(o => (o[1] || '').length <= 24 && !/<img|\\\(|【图/.test(o[1] || '')) ? ' opts-short' : '') + '">' + optionList(q).map((o, i) =>
-              '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
-          '<div class="gq-fb"></div>' +
-        '</div>').join('') +
-      '<div class="qactions" id="qact">' + prevBtn(p) + '<span class="muted kbd-tip" id="g-left"></span><div class="spacer"></div>' +
+      '<div class="g-wrap">' +
+        '<div class="g-mat">' + materialBox(q0) +
+          '<div class="gq-tabs"><span class="gq-tabs-t">小题</span>' + qs.map((q, k) =>
+            '<button class="gq-tab" onclick="gGo(' + k + ')">' + (k + 1) + '</button>').join('') + '</div></div>' +
+        '<div class="g-qs">' +
+          '<div class="gq-pane" id="gq-pane">' + qs.map((q, k) =>
+            '<div class="gq" data-i="' + (s + k) + '">' +
+              '<div class="stem gq-stem"><span class="gq-num">' + (k + 1) + '</span><span>' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
+                (q.type === 'multi' ? '<span class="muted">（多选）</span>' : '') + '</span></div>' + stemCn(q) +
+              (q.type === 'judge'
+                ? '<div class="judge-row">' + optionList(q).map(o =>
+                  '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
+                // 选项都很短（完形、补全对话常见）就横着排几列
+                : '<div class="opts' + (short(q) ? ' opts-short' : '') + '">' + optionList(q).map((o, i) =>
+                  '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
+              '<div class="gq-fb"></div>' +
+            '</div>').join('') + '</div>' +
+          '<div class="gq-nav"><button class="btn ghost sm" id="gq-prev" onclick="gGo(state.practice.group.cur - 1)">‹ 上一小题</button>' +
+            '<span class="muted gq-hint">' + (TOUCH ? '左右滑动切换小题' : '← → 切换小题') + '</span>' +
+            '<button class="btn ghost sm" id="gq-next" onclick="gGo(state.practice.group.cur + 1)">下一小题 ›</button></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="qactions" id="qact">' + prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip" id="g-left"></span><div class="spacer"></div>' +
         '<button class="btn" id="confirm-btn" disabled onclick="submitGroup()">提交本篇</button></div>' +
       '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
     '</div>';
+  gSwipe($('#gq-pane'));
+  const mb = $('.g-mat .material-box');
+  if (mb) {
+    const fade = () => mb.classList.toggle('more', mb.scrollTop + mb.clientHeight < mb.scrollHeight - 4);
+    mb.addEventListener('scroll', fade, { passive: true });
+    fade();
+  }
   if (qs.every((_, k) => p.done[s + k])) {      // 回看做过的篇：显示当时的作答和解析，不再记分
     $$('.gq').forEach(div => {
       const sel = p.done[+div.dataset.i];
       Array.from(div.querySelectorAll('.opt')).forEach(b => { if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('sel'); });
     });
     gradeGroup(true);
-  } else groupLeft();
+  } else {
+    gGo(0);
+    groupLeft();
+  }
+}
+
+// 切到第 k 道小题
+function gGo(k) {
+  const p = state.practice;
+  if (!p || !p.group) return;
+  const divs = $$('.gq'), tabs = $$('.gq-tab');
+  if (k < 0 || k >= divs.length) return;
+  p.group.cur = k;
+  divs.forEach((d, i) => d.classList.toggle('cur', i === k));
+  tabs.forEach((t, i) => t.classList.toggle('cur', i === k));
+  const prev = $('#gq-prev'), next = $('#gq-next');
+  if (prev) prev.disabled = k === 0;
+  if (next) next.disabled = k === divs.length - 1;
+  if (p.answered) {                 // 判完以后：材料里只标黄这道小题的原文依据，并滚到那里
+    clearEvidence();
+    const q = p.list[+divs[k].dataset.i];
+    markEvidence(q);
+    const box = $('.g-mat .material-box'), m = box && box.querySelector('mark.evidence');
+    if (m) box.scrollTop = Math.max(0, m.offsetTop - 40);
+  }
+}
+
+function clearEvidence() {
+  $$('.qcard-main mark.evidence').forEach(m => {
+    const par = m.parentNode;
+    while (m.firstChild) par.insertBefore(m.firstChild, m);
+    par.removeChild(m);
+    par.normalize();
+  });
+}
+
+// 左右滑动切换小题（竖着滑照常滚动）
+function gSwipe(el) {
+  if (!el) return;
+  let x0 = null, y0 = 0;
+  el.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) gGo(state.practice.group.cur + (dx < 0 ? 1 : -1));
+  });
 }
 
 function groupLeft() {
   const p = state.practice;
-  const n = p.group.e - p.group.s;
-  const picked = $$('.gq').filter(div => Array.from(div.querySelectorAll('.opt.sel')).length).length;
+  const divs = $$('.gq'), tabs = $$('.gq-tab');
+  const picked = divs.map(div => !!div.querySelector('.opt.sel'));
+  picked.forEach((x, i) => tabs[i] && tabs[i].classList.toggle('picked', x));
+  const n = divs.length, got = picked.filter(Boolean).length;
   const tip = $('#g-left');
-  if (tip) tip.textContent = picked < n ? '已选 ' + picked + ' / ' + n + ' 题，全部选完再提交' : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
+  if (tip) tip.textContent = got < n ? '已选 ' + got + ' / ' + n + ' 题，全部选完再提交' : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
   const ok = $('#confirm-btn');
-  if (ok) ok.disabled = picked < n;
+  if (ok) ok.disabled = got < n;
+  return picked;
 }
 
 function gTap(btn) {
   const p = state.practice;
   if (!p || p.answered) return;
   const div = btn.closest('.gq');
-  if (p.list[+div.dataset.i].type === 'multi') btn.classList.toggle('sel');
+  const multi = p.list[+div.dataset.i].type === 'multi';
+  if (multi) btn.classList.toggle('sel');
   else Array.from(div.querySelectorAll('.opt')).forEach(b => b.classList.toggle('sel', b === btn));
-  groupLeft();
+  const picked = groupLeft();
+  if (multi) return;
+  // 单选选好了：稍停一下跳到后面第一道还没选的小题（都选完了就停在这里）
+  const k = p.group.cur;
+  let nk = -1;
+  for (let i = 1; i < picked.length && nk < 0; i++) { const j = (k + i) % picked.length; if (!picked[j]) nk = j; }
+  if (nk >= 0) setTimeout(() => { if (state.practice === p && !p.answered && p.group.cur === k) gGo(nk); }, 280);
 }
 
 function submitGroup() {
   const p = state.practice;
   if (!p || p.answered || !p.group) return;
   const divs = $$('.gq');
-  if (divs.some(div => !Array.from(div.querySelectorAll('.opt.sel')).length)) { groupLeft(); toast('还有题没选'); return; }
+  const miss = divs.findIndex(div => !div.querySelector('.opt.sel'));
+  if (miss >= 0) { gGo(miss); groupLeft(); toast('还有题没选'); return; }
   divs.forEach(div => { p.done[+div.dataset.i] = Array.from(div.querySelectorAll('.opt.sel')).map(b => b.dataset.k); });
   gradeGroup(false);
 }
 
 function gradeGroup(replay) {
   const p = state.practice;
-  const n = p.group.e - p.group.s;
+  const divs = $$('.gq'), tabs = $$('.gq-tab');
+  const n = divs.length;
   p.answered = true;
   $('.qcard-main').classList.add('answered');
-  let right = 0;
-  $$('.gq').forEach(div => {
+  let right = 0, firstBad = -1;
+  divs.forEach((div, k) => {
     const i = +div.dataset.i, q = p.list[i], sel = p.done[i];
     const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
     const ok = q.type === 'multi' ? sel.slice().sort().join('') === ans.slice().sort().join('') : sel[0] === q.answer;
     if (ok) right++;
+    else if (firstBad < 0) firstBad = k;
     if (!replay) recordResult(q, ok, true);
     Array.from(div.querySelectorAll('.opt')).forEach(b => {
       b.disabled = true;
       if (ans.indexOf(b.dataset.k) >= 0) b.classList.add('ok');
       else if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('bad');
     });
-    div.classList.add(ok ? 'gq-ok' : 'gq-bad');
+    if (tabs[k]) tabs[k].classList.add(ok ? 'ok' : 'bad');
     div.querySelector('.gq-fb').innerHTML = '<div class="feedback ' + (ok ? 'good' : 'bad') + '">' +
       '<div class="ans-line">' + (ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
       (ok ? rightBox(q) : whyBox(q, sel)) +
       (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' +
         (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
       evidenceBox(q) + pointBox(q) + phraseBox(q) + '</div>';
-    markEvidence(q);
   });
   if (!replay) {
     autoSave();
     toast('本篇 ' + n + ' 题，答对 ' + right + ' 题', right === n ? 'good' : '');
   }
-  $('#qact').innerHTML = prevBtn(p) + '<span class="muted kbd-tip">本篇答对 ' + right + ' / ' + n + ' 题</span><div class="spacer"></div>' +
+  $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + ' / ' + n + ' 题，点题号看每题解析</span><div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.group.e >= p.list.length ? '查看结果' : '下一篇') + '</button>';
-  // 跳到第一道做错的题，方便看解析
-  const bad = $('.gq-bad');
-  if (bad && !replay) bad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  gGo(firstBad >= 0 ? firstBad : 0);     // 先看第一道做错的
+}
+
+// 整篇卡片的键盘：← → 切小题，1-6 / A-F 给当前小题选选项，回车提交 / 下一篇
+function groupKey2(e) {
+  const p = state.practice, g = p.group;
+  if (e.key === 'ArrowLeft') return gGo(g.cur - 1);
+  if (e.key === 'ArrowRight') return gGo(g.cur + 1);
+  if (e.key === 'Enter') { e.preventDefault(); return p.answered ? nextQ() : submitGroup(); }
+  if (p.answered) return;
+  const map = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 };
+  const i = map[e.key.toLowerCase()];
+  const div = $$('.gq')[g.cur];
+  const btn = i === undefined || !div ? null : div.querySelectorAll('.opt')[i];
+  if (btn) gTap(btn);
 }
 
 function renderQ() {
@@ -2046,16 +2135,16 @@ document.addEventListener('keydown', e => {
   const interactive = (tag === 'input' || tag === 'textarea' || tag === 'select' ||
                       (tag === 'button' && !t.disabled && !t.classList.contains('opt')));
   if (interactive) return;
+  if (p.group) return groupKey2(e);
   if (e.key === 'ArrowLeft') { prevQ(); return; }
   if (e.key === 'ArrowRight') { if (p.answered) nextQ(); return; }
   if (e.key === 'Enter') {
     e.preventDefault();
-    if (p.group) { if (p.answered) nextQ(); else submitGroup(); return; }
     if (p.answered) nextQ();                                       // 第二次回车：下一题
     else if (SELF_TYPES.indexOf(q.type) < 0) confirmChoice();      // 第一次回车：确认答案
     return;
   }
-  if (p.answered || p.group || SELF_TYPES.indexOf(q.type) >= 0) return;
+  if (p.answered || SELF_TYPES.indexOf(q.type) >= 0) return;
   const opts = optionList(q);
   const map = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5 };
   const km = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 };
