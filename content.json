@@ -1,6 +1,6 @@
 {
- "content_version": 57,
- "created": "2026-10-14 10:23:27",
+ "content_version": 58,
+ "created": "2026-10-14 10:31:21",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "c96e4181398ba7e8b09d68d5b34e0576c90a4465282f77e14110e626213a6794",
-   165163
+   "a7ef71404d665e8185dc49c3ffe006c4a4f21b79c640141b066464aa8637b2a2",
+   165390
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "题库和界面自动在后台更新（做题时不打断，回到首页再换上；设置里可关）；手机连不上 GitHub 时自动走国内镜像，检查更新更快",
+ "notes": "整篇卡片里中文选项不再挤成两列",
  "py_shell_api": 1,
- "tag": "content-57"
+ "tag": "content-58"
 }

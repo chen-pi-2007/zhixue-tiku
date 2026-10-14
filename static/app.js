@@ -1407,7 +1407,9 @@ function renderGroup() {
   p.group = { s: s, e: e, cur: 0 };
   const pct = Math.round(100 * s / p.list.length);
   const no = unitNo(p).split('/');
-  const short = q => q.type !== 'judge' && optionList(q).every(o => (o[1] || '').length <= 24 && !/<img|\\\(|【图/.test(o[1] || ''));
+  // 选项都很短（完形、补全对话那种几个单词）才排两列；中文一个字按两个英文字符的宽度算，免得中文选项挤成好几行
+  const width = t => (t || '').replace(/[^\x00-\xff]/g, 'xx').length;
+  const short = q => q.type !== 'judge' && optionList(q).every(o => width(o[1]) <= 20 && !/<img|\\\(|【图/.test(o[1] || ''));
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
