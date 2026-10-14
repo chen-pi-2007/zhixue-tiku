@@ -1421,13 +1421,13 @@ function renderGroup() {
       '</div>' +
       '<div class="g-wrap">' +
         '<div class="g-mat">' + materialBox(q0) +
-          '<div class="gq-tabs"><span class="gq-tabs-t">小题</span>' + qs.map((q, k) =>
+          '<div class="gq-tabs">' + qs.map((q, k) =>
             '<button class="gq-tab" onclick="gGo(' + k + ')">' + (k + 1) + '</button>').join('') + '</div></div>' +
         '<div class="g-qs">' +
           '<div class="gq-pane" id="gq-pane">' + qs.map((q, k) =>
             '<div class="gq" data-i="' + (s + k) + '">' +
-              '<div class="stem gq-stem"><span class="gq-num">' + (k + 1) + '</span><span>' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
-                (q.type === 'multi' ? '<span class="muted">（多选）</span>' : '') + '</span></div>' + stemCn(q) +
+              '<div class="stem">' + (k + 1) + '/' + qs.length + '、' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
+                (q.type === 'multi' ? '（多选）' : '') + '</div>' + stemCn(q) +
               (q.type === 'judge'
                 ? '<div class="judge-row">' + optionList(q).map(o =>
                   '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
@@ -1436,9 +1436,6 @@ function renderGroup() {
                   '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
               '<div class="gq-fb"></div>' +
             '</div>').join('') + '</div>' +
-          '<div class="gq-nav"><button class="btn ghost sm" id="gq-prev" onclick="gGo(state.practice.group.cur - 1)">‹ 上一小题</button>' +
-            '<span class="muted gq-hint">' + (TOUCH ? '左右滑动切换小题' : '← → 切换小题') + '</span>' +
-            '<button class="btn ghost sm" id="gq-next" onclick="gGo(state.practice.group.cur + 1)">下一小题 ›</button></div>' +
         '</div>' +
       '</div>' +
       '<div class="qactions" id="qact">' + prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip" id="g-left"></span><div class="spacer"></div>' +
@@ -1446,12 +1443,6 @@ function renderGroup() {
       '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
     '</div>';
   gSwipe($('#gq-pane'));
-  const mb = $('.g-mat .material-box');
-  if (mb) {
-    const fade = () => mb.classList.toggle('more', mb.scrollTop + mb.clientHeight < mb.scrollHeight - 4);
-    mb.addEventListener('scroll', fade, { passive: true });
-    fade();
-  }
   if (qs.every((_, k) => p.done[s + k])) {      // 回看做过的篇：显示当时的作答和解析，不再记分
     $$('.gq').forEach(div => {
       const sel = p.done[+div.dataset.i];
@@ -1473,9 +1464,6 @@ function gGo(k) {
   p.group.cur = k;
   divs.forEach((d, i) => d.classList.toggle('cur', i === k));
   tabs.forEach((t, i) => t.classList.toggle('cur', i === k));
-  const prev = $('#gq-prev'), next = $('#gq-next');
-  if (prev) prev.disabled = k === 0;
-  if (next) next.disabled = k === divs.length - 1;
   if (p.answered) {                 // 判完以后：材料里只标黄这道小题的原文依据，并滚到那里
     clearEvidence();
     const q = p.list[+divs[k].dataset.i];
@@ -1514,7 +1502,8 @@ function groupLeft() {
   picked.forEach((x, i) => tabs[i] && tabs[i].classList.toggle('picked', x));
   const n = divs.length, got = picked.filter(Boolean).length;
   const tip = $('#g-left');
-  if (tip) tip.textContent = got < n ? '已选 ' + got + ' / ' + n + ' 题，全部选完再提交' : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
+  if (tip) tip.textContent = got < n ? '已选 ' + got + '/' + n + ' 题，' + (TOUCH ? '左右滑动或点题号切换' : '点题号或按 ← → 切换') + '，全部选完再提交'
+                                     : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
   const ok = $('#confirm-btn');
   if (ok) ok.disabled = got < n;
   return picked;
@@ -1577,7 +1566,7 @@ function gradeGroup(replay) {
     autoSave();
     toast('本篇 ' + n + ' 题，答对 ' + right + ' 题', right === n ? 'good' : '');
   }
-  $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + ' / ' + n + ' 题，点题号看每题解析</span><div class="spacer"></div>' +
+  $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + '/' + n + ' 题，点题号看每题的解析</span><div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.group.e >= p.list.length ? '查看结果' : '下一篇') + '</button>';
   gGo(firstBad >= 0 ? firstBad : 0);     // 先看第一道做错的
 }

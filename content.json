@@ -1,6 +1,6 @@
 {
- "content_version": 55,
- "created": "2026-10-14 10:03:13",
+ "content_version": 56,
+ "created": "2026-10-14 10:10:26",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "2aab7a48f02254593ca5ea5ffea71f0bde038a533afc9a6d1b4db58cff242a76",
-   161859
+   "5671c91722c05fce60ab6a34bc91b52287ca103c4010baf2262d43861a2ac473",
+   161116
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "883993ea19d1aae86cdb42c3d19054c37bc469523e5ab40fe660e48afacbed71",
-   56735
+   "1c7a8595042f73b2c231b665b0504490646dc3543ecd386fec67e216f1a3d7c8",
+   55450
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "阅读、完形改成文章在上、下面一条题号栏，小题一次一道、左右滑动切换，选完自动跳到下一题；样式重新调整",
+ "notes": "整篇卡片样式和整体统一：材料框、题号块、对错颜色沿用原有样式",
  "py_shell_api": 1,
- "tag": "content-55"
+ "tag": "content-56"
 }
