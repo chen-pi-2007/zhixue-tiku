@@ -1255,10 +1255,11 @@ async function openModeSheet(src, name) {
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
         '<button class="btn ghost" data-act="rc-rand">打乱背</button></div></div>' +
-      '<div class="sheet-sec"><div class="sheet-t">导出 Word</div>' +
+      // 导出 Word 只在电脑上有（用户：手机上用不上）
+      (IS_APP ? '' : '<div class="sheet-sec"><div class="sheet-t">导出 Word</div>' +
         '<div class="sheet-d">按原卷顺序导出成 Word 文档，可以打印出来做。答案卷用红字标出答案，最后附答案速查（不带解析）。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="wd-blank">空白卷</button>' +
-        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div></div>' +
+        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div></div>') +
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
