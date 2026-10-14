@@ -486,6 +486,8 @@ function route() {
     app.classList.add('page-in');
   }
   routes[name](parts.slice(1));
+  if (state.pendingReload) setTimeout(reloadIfIdle, 300);
+  else if (state.updWanted) setTimeout(() => autoContentUpdate(state.updWanted), 1000);
 }
 window.addEventListener('hashchange', route);
 // 做题中途能去设置再回来的页面（练习 / 背题还在进行中才算）
@@ -2408,10 +2410,13 @@ async function viewSettings() {
 
     '<div class="set-group-t">更新</div><div class="set-list">' +
       item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
+      (canUpd ? '<label class="set-item"><span class="set-main">自动更新题库和界面</span>' +
+        '<input type="checkbox" class="switch" id="auto-upd"' + (autoUpdOn() ? ' checked' : '') + '></label>' : '') +
       '<button class="set-item set-link" id="upd-check"' + (canUpd ? '' : ' disabled data-off="1"') + '><span class="set-main upd-label">检查更新</span></button>' +
     '</div>' +
     '<div id="upd-out"></div>' +
-    '<div class="set-foot">' + (canUpd ? '题库和界面只下载改动的部分，几秒就好；做题记录不会丢。' : '源码运行，用 git pull 更新。') + '</div>' +
+    '<div class="set-foot">' + (canUpd ? '打开自动更新后，题库和界面有新版时会在后台自己下载装好（只下载改动的部分）；正在做题、背题、模拟考时不打断，' +
+      '回到首页等页面才换上。做题记录不会受影响。新版程序（安装包）要重新安装，有的话「检查更新」上会有小红点。' : '源码运行，用 git pull 更新。') + '</div>' +
 
     (sy && sy.available ? '<div class="set-group-t">账号同步（内测）</div><div id="sync-box">' + syncBoxHtml(sy) + '</div>' : '') +
 
@@ -2434,6 +2439,12 @@ async function viewSettings() {
     '</div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
+  const au = $('#auto-upd');
+  if (au) au.addEventListener('change', () => {
+    store.set('zx.autoUpd', au.checked);
+    toast(au.checked ? '已打开自动更新：题库和界面有新版时会在后台自己装好' : '已关闭自动更新：有新版时只在「检查更新」上提示');
+    if (au.checked) { store.del('zx.lastAutoCheck'); api('/api/app').then(autoCheckUpdate).catch(() => {}); }
+  });
   markUpdDots();
   updRestore();
   // 热更新了后端代码、还没重启：提醒一下（重启后 a.py.active 会追上来）
@@ -2705,7 +2716,7 @@ async function restartApp() {
 // 有更新时的提示：导航「设置」和「检查更新」按钮上的红点（一直在，更新完才消失），
 // 外加页面底部的提示条（点「以后再说」只关掉提示条，红点还在）。
 // 每 6 小时在后台查一次；手动点「检查更新」的结果也会同步过来。
-const UPD_EVERY = 6 * 3600 * 1000;
+const UPD_EVERY = 3600 * 1000;
 
 function cmpVer(a, b) {
   const p = s => String(s || '').replace(/^[vV]/, '').split('.').map(x => parseInt(x, 10) || 0).concat([0, 0, 0]).slice(0, 3);
@@ -2734,6 +2745,50 @@ async function autoCheckUpdate(a) {
     api('/api/content/check').catch(() => ({ failed: true })),
   ]);
   syncUpdNotice(app, cont, app.failed, cont.failed);
+  if (!cont.failed) autoContentUpdate(cont);
+}
+
+/* ---- 自动更新题库和界面（用户要求：很多人不会自己去更新）----
+   查到内容更新（只下载改动的文件，和手动「现在更新」同一套：先下到临时文件夹、逐个核对指纹、齐了才整个换上，
+   失败就还用原来那份；做题记录在数据文件夹里，不受影响）就在后台下载装好，不弹窗。
+   装好后不马上刷新：正在做题、背题、模拟考、技能实操、导入试卷时不打断，等回到首页、错题本、搜索、设置这些页面再刷新换上新界面，
+   刷新后提示一句。程序整包（exe / apk）要重装，仍然只亮小红点。设置里可以关掉（localStorage zx.autoUpd = false）。 */
+function autoUpdOn() { return store.get('zx.autoUpd') !== false; }
+const RELOAD_OK = ['home', 'subject', 'wrong', 'bank', 'settings'];   // 在这些页面刷新不会丢掉正在做的东西
+let autoUpdRunning = false;
+function idlePage() {
+  const name = (location.hash || '#/home').replace(/^#\/?/, '').split('/')[0] || 'home';
+  return RELOAD_OK.indexOf(name) >= 0;
+}
+async function autoContentUpdate(cont) {
+  if (!autoUpdOn() || autoUpdRunning || upd.busy || !cont || !cont.has_update) return;
+  // 正在做题、背题、模拟考：先不下载（手机上写大文件会卡一下），回到首页这类页面再开始
+  if (!idlePage()) { state.updWanted = cont; return; }
+  state.updWanted = null;
+  autoUpdRunning = true;
+  try {
+    let p = await api('/api/content/update', { method: 'POST' });
+    while (p.state === 'downloading') {
+      await new Promise(r => setTimeout(r, 1500));
+      p = await api('/api/content/progress');
+    }
+    if (p.state !== 'done') return;                  // 失败了不打扰，下次检查再试；小红点还在
+    store.del('zx.updNotice');
+    markUpdDots();
+    if (p.restart && !IS_APP) store.set('zx.needRestart', p.version);   // 电脑版后台代码下次打开题库时生效
+    state.pendingReload = p.version || 1;
+    reloadIfIdle();
+  } catch (e) { /* 网络不好之类，下次再试 */ }
+  finally { autoUpdRunning = false; }
+}
+// 装好了新内容：不在做题等页面、也没开着弹窗时，刷新换上新界面
+function reloadIfIdle() {
+  if (!state.pendingReload || upd.busy) return;
+  if (!idlePage() || $('.sheet-mask') || $('.zoom')) return;
+  const a = document.activeElement;
+  if (a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'checkbox' && a.value))) return;   // 正在输入
+  store.set('zx.updDone', state.pendingReload);
+  location.reload();
 }
 
 // 检查结果同步到提示：查到更新就提示；两边都确认没有更新才清掉；有一边没连上时保留原来的提示
@@ -2960,5 +3015,12 @@ window.addEventListener('DOMContentLoaded', () => {
   route();
   lsPull();                 // 别的设备的练习存档（登录了同步才有）
   // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
-  api('/api/app').then(a => { if (a.frozen || a.mobile) setTimeout(() => autoCheckUpdate(a), 1500); }).catch(() => {});
+  api('/api/app').then(a => {
+    if (!(a.frozen || a.mobile)) return;
+    setTimeout(() => autoCheckUpdate(a), 1500);
+    // 开着不关的也每小时查一次（autoCheckUpdate 里按上次检查的时间节流）
+    setInterval(() => api('/api/app').then(autoCheckUpdate).catch(() => {}), 10 * 60 * 1000);
+  }).catch(() => {});
+  const done = store.get('zx.updDone');
+  if (done) { store.del('zx.updDone'); setTimeout(() => toast('题库和界面已自动更新到第 ' + done + ' 版', 'good'), 600); }
 });

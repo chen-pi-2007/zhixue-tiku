@@ -1215,19 +1215,42 @@
       return new Uint8Array(await r.arrayBuffer());
     } finally { clearTimeout(timer); }
   }
+  // 很多手机的网络连不上 GitHub：下载文件（按发布标签取，内容不会变）先走上次成功的线路，
+  // 没有记录时先走国内能连的 jsDelivr，GitHub 原站放最后；一条线路不通很快换下一条
+  function mirrorOrder() {
+    let good = -1;
+    try { good = +(localStorage.getItem('zx.mirror') || -1); } catch (e) { /* 无痕之类 */ }
+    const order = [1, 2, 3, 0];
+    if (good >= 0 && good < MIRRORS.length) { order.splice(order.indexOf(good), 1); order.unshift(good); }
+    return order;
+  }
+  function mirrorOk(i) { try { localStorage.setItem('zx.mirror', String(i)); } catch (e) { /* 无痕之类 */ } }
   async function fetchRepo(ref, rel, ms) {
     const p = rel.split('/').map(encodeURIComponent).join('/');
     let last;
-    for (const mk of MIRRORS) {
-      for (let i = 0; i < 2; i++) {
-        try { return await getTimeout(mk(ref, p), ms || 20000); } catch (e) { last = e; }
+    for (let round = 0; round < 2; round++) {
+      for (const i of mirrorOrder()) {
+        try { const got = await getTimeout(MIRRORS[i](ref, p), ms || 15000); mirrorOk(i); return got; } catch (e) { last = e; }
       }
     }
     throw last;
   }
+  // 最新清单（main 分支上的 content.json）：四条线路同时问，最多等 8 秒，取版本最新的一份
+  // （jsDelivr 偶尔缓存着旧的，取最大的不会把新的当成旧的；全都连不上才算失败）
   async function latestManifest() {
-    try { return JSON.parse(new TextDecoder().decode(await fetchRepo('main', 'content.json', 15000))); }
-    catch (e) { throw new Error('连不上 GitHub 和镜像，检查一下网络'); }
+    const got = await new Promise(resolve => {
+      const res = [];
+      let left = MIRRORS.length;
+      const finish = () => resolve(res);
+      const timer = setTimeout(finish, 8000);
+      MIRRORS.forEach((mk, i) => {
+        getTimeout(mk('main', 'content.json'), 8000).then(b => {
+          try { res.push(JSON.parse(new TextDecoder().decode(b))); } catch (e) { /* 坏的不要 */ }
+        }).catch(() => {}).then(() => { if (--left === 0) { clearTimeout(timer); finish(); } });
+      });
+    });
+    if (!got.length) throw new Error('连不上 GitHub 和镜像，检查一下网络');
+    return got.reduce((a, b) => ((b.content_version || 0) > (a.content_version || 0) ? b : a));
   }
   const hex = buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   function b64(bytes) {

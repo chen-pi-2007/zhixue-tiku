@@ -1,6 +1,6 @@
 {
- "content_version": 56,
- "created": "2026-10-14 10:10:26",
+ "content_version": 57,
+ "created": "2026-10-14 10:23:27",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "c04e2e858558df56a03bf1873314d0aca87fe70d52aa7fdb5a9ba2ad7f6fd827",
-   65169
+   "ce1beebdabd0276c7b070408fc7ac9fd27c85cc17d40e1f2f8963a9e7ba691c7",
+   66623
   ],
   "server.py": [
    "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "5671c91722c05fce60ab6a34bc91b52287ca103c4010baf2262d43861a2ac473",
-   161116
+   "c96e4181398ba7e8b09d68d5b34e0576c90a4465282f77e14110e626213a6794",
+   165163
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "整篇卡片样式和整体统一：材料框、题号块、对错颜色沿用原有样式",
+ "notes": "题库和界面自动在后台更新（做题时不打断，回到首页再换上；设置里可关）；手机连不上 GitHub 时自动走国内镜像，检查更新更快",
  "py_shell_api": 1,
- "tag": "content-56"
+ "tag": "content-57"
 }
