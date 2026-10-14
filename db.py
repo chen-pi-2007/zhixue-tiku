@@ -254,6 +254,16 @@ def delete_paper(pid):
         _save_prog()
 
 
+def _paper_sort_key(p):
+    """卷子的正常顺序（首页卷子列表）：先按科目，再按卷子 key（chinese-7 在 chinese-8 前面；paper_id 是导入先后，不能用来排）"""
+    return (SUBJECTS.index(p.get('subject', 'general')) if p.get('subject') in SUBJECTS else 99, p['key'])
+
+
+def _paper_rank():
+    """卷子 id -> 在正常顺序里排第几（题型练习“按卷子顺序”、搜索结果按它排）"""
+    return {p['id']: i for i, p in enumerate(sorted(_bank['papers'], key=_paper_sort_key))}
+
+
 def list_papers():
     with _lock:
         _load()
@@ -262,8 +272,7 @@ def list_papers():
         for q in _bank['questions']:
             qmap.setdefault(q['paper_id'], []).append(q)
         out = []
-        for p in sorted(_bank['papers'], key=lambda x: (SUBJECTS.index(x.get('subject', 'general'))
-                                                          if x.get('subject') in SUBJECTS else 99, x['key'])):
+        for p in sorted(_bank['papers'], key=_paper_sort_key):
             qs = qmap.get(p['id'], [])
             cs = [cards[_ck(q)] for q in qs if _ck(q) in cards]
             nmap = {}
@@ -389,7 +398,8 @@ def get_questions(paper_id=None, qtype=None, search=None, limit=50, offset=0, su
     with _lock:
         _load()
         papers = _papers_by_id()
-        qs = sorted(_filter(paper_id, subject, qtype, search), key=lambda x: (x['paper_id'], x['qno'], x['id']))
+        rank = _paper_rank()
+        qs = sorted(_filter(paper_id, subject, qtype, search), key=lambda x: (rank.get(x['paper_id'], 1 << 30), x['qno'], x['id']))
         return [_view(q, papers) for q in qs[offset:offset + limit]], len(qs)
 
 
@@ -466,11 +476,12 @@ def practice_set(paper_id=None, scope='all', shuffle=True, seed=None, subject=No
             if scope == 'new' and c:
                 continue
             items.append(_view(q, papers))
+        rank = _paper_rank()
     if shuffle:
         rnd = random.Random(seed)
         rnd.shuffle(items)
         return _group_material(items, rnd)
-    items.sort(key=lambda x: (x['paper_id'], x['qno']))
+    items.sort(key=lambda x: (rank.get(x['paper_id'], 1 << 30), x['qno']))     # 按卷子的正常顺序，不按导入先后（paper_id）
     return _group_material(items)
 
 

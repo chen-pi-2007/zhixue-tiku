@@ -649,7 +649,7 @@ function homeTypes(d, subj) {
 
 function paperRow(p, i) {
   const st = p.mastery >= 80 ? ['已掌握', 'st-done'] : (p.seen ? ['练习中', 'st-doing'] : ['未开始', 'st-new']);
-  return '<a class="prow" href="javascript:void(0)" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ')">' +
+  return '<a class="prow" href="javascript:void(0)" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ')">' +
     '<span class="prow-t">' + (i + 1) + '. ' + esc(p.name) + '</span>' +
     '<span class="prow-c">' + p.total + ' 题</span>' +
     '<span class="prow-m">' + p.mastery + '%</span>' +
@@ -847,8 +847,8 @@ function paperCard(p) {
       (p.seen ? ' · 做过 ' + p.seen + ' 题 · 正确率 ' + accPct + '%' : '') + '</div>' +
     bar(p.mastery) +
     '<div class="paper-acts">' +
-      '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ')">开始练习</button>' +
-      (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',scope:\'wrongmix\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
+      '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ')">开始练习</button>' +
+      (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',paper_key:' + jsq(p.key) + ',scope:\'wrongmix\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
       '<button class="btn ghost sm" onclick="goBank(' + p.id + ')">浏览</button>' +
       '<button class="btn danger sm" onclick="delPaper(' + p.id + ',' + jsq(p.name) + ')">删除</button>' +
     '</div></div>';
@@ -1203,11 +1203,30 @@ function beginPractice(list, title, mode) {
 /* ---- 整卷 / 题型练习的两种方式 + 手动存档 ---- */
 
 // 练习的范围：一张卷子，或者某科的某个题型（比如数学·单选题）
-function practiceSrc(o) { return o.paper_id ? { paper_id: o.paper_id } : { subject: o.subject || '', type: o.type || '' }; }
+// 卷子带上 key：存档跟着账号同步到别的设备，那边的卷子 id 可能不一样（导入先后不同），key 才对得上
+function practiceSrc(o) {
+  return o.paper_id ? (o.paper_key ? { paper_id: o.paper_id, paper_key: o.paper_key } : { paper_id: o.paper_id })
+                    : { subject: o.subject || '', type: o.type || '' };
+}
 function saveKeyOf(o) {
   const scope = o.scope && o.scope !== 'all' ? '.' + o.scope : '';
-  if (o.paper_id) return 'zx.save.' + o.paper_id + scope;           // 整卷：zx.save.<卷子id>（1.4.8 起的存档沿用）
+  if (o.paper_key) return 'zx.save.paper.' + o.paper_key + scope;    // 整卷：zx.save.paper.<卷子key>
+  if (o.paper_id) return 'zx.save.' + o.paper_id + scope;           // 旧的整卷存档：zx.save.<卷子id>（只在存的那台设备上对得上）
   return 'zx.save.' + (o.subject || 'all') + '.' + (o.type || '') + scope;
+}
+// 以前按卷子 id 存的整卷存档 / 自动进度，挪到按 key 的新位置。
+// 同步过来的旧存档可能是别的设备上另一张卷子（id 不一样），所以只挪存档标题对得上这张卷子名字的
+function migrateSave(src, name) {
+  if (!src.paper_key) return;
+  const oldKey = saveKeyOf({ paper_id: src.paper_id }), newKey = saveKeyOf(src);
+  [[oldKey, newKey], [autoKeyOf(oldKey), autoKeyOf(newKey)]].forEach(([o, n]) => {
+    const v = store.get(o);
+    if (!v || store.get(n) || (v.title || '').indexOf(name) !== 0) return;
+    if (v.opts) v.opts = Object.assign({}, v.opts, { paper_key: src.paper_key });
+    if (v.auto) v.auto = autoKeyOf(newKey);
+    store.set(n, v);
+    store.del(o);
+  });
 }
 // 自动保存的进度：zx.auto.<同上>。手动存档是回档点，自动进度是“上次退出时做到哪”，两者互不覆盖
 function autoKeyOf(saveKey) { return saveKey.replace('zx.save.', 'zx.auto.'); }
@@ -1219,6 +1238,7 @@ const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[
 function shuffleQuestion(q) {
   const opts = q.options || [];
   if (q.type === 'judge' || opts.length < 2 || opts.some(o => NO_SHUFFLE.test((o[1] || '').trim()))) return q;
+  if (q.material && opts.length >= 5) return q;     // 一组题共用材料里列的 A～E（书面表达排序、信息匹配）：不打乱（同模拟考 exam.py）
   const perm = opts.map((_, i) => i);
   for (let i = perm.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
   const L = i => String.fromCharCode(65 + i);
@@ -1234,10 +1254,11 @@ function shuffleQuestion(q) {
   return c;
 }
 
-function openPaperSheet(pid, name) { openModeSheet({ paper_id: pid }, name); }
+function openPaperSheet(pid, name, pkey) { openModeSheet(pkey ? { paper_id: pid, paper_key: pkey } : { paper_id: pid }, name); }
 
 async function openModeSheet(src, name) {
   await lsPull();
+  migrateSave(src, name);
   const key = saveKeyOf(src);
   const save = store.get(key);
   const auto = store.get(autoKeyOf(key));
@@ -1292,12 +1313,13 @@ async function openModeSheet(src, name) {
   document.body.appendChild(sheet);
 }
 
-// 当前这道已经答完就存“做完这道”，下次从下一道开始
+// 当前这道已经答完就存“做完这道”，下次从下一道开始。
+// 题目记 key（<卷子key>#<序号>，v: 2）：存档同步到别的设备时题目 id 可能不一样，key 是一样的
 function snapshot(p) {
   const idx = p.answered ? unitEnd(p, p.idx) : p.idx;
   return {
-    ids: p.list.map(q => q.id), idx: Math.min(idx, p.list.length - 1), done: p.done,
-    results: p.results.map(r => [r.q.id, r.correct]), correct: p.correct,
+    v: 2, ids: p.list.map(q => q.key), idx: Math.min(idx, p.list.length - 1), done: p.done,
+    results: p.results.map(r => [r.q.key, r.correct]), correct: p.correct,
     title: p.title, opts: p.saveOpts, auto: p.autoKey || null, t: nowText(),
   };
 }
@@ -1321,22 +1343,33 @@ async function loadSave(key) {
   const sv = store.get(key);
   const isAuto = key.indexOf('zx.auto.') === 0;
   if (!sv) { toast(isAuto ? '没有上次的进度' : '还没有存档'); return; }
-  const o = sv.opts || {};
+  const o = Object.assign({}, sv.opts || {});
+  const ids = Array.isArray(sv.ids) ? sv.ids : [];
   let d;
   try {
-    // 取这个范围里的全部题，再按存档里的题目 id 和顺序还原
+    // 存档里记的是卷子 key：换到这台设备上的卷子 id（别的设备同步过来的存档，id 可能不一样）
+    if (o.paper_key) {
+      const pp = ((await api('/api/papers')).papers || []).find(x => x.key === o.paper_key);
+      if (!pp) { toast('这台设备上没有这张卷子，存档用不了', 'bad'); return; }
+      o.paper_id = pp.id;
+    }
+    // 取这个范围里的全部题，再按存档里的题目顺序还原
     d = await api('/api/practice?scope=all&order=seq' + (o.paper_id ? '&paper_id=' + o.paper_id
       : (o.subject ? '&subject=' + encodeURIComponent(o.subject) : '') + (o.type ? '&type=' + encodeURIComponent(o.type) : '')));
   } catch (e) { toast(e.message, 'bad'); return; }
+  // 新存档（v: 2）按题目 key 对；以前的存档记的是题目 id，只有在存的那台设备上对得上
   const byId = {};
-  d.items.forEach(q => { byId[q.id] = q; });
-  const list = sv.ids.map(id => byId[id]).filter(Boolean);
-  if (list.length !== sv.ids.length) { toast('题目变过了，这个存档用不了', 'bad'); return; }
+  d.items.forEach(q => { byId[sv.v === 2 ? q.key : q.id] = q; });
+  const list = ids.map(id => byId[id]).filter(Boolean);
+  if (!list.length || list.length !== ids.length) {
+    toast(sv.v === 2 ? '题目变过了，这个存档用不了' : '这是旧版本存的档，题目对不上（可能是在别的设备上存的），用不了', 'bad');
+    return;
+  }
   beginPractice(list, sv.title, 'practice');
   const p = state.practice;
   Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0,
                      results: (sv.results || []).map(r => ({ q: byId[r[0]], correct: r[1] })).filter(r => r.q),
-                     saveKey: isAuto ? key.replace('zx.auto.', 'zx.save.') : key, saveOpts: sv.opts,
+                     saveKey: isAuto ? key.replace('zx.auto.', 'zx.save.') : key, saveOpts: Object.assign({}, sv.opts, { paper_id: o.paper_id }),
                      autoKey: isAuto ? key : (sv.auto || null) });
   route();
   toast(isAuto ? '接着上次：第 ' + (sv.idx + 1) + ' 题' : '已读档：回到第 ' + (sv.idx + 1) + ' 题');
@@ -1380,15 +1413,18 @@ function statsHtml(p) {
 function groupKey(q) {
   return q && q.material && q.material.trim() && SELF_TYPES.indexOf(q.type) < 0 ? q.paper_id + '\u0001' + q.material : null;
 }
-function unitEnd(p, i) {
+// 复习里做错、追加到末尾“再来一次”的题（下标 >= firstTotal）自成一篇，不和紧挨着的原篇连在一起
+function sameUnit(p, i, j) {
   const k = groupKey(p.list[i]);
+  return !!k && groupKey(p.list[j]) === k && (i >= p.firstTotal) === (j >= p.firstTotal);
+}
+function unitEnd(p, i) {
   let j = i + 1;
-  if (k) while (j < p.list.length && groupKey(p.list[j]) === k) j++;
+  while (j < p.list.length && sameUnit(p, i, j)) j++;
   return j;
 }
 function unitStart(p, i) {
-  const k = groupKey(p.list[i]);
-  while (k && i > 0 && groupKey(p.list[i - 1]) === k) i--;
+  while (i > 0 && sameUnit(p, i, i - 1)) i--;
   return i;
 }
 // “3/8”：第几篇 / 共几篇
@@ -1433,6 +1469,7 @@ function renderGroup() {
       '<div class="qhead">' +
         '<span class="tag t-' + q0.type + '">' + (TYPE_NAME[q0.cat] || TYPE_NAME[q0.type]) + '</span>' +
         '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题 · 第 ' + no[0] + ' / ' + no[1] + ' 篇</span>' +
+        (s >= p.firstTotal ? '<span class="rec-badge bad">刚才做错，再来一次</span>' : '') +
         '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
       '</div>' +
       '<div class="g-wrap">' +
@@ -2152,6 +2189,7 @@ function practiceExamWrongs() {
 
 document.addEventListener('keydown', e => {
   if (document.querySelector('.zoom') && e.key === 'Escape') { $$('.zoom').forEach(z => z.remove()); return; }
+  if (location.hash === '#/recite') return reciteKey(e);
   const p = state.practice;
   if (!p || location.hash !== '#/practice' || p.finished) return;
   const q = p.list[p.idx];
@@ -2159,9 +2197,10 @@ document.addEventListener('keydown', e => {
   // 焦点在可交互控件上时交给控件自身(避免回车双触发/输入误触)
   const t = e.target;
   const tag = t && t.tagName ? t.tagName.toLowerCase() : '';
-  // 选项按钮点过以后焦点会停在上面，回车照样走「确认 / 下一题」，所以选项按钮不算
+  // 选项按钮、整篇卡片的题号按钮点过以后焦点会停在上面，← → 和回车照样走「切换 / 确认 / 下一题」，所以它们不算
+  // （回车由下面 preventDefault 拦住，不会再点一次题号）
   const interactive = (tag === 'input' || tag === 'textarea' || tag === 'select' ||
-                      (tag === 'button' && !t.disabled && !t.classList.contains('opt')));
+                      (tag === 'button' && !t.disabled && !t.classList.contains('opt') && !t.classList.contains('gq-tab')));
   if (interactive) return;
   if (p.group) return groupKey2(e);
   if (e.key === 'ArrowLeft') { prevQ(); return; }
@@ -2280,6 +2319,8 @@ function viewRecite() {
   const hide = rcHide(), open = !hide || r.shown;
   const cat = TYPE_NAME[q0.cat] || TYPE_NAME[q0.type] || '';
   const done = Object.keys(r.res).length;
+  // 点「上一张」回看已经记过的卡片：只看不再记（和练习回看上一题不再记分一样）
+  const marked = g.every(q => q.id in r.res) ? (g.every(q => r.res[q.id]) ? 'ok' : 'bad') : '';
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(r.title) + '</span>' +
       '<span class="crumb-acts"><a href="javascript:void(0)" onclick="rcToggleHide()">' + (hide ? '答案：先盖住' : '答案：直接显示') + '</a>' +
@@ -2294,11 +2335,13 @@ function viewRecite() {
     '</div>' +
     '<div class="qactions rc-acts">' +
       (r.idx > 0 ? '<button class="btn ghost" onclick="rcPrev()">上一张</button>' : '') +
-      '<span class="muted">' + (open ? '记住了吗？' : '先在心里想答案，再点卡片看') + '</span><div class="spacer"></div>' +
-      (open ? '<button class="btn danger" onclick="rcMarkCard(false)">没记住</button><button class="btn green" onclick="rcMarkCard(true)">记住了</button>'
-            : '<button class="btn" onclick="rcReveal()">看答案</button>') +
+      '<span class="muted">' + (!open ? '先在心里想答案，再点卡片看' : marked ? '这张记过了：' + (marked === 'ok' ? '记住了' : '没记住') : '记住了吗？') + '</span><div class="spacer"></div>' +
+      (!open ? '<button class="btn" onclick="rcReveal()">看答案</button>'
+        : marked ? '<button class="btn" onclick="rcMarkCard()">下一张</button>'
+        : '<button class="btn danger" onclick="rcMarkCard(false)">没记住</button><button class="btn green" onclick="rcMarkCard(true)">记住了</button>') +
     '</div>' +
-    '<div class="msg-bar">已背 ' + done + ' 题 · 记住 ' + Object.values(r.res).filter(Boolean).length + ' · 没记住 ' + Object.values(r.res).filter(x => !x).length + '</div>';
+    '<div class="msg-bar">已背 ' + done + ' 题 · 记住 ' + Object.values(r.res).filter(Boolean).length + ' · 没记住 ' + Object.values(r.res).filter(x => !x).length + '</div>' +
+    (TOUCH ? '' : '<div class="muted kbd-tip rc-kbd">回车或 →：看答案 / 记住了，下一张　N 或 0：没记住　←：上一张</div>');
   if (open) g.forEach(q => markEvidence(q));
   applyCn();
 }
@@ -2374,6 +2417,7 @@ function rcMarkCard(ok) {
   const r = state.recite;
   const g = r.cards[r.idx];
   g.forEach(q => {
+    if (q.id in r.res || ok === undefined) return;    // 这张已经记过（回看上一张）：不重复记
     r.res[q.id] = ok;
     api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: 'recite' } }).catch(e => toast('记录失败：' + e.message, 'bad'));
   });
@@ -2381,6 +2425,29 @@ function rcMarkCard(ok) {
   r.shown = false;
   viewRecite();
   window.scrollTo(0, 0);
+}
+
+// 背题的键盘（电脑上用）：回车 / → 盖着时看答案，看过了 = 记住了、下一张（这张记过了就只翻到下一张）；N 或 0 = 没记住；← 上一张。
+// 焦点停在背题页的按钮上也照样走这里（回车 preventDefault，不会再点一次按钮、重复记作答）
+function reciteKey(e) {
+  const r = state.recite;
+  if (!r || r.idx >= r.cards.length || $('.sheet-mask') || $('.zoom')) return;     // 背完的结果页、开着弹窗时不管
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  const t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+  if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+  const open = !rcHide() || r.shown;
+  const marked = r.cards[r.idx].every(q => q.id in r.res);
+  if (e.key === 'Enter' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (!open) rcReveal();
+    else rcMarkCard(marked ? undefined : true);
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    rcPrev();
+  } else if ((e.key === 'n' || e.key === 'N' || e.key === '0') && open && !marked) {
+    e.preventDefault();
+    rcMarkCard(false);
+  }
 }
 
 function rcFinish() {
@@ -2806,6 +2873,7 @@ const RELOAD_OK = ['home', 'subject', 'wrong', 'bank', 'settings'];   // 在这�
 let autoUpdRunning = false;
 function idlePage() {
   const name = (location.hash || '#/home').replace(/^#\/?/, '').split('/')[0] || 'home';
+  if (name === 'settings' && state.backTo) return false;   // 做题、背题中途点齿轮来的设置（有「返回做题」）：刷新会丢掉做到一半的
   return RELOAD_OK.indexOf(name) >= 0;
 }
 async function autoContentUpdate(cont) {

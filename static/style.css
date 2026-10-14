@@ -780,3 +780,4 @@ main.page-in { animation: page-in .22s ease-out; }
 .rc-phon .rc-row { padding: 4px 0; }
 .rc-hit .rc-k { font-weight: 600; color: var(--ink); }
 .rc-acts { margin-top: 12px; }
+.rc-kbd { margin-top: 8px; font-size: 12.5px; }

@@ -178,11 +178,20 @@
     });
   }
 
+  // 卷子的正常顺序（首页卷子列表）：先按科目，再按卷子 key（同 db.py _paper_sort_key；paper_id 是导入先后，不能用来排）
+  const paperCmp = (a, b) => subjIndex(a.subject || 'general') - subjIndex(b.subject || 'general') ||
+                             (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+  // 卷子 id -> 在正常顺序里排第几（题型练习“按卷子顺序”、搜索结果按它排，同 db.py _paper_rank）
+  function paperRank() {
+    const r = {};
+    bank.papers.slice().sort(paperCmp).forEach((p, i) => { r[p.id] = i; });
+    return id => (id in r ? r[id] : 1 << 30);
+  }
+
   function listPapers() {
     const qmap = {};
     bank.questions.forEach(q => { (qmap[q.paper_id] = qmap[q.paper_id] || []).push(q); });
-    return bank.papers.slice().sort((a, b) => subjIndex(a.subject || 'general') - subjIndex(b.subject || 'general') ||
-                                              (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)).map(p => {
+    return bank.papers.slice().sort(paperCmp).map(p => {
       const qs = qmap[p.id] || [];
       const cs = qs.filter(q => prog.cards[ck(q)]).map(q => prog.cards[ck(q)]);
       const counts = {};
@@ -199,7 +208,8 @@
 
   function getQuestions(paperId, qtype, search, limit, offset, subject) {
     const papers = papersById();
-    const qs = filter(paperId, subject, qtype, search).sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno || a.id - b.id);
+    const rank = paperRank();
+    const qs = filter(paperId, subject, qtype, search).sort((a, b) => rank(a.paper_id) - rank(b.paper_id) || a.qno - b.qno || a.id - b.id);
     return { items: qs.slice(offset, offset + limit).map(q => view(q, papers)), total: qs.length };
   }
 
@@ -265,7 +275,8 @@
       items.push(view(q, papers));
     });
     if (doShuffle) { shuffle(items); return groupMaterial(items, true); }
-    items.sort((a, b) => a.paper_id - b.paper_id || a.qno - b.qno);
+    const rank = paperRank();
+    items.sort((a, b) => rank(a.paper_id) - rank(b.paper_id) || a.qno - b.qno);     // 按卷子的正常顺序，不按导入先后（paper_id）
     return groupMaterial(items);
   }
 
@@ -511,17 +522,18 @@
     });
     return order.map(k => groups[k].sort((a, b) => a.qno - b.qno));
   }
+  // 随机抽整组单元凑成正好 count 题，一篇阅读不拆开、也不拿半篇来补（同 exam.py pick）
   function pick(pool, count) {
     const us = shuffle(units(pool));
-    const out = [];
-    for (const u of us) {
-      if (out.length >= count) break;
-      if (out.length + u.length <= count) out.push.apply(out, u);
+    const reach = new Map([[0, []]]);              // 题数 -> 凑出这个题数用的单元下标
+    for (let i = 0; i < us.length && !reach.has(count); i++) {
+      Array.from(reach.entries()).forEach(([n, path]) => {
+        const m = n + us[i].length;
+        if (m <= count && !reach.has(m)) reach.set(m, path.concat([i]));
+      });
     }
-    if (out.length < count) {
-      for (const u of us) for (const q of u) { if (out.length >= count) break; if (out.indexOf(q) < 0) out.push(q); }
-    }
-    return out;
+    const best = Math.max.apply(null, Array.from(reach.keys()));
+    return [].concat.apply([], reach.get(best).map(i => us[i]));
   }
   function compose(questions, papers, subject, preset) {
     const bp = blueprint(subject, preset);
@@ -539,14 +551,17 @@
     };
     bp.sections.forEach(([name, prefix, types, count, points, filt]) => {
       const parts = Array.isArray(prefix) ? prefix : [[prefix, count, filt]];
-      let got = [];
+      let got = [], avail = 0;
       parts.forEach(([pfx, cnt, flt]) => {
         const pool = questions.filter(q => types.indexOf(q.type) >= 0 && q.answer && !used.has(q.id) &&
                                             (pkey[q.paper_id] || '').indexOf(pfx) === 0 && keep(q, flt));
         const part = pick(pool, cnt);
         part.forEach(q => used.add(q.id));
         got = got.concat(part);
+        avail += Math.min(cnt, pool.length);
       });
+      // 题够、只是整篇凑不出正好的题数：少几题，每题分值按比例加，这一节总分不变（同 exam.py）
+      if (got.length && got.length < avail) points = (points || 1) * avail / got.length;
       if (Array.isArray(prefix)) {                    // 几处抽来的混在一起（整组的按组打乱，组内顺序不变）
         const us = units(got);
         shuffle(us);

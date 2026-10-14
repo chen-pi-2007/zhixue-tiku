@@ -67,6 +67,31 @@ class ExamTest(unittest.TestCase):
         self.assertEqual(len(got), 10)
         self.assertEqual(len(set(x['material'] for x in got)), 2)
 
+    def test_pick_whole_passages_chinese_reading(self):
+        # 语文现代文阅读每卷 4+3+3 篇：凑 10 题只用整篇，不拿别的篇的前几题补
+        import random
+        pool, n = [], 0
+        for pid in range(1, 9):
+            for k, size in enumerate((4, 3, 3)):
+                for _ in range(size):
+                    n += 1
+                    pool.append(q(n, pid=pid, mat='文章%d-%d' % (pid, k)))
+        for seed in range(30):
+            got = exam.pick(pool, 10, random.Random(seed))
+            self.assertEqual(len(got), 10)
+            mats = {}
+            for x in got:
+                mats[x['material']] = mats.get(x['material'], 0) + 1
+            self.assertTrue(all(v == (4 if m.endswith('-0') else 3) for m, v in mats.items()), mats)
+
+    def test_compose_keeps_section_total_when_passages_dont_fit(self):
+        # 只有 4 题一篇的阅读，凑不出正好 10 题：取两篇 8 题，每题 1.25 分，这一节还是 10 分
+        papers = [{'id': 1, 'key': 'chinese-1'}]
+        pool = [q(i, t='reading', mat='文章%d' % (i // 4)) for i in range(12)]
+        name, got, pts = exam.compose(pool, papers, 'chinese', seed=1)[2][0]
+        self.assertEqual((name, len(got), pts), ('现代文阅读', 8, 1.25))
+        self.assertEqual(len({x['material'] for x in got}), 2)
+
     def test_compose_english_like_teacher_paper(self):
         # 照老师在学习通上组的试卷6：单选 35（语音 5 + 词汇 20 + 图文 10 混在一起）、排序 3 组、连线 1 组、完形 1 篇、阅读 4 篇
         papers = [{'id': i, 'key': k} for i, k in enumerate(

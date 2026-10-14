@@ -81,23 +81,19 @@ def units(pool):
 
 
 def pick(pool, count, rng):
-    """随机抽单元凑够 count 题；大单元放不下就跳过，尽量凑满。"""
+    """随机抽整组单元凑成正好 count 题，一篇阅读不拆开、也不拿半篇来补（语文现代文阅读 4+3+3 篇正好 10 题）。
+    单元打乱后依次看，记下每个题数最早能用哪几个单元凑出来，凑出 count 就停；
+    怎么也凑不出正好 count 题时，取不超过 count 的最多题数（少的分数由 compose 摊到这一节的每题上）。"""
     us = units(pool)
     rng.shuffle(us)
-    out = []
-    for u in us:
-        if len(out) >= count:
+    reach = {0: []}                # 题数 -> 凑出这个题数用的单元下标
+    for i, u in enumerate(us):
+        if count in reach:
             break
-        if len(out) + len(u) <= count:
-            out.extend(u)
-    if len(out) < count:           # 剩下的空位用大单元的前几题补上（材料仍完整显示）
-        for u in us:
-            for q in u:
-                if len(out) >= count:
-                    break
-                if q not in out:
-                    out.append(q)
-    return out
+        for n, path in list(reach.items()):
+            if n + len(u) <= count and n + len(u) not in reach:
+                reach[n + len(u)] = path + [i]
+    return [q for i in reach[max(reach)] for q in us[i]]
 
 
 def is_match(q):
@@ -131,7 +127,7 @@ def compose(questions, papers, subject, preset='standard', seed=None):
         points = sec[4] if len(sec) > 4 else 1
         filt = sec[5] if len(sec) > 5 else None
         parts = prefix if isinstance(prefix, list) else [(prefix, count, filt)]
-        got = []
+        got, avail = [], 0
         for pfx, cnt, flt in parts:
             pool = [q for q in questions
                     if q['type'] in types and q['answer'] and q['id'] not in used
@@ -139,6 +135,9 @@ def compose(questions, papers, subject, preset='standard', seed=None):
             part = pick(pool, cnt, rng)
             used.update(q['id'] for q in part)
             got.extend(part)
+            avail += min(cnt, len(pool))
+        if got and len(got) < avail:           # 题够、只是整篇凑不出正好的题数：少几题，每题分值按比例加，这一节总分不变
+            points = points * avail / len(got)
         if isinstance(prefix, list):           # 几处抽来的混在一起（整组的材料题按组打乱，组内顺序不变）
             us = units(got)
             rng.shuffle(us)

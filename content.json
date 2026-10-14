@@ -1,6 +1,6 @@
 {
- "content_version": 62,
- "created": "2026-10-14 16:02:59",
+ "content_version": 63,
+ "created": "2026-10-14 21:13:53",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,24 +1571,24 @@
    17784
   ],
   "db.py": [
-   "1a2221931d86887887f5898ae846d9521d14689a87e784e8deda2ff7dc573e5b",
-   48969
+   "9d3d4b833302013b791ad7eba9b9f7d7b6632bf8edcef220a9b90ab0127cd16c",
+   49514
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
    15673
   ],
   "exam.py": [
-   "208249d0916095c46a667e9a9bcc0b70683453e66a68ea656f6e39e2ef4446e1",
-   8846
+   "a8b10c4c05d8d1a56f222204cb90da21f9c404b1d3a47367f5ca87f91f4ff425",
+   9344
   ],
   "llm.py": [
    "3a73611c437237d01d5d89a1d2524a8a01201acd2fb7999cbeefdbfe762184ff",
    3586
   ],
   "mobile/local.js": [
-   "3ee7e59a7774c9d3fca5b4ae4b8e88d2f1914089a33d8823d6ac3fe96abd13ef",
-   67696
+   "8a8b952e748416beb6f471e4b5e04ab3974b7440f657b2e2b4187aa75fc1e53e",
+   68874
   ],
   "server.py": [
    "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "b58d68057d072afb3b008a8da418ffb5467ab82ab9a0f1416b601fa9d7c698dc",
-   168096
+   "388138c597db8519f7eba278126a83a0071338181744555e27d250fd3ff395cd",
+   172901
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "077cc67dcb449fe971ce482a63864893f1ca13882a0421b205b9daee3f8caae0",
-   56466
+   "9c428ddb252ea2602f4681e08c2cd1b1c5af00487cc0f4501e4f3580136e7f2b",
+   56514
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "电脑上整篇阅读、完形改成学习通样式：左边原文和参考译文分开两个框，右边列出所有小题；修正判完后材料没滚到原文依据的问题",
+ "notes": "修复 8 个问题：复习里整篇做错的小题再来一次不再被跳过；做题中途进设置不会被自动更新刷掉；全部乱序不打乱书面表达等共用 A–E 的题；题型练习按卷子顺序（卷 7 在卷 8 前）；语文模拟卷现代文阅读按整篇抽；存档按卷子 key 存，换设备也对得上；背题回看不重复记；整篇卡片点题号后键盘照常用；背题支持回车、方向键和 N",
  "py_shell_api": 1,
- "tag": "content-62"
+ "tag": "content-63"
 }
