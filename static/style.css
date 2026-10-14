@@ -613,11 +613,14 @@ input.switch:checked::before { transform: translateX(18px); }
 .cn-off .cn-show .stem-cn, .cn-off .cn-show .opt-cn, .cn-off .cn-show .material-cn { display: block; }
 .ans-hidden .after { display: none; }   /* 搜索题目里还没点「显示答案」：选项译文里的语法提示、音标先不显示 */
 .qcard-main:not(.answered) .after { display: none; }
-/* 文章在上（框里单独滚动），下面一排题号，再下面是当前这道小题（排列照用户画的；样式沿用材料框、答题卡、选项） */
-.g-mat .material-box { max-height: 45vh; max-height: calc(45vh / var(--z)); overflow: auto; margin-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--layer-3) transparent; }
-.g-mat .material-box::-webkit-scrollbar { width: 6px; }
-.g-mat .material-box::-webkit-scrollbar-button { display: none; height: 0; }
-.g-mat .material-box::-webkit-scrollbar-thumb { background: var(--layer-3); border-radius: 3px; }
+/* 整篇卡片。手机：文章在上（框里单独滚动），下面一排题号，再下面是当前这道小题；
+   电脑（宽屏）照学习通：左边原文 + 参考译文（上下两个框各自滚动），右边题号栏 + 所有小题列出来（单独滚动）。样式沿用材料框、答题卡、选项 */
+.g-mat .material-box, .gq-pane { scrollbar-width: thin; scrollbar-color: var(--layer-3) transparent; }
+.g-mat .material-box::-webkit-scrollbar, .gq-pane::-webkit-scrollbar { width: 6px; }
+.g-mat .material-box::-webkit-scrollbar-button, .gq-pane::-webkit-scrollbar-button { display: none; height: 0; }
+.g-mat .material-box::-webkit-scrollbar-thumb, .gq-pane::-webkit-scrollbar-thumb { background: var(--layer-3); border-radius: 3px; }
+.g-mat .material-box { overflow: auto; margin-bottom: 10px; }
+.g-mat .g-orig-cn { padding-top: 14px; border-top: 0; }
 .gq-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
 .gq-tab { flex: none; min-width: 40px; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: var(--layer-2);
   color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
@@ -631,8 +634,20 @@ input.switch:checked::before { transform: translateX(18px); }
 .gq-pane { touch-action: pan-y; }
 .gq .opts-short { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 @media (max-width: 760px) {
-  .g-mat .material-box { max-height: 36vh; }
+  .g-mat .g-orig { max-height: 36vh; }
+  .g-mat .g-orig-cn { max-height: 26vh; }
   .gq-tabs { flex-wrap: nowrap; overflow-x: auto; }
+}
+@media (min-width: 761px) {
+  .g-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px;
+    height: calc(100vh / var(--z) - 350px); min-height: 340px; }
+  .g-mat, .g-qs { display: flex; flex-direction: column; min-height: 0; }
+  .g-mat .g-orig { flex: 3 1 0; min-height: 0; margin-bottom: 0; }
+  .g-mat .g-orig-cn { flex: 2 1 0; min-height: 0; margin: 10px 0 0; }
+  .gq-tabs { flex: none; margin-bottom: 10px; }
+  .gq-pane { flex: 1; min-height: 0; overflow: auto; padding-right: 6px; }
+  .gq { display: block; padding: 14px 14px 4px; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 8px; }
+  .gq.cur { border-color: var(--ink-3); }
 }
 .group-card .qactions { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show) { position: relative; cursor: pointer; color: transparent; text-shadow: 0 0 7px var(--ink-3); user-select: none; }

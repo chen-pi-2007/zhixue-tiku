@@ -1371,8 +1371,10 @@ function statsHtml(p) {
 
 /* ---- 整篇一张卡片（用户要求，照学习通考试的样子）----
    共用一段材料的选择题（一篇阅读、一篇完形、一组补全对话……）连在一起时做成一张卡片。
-   阅读的答案要回材料里找，所以材料一直看得见：文章在上面、框里单独滚动，紧贴着下面一条题号栏，再下面是当前这道小题（电脑、手机一样）。
-   小题一次只显示一道：上面一排题号，左右滑（电脑上点题号或按 ← →）切换；单选选完自动跳到下一道没选的；全部选完「提交本篇」一起判。
+   阅读的答案要回材料里找，所以材料一直看得见，各自单独滚动：
+   电脑（宽屏）照学习通：左边文章，显示翻译时下半截是参考译文；右边上面一排题号，下面所有小题依次列出。
+   手机：文章在上面，紧贴着一排题号，再下面一次只显示一道小题，左右滑切换。
+   点题号或按 ← → 切换当前小题；单选选完自动跳到下一道没选的；全部选完「提交本篇」一起判。
    进度按篇数（单独的题一题算一篇）。打乱时只打乱篇的先后和选项，篇里的题目顺序不变。
    p.idx 始终指向这一篇的第一题；作答记录还是逐题记（p.done[题目序号]、p.results），存档 / 读档不受影响。 */
 function groupKey(q) {
@@ -1434,12 +1436,16 @@ function renderGroup() {
         '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
       '</div>' +
       '<div class="g-wrap">' +
-        '<div class="g-mat">' + materialBox(q0) +
-          '<div class="gq-tabs">' + qs.map((q, k) =>
-            '<button class="gq-tab" onclick="gGo(' + k + ')">' + (k + 1) + '</button>').join('') + '</div></div>' +
+        // 原文和参考译文分成上下两个框，各自滚动（译文不接在原文末尾，要看不用滚到底）
+        '<div class="g-mat"><div class="material-box g-orig"><div class="material-title">原文</div>' +
+          '<div class="material-body">' + rich(q0.material) + '</div></div>' +
+          (q0.material_cn ? '<div class="material-box g-orig-cn material-cn"><div class="material-title">参考译文</div>' + rich(q0.material_cn) + '</div>' : '') +
+        '</div>' +
         '<div class="g-qs">' +
+          '<div class="gq-tabs">' + qs.map((q, k) =>
+            '<button class="gq-tab" onclick="gGo(' + k + ')">' + (k + 1) + '</button>').join('') + '</div>' +
           '<div class="gq-pane" id="gq-pane">' + qs.map((q, k) =>
-            '<div class="gq" data-i="' + (s + k) + '">' +
+            '<div class="gq" data-i="' + (s + k) + '" onclick="gPick(' + k + ')">' +
               '<div class="stem">' + (k + 1) + '/' + qs.length + '、' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
                 (q.type === 'multi' ? '（多选）' : '') + '</div>' + stemCn(q) +
               (q.type === 'judge'
@@ -1469,8 +1475,18 @@ function renderGroup() {
   }
 }
 
-// 切到第 k 道小题
-function gGo(k) {
+// 电脑宽屏：左右分栏，小题全部列出（和 style.css 里 .g-wrap 的断点一致）
+function gSplit() { return window.matchMedia('(min-width: 761px)').matches; }
+// 在框里滚到某个元素（只滚这个框，不带着整页动）；看得全就不滚，除非 always
+function scrollInBox(box, el, pad, always) {
+  if (!box || !el) return;
+  const b = box.getBoundingClientRect(), r = el.getBoundingClientRect();
+  if (!always && r.top >= b.top && r.bottom <= b.bottom) return;
+  box.scrollTop = Math.max(0, box.scrollTop + r.top - b.top - pad);
+}
+
+// 切到第 k 道小题（noScroll：电脑上直接点在这道题上，不用再滚）
+function gGo(k, noScroll) {
   const p = state.practice;
   if (!p || !p.group) return;
   const divs = $$('.gq'), tabs = $$('.gq-tab');
@@ -1478,13 +1494,19 @@ function gGo(k) {
   p.group.cur = k;
   divs.forEach((d, i) => d.classList.toggle('cur', i === k));
   tabs.forEach((t, i) => t.classList.toggle('cur', i === k));
+  if (gSplit() && !noScroll) scrollInBox($('#gq-pane'), divs[k], 8, true);
   if (p.answered) {                 // 判完以后：材料里只标黄这道小题的原文依据，并滚到那里
     clearEvidence();
     const q = p.list[+divs[k].dataset.i];
     markEvidence(q);
-    const box = $('.g-mat .material-box'), m = box && box.querySelector('mark.evidence');
-    if (m) box.scrollTop = Math.max(0, m.offsetTop - 40);
+    const box = $('.g-mat .g-orig');
+    scrollInBox(box, box && box.querySelector('mark.evidence'), 40);
   }
+}
+// 电脑上点到某道小题上（选项或题干）：它就是当前这道
+function gPick(k) {
+  const p = state.practice;
+  if (p && p.group && p.group.cur !== k && gSplit()) gGo(k, true);
 }
 
 function clearEvidence() {

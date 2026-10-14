@@ -1,6 +1,6 @@
 {
- "content_version": 61,
- "created": "2026-10-14 11:05:03",
+ "content_version": 62,
+ "created": "2026-10-14 16:02:59",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "2287d4ce7248e5f01c290013d95a9b4fe806a0e990330de7ace422b6a01db375",
-   166664
+   "b58d68057d072afb3b008a8da418ffb5467ab82ab9a0f1416b601fa9d7c698dc",
+   168096
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "1c7a8595042f73b2c231b665b0504490646dc3543ecd386fec67e216f1a3d7c8",
-   55450
+   "077cc67dcb449fe971ce482a63864893f1ca13882a0421b205b9daee3f8caae0",
+   56466
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "设置里加「答题后自动显示翻译」：英语题答完自动显示中文翻译",
+ "notes": "电脑上整篇阅读、完形改成学习通样式：左边原文和参考译文分开两个框，右边列出所有小题；修正判完后材料没滚到原文依据的问题",
  "py_shell_api": 1,
- "tag": "content-61"
+ "tag": "content-62"
 }
