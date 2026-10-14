@@ -398,8 +398,8 @@ BLANK_STEM = re.compile(r'第\d+空')       # 完形、补全对话、书面表�
 
 def _group_material(items, rnd=None):
     """把共用材料的题挪到一起（一篇阅读的题不会被拆开、和别的篇混在一起）。
-    rnd 给了（打乱练习）就在本篇内部打乱；按“第几空”排的组（完形、补全对话、书面表达）保持原顺序，
-    不然题号和文章里的空对不上。"""
+    篇内的题一律按原题号排（用户要求：打乱只打乱篇与篇的先后和选项，篇里的题目顺序不变，像学习通考试那样整篇做）。
+    rnd 参数留着兼容旧调用，不再用。"""
     order, groups = [], {}
     for q in items:
         k = (q['paper_id'], q['material']) if q['material'] else ('q', q['id'])
@@ -409,10 +409,7 @@ def _group_material(items, rnd=None):
         groups[k].append(q)
     out = []
     for k in order:
-        g = sorted(groups[k], key=lambda x: x['qno'])
-        if rnd and len(g) > 1 and not any(BLANK_STEM.search(q['stem']) for q in g):
-            rnd.shuffle(g)
-        out.extend(g)
+        out.extend(sorted(groups[k], key=lambda x: x['qno']))
     return out
 
 
@@ -1069,8 +1066,14 @@ def dashboard():
             d = subj.setdefault(s, {'subject': s, 'total': 0, 'gradable': 0, 'seen': 0, 'right': 0, 'wrong': 0,
                                     'wrong_open': 0, 'due': 0, 'mastery_sum': 0.0, 'types': {}})
             d['total'] += 1
-            t = d['types'].setdefault(_cat(q), {'type': _cat(q), 'total': 0, 'seen': 0, 'mastery_sum': 0.0})
+            t = d['types'].setdefault(_cat(q), {'type': _cat(q), 'total': 0, 'units': 0, 'seen': 0, 'mastery_sum': 0.0, 'mats': set()})
             t['total'] += 1
+            # units：几篇（共用一段材料的题算一篇），题型卡片上显示“8 篇 · 80 题”
+            mk = (q['paper_id'], q['material']) if q['material'] else None
+            if mk not in t['mats']:
+                t['units'] += 1
+                if mk:
+                    t['mats'].add(mk)
             if q['answer']:
                 d['gradable'] += 1
             c = cards.get(_ck(q))
@@ -1092,6 +1095,7 @@ def dashboard():
             types = []
             for t in d.pop('types').values():
                 t['mastery'] = _round(100 * t.pop('mastery_sum') / t['total']) if t['total'] else 0
+                t.pop('mats')
                 a = acc.get((s, t['type']))
                 t['accuracy'] = _round(100 * a) if a is not None else None
                 types.append(t)

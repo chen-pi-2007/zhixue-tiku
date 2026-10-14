@@ -613,6 +613,16 @@ input.switch:checked::before { transform: translateX(18px); }
 .cn-off .cn-show .stem-cn, .cn-off .cn-show .opt-cn, .cn-off .cn-show .material-cn { display: block; }
 .ans-hidden .after { display: none; }   /* 搜索题目里还没点「显示答案」：选项译文里的语法提示、音标先不显示 */
 .qcard-main:not(.answered) .after { display: none; }
+/* 整篇一张卡片（阅读、完形……）：材料在上，小题依次往下排 */
+.group-no { margin: -4px 0 12px; font-size: 13px; color: var(--ink-3); }
+.gq { padding: 16px 0 6px; border-top: 1px solid var(--line); }
+.gq + .gq { margin-top: 4px; }
+.gq-stem { display: flex; gap: 6px; margin-bottom: 10px; }
+.gq-no { flex: none; color: var(--ink-3); font-weight: 600; }
+.gq .opts { gap: 8px; }
+.gq .opts-short { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.gq-fb .feedback { margin-top: 10px; }
+.group-card .qactions { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show) { position: relative; cursor: pointer; color: transparent; text-shadow: 0 0 7px var(--ink-3); user-select: none; }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show)::after { content: '点一下看翻译（会提示答案）'; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); text-align: center; color: var(--ink-2); text-shadow: none; font-size: 13px; }
 .point-box { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--teal); border-radius: 0 6px 6px 0; background: var(--layer-2); color: var(--ink-2); line-height: 1.75; }

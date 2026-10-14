@@ -203,7 +203,7 @@
     return { items: qs.slice(offset, offset + limit).map(q => view(q, papers)), total: qs.length };
   }
 
-  // 共用材料的题挪到一起；doShuffle 时在本篇内部打乱（按“第几空”排的组保持原顺序），同 db.py _group_material
+  // 共用材料的题挪到一起，篇内按原题号排（打乱只打乱篇的先后和选项），同 db.py _group_material
   function groupMaterial(items, doShuffle) {
     const order = [], groups = {};
     items.forEach(q => {
@@ -214,7 +214,6 @@
     const out = [];
     order.forEach(k => {
       const g = groups[k].sort((a, b) => a.qno - b.qno);
-      if (doShuffle && g.length > 1 && !g.some(q => /第\d+空/.test(q.stem))) shuffle(g);
       out.push.apply(out, g);
     });
     return out;
@@ -417,8 +416,12 @@
       const s = (papers[q.paper_id] || {}).subject || 'general';
       const d = subj[s] = subj[s] || { subject: s, total: 0, gradable: 0, seen: 0, right: 0, wrong: 0, wrong_open: 0, due: 0, mastery_sum: 0, types: {} };
       d.total++;
-      const t = d.types[cat(q)] = d.types[cat(q)] || { type: cat(q), total: 0, seen: 0, mastery_sum: 0 };
+      const t = d.types[cat(q)] = d.types[cat(q)] || { type: cat(q), total: 0, units: 0, seen: 0, mastery_sum: 0, mats: {} };
       t.total++;
+      // units：几篇（共用一段材料的题算一篇，同 db.py）
+      const mk = q.material ? q.paper_id + '' + q.material : null;
+      if (!mk) t.units++;
+      else if (!t.mats[mk]) { t.mats[mk] = 1; t.units++; }
       if (q.answer) d.gradable++;
       const c = prog.cards[ck(q)];
       if (c) {
@@ -437,7 +440,7 @@
       delete d.mastery_sum;
       d.types = Object.values(d.types).map(t => {
         t.mastery = t.total ? Math.round(100 * t.mastery_sum / t.total) : 0;
-        delete t.mastery_sum;
+        delete t.mastery_sum; delete t.mats;
         const a = acc[s + '|' + t.type];
         t.accuracy = a != null ? Math.round(100 * a) : null;
         return t;

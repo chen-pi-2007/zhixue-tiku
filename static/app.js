@@ -614,7 +614,7 @@ function typeGrid(s, subj) {
       ',type:' + jsq(t.type) + '},' + jsq(name + '·' + (TYPE_NAME[t.type] || t.type)) + ')">' +
       '<span class="ti">' + (TYPE_ICON[t.type] || '') + '</span>' +
       '<span class="tn">' + (TYPE_NAME[t.type] || t.type) + '</span>' +
-      '<span class="tc">' + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
+      '<span class="tc">' + (t.units && t.units < t.total && SELF_TYPES.indexOf(t.type) < 0 ? t.units + ' 篇 · ' : '') + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
       bar(t.mastery, 'thin') +
     '</button>').join('') + '</div>';
 }
@@ -1161,7 +1161,7 @@ async function startPractice(opts) {
     toast(/^wrong/.test(opts.scope) ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
     return;
   }
-  const list = opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items;
+  const list = sortUnits(opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items);
   beginPractice(list, opts.title || '练习', 'practice');
   // 除了全部乱序（选项每次重新打乱），平时的练习都能手动存档；模拟考试另有自己的进度保存
   if (!opts.shuffleOpts) allowSave(opts, opts.title);
@@ -1282,7 +1282,7 @@ async function openModeSheet(src, name) {
 
 // 当前这道已经答完就存“做完这道”，下次从下一道开始
 function snapshot(p) {
-  const idx = p.answered ? p.idx + 1 : p.idx;
+  const idx = p.answered ? unitEnd(p, p.idx) : p.idx;
   return {
     ids: p.list.map(q => q.id), idx: Math.min(idx, p.list.length - 1), done: p.done,
     results: p.results.map(r => [r.q.id, r.correct]), correct: p.correct,
@@ -1301,7 +1301,7 @@ function saveProgress() {
 function autoSave() {
   const p = state.practice;
   if (!p || !p.autoKey) return;
-  if (p.answered && p.idx + 1 >= p.list.length) store.del(p.autoKey);
+  if (p.answered && unitEnd(p, p.idx) >= p.list.length) store.del(p.autoKey);
   else store.set(p.autoKey, snapshot(p));
 }
 
@@ -1357,9 +1357,161 @@ function statsHtml(p) {
     '<span class="muted">正确率：</span>' + (doneN ? Math.round(100 * p.correct / doneN) : 0) + '%';
 }
 
+/* ---- 整篇一张卡片（用户要求，照学习通考试的样子）----
+   共用一段材料的选择题（一篇阅读、一篇完形、一组补全对话……）连在一起时做成一张卡片：材料在上，这一篇的小题按原题号排在下面，
+   每题选好后「提交本篇」一起判。进度按篇数（单独的题一题算一篇）。打乱时只打乱篇的先后和选项，篇里的题目顺序不变。
+   p.idx 始终指向这一篇的第一题；作答记录还是逐题记（p.done[题目序号]、p.results），存档 / 读档不受影响。 */
+function groupKey(q) {
+  return q && q.material && q.material.trim() && SELF_TYPES.indexOf(q.type) < 0 ? q.paper_id + '\u0001' + q.material : null;
+}
+function unitEnd(p, i) {
+  const k = groupKey(p.list[i]);
+  let j = i + 1;
+  if (k) while (j < p.list.length && groupKey(p.list[j]) === k) j++;
+  return j;
+}
+function unitStart(p, i) {
+  const k = groupKey(p.list[i]);
+  while (k && i > 0 && groupKey(p.list[i - 1]) === k) i--;
+  return i;
+}
+// “3/8”：第几篇 / 共几篇
+function unitNo(p) {
+  let n = 0, cur = 0;
+  for (let i = 0; i < p.list.length; i = unitEnd(p, i)) { n++; if (i <= p.idx) cur = n; }
+  return cur + '/' + n;
+}
+// 连在一起的同一篇按原题号排
+function sortUnits(list) {
+  const out = list.slice();
+  for (let i = 0; i < out.length;) {
+    const k = groupKey(out[i]);
+    let j = i + 1;
+    if (k) while (j < out.length && groupKey(out[j]) === k) j++;
+    if (j - i > 1) out.splice.apply(out, [i, j - i].concat(out.slice(i, j).sort((a, b) => a.qno - b.qno)));
+    i = j;
+  }
+  return out;
+}
+
+function renderGroup() {
+  const p = state.practice;
+  const s = p.idx, e = unitEnd(p, s);
+  const qs = p.list.slice(s, e);
+  const q0 = qs[0];
+  const cnQ = qs.find(hasCn);
+  p.group = { s: s, e: e };
+  const pct = Math.round(100 * s / p.list.length);
+  const no = unitNo(p).split('/');
+  app.innerHTML =
+    '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
+      '<span class="crumb-acts">' +
+        (p.saveKey ? '<a href="javascript:void(0)" onclick="saveProgress()">存档</a>' +
+          (store.get(p.saveKey) ? '<a href="javascript:void(0)" onclick="loadSave(' + jsq(p.saveKey) + ')">读档</a>' : '') : '') +
+        '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></span></div>' +
+    '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
+    '<div class="card qcard-main group-card">' +
+      '<div class="qhead">' +
+        '<span class="tag t-' + q0.type + '">' + (TYPE_NAME[q0.cat] || TYPE_NAME[q0.type]) + '</span>' +
+        '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题</span>' +
+        '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
+      '</div>' +
+      '<div class="group-no">第 ' + no[0] + ' / 共 ' + no[1] + ' 篇 · 本篇 ' + qs.length + ' 题</div>' +
+      materialBox(q0) +
+      qs.map((q, k) => '<div class="gq" data-i="' + (s + k) + '">' +
+          '<div class="stem gq-stem"><span class="gq-no">' + (k + 1) + '.</span>' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
+            (q.type === 'multi' ? '<span class="muted">（多选）</span>' : '') + '</div>' + stemCn(q) +
+          (q.type === 'judge'
+            ? '<div class="judge-row">' + optionList(q).map(o =>
+              '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
+            // 选项都很短（完形、补全对话常见）就横着排几列，省得一篇十题拉得很长
+            : '<div class="opts' + (optionList(q).every(o => (o[1] || '').length <= 24 && !/<img|\\\(|【图/.test(o[1] || '')) ? ' opts-short' : '') + '">' + optionList(q).map((o, i) =>
+              '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
+          '<div class="gq-fb"></div>' +
+        '</div>').join('') +
+      '<div class="qactions" id="qact">' + prevBtn(p) + '<span class="muted kbd-tip" id="g-left"></span><div class="spacer"></div>' +
+        '<button class="btn" id="confirm-btn" disabled onclick="submitGroup()">提交本篇</button></div>' +
+      '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
+    '</div>';
+  if (qs.every((_, k) => p.done[s + k])) {      // 回看做过的篇：显示当时的作答和解析，不再记分
+    $$('.gq').forEach(div => {
+      const sel = p.done[+div.dataset.i];
+      Array.from(div.querySelectorAll('.opt')).forEach(b => { if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('sel'); });
+    });
+    gradeGroup(true);
+  } else groupLeft();
+}
+
+function groupLeft() {
+  const p = state.practice;
+  const n = p.group.e - p.group.s;
+  const picked = $$('.gq').filter(div => Array.from(div.querySelectorAll('.opt.sel')).length).length;
+  const tip = $('#g-left');
+  if (tip) tip.textContent = picked < n ? '已选 ' + picked + ' / ' + n + ' 题，全部选完再提交' : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
+  const ok = $('#confirm-btn');
+  if (ok) ok.disabled = picked < n;
+}
+
+function gTap(btn) {
+  const p = state.practice;
+  if (!p || p.answered) return;
+  const div = btn.closest('.gq');
+  if (p.list[+div.dataset.i].type === 'multi') btn.classList.toggle('sel');
+  else Array.from(div.querySelectorAll('.opt')).forEach(b => b.classList.toggle('sel', b === btn));
+  groupLeft();
+}
+
+function submitGroup() {
+  const p = state.practice;
+  if (!p || p.answered || !p.group) return;
+  const divs = $$('.gq');
+  if (divs.some(div => !Array.from(div.querySelectorAll('.opt.sel')).length)) { groupLeft(); toast('还有题没选'); return; }
+  divs.forEach(div => { p.done[+div.dataset.i] = Array.from(div.querySelectorAll('.opt.sel')).map(b => b.dataset.k); });
+  gradeGroup(false);
+}
+
+function gradeGroup(replay) {
+  const p = state.practice;
+  const n = p.group.e - p.group.s;
+  p.answered = true;
+  $('.qcard-main').classList.add('answered');
+  let right = 0;
+  $$('.gq').forEach(div => {
+    const i = +div.dataset.i, q = p.list[i], sel = p.done[i];
+    const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
+    const ok = q.type === 'multi' ? sel.slice().sort().join('') === ans.slice().sort().join('') : sel[0] === q.answer;
+    if (ok) right++;
+    if (!replay) recordResult(q, ok, true);
+    Array.from(div.querySelectorAll('.opt')).forEach(b => {
+      b.disabled = true;
+      if (ans.indexOf(b.dataset.k) >= 0) b.classList.add('ok');
+      else if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('bad');
+    });
+    div.classList.add(ok ? 'gq-ok' : 'gq-bad');
+    div.querySelector('.gq-fb').innerHTML = '<div class="feedback ' + (ok ? 'good' : 'bad') + '">' +
+      '<div class="ans-line">' + (ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
+      (ok ? rightBox(q) : whyBox(q, sel)) +
+      (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' +
+        (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
+      evidenceBox(q) + pointBox(q) + phraseBox(q) + '</div>';
+    markEvidence(q);
+  });
+  if (!replay) {
+    autoSave();
+    toast('本篇 ' + n + ' 题，答对 ' + right + ' 题', right === n ? 'good' : '');
+  }
+  $('#qact').innerHTML = prevBtn(p) + '<span class="muted kbd-tip">本篇答对 ' + right + ' / ' + n + ' 题</span><div class="spacer"></div>' +
+    '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.group.e >= p.list.length ? '查看结果' : '下一篇') + '</button>';
+  // 跳到第一道做错的题，方便看解析
+  const bad = $('.gq-bad');
+  if (bad && !replay) bad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
 function renderQ() {
   const p = state.practice;
   const q = p.list[p.idx];
+  if (unitEnd(p, p.idx) - p.idx > 1) return renderGroup();
+  p.group = null;
   if (p.shownIdx !== p.idx) { p.shownIdx = p.idx; p.shownAt = Date.now(); }   // 换到新题的时间（optTap 防误触用）
   const opts = optionList(q);
   const pct = Math.round(100 * p.idx / p.list.length);
@@ -1379,7 +1531,7 @@ function renderQ() {
         '<span class="spacer"></span>' + cnBtn(q) +
       '</div>' +
       materialBox(q) +
-      '<div class="stem">' + (p.idx + 1) + '/' + p.list.length + '、' + rich(q.stem) + '</div>' + stemCn(q) +
+      '<div class="stem">' + unitNo(p) + '、' + rich(q.stem) + '</div>' + stemCn(q) +
       '<div id="qbody"></div>' +
       '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
     '</div>';
@@ -1467,7 +1619,7 @@ function confirmChoice() {
 }
 
 
-function recordResult(q, ok) {
+function recordResult(q, ok, quiet) {
   const p = state.practice;
   p.results.push({ q: q, correct: ok });
   if (ok) p.correct++;
@@ -1480,6 +1632,7 @@ function recordResult(q, ok) {
   }
   api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: p.mode } })
     .then(d => {
+      if (quiet) return;
       if (d.event === 'released') toast('连续答对 ' + MASTER_STREAK + ' 次，这道错题已消灭', 'good');
       else if (d.event === 'entered') toast('已加入错题本');
     })
@@ -1565,7 +1718,7 @@ function nextQ() {
   if (!p) return;
   if (!p.answered && !p.done[p.idx]) return;     // 还没作答，不能跳过去
   p.answered = false;
-  p.idx++;
+  p.idx = unitEnd(p, p.idx);
   if (p.idx >= p.list.length) p.finished = true;
   route();
 }
@@ -1574,7 +1727,7 @@ function prevQ() {
   const p = state.practice;
   if (!p || p.idx <= 0) return;
   p.answered = false;
-  p.idx--;
+  p.idx = unitStart(p, p.idx - 1);
   route();
 }
 
@@ -1897,11 +2050,12 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { if (p.answered) nextQ(); return; }
   if (e.key === 'Enter') {
     e.preventDefault();
+    if (p.group) { if (p.answered) nextQ(); else submitGroup(); return; }
     if (p.answered) nextQ();                                       // 第二次回车：下一题
     else if (SELF_TYPES.indexOf(q.type) < 0) confirmChoice();      // 第一次回车：确认答案
     return;
   }
-  if (p.answered || SELF_TYPES.indexOf(q.type) >= 0) return;
+  if (p.answered || p.group || SELF_TYPES.indexOf(q.type) >= 0) return;
   const opts = optionList(q);
   const map = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5 };
   const km = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 };

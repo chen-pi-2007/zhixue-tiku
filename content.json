@@ -1,6 +1,6 @@
 {
- "content_version": 53,
- "created": "2026-10-13 12:43:25",
+ "content_version": 54,
+ "created": "2026-10-14 09:48:39",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "5d8264ffaa944060e6cb50bb486905c26b816ef6d49d1805b529f36b866597d7",
-   48693
+   "1a2221931d86887887f5898ae846d9521d14689a87e784e8deda2ff7dc573e5b",
+   48969
   ],
   "docparse.py": [
    "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "de7d6a06c735ec3a85bef33f904fbbc37e3b1be51b90dcb508d4eb86f8c56e06",
-   65016
+   "c04e2e858558df56a03bf1873314d0aca87fe70d52aa7fdb5a9ba2ad7f6fd827",
+   65169
   ],
   "server.py": [
    "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "4aebfbedec244c70098f2d9d97a6614772f6c98d8eccf958b8918063a7bbf55d",
-   149121
+   "11f499b59c8fb7098cce855e41ccc0098d2ca8c82610be5ca35cf404e10bf71c",
+   157602
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "512ee5a82b8e6f7db2dfb6bc1f52a7d272f325b4165149545853f923139b37b2",
-   53812
+   "afd40e4c6284efe2fc4483d60d870b08d6755e62384541cfa9d084b6b5724996",
+   54450
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "语文新增模拟试卷(7)，28 题",
+ "notes": "阅读、完形等整篇一张卡片：材料在上、本篇小题全列出来，选完一起提交；进度和题型按篇数显示；打乱时篇内题目顺序不变，只打乱选项",
  "py_shell_api": 1,
- "tag": "content-53"
+ "tag": "content-54"
 }
