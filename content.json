@@ -1,6 +1,6 @@
 {
- "content_version": 60,
- "created": "2026-10-14 10:49:56",
+ "content_version": 61,
+ "created": "2026-10-14 11:05:03",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "7b4a82f4308f3c1fefab3a1e6d0f2d3cbc8b572b7ee422813ef7d08c633e6ac9",
-   165479
+   "2287d4ce7248e5f01c290013d95a9b4fe806a0e990330de7ace422b6a01db375",
+   166664
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "手机版不再显示导出 Word",
+ "notes": "设置里加「答题后自动显示翻译」：英语题答完自动显示中文翻译",
  "py_shell_api": 1,
- "tag": "content-60"
+ "tag": "content-61"
 }

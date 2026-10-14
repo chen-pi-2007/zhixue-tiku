@@ -254,6 +254,15 @@ function optionList(q) {
 // 译文作答前就能看；只有会直接暴露答案的部分留到作答后（.after）：选项译文里括号中的语法提示和音标；【】里的形式标签作答前就显示。
 // 题干译文和英文一样留空（学测/_脚本/english_cn）；万一有把空填好了的，作答前盖住（.peek），点一下才看。
 function cnLocked() { return !!store.get('quiz.cnlock'); }
+// 设置「答题后自动显示翻译」（localStorage quiz.cnafter）：答完这张卡片自动加 .cn-show，和点一下「译」一样
+function cnAfterOn() { return !!store.get('quiz.cnafter'); }
+function cnAfterAnswer() {
+  if (!cnAfterOn()) return;
+  const card = $('.qcard-main');
+  if (!card || !card.querySelector('.cn-btn')) return;
+  card.classList.add('cn-show');
+  applyCn();
+}
 function applyCn() {
   const lock = cnLocked();
   document.documentElement.classList.toggle('cn-off', !lock);
@@ -1573,6 +1582,7 @@ function gradeGroup(replay) {
   }
   $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + '/' + n + ' 题，点题号看每题的解析</span><div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.group.e >= p.list.length ? '查看结果' : '下一篇') + '</button>';
+  cnAfterAnswer();
   gGo(firstBad >= 0 ? firstBad : 0);     // 先看第一道做错的
 }
 
@@ -1754,6 +1764,7 @@ function gradeAndShow(selKeys, replay) {
     evidenceBox(q) + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
   markEvidence(q);
+  cnAfterAnswer();
 
   $('#qact').innerHTML = nextActions(p);
 }
@@ -1776,6 +1787,7 @@ function showQaAns(replay) {
   fb.innerHTML = '<div class="ans-line">参考答案</div><div class="analysis">' + rich(q.answer) + '</div>' +
     (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' : '') + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
+  cnAfterAnswer();
   if (ta) ta.disabled = true;
   if (replay) {                      // 回看：已经自评过了
     $('#qact').innerHTML = nextActions(p);
@@ -2411,6 +2423,12 @@ async function viewSettings() {
     subjList('culture') + subjList('pro') + subjList('other') +
     '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +
 
+    '<div class="set-group-t">做题</div><div class="set-list">' +
+      '<label class="set-item"><span class="set-main">答题后自动显示翻译</span>' +
+        '<input type="checkbox" class="switch" id="cn-after"' + (cnAfterOn() ? ' checked' : '') + '></label>' +
+    '</div>' +
+    '<div class="set-foot">英语题答完（单题确认答案、整篇提交）后，这道题的中文翻译自动显示出来，不用再点「译」；作答前还是不显示。</div>' +
+
     '<div class="set-group-t">更新</div><div class="set-list">' +
       item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
       (canUpd ? '<label class="set-item"><span class="set-main">自动更新题库和界面</span>' +
@@ -2457,6 +2475,11 @@ async function viewSettings() {
     else if (!upd.busy && !upd.html) updShow('<div class="upd-box"><b>后台程序的更新还没生效</b><div class="muted">重启题库后生效，几秒钟，做题记录不受影响。</div>' +
       '<button class="btn" onclick="restartApp()">现在重启</button></div>');
   }
+  const ca = $('#cn-after');
+  if (ca) ca.addEventListener('change', () => {
+    store.set('quiz.cnafter', ca.checked);
+    toast(ca.checked ? '已打开：英语题答完后自动显示翻译' : '已关闭：答完后要看翻译点「译」');
+  });
   $$('.subj-check input').forEach(c => c.addEventListener('change', () => {
     c.closest('.subj-check').classList.toggle('off', !c.checked);     // 关掉的科目名变灰（老 WebView 不支持 :has，用 class）
     saveHidden();
