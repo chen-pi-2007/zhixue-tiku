@@ -1188,6 +1188,7 @@
     (ref, p) => 'https://cdn.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,     // 国内一般能连（发布时会刷新 main 的缓存）
     (ref, p) => 'https://fastly.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,  // jsDelivr 的其他节点
     (ref, p) => 'https://gcore.jsdelivr.net/gh/' + REPO + '@' + ref + '/' + p,
+    (ref, p) => 'https://ghproxy.net/https://raw.githubusercontent.com/' + REPO + '/' + ref + '/' + p,   // 转发 GitHub 原站，没有长缓存
   ];
   const job = { state: 'idle', done: 0, total: 0, files_done: 0, files_total: 0, speed: 0, error: '', version: 0 };
 
@@ -1220,7 +1221,7 @@
   function mirrorOrder() {
     let good = -1;
     try { good = +(localStorage.getItem('zx.mirror') || -1); } catch (e) { /* 无痕之类 */ }
-    const order = [1, 2, 3, 0];
+    const order = [1, 2, 3, 4, 0];
     if (good >= 0 && good < MIRRORS.length) { order.splice(order.indexOf(good), 1); order.unshift(good); }
     return order;
   }
@@ -1235,16 +1236,28 @@
     }
     throw last;
   }
-  // 最新清单（main 分支上的 content.json）：四条线路同时问，最多等 8 秒，取版本最新的一份
-  // （jsDelivr 偶尔缓存着旧的，取最大的不会把新的当成旧的；全都连不上才算失败）
+  // 最新清单：几条路同时问，最多等 10 秒，取版本最大的一份（全都连不上才算失败）。
+  // 很多手机连不上 GitHub；jsDelivr 上 main 分支的清单会缓存好几个小时（真机上实测发了新版还拿到旧的），
+  // 所以另外两条路：ghproxy 转发 GitHub 原站；jsDelivr 的版本列表接口（新标签几分钟内就有）找到最新的 content-N 标签，
+  // 再按标签取清单（按标签取的内容固定，不会是旧缓存）。取最大的不会把旧的当成新的。
+  async function latestByTag() {
+    const list = JSON.parse(new TextDecoder().decode(await getTimeout('https://data.jsdelivr.com/v1/package/gh/' + REPO, 8000)));
+    const n = Math.max.apply(null, (list.versions || []).map(v => (/^content-(\d+)$/.exec(v) || [0, 0])[1] | 0));
+    if (!(n > 0)) throw new Error('no tag');
+    for (const i of [2, 3, 1]) {
+      try { return await getTimeout(MIRRORS[i]('content-' + n, 'content.json'), 8000); } catch (e) { /* 换节点 */ }
+    }
+    throw new Error('tag fetch failed');
+  }
   async function latestManifest() {
+    const tries = MIRRORS.map(mk => () => getTimeout(mk('main', 'content.json'), 10000)).concat([latestByTag]);
     const got = await new Promise(resolve => {
       const res = [];
-      let left = MIRRORS.length;
+      let left = tries.length;
       const finish = () => resolve(res);
-      const timer = setTimeout(finish, 8000);
-      MIRRORS.forEach((mk, i) => {
-        getTimeout(mk('main', 'content.json'), 8000).then(b => {
+      const timer = setTimeout(finish, 10000);
+      tries.forEach(t => {
+        Promise.resolve().then(t).then(b => {
           try { res.push(JSON.parse(new TextDecoder().decode(b))); } catch (e) { /* 坏的不要 */ }
         }).catch(() => {}).then(() => { if (--left === 0) { clearTimeout(timer); finish(); } });
       });

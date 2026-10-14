@@ -1,6 +1,6 @@
 {
- "content_version": 58,
- "created": "2026-10-14 10:31:21",
+ "content_version": 59,
+ "created": "2026-10-14 10:36:34",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1587,8 +1587,8 @@
    3586
   ],
   "mobile/local.js": [
-   "ce1beebdabd0276c7b070408fc7ac9fd27c85cc17d40e1f2f8963a9e7ba691c7",
-   66623
+   "3ee7e59a7774c9d3fca5b4ae4b8e88d2f1914089a33d8823d6ac3fe96abd13ef",
+   67696
   ],
   "server.py": [
    "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "整篇卡片里中文选项不再挤成两列",
+ "notes": "手机连不上 GitHub、镜像缓存旧版时也能及时发现新版（加 ghproxy 和按发布标签取清单）",
  "py_shell_api": 1,
- "tag": "content-58"
+ "tag": "content-59"
 }
