@@ -1,6 +1,6 @@
 {
- "content_version": 70,
- "created": "2026-10-17 17:28:30",
+ "content_version": 71,
+ "created": "2026-10-17 20:24:35",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "67523b01b6670af9916a2e86f1dd6b753b1136eff05cc3520a9dc096aa375ab1",
-   186765
+   "2d43ad3f4e9ae75e9395ec4ff27adc21fa638dfdfbafc6748a28a0fb26624be4",
+   187481
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "选项并排按最长选项算列宽，文字不再挤成两行；手机上做题、背题的按钮条固定在屏幕底部，下一题按钮位置不再变",
+ "notes": "错题再出现时保证正确答案换到别的字母上（原来随机打乱约 1/4 还在原位置，看着像没打乱）；全部乱序保证顺序和原卷不同",
  "py_shell_api": 1,
- "tag": "content-70"
+ "tag": "content-71"
 }

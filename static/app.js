@@ -1244,12 +1244,21 @@ function autoKeyOf(saveKey) { return saveKey.replace('zx.save.', 'zx.auto.'); }
 const NO_SHUFFLE = /以上|上述|都(?:对|错|正确|不正确)|(?<![A-Za-z])[A-G]\s*[和与及、,，]\s*[A-G](?![A-Za-z])|^[A-G]{1,4}$|见材料|(?<!可)见图|\b(?:[Aa]ll|[Nn]one|[Bb]oth|[Nn]either) of the above\b|\b[A-G] and [A-G]\b/;
 
 // 全乱序模式：把题目复制一份，选项打乱后重新标 A、B、C，答案、中文释义、每个选项的说明跟着换
-function shuffleQuestion(q) {
+// moveAns：再出现的题（做错了再来、以前错过的、背题小测）要求正确答案换到别的字母上，不能还在老位置（用户：看着像没打乱）；
+// 不然完全随机时约 1/4 的机会答案还是原来那个字母。顺序也一定和原来不同（全部乱序也一样）
+function shuffleQuestion(q, moveAns) {
   const opts = q.options || [];
   if (q.type === 'judge' || opts.length < 2 || opts.some(o => NO_SHUFFLE.test((o[1] || '').trim()))) return q;
   if (q.material && opts.length >= 5) return q;     // 一组题共用材料里列的 A～E（书面表达排序、信息匹配）：不打乱（同模拟考 exam.py）
-  const perm = opts.map((_, i) => i);
-  for (let i = perm.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
+  const ans = opts.map((o, i) => (q.answer || '').indexOf(o[0]) >= 0 ? i : -1).filter(i => i >= 0);
+  let perm;
+  for (let t = 0; t < 50; t++) {
+    perm = opts.map((_, i) => i);
+    for (let i = perm.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
+    const same = perm.every((j, i) => j === i);
+    const stay = moveAns && ans.length < opts.length && ans.some(i => perm[i] === i);   // 正确答案还在原来的字母上（全选的多选题没法挪）
+    if (!same && !stay) break;
+  }
   const L = i => String.fromCharCode(65 + i);
   const newKey = {};
   perm.forEach((j, i) => { newKey[opts[j][0]] = L(i); });
@@ -1276,7 +1285,7 @@ function againGap() { return AGAIN_GAP_MIN + Math.floor(Math.random() * (AGAIN_G
 const OLD_EVERY = 5, OLD_MAX = 8;
 function againOn() { return store.get('quiz.again') !== false; }
 function mixOldOn() { return store.get('quiz.mixold') !== false; }
-function extraCopy(q, kind) { return Object.assign({}, shuffleQuestion(q), { extra: kind }); }
+function extraCopy(q, kind) { return Object.assign({}, shuffleQuestion(q, true), { extra: kind }); }
 function extraBadge(q) {
   return '<span class="rec-badge bad">' + (q.extra === 'old' ? '以前错过' + (q.wrong_count ? ' ' + q.wrong_count + ' 次' : '') + '，再练一次' : '刚才做错，再来一次') +
     (q.shuffled ? ' · 选项已打乱' : '') + '</span>';
