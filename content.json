@@ -1,6 +1,6 @@
 {
- "content_version": 67,
- "created": "2026-10-17 17:00:09",
+ "content_version": 68,
+ "created": "2026-10-17 17:06:58",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "0475754d41d4b981efb41c951212c679e56ff9e3ec872a6cf7e837100315ba7b",
-   56403
+   "2a52bae4582b07bdde91a135eae0ea65ecba5489644c17c2ae402dfb8b8fb476",
+   57145
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "修复整篇阅读里点了不同选项会瞬移到下一题：电脑上点选项不再自动跳，手机上只在第一次选好时跳、改答案不跳；单题练习连点正确答案不会跳过解析",
+ "notes": "选中的选项改成明显的蓝色（浅蓝底、蓝边、字母蓝底白字），整篇阅读里已选的题号也是蓝色；原来选了像没选",
  "py_shell_api": 1,
- "tag": "content-67"
+ "tag": "content-68"
 }
