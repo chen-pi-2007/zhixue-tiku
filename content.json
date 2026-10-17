@@ -1,6 +1,6 @@
 {
- "content_version": 66,
- "created": "2026-10-17 16:52:54",
+ "content_version": 67,
+ "created": "2026-10-17 17:00:09",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "04bf83ed773408f5de196355c393086be28445196d2f8163de42b2913d2d2939",
-   185481
+   "913466986d9618bf3bdacffafd13c14df48b331692df4cce63075b5563f37f18",
+   186202
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "设置页去掉多余的「返回做题」按钮：从做题进来时左上角的返回就回到刚才那道题",
+ "notes": "修复整篇阅读里点了不同选项会瞬移到下一题：电脑上点选项不再自动跳，手机上只在第一次选好时跳、改答案不跳；单题练习连点正确答案不会跳过解析",
  "py_shell_api": 1,
- "tag": "content-66"
+ "tag": "content-67"
 }

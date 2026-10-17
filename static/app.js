@@ -1466,7 +1466,7 @@ function statsHtml(p) {
    阅读的答案要回材料里找，所以材料一直看得见，各自单独滚动：
    电脑（宽屏）照学习通：左边文章，显示翻译时下半截是参考译文；右边上面一排题号，下面所有小题依次列出。
    手机：文章在上面，紧贴着一排题号，再下面一次只显示一道小题，左右滑切换。
-   点题号或按 ← → 切换当前小题；单选选完自动跳到下一道没选的；全部选完「提交本篇」一起判。
+   点题号或按 ← → 切换当前小题；手机上单选第一次选好自动跳到下一道没选的（改答案不跳；电脑上小题都列着，不跳）；全部选完「提交本篇」一起判。
    进度按篇数（单独的题一题算一篇）。打乱时只打乱篇的先后和选项，篇里的题目顺序不变。
    p.idx 始终指向这一篇的第一题；作答记录还是逐题记（p.done[题目序号]、p.results），存档 / 读档不受影响。 */
 function groupKey(q) {
@@ -1645,13 +1645,17 @@ function gTap(btn) {
   const p = state.practice;
   if (!p || p.answered) return;
   const div = btn.closest('.gq');
+  const k = $$('.gq').indexOf(div);              // 点的是第几道（电脑上点之前 p.group.cur 可能还是别的题）
   const multi = p.list[+div.dataset.i].type === 'multi';
+  const first = !div.querySelector('.opt.sel');  // 这道题是不是第一次选
   if (multi) btn.classList.toggle('sel');
   else Array.from(div.querySelectorAll('.opt')).forEach(b => b.classList.toggle('sel', b === btn));
   const picked = groupLeft();
-  if (multi) return;
+  // 电脑上小题都列在右边，不自动跳（用户：点着点着瞬移到下一题不对），点到哪道哪道就是当前题；
+  // 手机上一次只显示一道：单选第一次选好才跳到下一道没选的，改答案不跳
+  if (gSplit()) { if (p.group.cur !== k) gGo(k, true); return; }
+  if (multi || !first) return;
   // 单选选好了：稍停一下跳到后面第一道还没选的小题（都选完了就停在这里）
-  const k = p.group.cur;
   let nk = -1;
   for (let i = 1; i < picked.length && nk < 0; i++) { const j = (k + i) % picked.length; if (!picked[j]) nk = j; }
   if (nk >= 0) setTimeout(() => { if (state.practice === p && !p.answered && p.group.cur === k) gGo(nk); }, 280);
@@ -1800,8 +1804,8 @@ function optTap(btn) {
   const p = state.practice;
   if (!p) return;
   if (p.answered) {
-    // 只有点绿色的正确答案才进下一题（判完马上就能点，不用等）
-    if (btn.classList.contains('ok')) nextQ();
+    // 只有点绿色的正确答案才进下一题。判完 0.6 秒内不算：双击确认时手快多点了一下，不会连解析都没看就跳到下一题
+    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 600) nextQ();
     return;
   }
   const now = Date.now();
@@ -1871,6 +1875,7 @@ function gradeAndShow(selKeys, replay) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
+  p.gradedAt = Date.now();
   $('.qcard-main').classList.add('answered');
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
