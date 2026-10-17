@@ -557,7 +557,6 @@ body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: var(--top)
   background: var(--layer-1); border-bottom: 1px solid var(--line); font-size: 18px; }
 body.subpage .page-back { display: inline-flex; margin-left: 0; }
 body.subpage .set-page { margin: 0 auto; }
-.page-h .set-backwork { margin-left: auto; height: 34px; padding: 0 14px; font-size: 14px; font-weight: 500; }
 .set-group-t { margin: 22px 4px 8px; font-size: 13px; color: var(--ink-3); }
 .set-page > .set-group-t:first-child { margin-top: 0; }
 .set-list { background: var(--layer-1); border-radius: 12px; overflow: hidden; }
