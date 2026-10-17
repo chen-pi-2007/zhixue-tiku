@@ -31,7 +31,6 @@
   --red: #f63737;
   --red-soft: rgba(246, 55, 55, .1);
   --blue: #007aff;
-  --blue-soft: rgba(0, 122, 255, .1);
   --code-bg: #262626;
   --code-ink: #eff1f6;
   --img-bg: #f4f4f4;
@@ -52,7 +51,6 @@
   --green-soft: rgba(45, 181, 93, .16);
   --red-soft: rgba(246, 55, 55, .15);
   --blue: #3f9cff;
-  --blue-soft: rgba(63, 156, 255, .18);
   --code-bg: #1e1e1e;
   --img-bg: #e6e6e6;
   --pop: 0 6px 20px rgba(0, 0, 0, .5);
@@ -326,15 +324,19 @@ details.material-box[open] summary { margin-bottom: 8px; }
 .opt:disabled { cursor: default; }
 .opt { touch-action: manipulation; }          /* 手机浏览器里双击选项不放大页面 */
 .opt .key { flex: none; width: 22px; color: var(--ink-3); font-weight: 600; }
-/* 选中（还没判）：浅蓝底 + 蓝边，字母变成蓝底白字的圆点。原来只有一圈细边，暗色下几乎看不出来（用户：选了像没选一样）；
-   蓝色和判完的绿（对）、红（错）分得开 */
-.opt.sel { background: var(--blue-soft); border-color: var(--blue); }
-.opt.sel .key { width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; line-height: 22px; text-align: center; }
-.judge-row .opt.sel .key { width: auto; height: auto; margin-top: 0; background: none; color: var(--blue); font-size: inherit; line-height: inherit; }
+/* 选中（还没判）：底色加深、边框加深，字母变成实心圆点（和“选中胶囊”一样用 --fill 深色实底，不另加颜色）。
+   原来只有一圈细边，暗色下像没选（用户）；试过蓝色，用户说丑。判完后圆点跟着变绿 / 红：圆点 = 你选的那个 */
+.opt.sel { background: var(--layer-3); border-color: var(--ink-3); }
+.opt.sel .key { width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; background: var(--fill); color: var(--fill-ink); font-size: 13px; line-height: 22px; text-align: center; }
+.judge-row .opt.sel .key { width: auto; height: auto; margin-top: 0; background: none; color: var(--ink); font-size: inherit; line-height: inherit; }
 .opt.ok { background: var(--green-soft); border-color: var(--green); }
 .opt.ok .key { color: var(--green); }
 .opt.bad { background: var(--red-soft); border-color: var(--red); }
 .opt.bad .key { color: var(--red); }
+.opt.ok.sel .key { background: var(--green); color: #fff; }
+.opt.bad.sel .key { background: var(--red); color: #fff; }
+.judge-row .opt.ok.sel .key { background: none; color: var(--green); }
+.judge-row .opt.bad.sel .key { background: none; color: var(--red); }
 .judge-row { display: flex; gap: 10px; }
 .judge-row .opt { flex: 1; justify-content: center; font-weight: 600; }
 .judge-row .opt .key { width: auto; }
@@ -629,7 +631,7 @@ input.switch:checked::before { transform: translateX(18px); }
 .gq-tab { flex: none; min-width: 40px; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: var(--layer-2);
   color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
 .gq-tab:hover { background: var(--layer-3); }
-.gq-tab.picked { background: var(--blue); color: #fff; }     /* 已选（还没判）：和选中的选项一样用蓝色，绿色留给判完答对 */
+.gq-tab.picked { background: var(--fill); color: var(--fill-ink); }     /* 已选（还没判）：和选中选项的圆点一样深色实底，绿 / 红留给判完的对 / 错 */
 .gq-tab.ok { background: var(--green-soft); border-color: var(--green); color: var(--green); }
 .gq-tab.bad { background: var(--red-soft); border-color: var(--red); color: var(--red); }
 .gq-tab.cur { border-color: var(--ink); font-weight: 600; }

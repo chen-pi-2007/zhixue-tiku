@@ -2544,7 +2544,7 @@ function rcQuizView(g) {
   const judge = q.type === 'judge';
   const btn = (o, i) => {
     let cls = 'opt';
-    if (st) cls += ans.indexOf(o[0]) >= 0 ? ' ok' : sel.indexOf(o[0]) >= 0 ? ' bad' : '';
+    if (st) cls += (ans.indexOf(o[0]) >= 0 ? ' ok' : sel.indexOf(o[0]) >= 0 ? ' bad' : '') + (sel.indexOf(o[0]) >= 0 ? ' sel' : '');   // sel：圆点标出你选的
     return '<button class="' + cls + '" data-k="' + esc(o[0]) + '"' + (st ? ' disabled' : '') + ' onclick="rcQuizPick(this)">' +
       '<span class="key">' + (judge ? (o[0] === '对' ? '✓' : '✗') : esc(o[0])) + '</span>' +
       '<span>' + (judge ? esc(o[1]) : rich(o[1]) + optCn(q, i)) + '</span></button>';
