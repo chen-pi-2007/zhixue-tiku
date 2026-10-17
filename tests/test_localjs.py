@@ -121,9 +121,9 @@ GROUP_JS = r'''
 const SELF_TYPES = ['qa', 'dictation', 'essay', 'blank', 'solution'];
 eval(require('fs').readFileSync(process.argv[2], 'utf8'));
 const q = (id, mat) => ({ id: id, paper_id: 1, qno: id, type: 'single', material: mat || '' });
-// 复习：最后一篇阅读（3、4、5）做错了 4、5，追加到末尾再来一次
-const p = { list: [q(1), q(2), q(3, 'M'), q(4, 'M'), q(5, 'M')], firstTotal: 5 };
-p.list.push(p.list[3], p.list[4]);
+// 最后一篇阅读（3、4、5）做错了 4、5，复制一份（extra）放到后面再来一次
+const p = { list: [q(1), q(2), q(3, 'M'), q(4, 'M'), q(5, 'M')] };
+p.list.push(Object.assign({}, p.list[3], { extra: 'again' }), Object.assign({}, p.list[4], { extra: 'again' }));
 const units = [];
 for (let i = 0; i < p.list.length; i = unitEnd(p, i)) units.push([i, unitEnd(p, i)]);
 p.idx = 5;

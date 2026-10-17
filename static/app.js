@@ -1172,10 +1172,18 @@ async function startPractice(opts) {
     toast(/^wrong/.test(opts.scope) ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
     return;
   }
-  const list = sortUnits(opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items);
+  let list = sortUnits(opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items);
+  let olds = [];
+  if (mixOldOn() && ['all', 'new'].indexOf(opts.scope || 'all') >= 0) {
+    const tmp = { list: list }, starts = [];
+    for (let i = 0; i < list.length; i = unitEnd(tmp, i)) starts.push(i);
+    olds = await oldWrongs(opts.subject || list[0].subject, list, Math.min(OLD_MAX, Math.floor(starts.length / OLD_EVERY)), typeOf(opts.type));
+    list = spreadIn(list, starts, olds.map(q => extraCopy(q, 'old')));
+  }
   beginPractice(list, opts.title || '练习', 'practice');
   // 除了全部乱序（选项每次重新打乱），平时的练习都能手动存档；模拟考试另有自己的进度保存
   if (!opts.shuffleOpts) allowSave(opts, opts.title);
+  if (olds.length) toast('穿插了 ' + olds.length + ' 道以前错过的题，选项已打乱');
   if (opts.scope === 'wrongmix') {
     const w = d.items.filter(q => q.in_wrong).length;
     const back = d.items.filter(q => !q.in_wrong && q.wrong_count).length;
@@ -1194,7 +1202,7 @@ function allowSave(src, title) {
 
 function beginPractice(list, title, mode) {
   state.practice = { list: list, idx: 0, correct: 0, answered: false, results: [], title: title,
-                     mode: mode, requeued: {}, firstTotal: list.length,
+                     mode: mode, requeued: {},
                      done: {} };          // 题目序号 -> 当时的作答（选项字母数组，或自评 {self: true/false}），回看上一题用
   if (location.hash === '#/practice') route();
   else location.hash = '#/practice';
@@ -1253,6 +1261,47 @@ function shuffleQuestion(q) {
   if (q.option_notes) c.option_notes = perm.map(j => q.option_notes[j]);
   return c;
 }
+
+/* ---- 错题穿插（用户要求：做错的题过几题再蹦出来，以前高频错的题也穿插进来，选项重新打乱，加深记忆）----
+   做题：做错的（单题、整篇里的小题）隔 AGAIN_GAP 题（篇）再出一次，一轮里同一题最多再出 AGAIN_MAX 次；
+         开始整卷 / 题型练习时，每 OLD_EVERY 篇穿插一道同科（题型练习是同题型）以前错过的题。
+   背题：点「没记住」的单题隔几张以「小测」再出（选项乱序，要自己选，选错还会再出）；同样按比例穿插以前错过的题做小测。
+   以前错过的题：错题本里的在前，其次错的次数多的。穿插进来的是复制的一份（extra: 'again' 刚才错的 / 'old' 以前错的），
+   作答照常记进度和错题本；不进存档，“再做一遍”也不带。设置「做题」里可以分别关掉（localStorage quiz.again / quiz.mixold，默认开）。 */
+const AGAIN_GAP = 4, AGAIN_MAX = 2;
+const OLD_EVERY = 5, OLD_MAX = 8;
+function againOn() { return store.get('quiz.again') !== false; }
+function mixOldOn() { return store.get('quiz.mixold') !== false; }
+function extraCopy(q, kind) { return Object.assign({}, shuffleQuestion(q), { extra: kind }); }
+function extraBadge(q) {
+  return '<span class="rec-badge bad">' + (q.extra === 'old' ? '以前错过' + (q.wrong_count ? ' ' + q.wrong_count + ' 次' : '') + '，再练一次' : '刚才做错，再来一次') +
+    (q.shuffled ? ' · 选项已打乱' : '') + '</span>';
+}
+const baseKey = q => q.same_as || q.key;      // 学习通卷的题和原题共用做题进度，算同一道
+// 同科以前错过的题（错题本里的在前，其次错的次数多的），去掉这一轮里已经有的；拿不到就算了，不影响开始练习
+async function oldWrongs(subject, have, n, pred) {
+  if (!subject || n <= 0) return [];
+  let d;
+  try { d = await api('/api/practice?scope=all&order=seq&subject=' + encodeURIComponent(subject)); } catch (e) { return []; }
+  const seen = {};
+  have.forEach(q => { seen[baseKey(q)] = 1; });
+  const c = d.items.filter(q => q.answer && (q.in_wrong || q.wrong_count >= 2) && SELF_TYPES.indexOf(q.type) < 0 &&
+                                (!pred || pred(q)) && !seen[baseKey(q)] && (seen[baseKey(q)] = 1));
+  const rnd = {};
+  c.forEach(q => { rnd[q.id] = Math.random(); });
+  c.sort((a, b) => (b.in_wrong - a.in_wrong) || (b.wrong_count - a.wrong_count) || (rnd[a.id] - rnd[b.id]));
+  return c.slice(0, n);
+}
+// 把 extras 均匀插进 arr：starts 是能插的位置（篇首），第 k 道插在第 round(k·U/(m+1)) 个位置前
+function spreadIn(arr, starts, extras) {
+  const out = arr.slice(), U = starts.length, m = extras.length;
+  for (let k = m; k >= 1; k--) {                 // 从后往前插，前面的位置不受影响
+    const j = Math.round(k * U / (m + 1));
+    out.splice(j < U ? starts[j] : arr.length, 0, extras[k - 1]);
+  }
+  return out;
+}
+const typeOf = t => q => !t || q.cat === t || q.type === t;
 
 function openPaperSheet(pid, name, pkey) { openModeSheet(pkey ? { paper_id: pid, paper_key: pkey } : { paper_id: pid }, name); }
 
@@ -1315,11 +1364,18 @@ async function openModeSheet(src, name) {
 
 // 当前这道已经答完就存“做完这道”，下次从下一道开始。
 // 题目记 key（<卷子key>#<序号>，v: 2）：存档同步到别的设备时题目 id 可能不一样，key 是一样的
+// 穿插进来的题（extra）不进存档：读档按存下的题目还原，穿插的下次重新安排
 function snapshot(p) {
-  const idx = p.answered ? unitEnd(p, p.idx) : p.idx;
+  const at = p.answered ? unitEnd(p, p.idx) : p.idx;
+  const keep = [], map = {}, done = {};
+  p.list.forEach((q, i) => { if (!q.extra) { map[i] = keep.length; keep.push(q); } });
+  let idx = keep.length - 1;
+  for (let i = at; i < p.list.length; i++) if (i in map) { idx = map[i]; break; }
+  Object.keys(p.done).forEach(i => { if (i in map) done[map[i]] = p.done[i]; });
+  const rs = p.results.filter(r => !r.q.extra);
   return {
-    v: 2, ids: p.list.map(q => q.key), idx: Math.min(idx, p.list.length - 1), done: p.done,
-    results: p.results.map(r => [r.q.key, r.correct]), correct: p.correct,
+    v: 2, ids: keep.map(q => q.key), idx: Math.max(idx, 0), done: done,
+    results: rs.map(r => [r.q.key, r.correct]), correct: rs.filter(r => r.correct).length,
     title: p.title, opts: p.saveOpts, auto: p.autoKey || null, t: nowText(),
   };
 }
@@ -1383,7 +1439,7 @@ function nowText() {
 function retryWrongOnly() {
   const p = state.practice;
   const seen = {};
-  const wrongs = p.results.filter(r => !r.correct && !seen[r.q.id] && (seen[r.q.id] = 1)).map(r => r.q);
+  const wrongs = p.results.filter(r => !r.correct && !seen[r.q.id] && (seen[r.q.id] = 1)).map(r => Object.assign({}, r.q, { extra: undefined }));
   if (!wrongs.length) { toast('这次没有错题'); return; }
   beginPractice(wrongs, p.title + '·错题重练', 'practice');
 }
@@ -1413,10 +1469,10 @@ function statsHtml(p) {
 function groupKey(q) {
   return q && q.material && q.material.trim() && SELF_TYPES.indexOf(q.type) < 0 ? q.paper_id + '\u0001' + q.material : null;
 }
-// 复习里做错、追加到末尾“再来一次”的题（下标 >= firstTotal）自成一篇，不和紧挨着的原篇连在一起
+// 穿插进来的题（extra：做错了再来一次 / 以前错过的）不和紧挨着的原篇连在一起；穿插进来的同一篇几道小题之间照样连成一篇
 function sameUnit(p, i, j) {
   const k = groupKey(p.list[i]);
-  return !!k && groupKey(p.list[j]) === k && (i >= p.firstTotal) === (j >= p.firstTotal);
+  return !!k && groupKey(p.list[j]) === k && !p.list[i].extra === !p.list[j].extra;
 }
 function unitEnd(p, i) {
   let j = i + 1;
@@ -1469,7 +1525,7 @@ function renderGroup() {
       '<div class="qhead">' +
         '<span class="tag t-' + q0.type + '">' + (TYPE_NAME[q0.cat] || TYPE_NAME[q0.type]) + '</span>' +
         '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题 · 第 ' + no[0] + ' / ' + no[1] + ' 篇</span>' +
-        (s >= p.firstTotal ? '<span class="rec-badge bad">刚才做错，再来一次</span>' : '') +
+        (q0.extra ? extraBadge(q0) : '') +
         '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
       '</div>' +
       '<div class="g-wrap">' +
@@ -1615,6 +1671,7 @@ function gradeGroup(replay) {
   p.answered = true;
   $('.qcard-main').classList.add('answered');
   let right = 0, firstBad = -1;
+  const bad = [];
   divs.forEach((div, k) => {
     const i = +div.dataset.i, q = p.list[i], sel = p.done[i];
     const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
@@ -1622,6 +1679,7 @@ function gradeGroup(replay) {
     if (ok) right++;
     else if (firstBad < 0) firstBad = k;
     if (!replay) recordResult(q, ok, true);
+    if (!ok) bad.push(q);
     Array.from(div.querySelectorAll('.opt')).forEach(b => {
       b.disabled = true;
       if (ans.indexOf(b.dataset.k) >= 0) b.classList.add('ok');
@@ -1636,6 +1694,7 @@ function gradeGroup(replay) {
       evidenceBox(q) + pointBox(q) + phraseBox(q) + '</div>';
   });
   if (!replay) {
+    requeueWrong(bad);
     autoSave();
     toast('本篇 ' + n + ' 题，答对 ' + right + ' 题', right === n ? 'good' : '');
   }
@@ -1667,7 +1726,6 @@ function renderQ() {
   if (p.shownIdx !== p.idx) { p.shownIdx = p.idx; p.shownAt = Date.now(); }   // 换到新题的时间（optTap 防误触用）
   const opts = optionList(q);
   const pct = Math.round(100 * p.idx / p.list.length);
-  const again = p.idx >= p.firstTotal;
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
@@ -1679,7 +1737,7 @@ function renderQ() {
       '<div class="qhead">' +
         '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
-        (again ? '<span class="rec-badge bad">刚才做错，再来一次</span>' : recBadge(q)) +
+        (q.extra ? extraBadge(q) : recBadge(q)) +
         '<span class="spacer"></span>' + cnBtn(q) +
       '</div>' +
       materialBox(q) +
@@ -1777,11 +1835,7 @@ function recordResult(q, ok, quiet) {
   if (ok) p.correct++;
   const st = $('#pstats');
   if (st) st.innerHTML = statsHtml(p);
-  // 复习模式:做错的题在本轮末尾再出现一次
-  if (!ok && p.mode === 'review' && !p.requeued[q.id]) {
-    p.requeued[q.id] = 1;
-    p.list.push(q);
-  }
+  if (!ok && !quiet) requeueWrong([q]);           // 整篇的小题由 gradeGroup 一起排
   api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: p.mode } })
     .then(d => {
       if (quiet) return;
@@ -1789,6 +1843,20 @@ function recordResult(q, ok, quiet) {
       else if (d.event === 'entered') toast('已加入错题本');
     })
     .catch(e => toast('记录失败：' + e.message, 'bad'));
+}
+
+// 做错的题过 AGAIN_GAP 题（篇）再出一次，选项重新打乱；整篇里错的几道小题放在一起，带着材料成一篇。
+// 关掉「做错的题稍后再出」以后，只有今日复习还像以前一样再来一次
+function requeueWrong(qs) {
+  const p = state.practice;
+  if (!p || !qs.length || (!againOn() && p.mode !== 'review')) return;
+  const max = againOn() ? AGAIN_MAX : 1;
+  const go = qs.filter(q => (p.requeued[q.id] || 0) < max);
+  if (!go.length) return;
+  go.forEach(q => { p.requeued[q.id] = (p.requeued[q.id] || 0) + 1; });
+  let at = unitEnd(p, p.idx);
+  for (let k = 0; k < AGAIN_GAP && at < p.list.length; k++) at = unitEnd(p, at);
+  p.list.splice.apply(p.list, [at, 0].concat(go.map(q => extraCopy(q, 'again'))));
 }
 
 function gradeAndShow(selKeys, replay) {
@@ -1913,7 +1981,7 @@ function renderFinish() {
       '<h2>' + esc(p.title) + ' 完成!</h2>' +
       '<div class="muted">共 ' + total + ' 题 · 答对 <b style="color:var(--green)">' + right + '</b> · 答错 <b style="color:var(--red)">' + wrongs.length + '</b><br>' + comment + '</div>' +
       '<div class="acts">' +
-        (p.mode === 'practice' ? '<button class="btn ghost" onclick="beginPractice(state.practice.list.slice(0,state.practice.firstTotal),state.practice.title,\'practice\')">再做一遍</button>' : '') +
+        (p.mode === 'practice' ? '<button class="btn ghost" onclick="beginPractice(state.practice.list.filter(q=>!q.extra),state.practice.title,\'practice\')">再做一遍</button>' : '') +
         (wrongs.length ? '<button class="btn danger" onclick="retryWrongOnly()">只练本次错题(' + wrongs.length + ')</button>' : '') +
         '<a class="btn ghost" href="#/wrong">查看错题本</a>' +
         '<a class="btn" href="#/home">返回首页</a>' +
@@ -2307,8 +2375,28 @@ async function startRecite(src, name, order) {
     if (q.material && last && last[0].material === q.material && last[0].paper_id === q.paper_id) last.push(q);
     else cards.push([q]);
   });
-  state.recite = { title: name + '·背题', cards: cards, idx: 0, shown: false, res: {}, src: src, order: order };
+  // 每 OLD_EVERY 张穿插一道以前错过的题做小测
+  let all = cards, olds = [];
+  if (mixOldOn()) {
+    olds = await oldWrongs(src.subject || items[0].subject, items, Math.min(OLD_MAX, Math.floor(cards.length / OLD_EVERY)),
+                           q => rcQuizable(q) && typeOf(src.type)(q));
+    all = spreadIn(cards, cards.map((_, i) => i), olds.map(q => rcQuizCard(q, 'old')));
+  }
+  state.recite = { title: name + '·背题', cards: all, idx: 0, shown: false, res: {}, src: src, order: order, quiz: {}, again: {} };
   if (location.hash === '#/recite') route(); else location.hash = '#/recite';
+  if (olds.length) setTimeout(() => toast('穿插了 ' + olds.length + ' 道以前错过的题做小测，选项已打乱'), 300);
+}
+
+function rcHead(r) {
+  return '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(r.title) + '</span>' +
+      '<span class="crumb-acts"><a href="javascript:void(0)" onclick="rcToggleHide()">' + (rcHide() ? '答案：先盖住' : '答案：直接显示') + '</a>' +
+      '<a class="crumb-exit" href="javascript:void(0)" onclick="rcQuit()">退出背题</a></span></div>' +
+    '<div class="pbar-wrap"><div class="pbar"><i style="width:' + Math.round(100 * r.idx / r.cards.length) + '%"></i></div></div>';
+}
+function rcStats(r) {
+  const vals = Object.values(r.res), qz = Object.values(r.quiz || {});
+  return '<div class="msg-bar">已背 ' + vals.length + ' 题 · 记住 ' + vals.filter(Boolean).length + ' · 没记住 ' + vals.filter(x => !x).length +
+    (qz.length ? ' · 小测 ' + qz.filter(x => x.ok).length + '/' + qz.length : '') + '</div>';
 }
 
 function viewRecite() {
@@ -2316,16 +2404,12 @@ function viewRecite() {
   if (!r) { location.hash = '#/home'; return; }
   if (r.idx >= r.cards.length) return rcFinish();
   const g = r.cards[r.idx], q0 = g[0];
+  if (g.quiz) return rcQuizView(g);
   const hide = rcHide(), open = !hide || r.shown;
   const cat = TYPE_NAME[q0.cat] || TYPE_NAME[q0.type] || '';
-  const done = Object.keys(r.res).length;
   // 点「上一张」回看已经记过的卡片：只看不再记（和练习回看上一题不再记分一样）
   const marked = g.every(q => q.id in r.res) ? (g.every(q => r.res[q.id]) ? 'ok' : 'bad') : '';
-  app.innerHTML =
-    '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(r.title) + '</span>' +
-      '<span class="crumb-acts"><a href="javascript:void(0)" onclick="rcToggleHide()">' + (hide ? '答案：先盖住' : '答案：直接显示') + '</a>' +
-      '<a class="crumb-exit" href="javascript:void(0)" onclick="rcQuit()">退出背题</a></span></div>' +
-    '<div class="pbar-wrap"><div class="pbar"><i style="width:' + Math.round(100 * r.idx / r.cards.length) + '%"></i></div></div>' +
+  app.innerHTML = rcHead(r) +
     '<div class="card qcard-main rc-card' + (open ? ' rc-open' : ' rc-closed') + '"' + (open ? '' : ' onclick="rcReveal()"') + '>' +
       '<div class="qhead"><span class="tag t-' + q0.type + '">' + esc(cat) + '</span>' +
         '<span class="qsrc">' + esc(q0.paper_name) + (g.length > 1 ? ' 第' + g[0].qno + '–' + g[g.length - 1].qno + '题' : ' 第' + q0.qno + '题') + '</span>' +
@@ -2340,7 +2424,7 @@ function viewRecite() {
         : marked ? '<button class="btn" onclick="rcMarkCard()">下一张</button>'
         : '<button class="btn danger" onclick="rcMarkCard(false)">没记住</button><button class="btn green" onclick="rcMarkCard(true)">记住了</button>') +
     '</div>' +
-    '<div class="msg-bar">已背 ' + done + ' 题 · 记住 ' + Object.values(r.res).filter(Boolean).length + ' · 没记住 ' + Object.values(r.res).filter(x => !x).length + '</div>' +
+    rcStats(r) +
     (TOUCH ? '' : '<div class="muted kbd-tip rc-kbd">回车或 →：看答案 / 记住了，下一张　N 或 0：没记住　←：上一张</div>');
   if (open) g.forEach(q => markEvidence(q));
   applyCn();
@@ -2416,15 +2500,101 @@ function rcQuit() { state.recite = null; location.hash = '#/home'; }
 function rcMarkCard(ok) {
   const r = state.recite;
   const g = r.cards[r.idx];
-  g.forEach(q => {
+  if (!g.quiz) g.forEach(q => {
     if (q.id in r.res || ok === undefined) return;    // 这张已经记过（回看上一张）：不重复记
     r.res[q.id] = ok;
     api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: 'recite' } }).catch(e => toast('记录失败：' + e.message, 'bad'));
+    if (!ok && g.length === 1 && rcQuizable(q)) rcRequeue(q);    // 没记住的单题过几张考一次
   });
   r.idx++;
   r.shown = false;
   viewRecite();
   window.scrollTo(0, 0);
+}
+
+/* ---- 背题里的小测：没记住的单题、以前错过的题，选项打乱，自己选一次 ---- */
+function rcQuizable(q) { return ['single', 'multi', 'judge'].indexOf(q.type) >= 0 && optionList(q).length >= 2; }
+function rcQuizCard(q, kind) { const c = [extraCopy(q, kind)]; c.quiz = kind; return c; }
+function rcRequeue(q) {
+  const r = state.recite;
+  if (!againOn()) return false;
+  const n = r.again[q.id] || 0;
+  if (n >= AGAIN_MAX) return false;
+  r.again[q.id] = n + 1;
+  r.cards.splice(Math.min(r.idx + 1 + AGAIN_GAP, r.cards.length), 0, rcQuizCard(q, 'again'));
+  return true;
+}
+
+function rcQuizView(g) {
+  const r = state.recite, q = g[0], st = r.quiz[r.idx];
+  const sel = st ? st.sel : [];
+  const ans = q.type === 'multi' ? q.answer.split('') : [q.answer];
+  const judge = q.type === 'judge';
+  const btn = (o, i) => {
+    let cls = 'opt';
+    if (st) cls += ans.indexOf(o[0]) >= 0 ? ' ok' : sel.indexOf(o[0]) >= 0 ? ' bad' : '';
+    return '<button class="' + cls + '" data-k="' + esc(o[0]) + '"' + (st ? ' disabled' : '') + ' onclick="rcQuizPick(this)">' +
+      '<span class="key">' + (judge ? (o[0] === '对' ? '✓' : '✗') : esc(o[0])) + '</span>' +
+      '<span>' + (judge ? esc(o[1]) : rich(o[1]) + optCn(q, i)) + '</span></button>';
+  };
+  app.innerHTML = rcHead(r) +
+    '<div class="card qcard-main rc-quiz' + (st ? ' answered' : '') + '">' +
+      '<div class="qhead"><span class="tag t-' + q.type + '">小测</span>' +
+        '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' + extraBadge(q) +
+        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q) + '</div>' +
+      materialBox(q, true) +
+      '<div class="stem">' + rich(q.stem) + (q.type === 'multi' ? '（多选）' : '') + '</div>' + stemCn(q) +
+      '<div class="' + (judge ? 'judge-row' : 'opts') + ' rcq-opts">' + optionList(q).map(btn).join('') + '</div>' +
+      (st ? '<div class="feedback ' + (st.ok ? 'good' : 'bad') + '">' +
+        '<div class="ans-line">' + (st.ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
+        (st.ok ? rightBox(q) : whyBox(q, sel)) + evidenceBox(q) + pointBox(q) + phraseBox(q) + '</div>' : '') +
+    '</div>' +
+    '<div class="qactions rc-acts">' +
+      (r.idx > 0 ? '<button class="btn ghost" onclick="rcPrev()">上一张</button>' : '') +
+      '<span class="muted">' + (!st ? (q.type === 'multi' ? '选好了点「确认」' : '选出答案') : st.ok ? '答对了' : st.again ? '答错了，过几张还会再考一次' : '答错了，已记进错题本') + '</span><div class="spacer"></div>' +
+      (st ? '<button class="btn" onclick="rcMarkCard()">下一张</button>'
+        : q.type === 'multi' ? '<button class="btn" id="rcq-ok" disabled onclick="rcQuizConfirm()">确认</button>' : '') +
+    '</div>' + rcStats(r) +
+    (TOUCH ? '' : '<div class="muted kbd-tip rc-kbd">1–4 或 A–D：选　回车或 →：' + (q.type === 'multi' ? '确认 / ' : '') + '下一张　←：上一张</div>');
+  if (st) { markEvidence(q); cnAfterAnswer(); }
+  applyCn();
+}
+function rcQuizPick(btn) {
+  const r = state.recite, q = r.cards[r.idx][0];
+  if (r.quiz[r.idx]) return;
+  if (q.type === 'multi') {
+    btn.classList.toggle('sel');
+    const ok = $('#rcq-ok');
+    if (ok) ok.disabled = !$$('.rcq-opts .opt.sel').length;
+    return;
+  }
+  rcQuizGrade([btn.dataset.k]);
+}
+function rcQuizConfirm() {
+  const sel = $$('.rcq-opts .opt.sel').map(b => b.dataset.k);
+  if (sel.length) rcQuizGrade(sel);
+}
+function rcQuizGrade(sel) {
+  const r = state.recite, q = r.cards[r.idx][0];
+  const ok = q.type === 'multi' ? sel.slice().sort().join('') === q.answer.split('').sort().join('') : sel[0] === q.answer;
+  r.quiz[r.idx] = { sel: sel, ok: ok, again: !ok && rcRequeue(q) };
+  api('/api/record', { method: 'POST', body: { question_id: q.id, correct: ok, mode: 'recite' } }).catch(e => toast('记录失败：' + e.message, 'bad'));
+  viewRecite();
+}
+// 小测的键盘：1–6 / A–F 选，回车或 → 确认（多选）/ 下一张，← 上一张
+function rcQuizKey(e, g) {
+  const r = state.recite, st = r.quiz[r.idx];
+  if (e.key === 'ArrowLeft') { e.preventDefault(); return rcPrev(); }
+  if (e.key === 'Enter' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (st) rcMarkCard();
+    else if (g[0].type === 'multi') rcQuizConfirm();
+    return;
+  }
+  if (st) return;
+  const i = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 }[e.key.toLowerCase()];
+  const b = i === undefined ? null : $$('.rcq-opts .opt')[i];
+  if (b) { e.preventDefault(); rcQuizPick(b); }
 }
 
 // 背题的键盘（电脑上用）：回车 / → 盖着时看答案，看过了 = 记住了、下一张（这张记过了就只翻到下一张）；N 或 0 = 没记住；← 上一张。
@@ -2435,6 +2605,7 @@ function reciteKey(e) {
   if (e.ctrlKey || e.altKey || e.metaKey) return;
   const t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
   if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+  if (r.cards[r.idx].quiz) return rcQuizKey(e, r.cards[r.idx]);
   const open = !rcHide() || r.shown;
   const marked = r.cards[r.idx].every(q => q.id in r.res);
   if (e.key === 'Enter' || e.key === 'ArrowRight') {
@@ -2455,16 +2626,17 @@ function rcFinish() {
   const vals = Object.values(r.res), ok = vals.filter(Boolean).length;
   const missIds = Object.keys(r.res).filter(k => !r.res[k]).map(Number);
   app.innerHTML = '<div class="card result-card"><h2 style="margin:0 0 10px">背完了</h2>' +
-    '<div class="msg-bar">共 ' + vals.length + ' 题 · 记住 ' + ok + ' · 没记住 ' + (vals.length - ok) + '</div>' +
-    '<div class="muted" style="margin:8px 0 14px">没记住的已经放进复习和错题本，过几天会再出现。</div>' +
+    '<div class="msg-bar">共 ' + vals.length + ' 题 · 记住 ' + ok + ' · 没记住 ' + (vals.length - ok) +
+      (Object.keys(r.quiz || {}).length ? ' · 小测答对 ' + Object.values(r.quiz).filter(x => x.ok).length + '/' + Object.keys(r.quiz).length : '') + '</div>' +
+    '<div class="muted" style="margin:8px 0 14px">没记住的、小测答错的已经放进复习和错题本，过几天会再出现。</div>' +
     '<div class="qactions">' + (missIds.length ? '<button class="btn" onclick="rcAgain()">没记住的再背一遍</button>' : '') +
     '<button class="btn ghost" onclick="rcQuit()">回首页</button></div></div>';
 }
 
 function rcAgain() {
   const r = state.recite;
-  const miss = r.cards.filter(g => g.some(q => r.res[q.id] === false));
-  state.recite = { title: r.title.replace(/·再背$/, '') + '·再背', cards: miss, idx: 0, shown: false, res: {}, src: r.src, order: r.order };
+  const miss = r.cards.filter(g => !g.quiz && g.some(q => r.res[q.id] === false));
+  state.recite = { title: r.title.replace(/·再背$/, '') + '·再背', cards: miss, idx: 0, shown: false, res: {}, src: r.src, order: r.order, quiz: {}, again: {} };
   viewRecite();
 }
 
@@ -2515,8 +2687,14 @@ async function viewSettings() {
     '<div class="set-group-t">做题</div><div class="set-list">' +
       '<label class="set-item"><span class="set-main">答题后自动显示翻译</span>' +
         '<input type="checkbox" class="switch" id="cn-after"' + (cnAfterOn() ? ' checked' : '') + '></label>' +
+      '<label class="set-item"><span class="set-main">做错的题过几题再考一次</span>' +
+        '<input type="checkbox" class="switch" id="again-on"' + (againOn() ? ' checked' : '') + '></label>' +
+      '<label class="set-item"><span class="set-main">穿插以前错过的题</span>' +
+        '<input type="checkbox" class="switch" id="mixold-on"' + (mixOldOn() ? ' checked' : '') + '></label>' +
     '</div>' +
-    '<div class="set-foot">英语题答完（单题确认答案、整篇提交）后，这道题的中文翻译自动显示出来，不用再点「译」；作答前还是不显示。</div>' +
+    '<div class="set-foot">翻译：英语题答完（单题确认答案、整篇提交）后，中文翻译自动显示出来，作答前还是不显示。<br>' +
+      '做错的题：做题时做错、背题时点「没记住」的题，隔几题会再出一次，选项重新打乱；再错还会再出。<br>' +
+      '以前错过的题：整卷、题型练习和背题时，每隔几题穿插一道同科以前错过的题（错题本里的、错得多的优先），选项打乱。</div>' +
 
     '<div class="set-group-t">更新</div><div class="set-list">' +
       item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
@@ -2564,6 +2742,11 @@ async function viewSettings() {
     else if (!upd.busy && !upd.html) updShow('<div class="upd-box"><b>后台程序的更新还没生效</b><div class="muted">重启题库后生效，几秒钟，做题记录不受影响。</div>' +
       '<button class="btn" onclick="restartApp()">现在重启</button></div>');
   }
+  [['#again-on', 'quiz.again', '做错的题过几题会再考一次', '做错的题不再穿插（今日复习照旧在后面再来一次）'],
+   ['#mixold-on', 'quiz.mixold', '练习和背题时会穿插以前错过的题', '不再穿插以前错过的题']].forEach(([id, key, on, off]) => {
+    const el = $(id);
+    if (el) el.addEventListener('change', () => { store.set(key, el.checked); toast(el.checked ? '已打开：' + on : '已关闭：' + off); });
+  });
   const ca = $('#cn-after');
   if (ca) ca.addEventListener('change', () => {
     store.set('quiz.cnafter', ca.checked);
