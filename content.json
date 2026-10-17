@@ -1,6 +1,6 @@
 {
- "content_version": 64,
- "created": "2026-10-17 16:24:28",
+ "content_version": 65,
+ "created": "2026-10-17 16:50:35",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "921611672e568d6729a2b71d6b33be1308ffd4a37449b8df31c9a308649e9f55",
-   184604
+   "d4732a31017d17d6aa4ae98609dfa5595f414030a618845c8418ce8ed092c619",
+   185432
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "错题穿插：做错的题过几题再考一次（选项重新打乱），整卷、题型练习和背题时穿插以前错过的题；背题里没记住的题会以小测再出；设置「做题」里可以关掉",
+ "notes": "做错的题不会紧接着再出：隔随机 3～6 题再出，中间至少隔 2 题，后面不够就不再出",
  "py_shell_api": 1,
- "tag": "content-64"
+ "tag": "content-65"
 }

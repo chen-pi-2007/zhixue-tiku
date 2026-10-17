@@ -1263,12 +1263,15 @@ function shuffleQuestion(q) {
 }
 
 /* ---- 错题穿插（用户要求：做错的题过几题再蹦出来，以前高频错的题也穿插进来，选项重新打乱，加深记忆）----
-   做题：做错的（单题、整篇里的小题）隔 AGAIN_GAP 题（篇）再出一次，一轮里同一题最多再出 AGAIN_MAX 次；
+   做题：做错的（单题、整篇里的小题）隔随机 AGAIN_GAP_MIN～AGAIN_GAP_MAX 题（篇）再出一次（用户要求：绝不能紧接着就出；
+         后面剩下不到 AGAIN_MIN_BETWEEN 题就不再出，这题已进错题本，以后复习、背题还会排出来），一轮里同一题最多再出 AGAIN_MAX 次；
          开始整卷 / 题型练习时，每 OLD_EVERY 篇穿插一道同科（题型练习是同题型）以前错过的题。
    背题：点「没记住」的单题隔几张以「小测」再出（选项乱序，要自己选，选错还会再出）；同样按比例穿插以前错过的题做小测。
    以前错过的题：错题本里的在前，其次错的次数多的。穿插进来的是复制的一份（extra: 'again' 刚才错的 / 'old' 以前错的），
    作答照常记进度和错题本；不进存档，“再做一遍”也不带。设置「做题」里可以分别关掉（localStorage quiz.again / quiz.mixold，默认开）。 */
-const AGAIN_GAP = 4, AGAIN_MAX = 2;
+const AGAIN_GAP_MIN = 3, AGAIN_GAP_MAX = 6, AGAIN_MIN_BETWEEN = 2, AGAIN_MAX = 2;
+// 这一次隔几题再出：AGAIN_GAP_MIN～AGAIN_GAP_MAX 随机，免得记成“隔几题就是它”
+function againGap() { return AGAIN_GAP_MIN + Math.floor(Math.random() * (AGAIN_GAP_MAX - AGAIN_GAP_MIN + 1)); }
 const OLD_EVERY = 5, OLD_MAX = 8;
 function againOn() { return store.get('quiz.again') !== false; }
 function mixOldOn() { return store.get('quiz.mixold') !== false; }
@@ -1845,7 +1848,7 @@ function recordResult(q, ok, quiet) {
     .catch(e => toast('记录失败：' + e.message, 'bad'));
 }
 
-// 做错的题过 AGAIN_GAP 题（篇）再出一次，选项重新打乱；整篇里错的几道小题放在一起，带着材料成一篇。
+// 做错的题过随机 3～6 题（篇）再出一次（至少隔 AGAIN_MIN_BETWEEN 题，不够就不出），选项重新打乱；整篇里错的几道小题放在一起，带着材料成一篇。
 // 关掉「做错的题稍后再出」以后，只有今日复习还像以前一样再来一次
 function requeueWrong(qs) {
   const p = state.practice;
@@ -1853,9 +1856,11 @@ function requeueWrong(qs) {
   const max = againOn() ? AGAIN_MAX : 1;
   const go = qs.filter(q => (p.requeued[q.id] || 0) < max);
   if (!go.length) return;
+  const gap = againGap();
+  let at = unitEnd(p, p.idx), k = 0;
+  while (k < gap && at < p.list.length) { at = unitEnd(p, at); k++; }
+  if (k < AGAIN_MIN_BETWEEN) return;               // 后面剩的题太少，再出就是紧挨着了：不出
   go.forEach(q => { p.requeued[q.id] = (p.requeued[q.id] || 0) + 1; });
-  let at = unitEnd(p, p.idx);
-  for (let k = 0; k < AGAIN_GAP && at < p.list.length; k++) at = unitEnd(p, at);
   p.list.splice.apply(p.list, [at, 0].concat(go.map(q => extraCopy(q, 'again'))));
 }
 
@@ -2520,8 +2525,10 @@ function rcRequeue(q) {
   if (!againOn()) return false;
   const n = r.again[q.id] || 0;
   if (n >= AGAIN_MAX) return false;
+  const left = r.cards.length - r.idx - 1;            // 这张后面还剩几张
+  if (left < AGAIN_MIN_BETWEEN) return false;          // 太少：再出就是紧挨着了，不出
   r.again[q.id] = n + 1;
-  r.cards.splice(Math.min(r.idx + 1 + AGAIN_GAP, r.cards.length), 0, rcQuizCard(q, 'again'));
+  r.cards.splice(r.idx + 1 + Math.min(againGap(), left), 0, rcQuizCard(q, 'again'));
   return true;
 }
 
