@@ -1,6 +1,6 @@
 {
- "content_version": 69,
- "created": "2026-10-17 17:19:50",
+ "content_version": 70,
+ "created": "2026-10-17 17:28:30",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "cc7719b3e4e7cb00f51c0445304d58574f0392a535d6e568c1e8d6f08f13f988",
-   186278
+   "67523b01b6670af9916a2e86f1dd6b753b1136eff05cc3520a9dc096aa375ab1",
+   186765
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "2c3f023353205dc9446dbbcd2b21f2c85530cf82cd5462908de6e5374a464e69",
-   57442
+   "ed1b66920896127e8d9fd4362449454627577295b957be5c36727e1093de1898",
+   58736
   ],
   "static/word.js": [
    "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "选中样式改成软件原本的黑白灰：选中的选项底色加深、字母变成实心圆点，判完后圆点变绿 / 红；已选的题号也是深色实底，不再用蓝色",
+ "notes": "选项并排按最长选项算列宽，文字不再挤成两行；手机上做题、背题的按钮条固定在屏幕底部，下一题按钮位置不再变",
  "py_shell_api": 1,
- "tag": "content-69"
+ "tag": "content-70"
 }

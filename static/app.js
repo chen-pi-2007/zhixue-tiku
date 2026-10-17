@@ -480,6 +480,7 @@ function route() {
   const navOf = { practice: 'home', subject: 'home', recite: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
   document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
+  document.body.classList.toggle('workpage', name === 'practice' || name === 'recite');   // 手机上做题 / 背题页：按钮条固定在屏幕最底下（style.css）
   const ts = $('#top-set');
   if (ts) ts.classList.toggle('active', name === 'settings');
   if (name !== 'exam') stopExamTimer();
@@ -1517,6 +1518,8 @@ function renderGroup() {
   // 选项都很短（完形、补全对话那种几个单词）才排两列；中文一个字按两个英文字符的宽度算，免得中文选项挤成好几行
   const width = t => (t || '').replace(/[^\x00-\xff]/g, 'xx').length;
   const short = q => q.type !== 'judge' && optionList(q).every(o => width(o[1]) <= 20 && !/<img|\\\(|【图/.test(o[1] || ''));
+  // 一列至少要多宽：按最长的选项算（一个宽度单位约 8px，加上字母、内边距），放得下一整行才并排，选项文字不折行（用户：挤成两行很丑）
+  const colW = q => Math.max.apply(null, optionList(q).map(o => width(o[1]))) * 8 + 64;
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
@@ -1548,7 +1551,7 @@ function renderGroup() {
                 ? '<div class="judge-row">' + optionList(q).map(o =>
                   '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + (o[0] === '对' ? '✓' : '✗') + '</span><span>' + esc(o[1]) + '</span></button>').join('') + '</div>'
                 // 选项都很短（完形、补全对话常见）就横着排几列
-                : '<div class="opts' + (short(q) ? ' opts-short' : '') + '">' + optionList(q).map((o, i) =>
+                : '<div class="opts' + (short(q) ? ' opts-short" style="--ow:' + colW(q) + 'px' : '') + '">' + optionList(q).map((o, i) =>
                   '<button class="opt" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span><span>' + rich(o[1]) + optCn(q, i) + '</span></button>').join('') + '</div>') +
               '<div class="gq-fb"></div>' +
             '</div>').join('') + '</div>' +

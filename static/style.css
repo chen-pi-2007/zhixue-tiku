@@ -638,7 +638,7 @@ input.switch:checked::before { transform: translateX(18px); }
 .gq { display: none; }
 .gq.cur { display: block; }
 .gq-pane { touch-action: pan-y; }
-.gq .opts-short { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.gq .opts-short { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--ow, 150px), 1fr)); }   /* --ow：按最长选项算的一列宽，放不下就少排几列 */
 @media (max-width: 760px) {
   .g-mat .g-orig { max-height: 36vh; }
   .g-mat .g-orig-cn { max-height: 26vh; }
@@ -786,4 +786,16 @@ main.page-in { animation: page-in .22s ease-out; }
 .rc-phon .rc-row { padding: 4px 0; }
 .rc-hit .rc-k { font-weight: 600; color: var(--ink); }
 .rc-acts { margin-top: 12px; }
+/* 手机：「上一题 / 确认 / 下一题」这条一直固定在屏幕最底下，题目长短、判没判，按钮都在同一个位置（用户：下一题位置会变，影响手感）；
+   页面底部留出同样高的空位，不挡内容。左边的提示压成一行，放不下用省略号，不把按钮挤到下一行 */
+@media (max-width: 760px) {
+  body.workpage #app { padding-bottom: 76px; }
+  body.workpage #toasts { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }   /* 提示别盖住按钮条 */
+  .qcard-main .qactions, .rc-acts { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; flex-wrap: nowrap; margin: 0;
+    padding: 10px 14px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); background: var(--layer-1); border-top: 1px solid var(--line); box-shadow: 0 -4px 12px rgba(0, 0, 0, .12); }
+  .group-card .qactions { margin: 0; padding-top: 10px; }
+  .qcard-main .qactions > .muted, .rc-acts > .muted { flex: 1 1 auto; min-width: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qcard-main .qactions > .spacer, .rc-acts > .spacer { display: none; }
+  .qcard-main .qactions > .btn, .rc-acts > .btn { flex: none; }
+}
 .rc-kbd { margin-top: 8px; font-size: 12.5px; }
