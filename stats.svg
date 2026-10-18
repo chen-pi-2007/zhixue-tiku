@@ -28,18 +28,18 @@
 <rect class="bg" x="0.5" y="0.5" width="839" height="379" rx="12"/>
 <rect class="accent" x="28" y="28" width="4" height="20" rx="2"/>
 <text class="h" x="42" y="44">智学题库 · 使用情况</text>
-<text class="m" x="812" y="44" text-anchor="end">每天自动更新 · 2026-10-17</text>
+<text class="m" x="812" y="44" text-anchor="end">每天自动更新 · 2026-10-18</text>
 <rect class="tile" x="28.0" y="68" width="250.7" height="96" rx="10"/>
 <text class="k" x="46.0" y="94">安装包下载</text>
 <text x="46.0" y="134"><tspan class="big">57</tspan><tspan class="unit" dx="6">次</tspan></text>
 <text class="m" x="46.0" y="154">电脑版 35 · 手机版 22</text>
 <rect class="tile" x="294.7" y="68" width="250.7" height="96" rx="10"/>
 <text class="k" x="312.7" y="94">近 7 天检查更新</text>
-<text x="312.7" y="134"><tspan class="big">196</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text x="312.7" y="134"><tspan class="big">215</tspan><tspan class="unit" dx="6">次</tspan></text>
 <text class="m" x="312.7" y="154">打开题库会自动检查，一天可能好几次</text>
 <rect class="tile" x="561.3" y="68" width="250.7" height="96" rx="10"/>
 <text class="k" x="579.3" y="94">近 30 天检查更新</text>
-<text x="579.3" y="134"><tspan class="big">243</tspan><tspan class="unit" dx="6">次</tspan></text>
+<text x="579.3" y="134"><tspan class="big">275</tspan><tspan class="unit" dx="6">次</tspan></text>
 <text class="m" x="579.3" y="154">国内线路统计，晚一两天才补上</text>
 <text class="k" x="28" y="200">每天检查更新次数</text>
 <line class="base" x1="58" x2="800" y1="336.0" y2="336.0"/>
@@ -48,14 +48,14 @@
 <text class="ax" x="48" y="279.0" text-anchor="end">50</text>
 <line class="grid" x1="58" x2="800" y1="214.0" y2="214.0"/>
 <text class="ax" x="48" y="218.0" text-anchor="end">100</text>
-<path d="M58.0 333.6 C99.2 333.6 99.2 336.0 140.4 336.0 C181.7 336.0 181.7 281.1 222.9 281.1 C264.1 281.1 264.1 320.1 305.3 320.1 C346.6 320.1 346.6 317.7 387.8 317.7 C429.0 317.7 429.0 328.7 470.2 328.7 C511.4 328.7 511.4 320.1 552.7 320.1 C593.9 320.1 593.9 292.1 635.1 292.1 C676.3 292.1 676.3 229.9 717.6 229.9 C758.8 229.9 758.8 304.3 800.0 304.3 L800.0 336.0 L58.0 336.0 Z" fill="url(#fill)"/>
-<path class="ln" d="M58.0 333.6 C99.2 333.6 99.2 336.0 140.4 336.0 C181.7 336.0 181.7 281.1 222.9 281.1 C264.1 281.1 264.1 320.1 305.3 320.1 C346.6 320.1 346.6 317.7 387.8 317.7 C429.0 317.7 429.0 328.7 470.2 328.7 C511.4 328.7 511.4 320.1 552.7 320.1 C593.9 320.1 593.9 292.1 635.1 292.1 C676.3 292.1 676.3 229.9 717.6 229.9 C758.8 229.9 758.8 304.3 800.0 304.3"/>
+<path d="M58.0 333.6 C95.1 333.6 95.1 336.0 132.2 336.0 C169.3 336.0 169.3 281.1 206.4 281.1 C243.5 281.1 243.5 320.1 280.6 320.1 C317.7 320.1 317.7 317.7 354.8 317.7 C391.9 317.7 391.9 328.7 429.0 328.7 C466.1 328.7 466.1 320.1 503.2 320.1 C540.3 320.1 540.3 292.1 577.4 292.1 C614.5 292.1 614.5 229.9 651.6 229.9 C688.7 229.9 688.7 304.3 725.8 304.3 C762.9 304.3 762.9 297.0 800.0 297.0 L800.0 336.0 L58.0 336.0 Z" fill="url(#fill)"/>
+<path class="ln" d="M58.0 333.6 C95.1 333.6 95.1 336.0 132.2 336.0 C169.3 336.0 169.3 281.1 206.4 281.1 C243.5 281.1 243.5 320.1 280.6 320.1 C317.7 320.1 317.7 317.7 354.8 317.7 C391.9 317.7 391.9 328.7 429.0 328.7 C466.1 328.7 466.1 320.1 503.2 320.1 C540.3 320.1 540.3 292.1 577.4 292.1 C614.5 292.1 614.5 229.9 651.6 229.9 C688.7 229.9 688.7 304.3 725.8 304.3 C762.9 304.3 762.9 297.0 800.0 297.0"/>
 <text class="ax" x="58.0" y="358" text-anchor="middle">10/6</text>
-<text class="ax" x="222.9" y="358" text-anchor="middle">10/8</text>
-<text class="ax" x="387.8" y="358" text-anchor="middle">10/10</text>
-<text class="ax" x="552.7" y="358" text-anchor="middle">10/12</text>
-<text class="ax" x="717.6" y="358" text-anchor="middle">10/14</text>
-<text class="ax" x="800.0" y="358" text-anchor="middle">10/15</text>
-<circle class="dot" cx="717.6" cy="229.9" r="5"/>
-<text class="lab" x="717.6" y="217.9" text-anchor="middle">87 次</text>
+<text class="ax" x="206.4" y="358" text-anchor="middle">10/8</text>
+<text class="ax" x="354.8" y="358" text-anchor="middle">10/10</text>
+<text class="ax" x="503.2" y="358" text-anchor="middle">10/12</text>
+<text class="ax" x="651.6" y="358" text-anchor="middle">10/14</text>
+<text class="ax" x="800.0" y="358" text-anchor="middle">10/16</text>
+<circle class="dot" cx="651.6" cy="229.9" r="5"/>
+<text class="lab" x="651.6" y="217.9" text-anchor="middle">87 次</text>
 </svg>
