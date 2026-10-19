@@ -472,12 +472,12 @@ const state = {
 };
 
 const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: viewWrong,
-                 practice: viewPractice, exam: viewExam, upload: viewUpload };
+                 practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers };
 
 function route() {
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
   const name = routes[parts[0]] ? parts[0] : 'home';
-  const navOf = { practice: 'home', subject: 'home', recite: 'home' };
+  const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
   document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
   document.body.classList.toggle('workpage', name === 'practice' || name === 'recite');   // 手机上做题 / 背题页：按钮条固定在屏幕最底下（style.css）
@@ -526,6 +526,7 @@ const ICONS = {
   target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>',
   calendar: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
   search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+  download: '<path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/>',
   shuffle: '<path d="M3 7h3c4 0 6 10 10 10h5"/><path d="M3 17h3c1.6 0 2.8-1.5 4-3.5"/><path d="M14 9.5C15.2 7.8 16.4 7 18 7h3"/><path d="m18 4 3 3-3 3M18 14l3 3-3 3"/>',
 };
 function icon(name, cls) {
@@ -589,6 +590,7 @@ async function viewHome() {
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
+          (IS_APP ? '' : '<button class="icon-btn" title="导出 Word（可以多张卷子一起）" onclick="homeExport()">' + icon('download') + '</button>') +
           (canShuffle ?
             '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' : '') +
         '</div>' +
@@ -615,6 +617,16 @@ async function viewHome() {
   if (np) np.addEventListener('change', async () => {
     try { await api('/api/settings', { method: 'POST', body: { new_per_day: +np.value } }); viewHome(); } catch (e) { toast(e.message, 'bad'); }
   });
+}
+
+// 首页的导出按钮：选了某一科就先勾上这一科的卷子
+async function homeExport() {
+  let pre = [];
+  const sj = state.home.subj;
+  if (sj && sj.indexOf('skill:') !== 0) {
+    try { pre = (await api('/api/papers')).papers.filter(p => p.subject === sj).map(p => p.key); } catch (e) { /* 不预选 */ }
+  }
+  openExportSheet(pre);
 }
 
 // 某一科的题型卡片：单做一种题型最练记忆，点进去选练习方式（能存档）
@@ -650,12 +662,13 @@ function homeTypes(d, subj) {
 
 function paperRow(p, i) {
   const st = p.mastery >= 80 ? ['已掌握', 'st-done'] : (p.seen ? ['练习中', 'st-doing'] : ['未开始', 'st-new']);
-  return '<a class="prow" href="javascript:void(0)" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ')">' +
+  const miss = p.total - (p.gradable == null ? p.total : p.gradable);
+  return '<a class="prow" href="javascript:void(0)" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ',' + miss + ')">' +
     '<span class="prow-t">' + (i + 1) + '. ' + esc(p.name) + '</span>' +
     '<span class="prow-c">' + p.total + ' 题</span>' +
     '<span class="prow-m">' + p.mastery + '%</span>' +
     '<span class="prow-s ' + st[1] + '">' + st[0] + '</span>' +
-    (p.wrong_open ? '<span class="prow-w">错 ' + p.wrong_open + '</span>' : '<span class="prow-w"></span>') +
+    (p.wrong_open ? '<span class="prow-w">错 ' + p.wrong_open + '</span>' : (miss ? '<span class="prow-w miss">缺答案 ' + miss + '</span>' : '<span class="prow-w"></span>')) +
   '</a>';
 }
 
@@ -827,6 +840,7 @@ async function viewSubject(args) {
         (s.wrong_open ? '<button class="btn danger" onclick="startPractice({subject:\'' + subj + '\',scope:\'wrongmix\',title:\'' + name + '·错题\'})">错题重练(' + s.wrong_open + ')</button>' : '') +
         (subj !== 'general' ? '<a class="btn ghost" href="#/exam/new/' + subj + '">模拟考</a>' : '') +
         '<button class="btn ghost" onclick="goBank(0,\'' + subj + '\')">浏览题目</button>' +
+        (IS_APP || !papers.length ? '' : '<button class="btn ghost" onclick="openExportSheet(' + esc(JSON.stringify(papers.map(p => p.key))) + ')">导出 Word</button>') +
       '</div>' +
     '</div>' +
 
@@ -848,7 +862,9 @@ function paperCard(p) {
       (p.seen ? ' · 做过 ' + p.seen + ' 题 · 正确率 ' + accPct + '%' : '') + '</div>' +
     bar(p.mastery) +
     '<div class="paper-acts">' +
-      '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ')">开始练习</button>' +
+      '<button class="btn sm" onclick="openPaperSheet(' + p.id + ',' + jsq(p.name) + ',' + jsq(p.key) + ',' + (p.total - (p.gradable == null ? p.total : p.gradable)) + ')">开始练习</button>' +
+      (!IS_APP && /^upload-/.test(p.key) ? '<a class="btn ghost sm" href="#/answers/' + p.id + '">' + (p.total > p.gradable ? '填答案' : '改答案') + '</a>' +
+        '<a class="btn ghost sm" href="#/upload/' + p.id + '">改题目</a>' : '') +
       (p.wrong_open ? '<button class="btn danger sm" onclick="startPractice({paper_id:' + p.id + ',paper_key:' + jsq(p.key) + ',scope:\'wrongmix\',title:' + jsq(p.name + '·错题') + '})">错题(' + p.wrong_open + ')</button>' : '') +
       '<button class="btn ghost sm" onclick="goBank(' + p.id + ')">浏览</button>' +
       '<button class="btn danger sm" onclick="delPaper(' + p.id + ',' + jsq(p.name) + ')">删除</button>' +
@@ -871,69 +887,501 @@ function goBank(pid, subject) {
 
 /* ================================================================ 导入 */
 
-function viewUpload() {
+/* ================================================================ 导入整理台
+ * 左边是卷子原文（拖文件进来或直接粘贴，可以直接改），右边实时显示识别结果；认不准的标黄、缺答案的标红，
+ * 点右边的题跳到左边原文。格式不对：自己在左边改，或者「复制 AI 整理提示词」拿去免费 AI 整理成标准格式再粘回来。
+ * 解析都在后台 docparse.py（/api/import/*），入库时后台按同一份文字重新解析，预览看到的就是导进去的。
+ * #/upload/<卷子id>：把已经导入的卷子转回标准格式，补答案、改题后整卷替换（题号不变，做题记录还在） */
+const IM_FLAG = { no_answer: ['缺答案', 'bad'], type_guess: ['题型待确认', 'warn'], doubt: ['AI 存疑', 'warn'], has_image: ['有图', 'warn'] };
+const IM_DRAFT = 'quiz.importDraft';          // 没导入的草稿（本机 localStorage，只图方便）
+const IM_CHUNK = 40;                          // 复制给 AI 时每段最多多少道题
+
+async function viewUpload(args) {
+  const pid = +(args && args[0]) || 0;
+  let st = { text: '', name: '', subject: 'general', key: '' };
+  if (pid) {
+    try {
+      const d = await api('/api/import/text?paper_id=' + pid);
+      st = { text: d.text, name: d.name, subject: d.subject, key: d.key };
+    } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  } else {
+    try { st = Object.assign(st, JSON.parse(localStorage.getItem(IM_DRAFT) || 'null') || {}); } catch (e) { /* 没草稿 */ }
+    st.key = '';
+  }
+  state.imp = { st: st, res: null, seq: 0 };
   app.innerHTML =
-    '<div class="card">' +
-      '<div class="sec-title" style="margin-top:0">导入试卷</div>' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">' +
-        '<b style="font-size:14px">科目：</b>' +
-        '<select class="inp" id="up-subject" style="padding:5px 10px">' +
-          Object.keys(SUBJECT_NAME).map(k => '<option value="' + k + '"' + (k === 'general' ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
-        '</select>' +
+    '<div class="crumb"><a href="#/home">首页</a> / ' + (st.key ? '修改导入的卷子' : '导入试卷') + '</div>' +
+    '<div class="im">' +
+      '<div class="im-bar">' +
+        '<input class="inp im-name" id="im-name" placeholder="卷子名称（不填就用文件名）" value="' + esc(st.name) + '">' +
+        '<select class="inp" id="im-subj">' + Object.keys(SUBJECT_NAME).map(k =>
+          '<option value="' + k + '"' + (k === st.subject ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') + '</select>' +
+        '<span class="spacer"></span>' +
+        '<button class="btn ghost sm" id="im-file">' + icon('upload') + '选择文件</button>' +
+        '<input type="file" id="im-fi" multiple accept=".docx,.doc,.txt,.md" hidden>' +
       '</div>' +
-      '<div class="dropzone" id="dz">' +
-        '<div class="big">+</div>' +
-        '<div><b>点击选择</b> 或把试卷文件拖到这里</div>' +
-        '<div class="upload-note">支持 .docx / .txt / .md · 可多选批量上传 · 泛雅格式、带答案的普通编号试卷都能识别</div>' +
+      '<div class="im-body">' +
+        '<section class="im-left">' +
+          '<div class="im-h">原文 <span class="muted">· 把 Word / 文本文件拖到这里，或者直接粘贴；可以直接改，右边跟着变</span></div>' +
+          '<textarea id="im-text" spellcheck="false" placeholder="' + esc(
+            '把老师发的卷子拖进来（.docx / .doc / .txt），或者把文字粘贴到这里。\n\n' +
+            '卷子和答案是两个文件的，一起拖进来，答案会按题号自动对上。\n\n' +
+            '什么格式都可以先试试：有没有题号、有没有“单选题”这样的标记都行，右边会显示认出来的结果。\n' +
+            '认得最准的写法（泛雅 / 学习通格式）：\n\n1.【单选题】题干\nA.选项\nB.选项\n答案：A') + '">' + esc(st.text) + '</textarea>' +
+          '<div class="im-tools">' +
+            '<button class="btn ghost sm" id="im-key">粘贴答案…</button>' +
+            (state.ai.on ? '<button class="btn sm" id="im-aido">用 AI 整理</button>' : '') +
+            '<button class="btn ghost sm" id="im-ai">复制 AI 整理提示词</button>' +
+            '<button class="btn ghost sm" id="im-undo" hidden>撤销 AI 整理</button>' +
+            '<span class="spacer"></span>' +
+            '<button class="btn ghost sm" id="im-clear">清空</button>' +
+          '</div>' +
+        '</section>' +
+        '<section class="im-right">' +
+          '<div class="im-sum" id="im-sum"></div>' +
+          '<div class="im-list" id="im-list"></div>' +
+          '<div class="im-go"><button class="btn block" id="im-save" disabled></button></div>' +
+        '</section>' +
       '</div>' +
-      '<input type="file" id="file" multiple accept=".docx,.txt,.md" style="display:none">' +
-      '<div id="upload-out"></div>' +
-      '<div class="muted" style="margin-top:10px">含图片、公式的大题库请用题库包导入：在 学测/_脚本 运行 build_packs.py,' +
-        '再关掉本服务运行 <code>python import_packs.py ..\\学测\\题库包</code>。</div>' +
     '</div>';
-  bindUpload();
+  const ta = $('#im-text');
+  let timer = 0;
+  const changed = () => { clearTimeout(timer); timer = setTimeout(imParse, 250); imDraft(); };
+  ta.addEventListener('input', changed);
+  $('#im-name').addEventListener('input', imDraft);
+  $('#im-subj').addEventListener('change', imDraft);
+  $('#im-file').addEventListener('click', () => $('#im-fi').click());
+  $('#im-fi').addEventListener('change', e => { imFiles(e.target.files); e.target.value = ''; });
+  const left = $('.im-left');
+  left.addEventListener('dragover', e => { e.preventDefault(); left.classList.add('drag'); });
+  left.addEventListener('dragleave', () => left.classList.remove('drag'));
+  left.addEventListener('drop', e => {
+    left.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); imFiles(e.dataTransfer.files); }
+  });
+  $('#im-key').addEventListener('click', imPasteKey);
+  $('#im-ai').addEventListener('click', imAiPrompt);
+  if ($('#im-aido')) $('#im-aido').addEventListener('click', imAiDo);
+  $('#im-undo').addEventListener('click', () => {
+    if (state.imp.undo == null) return;
+    $('#im-text').value = state.imp.undo;
+    state.imp.undo = null;
+    $('#im-undo').hidden = true;
+    imDraft();
+    imParse();
+  });
+  $('#im-clear').addEventListener('click', () => {
+    if (ta.value.trim() && !confirm('清空左边的原文？')) return;
+    ta.value = '';
+    changed();
+  });
+  $('#im-save').addEventListener('click', imSave);
+  $('#im-list').addEventListener('click', imListClick);
+  imParse();
 }
 
-function bindUpload() {
-  const dz = $('#dz'), fi = $('#file'), out = $('#upload-out');
-  dz.addEventListener('click', () => fi.click());
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('drag');
-    handleFiles(e.dataTransfer.files);
-  });
-  fi.addEventListener('change', () => { handleFiles(fi.files); fi.value = ''; });
+function imDraft() {
+  const im = state.imp;
+  if (!im || im.st.key) return;                // 改已导入的卷子不存草稿
+  try {
+    localStorage.setItem(IM_DRAFT, JSON.stringify({ text: $('#im-text').value, name: $('#im-name').value, subject: $('#im-subj').value }));
+  } catch (e) { /* 存不了就算了 */ }
+}
 
-  async function handleFiles(files) {
-    const subject = $('#up-subject').value;
-    for (const f of files) {
-      const line = document.createElement('div');
-      line.className = 'card upload-result';
-      line.style.marginTop = '10px';
-      line.textContent = '正在识别：' + f.name + ' …';
-      out.appendChild(line);
-      try {
-        const buf = await f.arrayBuffer();
-        const d = await api('/api/upload?name=' + encodeURIComponent(f.name) +
-                            '&engine=auto&subject=' + encodeURIComponent(subject),
-                            { method: 'POST', body: buf });
-        const parts = [];
-        const bt = d.by_type || {};
-        for (const t in TYPE_NAME) if (bt[t]) parts.push(TYPE_NAME[t] + ' ' + bt[t]);
-        line.innerHTML =
-          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">' +
-            '<div><b>✓ ' + esc(d.paper.name) + '</b> 识别出 <b>' + d.paper.total + '</b> 题(' + parts.join(' · ') + ')' +
-              (d.no_answer ? '<div class="muted" style="color:var(--amber)">' + d.no_answer + ' 题未识别到答案，仅收入题库浏览</div>' : '') +
-            '</div>' +
-            '<button class="btn sm" onclick="startPractice({paper_id:' + d.paper.id + ',scope:\'all\',order:\'seq\',title:' + jsq(d.paper.name) + '})">立即刷题</button>' +
-          '</div>';
-      } catch (e) {
-        line.className = 'card upload-result err';
-        line.innerHTML = '<b style="color:var(--red)">✗ ' + esc(f.name) + ' 识别失败</b><div class="muted">' + esc(e.message) + '</div>';
-      }
+// 读文件：卷子文件的文字放进左边；文件名带“答案”的当答案文件，只取出里面的答案表接到后面
+async function imFiles(files) {
+  const ta = $('#im-text');
+  const list = Array.from(files).sort((a, b) => /答案/.test(a.name) - /答案/.test(b.name));
+  for (const f of list) {
+    const isKey = /答案/.test(f.name) && list.length > 1 || (/答案/.test(f.name) && ta.value.trim());
+    toast('正在读取 ' + f.name + (/\.doc$/i.test(f.name) ? '（老版 .doc 要先用 Word 转换，稍等几秒）' : '') + '……');
+    let d;
+    try {
+      d = await api('/api/import/extract?name=' + encodeURIComponent(f.name) + (isKey ? '&answer=1' : ''),
+                    { method: 'POST', body: await f.arrayBuffer() });
+    } catch (e) { toast(f.name + '：' + e.message, 'bad'); continue; }
+    if (isKey) {
+      if (!d.keys) { toast(f.name + ' 里没找到“1.A 2.B”这样的答案表，可以打开它把答案复制到「粘贴答案」里', 'bad'); continue; }
+      ta.value = ta.value.replace(/\s*$/, '\n\n') + d.text;
+      toast('从 ' + f.name + ' 读到 ' + d.keys + ' 题的答案，已按题号对上', 'good');
+    } else {
+      if (ta.value.trim() && !confirm('左边已经有内容了，用「' + f.name + '」替换掉吗？\n（选“取消”就接在后面）')) ta.value = ta.value.replace(/\s*$/, '\n\n') + d.text;
+      else ta.value = d.text;
+      if (!$('#im-name').value.trim()) $('#im-name').value = f.name.replace(/\.(docx?|txt|md)$/i, '');
+      if (d.images) toast('原卷有 ' + d.images + ' 处图片或公式（显示成 [图片]），导不进来，这些题右边会标出来', 'bad');
     }
   }
+  imDraft();
+  imParse();
+}
+
+async function imParse() {
+  const im = state.imp;
+  if (!im) return;
+  const text = $('#im-text').value;
+  const seq = ++im.seq;
+  let r;
+  if (!text.trim()) r = { questions: [], by_type: {} };
+  else {
+    try { r = await api('/api/import/parse', { method: 'POST', body: { text: text } }); }
+    catch (e) { $('#im-sum').innerHTML = '<div class="im-err">' + esc(e.message) + '</div>'; return; }
+  }
+  if (seq !== im.seq || !$('#im-list')) return;            // 打字快：只画最后一次的结果
+  im.res = r;
+  const qs = r.questions, cnt = f => qs.filter(q => q.flags.indexOf(f) >= 0).length;
+  const types = Object.keys(r.by_type).map(t => (TYPE_NAME[t] || t) + ' ' + r.by_type[t]).join(' · ');
+  $('#im-sum').innerHTML = !qs.length ? '<div class="im-empty">' + (text.trim() ?
+      '还没认出题目。检查一下：题干后面有没有 A. B. C. 这样的选项、题目之间有没有分开；或者用「复制 AI 整理提示词」让 AI 先整理一遍。' :
+      '左边放进卷子，这里会显示认出来的每一道题。') + '</div>' :
+    '<div class="im-total">认出 <b>' + qs.length + '</b> 题<span class="muted"> · ' + esc(types) + '</span></div>' +
+    '<div class="im-chips">' + Object.keys(IM_FLAG).map(f => cnt(f) ?
+      '<span class="im-chip ' + IM_FLAG[f][1] + '">' + IM_FLAG[f][0] + ' ' + cnt(f) + '</span>' : '').join('') +
+      (!cnt('no_answer') && !cnt('type_guess') && !cnt('doubt') ? '<span class="im-chip ok">都有答案</span>' : '') + '</div>' +
+    (cnt('no_answer') ? '<div class="im-tip">缺答案的题可以在下面直接点答案，或者用「粘贴答案」把老师发的答案（如 1-5 CABDA）贴进来；不补也能导入，补上答案之前练习时会跳过。</div>' : '') +
+    (cnt('type_guess') ? '<div class="im-tip">“题型待确认”：没有题型标记，也没有答案，单选还是多选是猜的。补上答案就定了，或者在左边题号后面加上【多选题】。</div>' : '');
+  $('#im-list').innerHTML = qs.map((q, i) => imRow(q, i)).join('');
+  const b = $('#im-save');
+  b.disabled = !qs.length;
+  b.textContent = !qs.length ? '还没有题目' : (im.st.key ? '保存修改（' + qs.length + ' 题）' : '导入（' + qs.length + ' 题）');
+}
+
+function imRow(q, i) {
+  const fl = q.flags.filter(f => IM_FLAG[f]);
+  const cls = q.flags.indexOf('no_answer') >= 0 ? ' bad' : (fl.length ? ' warn' : '');
+  const choice = q.type === 'single' || q.type === 'multi' || q.type === 'reading' || q.type === 'poem';
+  let ans;
+  if (q.answer) ans = '<span class="im-ans">答案 ' + esc(q.answer.length > 40 ? q.answer.slice(0, 40) + '…' : q.answer) + '</span>';
+  else if (choice && q.options.length) {
+    ans = '<span class="im-pick" data-i="' + i + '" data-multi="' + (q.type === 'multi' ? 1 : 0) + '">' +
+      q.options.map(o => '<button class="im-k" data-k="' + o[0] + '">' + o[0] + '</button>').join('') +
+      (q.type === 'multi' ? '<button class="im-k ok" data-ok="1">确定</button>' : '') + '</span>';
+  } else if (q.type === 'judge') {
+    ans = '<span class="im-pick" data-i="' + i + '"><button class="im-k" data-k="对">对</button><button class="im-k" data-k="错">错</button></span>';
+  } else ans = '<span class="im-ans none">没有参考答案</span>';
+  return '<div class="im-q' + cls + '" data-i="' + i + '">' +
+    '<div class="im-qh"><b>' + q.qno + '.</b><span class="im-type">' + (TYPE_NAME[q.type] || q.type) + '</span>' +
+      fl.map(f => '<span class="im-chip ' + IM_FLAG[f][1] + '">' + IM_FLAG[f][0] + '</span>').join('') + '</div>' +
+    (q.material ? '<div class="im-mat">材料：' + esc(q.material.replace(/\s+/g, ' ').slice(0, 40)) + '…</div>' : '') +
+    '<div class="im-stem">' + esc(q.stem.replace(/\s+/g, ' ')) + '</div>' +
+    (q.options.length ? '<div class="im-opts">' + q.options.map(o => '<span><b>' + o[0] + '</b> ' + esc(o[1].replace(/\s+/g, ' ')) + '</span>').join('') + '</div>' : '') +
+    (q.doubt ? '<div class="im-doubt">AI 说：' + esc(q.doubt) + '</div>' : '') +
+    '<div class="im-qf">' + ans + '</div>' +
+  '</div>';
+}
+
+// 点题：跳到左边原文那几行；点答案按钮：在原文这道题后面补一行“答案：X”
+function imListClick(e) {
+  const k = e.target.closest('.im-k');
+  const im = state.imp;
+  if (k) {
+    const pick = k.closest('.im-pick'), q = im.res.questions[+pick.dataset.i];
+    if (pick.dataset.multi === '1' && !k.dataset.ok) { k.classList.toggle('on'); return; }
+    const val = k.dataset.ok ? Array.from(pick.querySelectorAll('.im-k.on')).map(b => b.dataset.k).join('') : k.dataset.k;
+    if (!val) { toast('先点选几个选项'); return; }
+    const ta = $('#im-text'), ls = ta.value.split('\n');
+    ls.splice(q.end + 1, 0, '答案：' + val);
+    ta.value = ls.join('\n');
+    imDraft();
+    imParse();
+    return;
+  }
+  const row = e.target.closest('.im-q');
+  if (!row) return;
+  const q = im.res.questions[+row.dataset.i], ta = $('#im-text'), ls = ta.value.split('\n');
+  let a = 0;
+  for (let i = 0; i < q.line; i++) a += ls[i].length + 1;
+  let b = a;
+  for (let i = q.line; i <= q.end && i < ls.length; i++) b += ls[i].length + 1;
+  ta.focus();
+  ta.setSelectionRange(a, Math.max(a, b - 1));
+  // 滚到选中的那几行：按行高估算
+  const lh = parseFloat(getComputedStyle(ta).lineHeight) || 20;
+  ta.scrollTop = Math.max(0, q.line * lh - ta.clientHeight / 3);
+}
+
+function imPasteKey() {
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  sheet.innerHTML = '<div class="sheet" role="dialog">' +
+    '<div class="sheet-h"><b>粘贴答案</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+    '<div class="sheet-d">把老师在群里发的答案原样贴进来，按题号对上缺答案的题。这些写法都行：<br>' +
+      '<code>1-5 CABDA 6-10 BBCDA</code>　<code>1.B 2.ACD 3.对</code>　<code>1.C2.A3.A</code></div>' +
+    '<textarea class="im-keyta" placeholder="1-5 CABDA&#10;6.对 7.错"></textarea>' +
+    '<div class="sheet-row" style="margin-top:12px"><button class="btn" data-act="ok">对上答案</button></div></div>';
+  const close = () => sheet.remove();
+  sheet.addEventListener('click', e => {
+    if (e.target === sheet || e.target.closest('.sheet-x')) return close();
+    if (!e.target.closest('[data-act="ok"]')) return;
+    const v = sheet.querySelector('textarea').value.trim();
+    if (!v) return close();
+    const ta = $('#im-text');
+    ta.value = ta.value.replace(/\s*$/, '\n\n') + v.split('\n').map(l => l.trim() ? '参考答案：' + l.trim() : '').join('\n') + '\n';
+    close();
+    imDraft();
+    const before = state.imp.res ? state.imp.res.questions.filter(q => !q.answer).length : 0;
+    imParse().then(() => {
+      const r = state.imp.res, after = r.questions.filter(q => !q.answer).length;
+      toast(before > after ? '对上了 ' + (before - after) + ' 题的答案' + (after ? '，还缺 ' + after + ' 题' : '') :
+            '没对上：检查一下题号和格式（比如 1-5 CABDA）', before > after ? 'good' : 'bad');
+    });
+  });
+  document.body.appendChild(sheet);
+  sheet.querySelector('textarea').focus();
+}
+
+// 复制提示词 + 原文，拿去免费 AI（豆包、DeepSeek、Kimi……）整理成标准格式；题多就分段，每段一个按钮
+async function imAiPrompt() {
+  const text = $('#im-text').value.trim();
+  if (!text) { toast('先把卷子放进左边'); return; }
+  let d;
+  try { d = await api('/api/import/prompt'); } catch (e) { toast(e.message, 'bad'); return; }
+  const ls = $('#im-text').value.split('\n'), qs = (state.imp.res || {}).questions || [];
+  const parts = [];
+  if (qs.length > IM_CHUNK) {                    // 按题切开：每段从某道题的第一行开始
+    for (let i = 0; i < qs.length; i += IM_CHUNK) {
+      const a = i ? qs[i].line : 0, b = i + IM_CHUNK < qs.length ? qs[i + IM_CHUNK].line : ls.length;
+      parts.push(ls.slice(a, b).join('\n').trim());
+    }
+  } else parts.push(text);
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  sheet.innerHTML = '<div class="sheet" role="dialog">' +
+    '<div class="sheet-h"><b>让 AI 整理格式</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+    '<div class="sheet-d">1. 点下面的按钮，复制好的是“整理要求 + 卷子原文”。<br>' +
+      '2. 打开豆包、DeepSeek、Kimi 这类免费 AI，<b>新开一个对话</b>，粘贴发送。<br>' +
+      '3. 把 AI 回复的内容全部复制，回来粘贴到左边（替换原来的内容）' + (parts.length > 1 ? '；分了几段的，按顺序一段一段接起来' : '') + '。</div>' +
+    '<div class="im-aibtns">' + parts.map((p, i) => '<button class="btn" data-p="' + i + '">' +
+      (parts.length > 1 ? '复制第 ' + (i + 1) + ' 段（第 ' + (i * IM_CHUNK + 1) + '–' + Math.min(qs.length, (i + 1) * IM_CHUNK) + ' 题）' : '复制提示词和原文') + '</button>').join('') + '</div>' +
+    '<div class="sheet-t" style="margin-top:14px">用 AI 要注意</div>' +
+    '<ul class="im-aitips">' + d.tips.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>';
+  sheet.addEventListener('click', async e => {
+    if (e.target === sheet || e.target.closest('.sheet-x')) return sheet.remove();
+    const b = e.target.closest('[data-p]');
+    if (!b) return;
+    const s = d.prompt + parts[+b.dataset.p] + '\n';
+    try { await navigator.clipboard.writeText(s); }
+    catch (er) {                                  // 老内核没有 clipboard API：退回选中复制
+      const t = document.createElement('textarea');
+      t.value = s; document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); } catch (e2) { /* 复制不了 */ }
+      t.remove();
+    }
+    b.textContent = '已复制 ✓ ' + b.textContent.replace(/^已复制 ✓ /, '');
+    toast('已复制，去 AI 那里新开一个对话粘贴', 'good');
+  });
+  document.body.appendChild(sheet);
+}
+
+// 用自己的 API 整理：和「复制 AI 整理提示词」同一份提示词，题多就一段一段整理再接起来；整理前的原文留着，可以撤销
+async function imAiDo() {
+  const ta = $('#im-text'), text = ta.value.trim();
+  if (!text) { toast('先把卷子放进左边'); return; }
+  const ls = ta.value.split('\n'), qs = (state.imp.res || {}).questions || [];
+  const parts = [];
+  if (qs.length > IM_CHUNK) {
+    for (let i = 0; i < qs.length; i += IM_CHUNK) {
+      const a = i ? qs[i].line : 0, b = i + IM_CHUNK < qs.length ? qs[i + IM_CHUNK].line : ls.length;
+      parts.push(ls.slice(a, b).join('\n').trim());
+    }
+  } else parts.push(text);
+  const b = $('#im-aido');
+  b.disabled = true;
+  const out = [];
+  try {
+    for (let i = 0; i < parts.length; i++) {
+      b.textContent = parts.length > 1 ? '正在整理第 ' + (i + 1) + '/' + parts.length + ' 段……' : 'AI 正在整理……';
+      out.push((await api('/api/ai/organize', { method: 'POST', body: { text: parts[i] } })).text.trim());
+    }
+  } catch (e) { toast('AI 整理失败：' + e.message, 'bad'); b.disabled = false; b.textContent = '用 AI 整理'; return; }
+  b.disabled = false;
+  b.textContent = '用 AI 整理';
+  state.imp.undo = ta.value;
+  $('#im-undo').hidden = false;
+  ta.value = out.join('\n\n') + '\n';
+  imDraft();
+  await imParse();
+  const r = state.imp.res;
+  toast('AI 整理好了：' + r.questions.length + ' 题。对照原卷看一眼，特别是标黄（AI 存疑）和缺答案的题；不满意可以撤销', 'good');
+}
+
+async function imSave() {
+  const im = state.imp, r = im.res;
+  if (!r || !r.questions.length) return;
+  const miss = r.questions.filter(q => !q.answer && SELF_TYPES.indexOf(q.type) < 0 && q.type !== 'qa').length;
+  if (miss && !confirm('还有 ' + miss + ' 道题没有答案，导进去以后练习时会先跳过，以后点这张卷子里的「填答案」补上。\n现在就导入吗？')) return;
+  const b = $('#im-save');
+  b.disabled = true;
+  b.textContent = '正在保存……';
+  let d;
+  try {
+    d = await api('/api/import/save', { method: 'POST', body: { text: $('#im-text').value, name: $('#im-name').value.trim(),
+                                                                subject: $('#im-subj').value, key: im.st.key || '' } });
+  } catch (e) { toast(e.message, 'bad'); imParse(); return; }
+  if (!im.st.key) { try { localStorage.removeItem(IM_DRAFT); } catch (e) { /* ignore */ } }
+  toast((im.st.key ? '已保存：' : '已导入：') + d.paper.name + '，' + d.paper.total + ' 题' + (d.no_answer ? '（' + d.no_answer + ' 题没答案）' : ''), 'good');
+  state.home.subj = $('#im-subj').value;
+  state.home.group = '';
+  state.home.q = '';
+  location.hash = '#/home';
+}
+
+/* ================================================================ 填答案（导入的卷子）
+ * #/answers/<卷子id>：答题卡式，每题点 A/B/C/D、对/错，问答题写参考答案；也能把老师发的“1-5 CABDA”粘进来一次对上。
+ * 只改答案，不动题目（改题去导入整理台）。只有自己导入的卷子（upload-…）能改，题库自带的卷子答案以官方为准。
+ * 没答案的题练习时会跳过，填上就能练。
+ * 防止点几下就把答案改乱（用户要求）：已经有答案的题默认锁着，点「改答案」才能改；粘贴的答案只填空着的题，
+ * 和已有答案不一样的先列出来问要不要替换；保存时改动了原有答案的，再列一遍“第几题 从什么改成什么”确认。 */
+async function viewAnswers(args) {
+  const pid = +(args && args[0]) || 0;
+  app.innerHTML = '<div class="empty">加载中…</div>';
+  let d;
+  try { d = await api('/api/import/answers?paper_id=' + pid); }
+  catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  // 改过还没保存的留在 state.ansDraft 里：中途离开这页再回来还在
+  state.ansDraft = state.ansDraft || {};
+  const dr = state.ansDraft[pid] = state.ansDraft[pid] || { edit: {}, open: {}, asMulti: {} };
+  const qs = d.questions;
+  const edit = dr.edit;                         // 改过还没保存的 {key: 答案}
+  const open = dr.open;                         // 点了「改答案」、解开锁的题
+  const asMulti = dr.asMulti;                   // 手动切成多选 / 单选的题（保存时后台按答案字母数定题型）
+  const choice = q => (q.options || []).length && q.type !== 'judge';
+  const multi = q => (q.key in asMulti ? asMulti[q.key] : q.type === 'multi');
+  const val = q => (q.key in edit ? edit[q.key] : q.answer || '');
+  const locked = q => !!q.answer && !open[q.key];
+  const st = { onlyMissing: qs.some(q => !q.answer) };
+  const short = s => (s.length > 30 ? s.slice(0, 30) + '…' : s) || '（空）';
+  app.innerHTML =
+    '<div class="crumb"><a href="#/home">首页</a> / 填答案</div>' +
+    '<div class="ans-page">' +
+      '<div class="ans-top card">' +
+        '<div class="ans-title"><b>' + esc(d.paper.name) + '</b><span class="muted" id="ans-count"></span></div>' +
+        '<div class="ans-paste"><input class="inp" id="ans-paste" placeholder="把老师发的答案粘贴到这里，比如 1-5 CABDA 6.对 7.ABD">' +
+          '<button class="btn ghost sm" id="ans-apply">对上答案</button></div>' +
+        '<div class="ans-tools"><label class="ans-only"><input type="checkbox" id="ans-only"' + (st.onlyMissing ? ' checked' : '') + '> 只看还没答案的题</label>' +
+          '<span class="spacer"></span><a class="btn ghost sm" href="#/upload/' + d.paper.id + '">改题目（导入整理台）</a>' +
+          '<button class="btn sm" id="ans-save" disabled>保存</button></div>' +
+      '</div>' +
+      '<div id="ans-list"></div>' +
+    '</div>';
+  const saveBtn = () => {
+    const n = Object.keys(edit).length, b = $('#ans-save');
+    b.disabled = !n;
+    b.textContent = n ? '保存（改了 ' + n + ' 题）' : '保存';
+  };
+  const draw = () => {
+    const miss = qs.filter(q => !val(q)).length;
+    $('#ans-count').textContent = ' · ' + qs.length + ' 题' + (miss ? '，还有 ' + miss + ' 题没答案（练习时会先跳过）' : '，都有答案了');
+    saveBtn();
+    const list = qs.filter(q => !st.onlyMissing || !q.answer || q.key in edit || open[q.key]);
+    $('#ans-list').innerHTML = list.length ? list.map(q => {
+      const v = val(q);
+      let pick;
+      if (locked(q)) {
+        pick = '<span class="ans-cur">答案 <b>' + esc(short(q.answer)) + '</b></span><button class="btn ghost sm ans-edit">改答案</button>';
+      } else {
+        if (q.type === 'judge') pick = ['对', '错'].map(k => '<button class="ans-k' + (v === k ? ' on' : '') + '" data-k="' + k + '">' + k + '</button>').join('');
+        else if (choice(q)) pick = q.options.map(o => '<button class="ans-k' + (v.indexOf(o[0]) >= 0 ? ' on' : '') + '" data-k="' + o[0] + '">' + o[0] + '</button>').join('') +
+          '<a href="javascript:void(0)" class="ans-mode">' + (multi(q) ? '多选（可以点几个）· 改成单选' : '单选 · 改成多选') + '</a>';
+        else pick = '<textarea class="ans-ta" rows="2" placeholder="参考答案（可以不填，练习时自己对照）">' + esc(v) + '</textarea>';
+        if (q.answer) pick += '<span class="ans-was">原答案 ' + esc(short(q.answer)) + '</span><button class="btn ghost sm ans-cancel">不改了</button>';
+      }
+      return '<div class="ans-q card' + (v ? '' : ' miss') + (q.key in edit ? ' changed' : '') + '" data-key="' + esc(q.key) + '">' +
+        '<div class="ans-qh"><b>' + q.qno + '.</b><span class="im-type">' + (TYPE_NAME[q.type] || q.type) + '</span>' +
+          (q.key in edit ? '<span class="im-chip warn">' + (q.answer ? '改了答案，还没保存' : '填了，还没保存') + '</span>' : (v ? '' : '<span class="im-chip bad">没答案</span>')) + '</div>' +
+        '<div class="ans-stem">' + rich(q.stem) + '</div>' +
+        (choice(q) ? '<div class="im-opts">' + q.options.map(o => '<span><b>' + o[0] + '</b> ' + rich(o[1]) + '</span>').join('') + '</div>' : '') +
+        '<div class="ans-pick">' + pick + '</div></div>';
+    }).join('') : '<div class="empty">' + (st.onlyMissing ? '都有答案了，可以去练习了。取消“只看还没答案的题”能看全部，要改哪题点「改答案」。' : '这张卷子没有题目') + '</div>';
+  };
+  const set = (key, v) => {
+    const q = qs.find(x => x.key === key);
+    if (v === (q.answer || '')) delete edit[key]; else edit[key] = v;
+    draw();
+  };
+  $('#ans-list').addEventListener('click', e => {
+    const row = e.target.closest('.ans-q');
+    if (!row) return;
+    const q = qs.find(x => x.key === row.dataset.key);
+    if (e.target.closest('.ans-edit')) { open[q.key] = true; return draw(); }
+    if (e.target.closest('.ans-cancel')) { delete open[q.key]; delete edit[q.key]; delete asMulti[q.key]; return draw(); }
+    if (locked(q)) return;
+    if (e.target.closest('.ans-mode')) {
+      asMulti[q.key] = !multi(q);
+      if (!asMulti[q.key] && val(q).length > 1) return set(q.key, val(q)[0]);   // 改回单选：只留第一个字母
+      return draw();
+    }
+    const k = e.target.closest('.ans-k');
+    if (!k) return;
+    const cur = val(q);
+    if (q.type === 'judge') return set(q.key, k.dataset.k === cur ? '' : k.dataset.k);
+    // 选择题：单选点字母就是选这个（再点一下是清空），多选点字母是勾上 / 去掉，按选项顺序排
+    const s = multi(q) ? (cur.indexOf(k.dataset.k) >= 0 ? cur.replace(k.dataset.k, '') : cur + k.dataset.k)
+                       : (cur === k.dataset.k ? '' : k.dataset.k);
+    set(q.key, q.options.map(o => o[0]).filter(x => s.indexOf(x) >= 0).join(''));
+  });
+  $('#ans-list').addEventListener('input', e => {
+    const t = e.target.closest('.ans-ta');
+    if (!t) return;
+    const q = qs.find(x => x.key === t.closest('.ans-q').dataset.key);
+    if (t.value.trim() === (q.answer || '')) delete edit[q.key]; else edit[q.key] = t.value.trim();
+    saveBtn();                                   // 打字时不重画列表，免得输入框失去焦点
+  });
+  $('#ans-only').addEventListener('change', e => { st.onlyMissing = e.target.checked; draw(); });
+  // 粘贴答案：空着的题直接填；已经有答案、又不一样的，列出来问要不要替换
+  $('#ans-apply').addEventListener('click', async () => {
+    const t = $('#ans-paste').value.trim();
+    if (!t) { toast('先把答案粘贴进来'); return; }
+    let r;
+    try { r = await api('/api/import/keyparse', { method: 'POST', body: { text: t } }); } catch (e) { toast(e.message, 'bad'); return; }
+    const fill = [], clash = [];
+    Object.keys(r.key).forEach(no => {
+      const q = qs.find(x => String(x.qno) === no);
+      if (!q || (q.type !== 'judge' && !choice(q))) return;
+      let v = r.key[no];
+      if (q.type === 'judge' && /^[AB]$/.test(v)) v = v === 'A' ? '对' : '错';
+      if (q.type !== 'judge') v = q.options.map(o => o[0]).filter(x => v.indexOf(x) >= 0).join('');
+      if (!v || val(q) === v) return;
+      (val(q) ? clash : fill).push([q, v]);
+    });
+    fill.forEach(([q, v]) => { edit[q.key] = v; });
+    let swapped = 0;
+    if (clash.length && confirm('粘贴的答案里有 ' + clash.length + ' 题和现在的答案不一样：\n\n' +
+        clash.slice(0, 12).map(([q, v]) => '第 ' + q.qno + ' 题：' + val(q) + ' → ' + v).join('\n') +
+        (clash.length > 12 ? '\n……还有 ' + (clash.length - 12) + ' 题' : '') +
+        '\n\n要用粘贴的答案替换掉吗？（选“取消”就只填空着的题）')) {
+      clash.forEach(([q, v]) => { open[q.key] = true; edit[q.key] = v; });
+      swapped = clash.length;
+    }
+    draw();
+    const n = fill.length + swapped;
+    toast(n ? '填上 ' + fill.length + ' 题' + (swapped ? '、替换 ' + swapped + ' 题' : '') + '，检查一下没问题就点「保存」' :
+          clash.length ? '没有改动' : '没对上：检查题号和写法（比如 1-5 CABDA、6.对）', n ? 'good' : 'bad');
+    if (n) $('#ans-paste').value = '';
+  });
+  // 保存：改动了原有答案的，列出来确认一次
+  $('#ans-save').addEventListener('click', async () => {
+    const changed = qs.filter(q => q.answer && q.key in edit);
+    if (changed.length && !confirm('下面 ' + changed.length + ' 题原来有答案，要改成新的：\n\n' +
+        changed.slice(0, 12).map(q => '第 ' + q.qno + ' 题：' + short(q.answer) + ' → ' + short(edit[q.key])).join('\n') +
+        (changed.length > 12 ? '\n……还有 ' + (changed.length - 12) + ' 题' : '') + '\n\n确定保存吗？')) return;
+    const b = $('#ans-save');
+    b.disabled = true;
+    try {
+      const r = await api('/api/import/answers', { method: 'POST', body: { paper_id: d.paper.id, answers: edit } });
+      Object.keys(edit).forEach(k => { const q = qs.find(x => x.key === k); q.answer = edit[k]; delete edit[k]; delete open[k]; });
+      toast('已保存 ' + r.changed + ' 题的答案', 'good');
+    } catch (e) { toast(e.message, 'bad'); }
+    draw();
+  });
+  // 改了没保存就离开：不拦着，提醒一句（改动留着，回到这页还在）
+  const here = location.hash;
+  const leave = () => {
+    window.removeEventListener('hashchange', leave);
+    if (location.hash !== here && Object.keys(edit).length)
+      setTimeout(() => toast('「' + d.paper.name + '」有 ' + Object.keys(edit).length + ' 题的答案还没保存，回到填答案页面点「保存」才生效', 'bad'), 300);
+  };
+  window.addEventListener('hashchange', leave);
+  draw();
 }
 
 /* ================================================================ 题库浏览 */
@@ -1049,7 +1497,7 @@ function qCard(q) {
     '<div class="qhead">' +
       '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
       '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题' + (q.answer ? '' : ' · 无答案') + '</span>' +
-      recBadge(q) + '<span class="spacer"></span>' + cnBtn(q) +
+      recBadge(q) + '<span class="spacer"></span>' + cnBtn(q) + aiBtn(q) +
     '</div>' +
     materialBox(q) +
     '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
@@ -1111,7 +1559,7 @@ async function viewWrong() {
             '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题</span>' +
             '<span class="rec-badge bad">做错 ' + q.wrong_count + ' 次</span>' +
             (!q.mastered ? '<span class="rec-badge">' + streakText(q.streak) + (q.due ? ' · ' + q.due.slice(5) + ' 复习' : '') + '</span>' : '') +
-            '<div style="flex:1"></div>' + cnBtn(q) +
+            '<div style="flex:1"></div>' + cnBtn(q) + aiBtn(q) +
             (q.mastered
               ? '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',false)">重新加入</button>'
               : '<button class="btn ghost sm" onclick="markWrong(' + q.id + ',true)">标记已掌握</button>') +
@@ -1287,7 +1735,8 @@ function againOn() { return store.get('quiz.again') !== false; }
 function mixOldOn() { return store.get('quiz.mixold') !== false; }
 function extraCopy(q, kind) { return Object.assign({}, shuffleQuestion(q, true), { extra: kind }); }
 function extraBadge(q) {
-  return '<span class="rec-badge bad">' + (q.extra === 'old' ? '以前错过' + (q.wrong_count ? ' ' + q.wrong_count + ' 次' : '') + '，再练一次' : '刚才做错，再来一次') +
+  return '<span class="rec-badge bad">' + (q.extra === 'old' ? '以前错过' + (q.wrong_count ? ' ' + q.wrong_count + ' 次' : '') + '，再练一次' :
+                                     q.extra === 'last' ? '上次做错，再考一次' : '刚才做错，再来一次') +
     (q.shuffled ? ' · 选项已打乱' : '') + '</span>';
 }
 const baseKey = q => q.same_as || q.key;      // 学习通卷的题和原题共用做题进度，算同一道
@@ -1316,7 +1765,9 @@ function spreadIn(arr, starts, extras) {
 }
 const typeOf = t => q => !t || q.cat === t || q.type === t;
 
-function openPaperSheet(pid, name, pkey) { openModeSheet(pkey ? { paper_id: pid, paper_key: pkey } : { paper_id: pid }, name); }
+function openPaperSheet(pid, name, pkey, missing) {
+  openModeSheet(Object.assign(pkey ? { paper_id: pid, paper_key: pkey } : { paper_id: pid }, missing ? { missing: missing } : {}), name);
+}
 
 async function openModeSheet(src, name) {
   await lsPull();
@@ -1347,11 +1798,18 @@ async function openModeSheet(src, name) {
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
         '<button class="btn ghost" data-act="rc-rand">打乱背</button></div></div>' +
+      // 自己导入的卷子（upload-…）：缺答案的题练习时跳过，在这里进导入整理台补上
+      (!IS_APP && /^upload-/.test(src.paper_key || '') ? '<div class="sheet-sec"><div class="sheet-t">答案 / 题目</div>' +
+        '<div class="sheet-d">' + (src.missing ? '这张卷子有 <b>' + src.missing + '</b> 题还没有答案，练习时会先跳过，填上就能练。' : '自己导入的卷子，答案和题目都可以改。') +
+          '改了题号不变，做题记录还在。</div>' +
+        '<div class="sheet-row"><button class="btn' + (src.missing ? '' : ' ghost') + '" data-act="answers">' + (src.missing ? '填答案' : '改答案') + '</button>' +
+        '<button class="btn ghost" data-act="edit">改题目</button></div></div>' : '') +
       // 导出 Word 只在电脑上有（用户：手机上用不上）
       (IS_APP ? '' : '<div class="sheet-sec"><div class="sheet-t">导出 Word</div>' +
         '<div class="sheet-d">按原卷顺序导出成 Word 文档，可以打印出来做。答案卷用红字标出答案，最后附答案速查（不带解析）。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="wd-blank">空白卷</button>' +
-        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div></div>') +
+        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div>' +
+        (src.paper_key ? '<button class="btn ghost block xp-more" data-act="wd-many">多张卷子一起导出…</button>' : '') + '</div>') +
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
@@ -1363,6 +1821,9 @@ async function openModeSheet(src, name) {
     close();
     if (act === 'rc-seq' || act === 'rc-rand') return startRecite(practiceSrc(src), name, act === 'rc-seq' ? 'seq' : 'random');
     if (act === 'wd-blank' || act === 'wd-ans') return exportWord(practiceSrc(src), name, act === 'wd-ans');
+    if (act === 'wd-many') return openExportSheet([src.paper_key]);
+    if (act === 'edit') { location.hash = '#/upload/' + src.paper_id; return; }
+    if (act === 'answers') { location.hash = '#/answers/' + src.paper_id; return; }
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
     else if (act === 'seq' || act === 'rand') {
@@ -1386,8 +1847,14 @@ function snapshot(p) {
   for (let i = at; i < p.list.length; i++) if (i in map) { idx = map[i]; break; }
   Object.keys(p.done).forEach(i => { if (i in map) done[map[i]] = p.done[i]; });
   const rs = p.results.filter(r => !r.q.extra);
+  // 这一轮里最后一次做错的题（包括穿插、再出的）：下次接着做时在开头几题后再考一次；
+  // 再出时已经做对的就不记了，交给今日复习按间隔再排
+  const last = {};
+  (p.pend || []).forEach(k => { last[k] = false; });
+  p.results.forEach(r => { if (SELF_TYPES.indexOf(r.q.type) < 0) last[r.q.key] = r.correct; });
   return {
     v: 2, ids: keep.map(q => q.key), idx: Math.max(idx, 0), done: done,
+    pend: Object.keys(last).filter(k => last[k] === false),
     results: rs.map(r => [r.q.key, r.correct]), correct: rs.filter(r => r.correct).length,
     title: p.title, opts: p.saveOpts, auto: p.autoKey || null, t: nowText(),
   };
@@ -1434,14 +1901,53 @@ async function loadSave(key) {
     toast(sv.v === 2 ? '题目变过了，这个存档用不了' : '这是旧版本存的档，题目对不上（可能是在别的设备上存的），用不了', 'bad');
     return;
   }
-  beginPractice(list, sv.title, 'practice');
+  const extra = await resumeExtras(list, sv, byId, o);
+  beginPractice(extra.list, sv.title, 'practice');
   const p = state.practice;
-  Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0,
+  Object.assign(p, { idx: sv.idx, done: sv.done || {}, correct: sv.correct || 0, pend: sv.pend || [],
                      results: (sv.results || []).map(r => ({ q: byId[r[0]], correct: r[1] })).filter(r => r.q),
                      saveKey: isAuto ? key.replace('zx.auto.', 'zx.save.') : key, saveOpts: Object.assign({}, sv.opts, { paper_id: o.paper_id }),
                      autoKey: isAuto ? key : (sv.auto || null) });
   route();
-  toast(isAuto ? '接着上次：第 ' + (sv.idx + 1) + ' 题' : '已读档：回到第 ' + (sv.idx + 1) + ' 题');
+  toast((isAuto ? '接着上次：第 ' + (sv.idx + 1) + ' 题' : '已读档：回到第 ' + (sv.idx + 1) + ' 题') +
+        (extra.again ? '，上次做错的 ' + extra.again + ' 道过几题再考一次' : '') +
+        (extra.old ? '，穿插 ' + extra.old + ' 道以前错过的题' : ''));
+}
+
+// 接着做（自动进度、读档）时把穿插的题补回来——存档里不存穿插的题，只存题目本身：
+// 1. 上次最后一次做错的（sv.pend）：从当前位置往后隔 2 篇出第一道，之后每隔 2 篇一道，选项重新打乱；
+// 2. 剩下的部分照开始练习时一样，每 OLD_EVERY 篇穿插一道以前错过的题（已经在这一轮里的不算）。
+// 都只插在当前位置后面，前面做过的题号不变
+async function resumeExtras(list, sv, byId, o) {
+  const at = Math.min(sv.idx || 0, list.length);
+  const ahead = {};
+  list.slice(at).forEach(q => { ahead[q.key] = 1; });
+  const keys = (sv.pend || []).filter(k => !ahead[k]);
+  const subject = o.subject || (list[0] && list[0].subject);
+  let pool = byId;
+  if (keys.some(k => !byId[k]) && subject) {                 // 穿插进来的旧错题可能是别的卷子的
+    try {
+      pool = Object.assign({}, byId);
+      (await api('/api/practice?scope=all&order=seq&subject=' + encodeURIComponent(subject))).items.forEach(q => { if (!pool[q.key]) pool[q.key] = q; });
+    } catch (e) { /* 拿不到就只补这个范围里的 */ }
+  }
+  const again = keys.map(k => pool[k]).filter(q => q && q.answer && SELF_TYPES.indexOf(q.type) < 0);
+  let olds = [];
+  const rest = list.slice(at), tmp = { list: rest }, starts = [];
+  for (let i = 0; i < rest.length; i = unitEnd(tmp, i)) starts.push(i);
+  if (mixOldOn() && subject) {
+    olds = await oldWrongs(subject, list.concat(again), Math.min(OLD_MAX, Math.floor(starts.length / OLD_EVERY)), typeOf(o.type));
+  }
+  let out = olds.length ? spreadIn(rest, starts, olds.map(q => extraCopy(q, 'old'))) : rest;
+  if (again.length) {
+    const t2 = { list: out }, st = [];
+    for (let i = 0; i < out.length; i = unitEnd(t2, i)) st.push(i);
+    for (let k = again.length - 1; k >= 0; k--) {           // 从后往前插，前面的位置不受影响
+      const j = 2 + 2 * k;
+      out.splice(j < st.length ? st[j] : out.length, 0, extraCopy(again[k], 'last'));
+    }
+  }
+  return { list: list.slice(0, at).concat(out), again: again.length, old: olds.length };
 }
 
 function nowText() {
@@ -1542,6 +2048,7 @@ function renderGroup() {
         '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题 · 第 ' + no[0] + ' / ' + no[1] + ' 篇</span>' +
         (q0.extra ? extraBadge(q0) : '') +
         '<span class="spacer"></span>' + (cnQ ? cnBtn(cnQ) : '') +
+        (state.ai.on && !IS_APP ? '<button class="ai-btn" data-aigroup="1" title="让 AI 讲讲当前这道小题">问 AI</button>' : '') +
       '</div>' +
       '<div class="g-wrap">' +
         // 原文和参考译文分成上下两个框，各自滚动（译文不接在原文末尾，要看不用滚到底）
@@ -1757,7 +2264,7 @@ function renderQ() {
         '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
         (q.extra ? extraBadge(q) : recBadge(q)) +
-        '<span class="spacer"></span>' + cnBtn(q) +
+        '<span class="spacer"></span>' + cnBtn(q) + aiBtn(q) +
       '</div>' +
       materialBox(q) +
       '<div class="stem">' + unitNo(p) + '、' + rich(q.stem) + '</div>' + stemCn(q) +
@@ -2015,7 +2522,7 @@ function renderFinish() {
           const q = r.q;
           return '<div class="card">' +
             '<div class="qhead"><span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
-            '<span class="qsrc">' + esc(q.paper_name || '') + ' · 第' + q.qno + '题</span><span class="spacer"></span>' + cnBtn(q) + '</div>' +
+            '<span class="qsrc">' + esc(q.paper_name || '') + ' · 第' + q.qno + '题</span><span class="spacer"></span>' + cnBtn(q) + aiBtn(q) + '</div>' +
             materialBox(q, true) +
             '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
             optsStatic(q) +
@@ -2353,34 +2860,213 @@ function rcPad(str, at, len, text) {
   return (/[A-Za-z0-9,.;:!?'"’)]/.test(before) ? ' ' : '') + text + (/[A-Za-z0-9('"‘]/.test(after) ? ' ' : '');
 }
 
-// 导出 Word（static/word.js 生成 .docx）：电脑上直接下载；手机上交给 App 弹分享面板（存到文件、发微信 / QQ）
-async function exportWord(src, name, ans) {
-  if (IS_APP && !(window.ZXStore && ZXStore.shareFile)) { toast('手机上导出 Word 要先更新到新版 App', 'bad'); return; }
-  let d;
-  try {
-    d = await api('/api/practice?paper_id=' + (src.paper_id || 0) + '&scope=all&order=seq' +
-      (src.subject ? '&subject=' + encodeURIComponent(src.subject) : '') + (src.type ? '&type=' + encodeURIComponent(src.type) : ''));
-  } catch (e) { toast(e.message, 'bad'); return; }
-  if (!d.items.length) { toast('这里没有题目'); return; }
-  toast('正在生成 Word……');
-  const fname = name.replace(/[\/:*?"<>|]/g, '') + '（' + (ans ? '答案' : '空白卷') + '）.docx';
-  let blob;
-  try {
-    blob = await WX.build(name, d.items.slice(), ans, q => q.section || TYPE_NAME[q.cat] || TYPE_NAME[q.type] || '题目');
-  } catch (e) { toast('生成失败：' + e.message, 'bad'); return; }
-  if (IS_APP) {
-    const b64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.readAsDataURL(blob); });
-    const err = ZXStore.shareFile(fname, b64, blob.type);
-    if (err) toast(err, 'bad');
-    return;
-  }
+// 导出 Word（static/word.js 生成 .docx），只在电脑上有，直接下载
+const exportSec = q => q.section || TYPE_NAME[q.cat] || TYPE_NAME[q.type] || '题目';
+const fileSafe = s => String(s).replace(/[\\/:*?"<>|]/g, '');
+function exportQs(src, scope) {
+  return api('/api/practice?paper_id=' + (src.paper_id || 0) + '&scope=' + (scope || 'all') + '&order=seq' +
+    (src.subject ? '&subject=' + encodeURIComponent(src.subject) : '') + (src.type ? '&type=' + encodeURIComponent(src.type) : ''))
+    .then(d => d.items);
+}
+function saveBlob(blob, fname) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = fname;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+}
+
+// 一张卷子或一个题型
+async function exportWord(src, name, ans) {
+  let qs;
+  try { qs = await exportQs(src); } catch (e) { toast(e.message, 'bad'); return; }
+  if (!qs.length) { toast('这里没有题目'); return; }
+  toast('正在生成 Word……');
+  const fname = fileSafe(name) + '（' + (ans ? '答案' : '空白卷') + '）.docx';
+  try { saveBlob(await WX.build(name, qs, ans, exportSec), fname); } catch (e) { toast('生成失败：' + e.message, 'bad'); return; }
   toast('已导出：' + fname, 'good');
+}
+
+// 多张卷子一起导出：搜索 / 按科目勾卷子，可以只要某几种题型、只要错题本里的题；
+// 空白卷 / 答案卷 / 两种都要，合成一个 Word 或每张一个（不止一个文件就打包成 zip）。
+// 上次选的导出内容、文件方式记在本机 localStorage quiz.export（只图方便，不同步）
+function exportPrefs() {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem('quiz.export') || 'null'); } catch (e) { /* 读不了就用默认 */ }
+  return Object.assign({ kind: 'blank', split: false }, o || {});
+}
+async function openExportSheet(pre) {
+  let papers, subjects;
+  try {
+    await loadHidden();
+    papers = (await api('/api/papers')).papers.filter(p => !isHidden(p.subject));
+    subjects = (await api('/api/dashboard')).data.subjects;
+  } catch (e) { toast(e.message, 'bad'); return; }
+  if (!papers.length) { toast('没有卷子可以导出'); return; }
+  const pf = exportPrefs();
+  const sel = {}, offTypes = {};          // offTypes：不要的题型（默认全要）
+  let q = '', wrongOnly = false;
+  (pre || []).forEach(k => { sel[k] = 1; });
+  const subjs = [];
+  papers.forEach(p => { if (subjs.indexOf(p.subject) < 0) subjs.push(p.subject); });
+  // 科目胶囊只是筛选列表（和首页一样），勾选靠复选框；带着预选进来时先筛到那一科
+  const preSj = papers.filter(p => sel[p.key]).map(p => p.subject);
+  let fsj = preSj.length && preSj.every(x => x === preSj[0]) ? preSj[0] : '';
+  const typesOf = sj => ((subjects.find(s => s.subject === sj) || {}).types || []).map(t => t.type);
+  const seg = (name, cur, opts) => '<div class="xp-seg" data-name="' + name + '">' + opts.map(o =>
+    '<button class="pill-tab' + (cur === o[0] ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  sheet.innerHTML =
+    '<div class="sheet xp" role="dialog">' +
+      '<div class="sheet-h"><b>导出 Word</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+      '<div class="xp-body"><div class="xp-left">' +
+        '<div class="sheet-t xp-t"><span>选卷子<span class="xp-n"></span></span>' +
+          '<span class="xp-links"><a href="javascript:void(0)" data-all="1">全选列表里的</a><a href="javascript:void(0)" data-all="0">清空</a></span></div>' +
+        '<div class="xp-subjs">' + [''].concat(subjs).map(sj => '<button class="pill-tab' + (sj === fsj ? ' on' : '') + '" data-sj="' + esc(sj) + '">' +
+          esc(sj ? SUBJECT_NAME[sj] || sj : '全部') + '</button>').join('') + '</div>' +
+        '<label class="search-pill xp-q">' + icon('search') + '<input placeholder="搜索卷子，比如 练习卷、模拟、(3)"></label>' +
+        '<div class="xp-list"></div>' +
+      '</div><div class="xp-right">' +
+        '<div class="sheet-t">题型</div>' +
+        '<div class="sheet-d xp-td">默认全要，点掉不要的。</div>' +
+        '<div class="xp-chks xp-types"></div>' +
+        '<div class="sheet-t xp-gap">范围</div>' +
+        '<div class="xp-seg xp-scope"></div>' +
+        '<div class="sheet-t xp-gap">导出内容</div>' +
+        '<div class="sheet-d">答案卷用红字标答案，每张卷子后面附答案速查（不带解析）。</div>' +
+        seg('kind', pf.kind, [['blank', '空白卷'], ['ans', '答案卷'], ['both', '两种都要']]) +
+        '<div class="sheet-t xp-gap">文件</div>' +
+        '<div class="sheet-d">合成一个：每张卷子另起一页，题号各自从 1 开始。不止一个文件时打包成 zip。</div>' +
+        seg('split', pf.split ? '1' : '0', [['0', '合成一个 Word'], ['1', '每张卷子一个 Word']]) +
+        '<button class="btn block xp-go"></button>' +
+      '</div></div>' +
+    '</div>';
+  const $s = s => sheet.querySelector(s);
+  const visible = () => papers.filter(p => (!fsj || p.subject === fsj) &&
+                                           (!q || p.name.indexOf(q) >= 0 || (SUBJECT_NAME[p.subject] || '').indexOf(q) >= 0));
+  const picked = () => papers.filter(p => sel[p.key]);
+  const pickedTypes = () => {           // 选中的卷子所在科目的题型（英语按细分题型）
+    const out = [];
+    picked().forEach(p => typesOf(p.subject).forEach(t => { if (out.indexOf(t) < 0) out.push(t); }));
+    return out;
+  };
+  const drawList = () => {
+    const vs = visible();
+    $s('.xp-list').innerHTML = subjs.map(sj => {
+      const ps = vs.filter(p => p.subject === sj);
+      if (!ps.length) return '';
+      const n = ps.filter(p => sel[p.key]).length;
+      return '<label class="xp-subj"><input type="checkbox" data-subj="' + esc(sj) + '"' + (n === ps.length ? ' checked' : '') + '>' +
+        esc(SUBJECT_NAME[sj] || sj) + '</label>' +
+        ps.map(p => '<label class="xp-item"><input type="checkbox" data-key="' + esc(p.key) + '"' + (sel[p.key] ? ' checked' : '') + '>' +
+          '<span class="xp-name">' + esc(p.name) + '</span>' + (p.wrong_open ? '<span class="xp-w">错 ' + p.wrong_open + '</span>' : '') +
+          '<span class="xp-c">' + p.total + ' 题</span></label>').join('');
+    }).join('') || '<div class="empty">没有符合条件的卷子</div>';
+    Array.from(sheet.querySelectorAll('input[data-subj]')).forEach(b => {
+      const ps = vs.filter(p => p.subject === b.dataset.subj), n = ps.filter(p => sel[p.key]).length;
+      b.indeterminate = n > 0 && n < ps.length;
+    });
+  };
+  const refresh = () => {
+    drawList();
+    Array.from(sheet.querySelectorAll('[data-sj]')).forEach(b => b.classList.toggle('on', b.dataset.sj === fsj));
+    const ts = pickedTypes();
+    $s('.xp-types').innerHTML = ts.length ? ts.map(t => '<button class="xp-chk' + (offTypes[t] ? '' : ' on') + '" data-t="' + esc(t) + '">' +
+      '<i></i>' + esc(TYPE_NAME[t] || t) + '</button>').join('') : '<span class="muted">先在左边勾卷子</span>';
+    $s('.xp-td').style.display = ts.length ? '' : 'none';
+    const wn = picked().reduce((s, p) => s + (p.wrong_open || 0), 0);
+    if (!wn) wrongOnly = false;                                   // 没有错题时这一项点不了
+    $s('.xp-scope').innerHTML = '<button class="pill-tab' + (wrongOnly ? '' : ' on') + '" data-w="0">全部题目</button>' +
+      '<button class="pill-tab' + (wrongOnly ? ' on' : '') + '" data-w="1"' + (wn ? '' : ' disabled title="选中的卷子里没有错题"') + '>只要错题本里的' +
+        (picked().length ? '（' + wn + ' 题）' : '') + '</button>';
+    const n = picked().length, go = $s('.xp-go');
+    $s('.xp-n').textContent = n ? '（已选 ' + n + ' 张）' : '';
+    const noType = ts.length && ts.every(t => offTypes[t]);
+    go.disabled = !n || noType;
+    go.textContent = !n ? '先在左边勾选卷子' : noType ? '至少留一种题型' : '导出（' + n + ' 张卷子）';
+  };
+  let busy = false;
+  const close = () => { if (!busy) sheet.remove(); };
+  sheet.addEventListener('change', e => {
+    const b = e.target;
+    if (b.dataset.key) sel[b.dataset.key] = b.checked ? 1 : 0;
+    else if (b.dataset.subj) visible().forEach(p => { if (p.subject === b.dataset.subj) sel[p.key] = b.checked ? 1 : 0; });
+    else return;
+    refresh();
+  });
+  $s('.xp-q input').addEventListener('input', e => { q = e.target.value.trim(); drawList(); });
+  sheet.addEventListener('click', async e => {
+    if (e.target === sheet || e.target.closest('.sheet-x')) return close();
+    const all = e.target.closest('[data-all]');                 // 全选：列表里（筛选、搜索后）看得见的；清空：全部不选
+    if (all) { (+all.dataset.all ? visible() : papers).forEach(p => { sel[p.key] = +all.dataset.all; }); return refresh(); }
+    const sj = e.target.closest('[data-sj]');                   // 科目胶囊：筛选列表
+    if (sj) { fsj = sj.dataset.sj; return refresh(); }
+    const t = e.target.closest('[data-t]');
+    if (t) { offTypes[t.dataset.t] = !offTypes[t.dataset.t]; return refresh(); }
+    const w = e.target.closest('[data-w]');
+    if (w) { if (!w.disabled) wrongOnly = w.dataset.w === '1'; return refresh(); }
+    const opt = e.target.closest('.xp-seg[data-name] .pill-tab');
+    if (opt) {
+      Array.from(opt.parentNode.querySelectorAll('.pill-tab')).forEach(x => x.classList.toggle('on', x === opt));
+      if (opt.parentNode.dataset.name === 'kind') pf.kind = opt.dataset.v; else pf.split = opt.dataset.v === '1';
+      try { localStorage.setItem('quiz.export', JSON.stringify(pf)); } catch (er) { /* 记不住也照样导出 */ }
+      return;
+    }
+    const go = e.target.closest('.xp-go');
+    if (!go || go.disabled || busy) return;
+    busy = true;
+    go.disabled = true;
+    const types = pickedTypes().filter(x => !offTypes[x]);
+    const filt = types.length === pickedTypes().length ? null : types;
+    try { await exportMany(picked(), { kind: pf.kind, split: pf.split, wrong: wrongOnly, types: filt }, x => { go.textContent = x; }); busy = false; sheet.remove(); }
+    catch (er) { busy = false; toast('导出失败：' + er.message, 'bad'); refresh(); }
+  });
+  document.body.appendChild(sheet);
+  refresh();
+}
+
+// o：{ kind: blank/ans/both, split, wrong: 只要错题本里的, types: 只要这些题型（null = 全要） }
+async function exportMany(sel, o, say) {
+  const parts = [];
+  for (let i = 0; i < sel.length; i++) {
+    say('正在读取题目 ' + (i + 1) + '/' + sel.length + '……');
+    let qs = await exportQs({ paper_id: sel[i].id }, o.wrong ? 'wrong' : 'all');
+    if (o.types) qs = qs.filter(x => o.types.some(t => typeOf(t)(x)));
+    if (qs.length) parts.push({ title: sel[i].name + (o.wrong ? '·错题' : ''), qs: qs, subject: sel[i].subject });
+  }
+  if (!parts.length) throw new Error(o.wrong ? '选中的卷子里没有错题本里的题' : '选中的卷子里没有符合条件的题');
+  const kinds = o.kind === 'both' ? [false, true] : [o.kind === 'ans'];
+  const tag = ans => '（' + (ans ? '答案' : '空白卷') + '）';
+  const sj = parts.every(p => p.subject === parts[0].subject) ? (SUBJECT_NAME[parts[0].subject] || '') : '';
+  const base = parts.length === 1 ? parts[0].title : (sj || '智学题库') + ' ' + parts.length + ' 张卷子' + (o.wrong ? '·错题' : '');
+  const files = [], used = {};
+  const add = (name, blob) => {           // zip 里不能有重名文件
+    const stem = fileSafe(name);
+    let n = stem + '.docx', k = 2;
+    while (used[n]) n = stem + '-' + (k++) + '.docx';
+    used[n] = 1;
+    files.push([n, blob]);
+  };
+  const total = kinds.length * (o.split ? parts.length : 1);
+  for (const ans of kinds) {
+    for (const p of (o.split ? parts : [null])) {
+      say('正在生成 Word ' + (files.length + 1) + '/' + total + '……');
+      if (p) add(p.title + tag(ans), await WX.build(p.title, p.qs, ans, exportSec));
+      else add(base + tag(ans), await WX.buildMany(parts, ans, exportSec));
+    }
+  }
+  let fname;
+  if (files.length === 1) { fname = files[0][0]; saveBlob(files[0][1], fname); }
+  else {
+    say('正在打包……');
+    fname = fileSafe(base + (kinds.length > 1 ? '（空白卷和答案）' : tag(kinds[0]))) + '.zip';
+    saveBlob(await WX.zipFiles(files), fname);
+  }
+  const skipped = sel.length - parts.length;
+  toast('已导出：' + fname + (files.length > 1 ? '（' + files.length + ' 个 Word）' : '') +
+        (skipped ? '，' + skipped + ' 张卷子没有符合条件的题，没导出' : ''), 'good');
 }
 
 async function startRecite(src, name, order) {
@@ -2435,7 +3121,7 @@ function viewRecite() {
     '<div class="card qcard-main rc-card' + (open ? ' rc-open' : ' rc-closed') + '"' + (open ? '' : ' onclick="rcReveal()"') + '>' +
       '<div class="qhead"><span class="tag t-' + q0.type + '">' + esc(cat) + '</span>' +
         '<span class="qsrc">' + esc(q0.paper_name) + (g.length > 1 ? ' 第' + g[0].qno + '–' + g[g.length - 1].qno + '题' : ' 第' + q0.qno + '题') + '</span>' +
-        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q0) + '</div>' +
+        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q0) + aiBtn(q0) + '</div>' +
       rcBody(g) +
       (open ? '' : '<div class="rc-tap">点一下看答案</div>') +
     '</div>' +
@@ -2565,7 +3251,7 @@ function rcQuizView(g) {
     '<div class="card qcard-main rc-quiz' + (st ? ' answered' : '') + '">' +
       '<div class="qhead"><span class="tag t-' + q.type + '">小测</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' + extraBadge(q) +
-        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q) + '</div>' +
+        '<span class="spacer"></span><span class="muted">' + (r.idx + 1) + ' / ' + r.cards.length + '</span>' + cnBtn(q) + aiBtn(q) + '</div>' +
       materialBox(q, true) +
       '<div class="stem">' + rich(q.stem) + (q.type === 'multi' ? '（多选）' : '') + '</div>' + stemCn(q) +
       '<div class="' + (judge ? 'judge-row' : 'opts') + ' rcq-opts">' + optionList(q).map(btn).join('') + '</div>' +
@@ -2678,6 +3364,8 @@ async function viewSettings() {
   try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库 */ }
   let sy = null;
   try { sy = await api('/api/sync/status'); } catch (e) { /* 老版本程序：没有同步 */ }
+  let aic = null;
+  if (!IS_APP) try { aic = await api('/api/ai/config'); } catch (e) { /* 老版本程序：没有 AI 助手 */ }
   state.hidden = d.settings.hidden_subjects || [];
   // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 专业技能 / 其他分组
   const subjOpts = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, note: s.total + ' 题' }));
@@ -2732,6 +3420,8 @@ async function viewSettings() {
 
     (sy && sy.available ? '<div class="set-group-t">账号同步（内测）</div><div id="sync-box">' + syncBoxHtml(sy) + '</div>' : '') +
 
+    (aic ? aiSettingsHtml(aic) : '') +
+
     '<div class="set-group-t">我的数据</div><div class="set-list">' +
       (a.mobile ? item('保存位置', '本机') : '<div class="set-item set-col"><span class="set-main">保存位置</span><span class="set-sub">' + esc(a.data_dir) + '</span></div>') +
       (a.open_data ? item('打开数据文件夹', '', ' onclick="openDataDir()"', 'set-link') : '') +
@@ -2751,6 +3441,7 @@ async function viewSettings() {
     '</div>';
   const btn = $('#upd-check');
   if (btn) btn.addEventListener('click', checkUpdate);
+  if (aic) bindAiSettings(aic);
   const au = $('#auto-upd');
   if (au) au.addEventListener('change', () => {
     store.set('zx.autoUpd', au.checked);
@@ -3299,6 +3990,213 @@ async function clearMyData() {
   } catch (e) { toast(e.message, 'bad'); }
 }
 
+/* ================================================================ AI 助手（可选）
+ * 设置里打开、填自己的 API Key 才有（llm.py，只在电脑版；手机上不显示）。没打开时界面上不出现任何 AI 的东西：
+ * aiBtn() 返回空、设置页只有一个开关、导入整理台没有「用 AI 整理」。
+ * 打开后：做题 / 背题 / 错题本 / 搜索的题目卡片右上角多一个「问 AI」，点开右侧对话框，带着这道题（官方答案、你选的）聊；
+ * 模拟考试里没有。对话只留在这次打开的页面里（state.ai.chats），不存盘、不同步。 */
+state.ai = { on: false, chats: {}, qs: {} };
+function loadAi() {
+  if (IS_APP) return Promise.resolve();
+  return api('/api/ai/config').then(c => { state.ai.on = !!c.enabled; }).catch(() => { state.ai.on = false; });
+}
+function aiBtn(q) {
+  if (!state.ai.on || IS_APP || !q || /^#\/exam/.test(location.hash)) return '';
+  state.ai.qs[q.id] = q;
+  return '<button class="ai-btn" data-aiq="' + q.id + '" title="让 AI 讲讲这道题">问 AI</button>';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.ai-btn');
+  if (!b) return;
+  e.stopPropagation();
+  const p = state.practice;                     // 整篇卡片：问的是当前那道小题
+  const q = b.dataset.aigroup ? (p && p.group && p.list[p.group.s + p.group.cur]) : state.ai.qs[b.dataset.aiq];
+  if (q) openAiChat(q);
+}, true);
+
+// 这道题现在的作答情况（做题页里才有）：给 AI 当背景，没作答时 AI 只给提示
+function aiQState(q) {
+  const p = state.practice;
+  if (location.hash !== '#/practice' || !p) return {};
+  const a = unitStart(p, p.idx), z = unitEnd(p, p.idx);
+  const i = p.list.findIndex((x, k) => x.id === q.id && k >= a && k < z);
+  if (i < 0) return {};
+  const sel = p.done[i];
+  if (!sel || sel.self !== undefined) return { answered: !!sel };
+  const s = sel.join('');
+  const ok = q.type === 'multi' ? s.split('').sort().join('') === q.answer.split('').sort().join('') : s === q.answer;
+  return { answered: true, selected: s, correct: ok };
+}
+
+function aiText(s) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^#{1,4}\s*/gm, '').replace(/\n/g, '<br>');
+}
+
+function openAiChat(q) {
+  closeAiChat();
+  const st = aiQState(q);
+  const chat = state.ai.chats[q.id] = state.ai.chats[q.id] || [];
+  const quick = [['讲解这道题', '讲解一下这道题。']];
+  if (st.answered && st.correct === false) quick.unshift(['我为什么错', '我选了 ' + st.selected + '，为什么不对？']);
+  if (!st.answered && SELF_TYPES.indexOf(q.type) < 0) quick.unshift(['给点提示', '先别告诉我答案，给我一点提示。']);
+  quick.push(['讲讲知识点', '这道题考的是什么知识点？帮我梳理一下要记住的内容。']);
+  const box = document.createElement('div');
+  box.className = 'ai-panel';
+  box.innerHTML =
+    '<div class="ai-head"><b>问 AI</b><span class="muted ai-sub">' + esc((q.paper_name ? q.paper_name + ' · ' : '') + '第 ' + q.qno + ' 题') + '</span>' +
+      '<button class="sheet-x" aria-label="关闭">×</button></div>' +
+    '<div class="ai-q">' + esc(String(q.stem || '').replace(/\[\[img:[^\]]+\]\]/g, '[图]').replace(/\s+/g, ' ').slice(0, 80)) + '</div>' +
+    '<div class="ai-msgs"></div>' +
+    '<div class="ai-quick">' + quick.map(x => '<button class="pill-tab" data-say="' + esc(x[1]) + '">' + x[0] + '</button>').join('') + '</div>' +
+    '<div class="ai-input"><textarea rows="2" placeholder="问点什么，回车发送（Shift+回车换行）"></textarea><button class="btn" data-send="1">发送</button></div>' +
+    '<div class="ai-foot">AI 的回答可能出错，只作参考；答案以官方答案为准。</div>';
+  document.body.appendChild(box);
+  document.body.classList.add('ai-open');
+  const msgs = box.querySelector('.ai-msgs'), ta = box.querySelector('textarea');
+  const draw = () => {
+    msgs.innerHTML = chat.length ? chat.map(m => '<div class="ai-m ' + m.role + (m.err ? ' err' : '') + '">' + aiText(m.content) + '</div>').join('') +
+      (box.dataset.busy ? '<div class="ai-m assistant typing">正在想……</div>' : '') :
+      '<div class="ai-empty">点下面的按钮，或者直接问。AI 看得到这道题的题目、选项和官方答案' + (st.answered ? '，也知道你选了什么' : '') + '。</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+  };
+  const send = async text => {
+    text = (text || '').trim();
+    if (!text || box.dataset.busy) return;
+    chat.push({ role: 'user', content: text });
+    box.dataset.busy = '1';
+    ta.value = '';
+    draw();
+    const ctx = Object.assign({ subject: SUBJECT_NAME[q.subject] || q.subject || '', type: q.type, stem: q.stem, material: q.material,
+                                options: q.options, answer: q.answer, analysis: q.analysis }, st);
+    try {
+      const r = await api('/api/ai/ask', { method: 'POST', body: { q: ctx, messages: chat.filter(m => !m.err) } });
+      chat.push({ role: 'assistant', content: r.reply || '（AI 没有回复内容）' });
+    } catch (e) {
+      chat.push({ role: 'assistant', content: e.message, err: true });
+    }
+    delete box.dataset.busy;
+    if (document.body.contains(box)) draw();
+  };
+  box.addEventListener('click', e => {
+    if (e.target.closest('.sheet-x')) return closeAiChat();
+    const s = e.target.closest('[data-say]');
+    if (s) return send(s.dataset.say);
+    if (e.target.closest('[data-send]')) send(ta.value);
+  });
+  ta.addEventListener('keydown', e => {
+    e.stopPropagation();                         // 打字时不触发做题页的快捷键
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(ta.value); }
+  });
+  draw();
+  ta.focus();
+}
+function closeAiChat() {
+  const b = document.querySelector('.ai-panel');
+  if (b) b.remove();
+  document.body.classList.remove('ai-open');
+}
+window.addEventListener('hashchange', closeAiChat);
+
+// 本机地址（Ollama）：不用 Key
+const aiLocal = u => /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(u || '');
+
+// 设置页「AI 助手」一节
+function aiSettingsHtml(c) {
+  const pv = c.providers.find(p => p.id === c.provider) || c.providers[0];
+  return '<div class="set-group-t">AI 助手（可选）</div><div class="set-list">' +
+      '<label class="set-item"><span class="set-main">打开 AI 助手</span><input type="checkbox" class="switch" id="ai-on"' + (c.enabled ? ' checked' : '') + '></label>' +
+      '<div class="set-item set-col ai-form" id="ai-form"' + (c.enabled || state.ai.editing ? '' : ' hidden') + '>' +
+        '<label class="ai-f"><span>服务商</span><select class="inp" id="ai-prov">' + c.providers.map(p =>
+          '<option value="' + p.id + '"' + (p.id === pv.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></label>' +
+        '<label class="ai-f"><span>API Key</span><input class="inp" id="ai-key" type="password" autocomplete="off" placeholder="' +
+          (aiLocal(c.base_url || pv.base_url) ? '本机 Ollama 不用填' : c.has_key ? '已保存（尾号 ' + esc(c.key_tail || '****') + '），不改就留空' : '粘贴你的 API Key') + '"></label>' +
+        '<label class="ai-f"><span>接口地址</span><input class="inp" id="ai-url" value="' + esc(c.base_url || pv.base_url) + '" placeholder="https://…/v1"></label>' +
+        '<label class="ai-f"><span>模型</span><input class="inp" id="ai-model" list="ai-models" value="' + esc(c.model || pv.model) + '" placeholder="模型名称"></label>' +
+        '<datalist id="ai-models"></datalist>' +
+        '<div class="ai-f ai-acts"><a href="javascript:void(0)" id="ai-site"' + (pv.site ? '' : ' hidden') + '>去申请 Key</a><span class="spacer"></span>' +
+          '<button class="btn ghost sm" id="ai-test">测试连接</button><button class="btn sm" id="ai-save">保存</button></div>' +
+        '<div class="ai-test-out" id="ai-test-out"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="set-foot">打开后：做题、背题、错题本里每道题右上角有「问 AI」，可以让它讲题、说你为什么错；导入试卷时可以「用 AI 整理」格式。' +
+      '关掉后界面上不会出现任何 AI 的按钮。<br>Key 只存在这台电脑上，不会同步到账号；问题会发给你选的服务商，费用按他们的规则算' +
+      '（智谱 glm-4-flash、硅基流动的部分模型免费，DeepSeek 很便宜）。AI 的回答可能出错，答案以官方答案为准。</div>';
+}
+
+function bindAiSettings(c) {
+  const on = $('#ai-on');
+  if (!on) return;
+  const form = $('#ai-form');
+  const prov = () => c.providers.find(p => p.id === $('#ai-prov').value) || {};
+  const keyOk = () => c.has_key || !!$('#ai-key').value.trim() || aiLocal($('#ai-url').value);
+  // 本机 Ollama：读出装了哪些模型，模型框里可以直接选；没填模型就先用第一个
+  const loadModels = async () => {
+    const url = $('#ai-url').value.trim();
+    $('#ai-key').placeholder = aiLocal(url) ? '本机 Ollama 不用填' : (c.has_key ? '已保存（尾号 ' + (c.key_tail || '****') + '），不改就留空' : '粘贴你的 API Key');
+    if (!aiLocal(url)) { $('#ai-models').innerHTML = ''; return; }
+    let ms = [];
+    try { ms = (await api('/api/ai/models', { method: 'POST', body: { base_url: url } })).models; } catch (e) { /* 连不上就算了 */ }
+    $('#ai-models').innerHTML = ms.map(m => '<option value="' + esc(m) + '">').join('');
+    if (!ms.length) toast('没连上本机的 Ollama：先打开 Ollama，再点「测试连接」', 'bad');
+    else if (!$('#ai-model').value.trim()) $('#ai-model').value = ms.find(m => !/:cloud$/.test(m)) || ms[0];
+  };
+  const body = () => ({ provider: $('#ai-prov').value, base_url: $('#ai-url').value.trim(), model: $('#ai-model').value.trim(),
+                        api_key: $('#ai-key').value.trim() });
+  const save = async enabled => {
+    try {
+      const r = await api('/api/ai/config', { method: 'POST', body: Object.assign(body(), { enabled: enabled }) });
+      c.has_key = r.has_key;
+      c.key_tail = r.key_tail;
+      state.ai.on = r.enabled;
+      on.checked = r.enabled;
+      return r;
+    } catch (e) { toast(e.message, 'bad'); return null; }
+  };
+  on.addEventListener('change', async () => {
+    if (on.checked) {
+      form.hidden = false;
+      state.ai.editing = true;
+      if (!keyOk()) { on.checked = false; toast('先填 API Key，点「保存」就打开了'); $('#ai-key').focus(); return; }
+      const r = await save(true);
+      if (r && r.enabled) toast('已打开 AI 助手', 'good');
+    } else {
+      form.hidden = true;
+      state.ai.editing = false;
+      await save(false);
+      closeAiChat();
+      toast('已关闭 AI 助手：界面上不再出现 AI 的按钮');
+    }
+  });
+  $('#ai-prov').addEventListener('change', () => {
+    const p = prov();
+    if (p.id !== 'custom') { $('#ai-url').value = p.base_url; $('#ai-model').value = p.model; }
+    $('#ai-site').hidden = !p.site;
+    if (p.id === 'doubao') toast('豆包的“模型”要填你在火山方舟上建的接入点 ID（ep-…）');
+    loadModels();
+  });
+  $('#ai-url').addEventListener('change', loadModels);
+  if (aiLocal($('#ai-url').value)) loadModels();
+  $('#ai-site').addEventListener('click', () => { const p = prov(); if (p.site) openExternal(p.site); });
+  $('#ai-test').addEventListener('click', async () => {
+    const out = $('#ai-test-out'), tb = $('#ai-test');
+    tb.disabled = true;                            // 连点两下，两次的结果会互相盖掉
+    out.className = 'ai-test-out';
+    out.textContent = '正在连接……';
+    try {
+      const r = await api('/api/ai/test', { method: 'POST', body: body() });
+      out.className = 'ai-test-out ok';
+      out.textContent = '连上了，AI 回复：' + r.reply;
+    } catch (e) { out.className = 'ai-test-out bad'; out.textContent = e.message; }
+    tb.disabled = false;
+  });
+  $('#ai-save').addEventListener('click', async () => {
+    const b = body();
+    if (!keyOk()) { toast('先填 API Key', 'bad'); return; }
+    const r = await save(true);
+    if (r) { $('#ai-key').value = ''; $('#ai-key').placeholder = '已保存（尾号 ' + (r.key_tail || '****') + '），不改就留空'; toast('已保存，AI 助手已打开', 'good'); }
+  });
+}
+
 /* ================================================================ 主题 */
 
 function applyTheme(pref) {
@@ -3336,6 +4234,7 @@ function applyTheme(pref) {
 
 window.addEventListener('DOMContentLoaded', () => {
   route();
+  loadAi().then(() => { if (state.ai.on) route(); });
   lsPull();                 // 别的设备的练习存档（登录了同步才有）
   // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
   api('/api/app').then(a => {

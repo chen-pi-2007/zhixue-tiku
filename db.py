@@ -232,10 +232,58 @@ def upsert_paper(key, name, subject, questions, media_src=None):
         return pid, (old or _bank['papers'][-1])['name']
 
 
-def add_upload(filename, parsed, subject='general'):
+def add_upload(filename, parsed, subject='general', key=None):
+    """导入的卷子（key 是 upload-…）。传 key 就是整卷替换已经导入过的那张（导入整理台里补答案、改题），同序号的题进度不变"""
     name = os.path.splitext(os.path.basename(filename))[0]
-    key = 'upload-%d' % int(time.time() * 1000)
+    key = key or 'upload-%d' % int(time.time() * 1000)
     return upsert_paper(key, name, subject or 'general', parsed['questions'])
+
+
+def paper_questions(pid):
+    """(卷子, 按原顺序的题目)：导入整理台把已导入的卷子转回标准格式文本用"""
+    with _lock:
+        _load()
+        p = next((x for x in _bank['papers'] if x['id'] == pid), None)
+        if not p:
+            return None, []
+        qs = [dict(q) for q in _bank['questions'] if q['paper_id'] == pid]
+        qs.sort(key=lambda q: int(q['key'].rsplit('#', 1)[1]))
+        return dict(p), qs
+
+
+def set_answers(pid, answers):
+    """导入的卷子直接填答案（app.js viewAnswers）：answers = {题目 key: 答案}。只能改自己导入的卷子（upload-…），
+    题库自带的卷子答案以官方为准，不让改。选择题答案只认这道题有的选项字母，判断题只认对 / 错。返回改了几题"""
+    with _lock:
+        _load()
+        p = next((x for x in _bank['papers'] if x['id'] == pid), None)
+        if not p:
+            raise KeyError('卷子不存在')
+        if not p['key'].startswith('upload-'):
+            raise ValueError('题库自带的卷子答案以官方为准，不能在这里改')
+        n = 0
+        for q in _bank['questions']:
+            if q['paper_id'] != pid or q['key'] not in answers:
+                continue
+            a = str(answers[q['key']] or '').strip()
+            if q['type'] == 'judge':
+                a = {'√': '对', '×': '错', 'A': '对', 'B': '错'}.get(a.upper(), a)
+                if a and a not in ('对', '错'):
+                    raise ValueError('第 %s 题是判断题，答案只能是对或错' % q['qno'])
+            elif q.get('options'):
+                keys = [o[0] for o in q['options']]
+                a = ''.join(k for k in keys if k in a.upper())         # 去重、按选项顺序
+                if q['type'] == 'single' and len(a) > 1:
+                    q['type'] = 'multi'                                 # 单选填了几个字母：其实是多选
+                elif q['type'] == 'multi' and len(a) == 1:
+                    q['type'] = 'single'
+            if a != q['answer']:
+                q['answer'] = a
+                n += 1
+        if n:
+            p['updated_at'] = now()
+            _save_bank()
+        return n
 
 
 def delete_paper(pid):

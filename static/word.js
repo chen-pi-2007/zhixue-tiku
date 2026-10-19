@@ -1,6 +1,8 @@
 /* 智学题库 · 导出 Word —— 作者：十三（xiabanghao13）、chen_pi（chen-pi-2007）
- * 把一份卷子（或一个题型）导出成 .docx：空白卷，或答案卷（红字标答案，最后附答案速查，不带解析）。
- * 不用任何库：自己拼 Word 的 XML，再打成不压缩的 zip。电脑上直接下载，手机上交给 App 弹分享面板。
+ * 把卷子（或一个题型）导出成 .docx：空白卷，或答案卷（红字标答案，附答案速查，不带解析）。
+ * 可以几张卷子合成一个文档（每张另起一页、题号各自从 1 开始、答案速查跟在各自后面），
+ * 也可以把几个 .docx 打成一个 zip（WX.zipFiles）。
+ * 不用任何库：自己拼 Word 的 XML，再打成不压缩的 zip。
  * 排版照 学测/_脚本/export_english_word.py。 */
 'use strict';
 
@@ -28,7 +30,7 @@ const WX = (() => {
     return t;
   })();
   function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
-  function zip(files) {               // files: [[路径, Uint8Array]]
+  function zip(files, type) {         // files: [[路径, Uint8Array]]
     const parts = [], cd = [];
     let off = 0;
     const u16 = v => [v & 255, (v >>> 8) & 255];
@@ -43,7 +45,7 @@ const WX = (() => {
     });
     const cdLen = cd.reduce((s, b) => s + b.length, 0);
     const end = new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdLen), u32(off), u16(0)));
-    return new Blob(parts.concat(cd, [end]), { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    return new Blob(parts.concat(cd, [end]), { type: type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
   }
 
   // ---------------------------------------------------------------- 文档内容
@@ -83,8 +85,8 @@ const WX = (() => {
     let pr = '<w:spacing w:before="0" w:after="' + Math.round((o.after == null ? 2 : o.after) * 20) + '" w:line="300" w:lineRule="auto"/>';
     if (o.indent) pr += '<w:ind w:left="' + Math.round(o.indent * 567) + '"/>';
     if (o.center) pr += '<w:jc w:val="center"/>';
+    if (o.pageBefore) pr = '<w:pageBreakBefore/>' + pr;     // Word 要求 pPr 里的顺序：keepNext 在 pageBreakBefore 前面
     if (o.keep) pr = '<w:keepNext/>' + pr;
-    if (o.pageBefore) pr = '<w:pageBreakBefore/>' + pr;
     this.body.push('<w:p><w:pPr>' + pr + '</w:pPr>' + (o.raw || '') + (text ? this.runs(text, o) : '') + '</w:p>');
   };
   // 图片：先登记、留占位，打包时统一下载，按原图比例缩到不超过 w × h 厘米
@@ -214,15 +216,13 @@ const WX = (() => {
     optionsLine(d, q);
   }
 
-  function answerTable(d, qs) {
-    d.p('答案速查', { size: 16, b: true, center: true, after: 10, pageBefore: true });
-    let sec = null;
-    qs.forEach(q => {
-      if (q.sec === sec) return;
-      sec = q.sec;
-      const ns = qs.filter(y => y.sec === sec && SELF.indexOf(y.type) < 0);
+  // 答案速查：按大题列，问答、默写这类长答案只在正文里写，这里不列
+  function answerTable(d, title, secs) {
+    d.p(title ? title + ' · 答案速查' : '答案速查', { size: 16, b: true, center: true, after: 10, pageBefore: true });
+    secs.forEach(([sec, sq]) => {
+      const ns = sq.filter(y => SELF.indexOf(y.type) < 0);
       if (!ns.length) return;
-      d.p(sec + '（第 ' + ns[0].qno + '–' + ns[ns.length - 1].qno + ' 题）', { size: 12, b: true });
+      d.p(sec + '（第 ' + ns[0].qno + (ns.length > 1 ? '–' + ns[ns.length - 1].qno : '') + ' 题）', { size: 12, b: true });
       for (let i = 0; i < ns.length; i += 10) d.p(ns.slice(i, i + 10).map(y => y.qno + '. ' + y.answer).join('    '));
       d.p('', { after: 4 });
     });
@@ -290,16 +290,14 @@ const WX = (() => {
     return zip(files);
   }
 
-  // qs：按卷子顺序的题目；secName(q)：这道题属于哪个大题
-  async function build(title, qs, ans, secName) {
-    const d = new Doc();
-    d.p(title + (ans ? '（答案）' : ''), { size: 18, b: true, center: true, after: 4 });
+  // 一张卷子：标题、各大题，答案卷后面另起一页附答案速查。pageBefore：不是第一张，另起一页
+  function writePaper(d, title, qs, ans, secName, pageBefore, many) {
+    d.p(title + (ans ? '（答案）' : ''), { size: 18, b: true, center: true, after: 4, pageBefore: pageBefore });
     if (ans) d.p('红字为参考答案（以官方参考答案为准）', { size: 10, center: true, after: 10 });
     else d.p('姓名 ____________    班级 ____________    得分 ________', { center: true, after: 10 });
     const secs = [];
     qs.forEach((q, i) => {
       q = Object.assign({}, q, { qno: i + 1, sec: secName(q) });
-      qs[i] = q;
       if (!secs.length || secs[secs.length - 1][0] !== q.sec) secs.push([q.sec, []]);
       secs[secs.length - 1][1].push(q);
     });
@@ -309,9 +307,25 @@ const WX = (() => {
       groups(sq).forEach(g => writeGroup(d, g, ans));
       d.p('', { after: 4 });
     });
-    if (ans) answerTable(d, qs);
-    return pack(d);
+    if (ans) answerTable(d, many ? title : '', secs);
   }
 
-  return { build: build };
+  // qs：按卷子顺序的题目；secName(q)：这道题属于哪个大题
+  async function build(title, qs, ans, secName) {
+    return buildMany([{ title: title, qs: qs }], ans, secName);
+  }
+  // 几张卷子合成一个文档：papers = [{ title, qs }]
+  async function buildMany(papers, ans, secName) {
+    const d = new Doc();
+    papers.forEach((p, i) => writePaper(d, p.title, p.qs, ans, secName, i > 0, papers.length > 1));
+    return pack(d);
+  }
+  // 几个文件打成一个 zip：files = [[文件名, Blob]]
+  async function zipFiles(files) {
+    const out = [];
+    for (const [name, blob] of files) out.push([name, new Uint8Array(await blob.arrayBuffer())]);
+    return zip(out, 'application/zip');
+  }
+
+  return { build: build, buildMany: buildMany, zipFiles: zipFiles };
 })();

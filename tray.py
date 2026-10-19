@@ -106,9 +106,33 @@ def backup_data():
 
 # ---------------------------------------------------------------- 主程序
 
-def already_running(url):
+# 访问本机的智学题库一律不走系统代理：开着代理软件时，urllib 会把 127.0.0.1 的请求也交给代理，白等好几秒
+_local = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
+def port_free(url):
+    """端口没人占 = 没有别的智学题库开着。试着占一下端口，一瞬间就知道；
+    原来直接去连 /api/stats，没人监听时 Windows 要重试到超时（1.5 秒），再加上走代理，每次启动白等 2 秒多"""
+    import socket
+    from urllib.parse import urlparse
+    u = urlparse(url)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        with urllib.request.urlopen(url + 'api/stats', timeout=1.5) as r:
+        if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        s.bind((u.hostname or '127.0.0.1', u.port or 80))
+        return True
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
+def already_running(url):
+    if port_free(url):
+        return False
+    try:
+        with _local.open(url + 'api/stats', timeout=1.5) as r:
             return r.status == 200
     except Exception:
         return False
@@ -118,7 +142,7 @@ def ask_show(url):
     """已经开着时：请正在运行的那个把窗口调出来。成功返回 True（旧版本没有窗口，返回 False）"""
     try:
         req = urllib.request.Request(url + 'api/window/show', data=b'', method='POST')
-        with urllib.request.urlopen(req, timeout=3) as r:
+        with _local.open(req, timeout=3) as r:
             return r.status == 200
     except Exception:
         return False
@@ -128,7 +152,7 @@ def running_version(url):
     """正在运行的那个智学题库是什么版本；很老的版本没有这个接口，返回 None"""
     try:
         import json
-        with urllib.request.urlopen(url + 'api/app', timeout=2) as r:
+        with _local.open(url + 'api/app', timeout=2) as r:
             return json.loads(r.read().decode('utf-8')).get('version')
     except Exception:
         return None

@@ -6,7 +6,9 @@
 
 exe 是单文件、可以直接发给别人。里面带一份完整的内容（content/：界面 static/、题库 data/ 里的
 bank.json、media/、skills/，以及描述它们的 content.json），不含做题记录。
-别人第一次运行时题库释放到 %LOCALAPPDATA%\\智学题库\\data；以后的内容更新走热更新（hotupdate.py）。"""
+1.7.0 起内容压成 zip 接在 exe 末尾（append_content），不再用 --add-data：第一次运行解压到
+%LOCALAPPDATA%\\智学题库\\content\\bundled\\（appdir._unpack_bundled），以后启动不用每次解压四十多 MB；
+题库再从那里放进 data\\。以后的内容更新走热更新（hotupdate.py）。"""
 import os
 import shutil
 import subprocess
@@ -32,6 +34,27 @@ def make_content():
     content.write_manifest(os.path.join(out, content.CONTENT_FILE), m)
     print('内容 v%d：%d 个文件' % (CONTENT_VERSION, len(m['files'])))
     return out
+
+
+def append_content(exe, bundled):
+    """内容压成 zip 接在 exe 末尾（1.7.0 起）。PyInstaller 6 从文件末尾往前找自己的数据，末尾多出来的不影响；
+    程序第一次运行时 appdir._unpack_bundled 用 zipfile 直接从 exe 里解压出来，以后启动不用再解压这四十多 MB。
+    原来用 --add-data 打进去，每次启动都要解压到临时目录，光这一步就三四秒"""
+    import zipfile
+    zpath = os.path.join(BUILD, 'content.zip')
+    with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+        for root, _, files in os.walk(bundled):
+            for f in files:
+                p = os.path.join(root, f)
+                z.write(p, os.path.relpath(p, bundled).replace(os.sep, '/'))
+    with open(exe, 'ab') as out, open(zpath, 'rb') as src:
+        shutil.copyfileobj(src, out)
+    with zipfile.ZipFile(exe) as z:                 # 接上以后从 exe 里读得出清单，才算成功
+        z.read(content.CONTENT_FILE)
+        bad = z.testzip()
+        if bad:
+            raise SystemExit('接在 exe 末尾的内容损坏：%s' % bad)
+    print('内容 zip %.1f MB 已接在 exe 末尾' % (os.path.getsize(zpath) / 1048576))
 
 
 def write_version_file():
@@ -76,15 +99,15 @@ def main():
         '--name', NAME, '--icon', ico, '--version-file', verfile,
         '--distpath', os.path.join(BUILD, 'dist'), '--workpath', os.path.join(BUILD, 'work'),
         '--specpath', BUILD,
-        '--add-data', '%s%scontent' % (bundled, os.pathsep),
         '--hidden-import', 'llm', '--hidden-import', 'updater', '--hidden-import', 'hotupdate',
-        '--hidden-import', 'sync', '--hidden-import', 'zx_endpoint',
+        '--hidden-import', 'sync', '--hidden-import', 'zx_endpoint', '--hidden-import', 'docparse',
         '--hidden-import', 'pystray._win32',
         # 独立窗口：pywebview 用 WebView2（Edge 内核），靠 pythonnet 调 .NET；把它们的 DLL 一起打进去
         '--collect-all', 'webview', '--collect-all', 'clr_loader', '--collect-all', 'pythonnet',
         'tray.py',
     ])
     dist = os.path.join(BUILD, 'dist', NAME + '.exe')
+    append_content(dist, bundled)
     try:
         shutil.copy(dist, os.path.join(HERE, NAME + '.exe'))
         print('\n完成：%s' % os.path.join(HERE, NAME + '.exe'))

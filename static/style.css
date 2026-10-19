@@ -297,6 +297,91 @@ select option, select optgroup { background-color: var(--layer-1); color: var(--
 .upload-note { margin-top: 6px; font-size: 13px; color: var(--ink-3); }
 .upload-result { border-left: 3px solid var(--green); }
 .upload-result.err { border-left-color: var(--red); }
+.prow-w.miss { width: auto; color: var(--yellow); white-space: nowrap; }
+
+/* 导入整理台（app.js viewUpload）：左边原文，右边实时识别结果 */
+.im-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.im-bar .im-name { width: 280px; max-width: 100%; }
+.im-bar .spacer { flex: 1; }
+.im-bar .btn .ico { width: 16px; height: 16px; }
+.im-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; height: calc(100vh - 190px); min-height: 460px; }
+.im-left, .im-right { display: flex; flex-direction: column; min-height: 0; border-radius: 12px; background: var(--layer-1); padding: 12px; }
+.im-left.drag { outline: 2px dashed var(--green); outline-offset: -4px; }
+.im-h { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+.im-h .muted { font-weight: 400; font-size: 12px; }
+#im-text { flex: 1; min-height: 0; resize: none; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--layer-2); color: var(--ink);
+  font: 14px/1.7 Consolas, "Microsoft YaHei", monospace; white-space: pre-wrap; outline: none; }
+#im-text:focus { border-color: var(--ink-3); }
+.im-tools { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.im-tools .spacer { flex: 1; }
+.im-sum { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.im-total { font-size: 15px; }
+.im-total .muted { font-size: 13px; }
+.im-empty, .im-err { color: var(--ink-3); font-size: 13px; line-height: 1.7; }
+.im-err { color: var(--red); }
+.im-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.im-chip { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; background: var(--layer-2); color: var(--ink-2); white-space: nowrap; }
+.im-chip.bad { background: var(--red-soft); color: var(--red); }
+.im-chip.warn { background: rgba(255, 183, 0, .14); color: #b07d00; }
+[data-theme="dark"] .im-chip.warn { color: var(--yellow); }
+.im-chip.ok { background: rgba(45, 181, 93, .12); color: var(--green); }
+.im-tip { margin-top: 8px; font-size: 12px; line-height: 1.6; color: var(--ink-3); }
+.im-list { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 2px 8px 0; }
+.im-q { padding: 10px 10px 8px; margin-bottom: 8px; border-radius: 8px; border-left: 3px solid transparent; background: var(--layer-2); cursor: pointer; }
+.im-q:hover { background: var(--layer-3); }
+.im-q.bad { border-left-color: var(--red); }
+.im-q.warn { border-left-color: var(--yellow); }
+.im-qh { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+.im-type { padding: 0 6px; border-radius: 4px; background: var(--layer-1); color: var(--ink-2); font-size: 12px; line-height: 20px; }
+.im-mat { margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+.im-stem { margin-top: 4px; font-size: 14px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.im-opts { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 4px; font-size: 13px; color: var(--ink-2); }
+.im-opts span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.im-doubt { margin-top: 4px; font-size: 12px; color: #b07d00; }
+[data-theme="dark"] .im-doubt { color: var(--yellow); }
+.im-qf { margin-top: 6px; font-size: 13px; }
+.im-ans { color: var(--green); font-weight: 600; }
+.im-ans.none { color: var(--ink-3); font-weight: 400; }
+.im-pick { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.im-k { min-width: 30px; height: 26px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--layer-1); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; }
+.im-k:hover { border-color: var(--ink-3); }
+.im-k.on { background: var(--fill); border-color: var(--fill); color: var(--fill-ink); }
+.im-k.ok { color: var(--green); }
+.im-go { padding-top: 10px; border-top: 1px solid var(--line); }
+
+/* 填答案（app.js viewAnswers）：导入的卷子答题卡式填 / 改答案 */
+.ans-page { max-width: 900px; }
+.ans-top { position: sticky; top: 0; z-index: 5; }
+.ans-title { font-size: 16px; }
+.ans-title .muted { font-size: 13px; }
+.ans-paste { display: flex; gap: 8px; margin-top: 10px; }
+.ans-paste .inp { flex: 1; min-width: 0; }
+.ans-tools { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.ans-tools .spacer { flex: 1; }
+.ans-only { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.ans-q { border-left: 3px solid transparent; }
+.ans-q.miss { border-left-color: var(--red); }
+.ans-q.changed { border-left-color: var(--yellow); }
+.ans-qh { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.ans-stem { margin-top: 6px; font-size: 15px; line-height: 1.7; }
+.ans-pick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.ans-k { min-width: 40px; height: 34px; padding: 0 12px; border: 0; border-radius: 8px; background: var(--layer-2); color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.ans-k:hover { background: var(--layer-3); }
+.ans-k.on { background: var(--fill); color: var(--fill-ink); }
+.ans-mode { margin-left: 6px; font-size: 13px; }
+.ans-cur { font-size: 14px; color: var(--ink-2); }
+.ans-cur b { color: var(--green); }
+.ans-was { margin-left: 6px; font-size: 13px; color: var(--ink-3); }
+.ans-ta { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--layer-2); color: var(--ink); font: inherit; font-size: 14px; line-height: 1.6; resize: vertical; }
+.im-keyta { width: 100%; min-height: 120px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--layer-2); color: var(--ink); font: 14px/1.6 Consolas, "Microsoft YaHei", monospace; resize: vertical; box-sizing: border-box; }
+.sheet-d code { padding: 1px 5px; border-radius: 4px; background: var(--layer-2); font-size: 12px; }
+.im-aibtns { display: flex; flex-direction: column; gap: 8px; }
+.im-aitips { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .im-body { grid-template-columns: 1fr; height: auto; }
+  #im-text { min-height: 40vh; }
+  .im-list { max-height: 60vh; }
+}
 
 /* 表格（题型统计等） */
 .tbl { width: 100%; border-collapse: collapse; }
@@ -324,9 +409,9 @@ details.material-box[open] summary { margin-bottom: 8px; }
 .opt:disabled { cursor: default; }
 .opt { touch-action: manipulation; }          /* 手机浏览器里双击选项不放大页面 */
 .opt .key { flex: none; width: 22px; color: var(--ink-3); font-weight: 600; }
-/* 选中（还没判）：底色加深、边框加深，字母变成实心圆点（和“选中胶囊”一样用 --fill 深色实底，不另加颜色）。
-   原来只有一圈细边，暗色下像没选（用户）；试过蓝色，用户说丑。判完后圆点跟着变绿 / 红：圆点 = 你选的那个 */
-.opt.sel { background: var(--layer-3); border-color: var(--ink-3); }
+/* 选中（还没判）：底色加深，字母变成实心圆点（和“选中胶囊”一样用 --fill 深色实底，不另加颜色），不加边框。
+   原来只有一圈细边，暗色下像没选（用户）；试过蓝色、加边框，用户说丑，2026-10-19 用户从几种样式里选了这种。判完后圆点跟着变绿 / 红：圆点 = 你选的那个 */
+.opt.sel { background: var(--layer-3); }
 .opt.sel .key { width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; background: var(--fill); color: var(--fill-ink); font-size: 13px; line-height: 22px; text-align: center; }
 .judge-row .opt.sel .key { width: auto; height: auto; margin-top: 0; background: none; color: var(--ink); font-size: inherit; line-height: inherit; }
 .opt.ok { background: var(--green-soft); border-color: var(--green); }
@@ -610,6 +695,40 @@ input.switch:checked::before { transform: translateX(18px); }
 .cn-btn { flex: none; height: 24px; min-width: 28px; padding: 0 8px; border: 0; border-radius: 5px; background: var(--layer-2); color: var(--ink-3); font: inherit; font-size: 12px; cursor: pointer; }
 .cn-btn:hover { background: var(--layer-3); color: var(--ink-2); }
 .cn-btn.on { background: var(--green-soft); color: var(--green); font-weight: 600; }
+
+/* AI 助手（设置里打开才有）：题目卡片右上角「问 AI」，右侧对话框 */
+.ai-btn { flex: none; height: 24px; margin-left: 6px; padding: 0 8px; border: 0; border-radius: 5px; background: var(--layer-2); color: var(--ink-3); font: inherit; font-size: 12px; cursor: pointer; }
+.ai-btn:hover { background: var(--layer-3); color: var(--ink); }
+.ai-panel { position: fixed; top: 64px; right: 16px; bottom: 16px; z-index: 80; display: flex; flex-direction: column; width: 380px; max-width: calc(100vw - 32px);
+  border-radius: 14px; background: var(--layer-1); box-shadow: var(--pop); }
+@media (min-width: 1100px) { body.ai-open main { padding-right: 412px; } }   /* 对话框开着时页面往左让，不挡题目 */
+.ai-head { display: flex; align-items: center; gap: 8px; padding: 14px 14px 8px 16px; }
+.ai-head .ai-sub { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.ai-q { margin: 0 16px; padding: 8px 10px; border-radius: 8px; background: var(--layer-2); font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.ai-msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px; }
+.ai-empty { font-size: 13px; color: var(--ink-3); line-height: 1.7; }
+.ai-m { max-width: 92%; margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; font-size: 14px; line-height: 1.7; word-break: break-word; }
+.ai-m.user { margin-left: auto; background: var(--fill); color: var(--fill-ink); }
+.ai-m.assistant { background: var(--layer-2); color: var(--ink); }
+.ai-m.err { background: var(--red-soft); color: var(--red); }
+.ai-m.typing { color: var(--ink-3); }
+.ai-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 8px; }
+.ai-quick .pill-tab { height: 28px; padding: 0 10px; font-size: 13px; }
+.ai-input { display: flex; gap: 8px; align-items: flex-end; padding: 0 16px; }
+.ai-input textarea { flex: 1; min-width: 0; resize: none; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--layer-2); color: var(--ink); font: inherit; font-size: 14px; line-height: 1.5; outline: none; }
+.ai-input textarea:focus { border-color: var(--ink-3); }
+.ai-foot { padding: 8px 16px 12px; font-size: 12px; color: var(--ink-3); }
+.ai-form { gap: 10px; padding: 12px 16px; }
+.ai-form[hidden] { display: none; }
+.ai-f { display: flex; align-items: center; gap: 10px; width: 100%; font-size: 14px; }
+.ai-f > span { flex: none; width: 64px; color: var(--ink-2); }
+.ai-f .inp { flex: 1; min-width: 0; }
+.ai-acts .spacer { flex: 1; }
+.ai-acts a { font-size: 13px; }
+.ai-test-out { width: 100%; font-size: 13px; color: var(--ink-3); }
+.ai-test-out:empty { display: none; }
+.ai-test-out.ok { color: var(--green); }
+.ai-test-out.bad { color: var(--red); }
 .stem-cn { margin: -10px 0 16px; color: var(--ink-3); font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
 .opt-cn { display: block; margin-top: 2px; color: var(--ink-3); font-size: 13px; line-height: 1.6; }
 .material-cn { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); white-space: pre-wrap; font-size: 14px; line-height: 1.85; color: var(--ink-3); }
@@ -652,8 +771,9 @@ input.switch:checked::before { transform: translateX(18px); }
   .g-mat .g-orig-cn { flex: 2 1 0; min-height: 0; margin: 10px 0 0; }
   .gq-tabs { flex: none; margin-bottom: 10px; }
   .gq-pane { flex: 1; min-height: 0; overflow: auto; padding-right: 6px; }
-  .gq { display: block; padding: 14px 14px 4px; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 8px; }
-  .gq.cur { border-color: var(--ink-3); }
+  /* 小题之间只用一条细线分开，不再给每道小题（和当前小题）套框；当前是哪道看上面的题号（用户：小题外面的大框不要） */
+  .gq { display: block; padding: 14px 4px 4px; }
+  .gq + .gq { border-top: 1px solid var(--line); }
 }
 .group-card .qactions { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
 .qcard-main:not(.answered) .stem-cn.peek:not(.show) { position: relative; cursor: pointer; color: transparent; text-shadow: 0 0 7px var(--ink-3); user-select: none; }
@@ -728,6 +848,50 @@ main.page-in { animation: page-in .22s ease-out; }
 .sheet-row { display: flex; gap: 10px; }
 .sheet-row .btn { flex: 1; }
 .sheet .btn.block + .sheet-row { margin-top: 10px; }
+.sheet .sheet-row + .xp-more { margin-top: 10px; }
+.btn:disabled { opacity: .55; cursor: default; }
+/* 导出 Word 弹层（app.js openExportSheet，只在电脑上有）：左边筛选、勾卷子，右边选项和导出按钮 */
+.sheet.xp { max-width: 860px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+.xp-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; padding-top: 10px; }
+.xp-left { display: flex; flex-direction: column; min-height: 0; }
+.xp-right { overflow-y: auto; padding-left: 24px; border-left: 1px solid var(--line); }
+.xp-t { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.xp-n { margin-left: 6px; font-weight: 400; font-size: 13px; color: var(--ink-3); }
+.xp-links { display: flex; gap: 14px; font-weight: 400; font-size: 13px; }
+.xp-subjs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.xp-subjs .pill-tab { height: 30px; padding: 0 12px; font-size: 13px; }
+.xp-q { display: flex; width: auto; margin-top: 10px; }
+.xp-list { flex: 1; min-height: 160px; height: 52vh; overflow-y: auto; margin-top: 10px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.xp-list .empty { padding: 16px 0; }
+.xp-subj, .xp-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; }
+.xp-subj { font-weight: 600; font-size: 14px; }
+.xp-subj:not(:first-child) { margin-top: 4px; border-top: 1px solid var(--line); padding-top: 10px; }
+.xp-item { padding-left: 22px; font-size: 14px; font-weight: 400; }
+.xp-item .xp-name { flex: 1; min-width: 0; }
+.xp-item .xp-c { flex: none; font-size: 12px; color: var(--ink-3); }
+.xp-item .xp-w { flex: none; font-size: 12px; color: var(--red); }
+.xp-subj input, .xp-item input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--fill); }
+.xp-gap { margin-top: 18px; }
+.xp-right .sheet-d { margin-bottom: 8px; }
+.xp-seg, .xp-chks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.xp-seg .pill-tab { height: 32px; padding: 0 14px; font-size: 13px; }
+.xp-seg .pill-tab:disabled { opacity: .45; cursor: not-allowed; }
+/* 题型是多选：方框打勾，和单选的胶囊区分开 */
+.xp-chk { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--ink-3); font: inherit; font-size: 13px; cursor: pointer; }
+.xp-chk i { flex: none; box-sizing: border-box; width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 3px; }
+.xp-chk.on { border-color: var(--ink-3); color: var(--ink); }
+.xp-chk.on i { position: relative; border-color: var(--fill); background: var(--fill); }
+.xp-chk.on i::after { content: ''; position: absolute; left: 3.5px; top: 0.5px; width: 3px; height: 7px; border: solid var(--fill-ink); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.xp-go { margin-top: 22px; height: 40px; }
+@media (max-width: 760px) {
+  .xp-body { display: block; overflow-y: auto; }
+  .xp-right { padding-left: 0; border-left: 0; margin-top: 16px; }
+  .xp-list { height: 40vh; }
+}
+.xp-subj input, .xp-item input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--fill); }
+.xp-seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.xp-seg .pill-tab { height: 34px; font-size: 14px; }
+.xp-go { margin-top: 14px; }
 .crumb-acts { float: right; display: flex; gap: 16px; }
 .crumb-acts .crumb-exit { float: none; }
 /* 练习页的位置栏：标题太长就省略，存档 / 读档 / 退出始终在同一行右边 */

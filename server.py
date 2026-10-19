@@ -8,6 +8,7 @@ import json
 import time
 import os
 import re
+import shutil
 import socketserver
 import sys
 import threading
@@ -246,6 +247,9 @@ class Handler(BaseHTTPRequestHandler):
         if method == 'POST' and path == '/api/upload':
             return self.api_upload(qs)
 
+        if path.startswith('/api/import/'):
+            return self.api_import(method, path, qs)
+
         if path.startswith('/api/skills'):
             return self.api_skills(method, path)
 
@@ -422,6 +426,25 @@ class Handler(BaseHTTPRequestHandler):
             import llm
             return self.send_json({'ok': True, 'available': llm.available()})
 
+        # AI 助手（llm.py）：设置里打开、填自己的 Key 才能用；没打开时除了读配置都不让调
+        if path.startswith('/api/ai/'):
+            import llm
+            if method == 'GET' and path == '/api/ai/config':
+                return self.send_json(dict(llm.public_config(), ok=True))
+            body = self.read_json_body() if method == 'POST' else {}
+            if path == '/api/ai/config':
+                return self.send_json(dict(llm.save_config(body), ok=True))
+            if path == '/api/ai/test':
+                return self.send_json({'ok': True, 'reply': llm.test(body)})
+            if path == '/api/ai/models':
+                return self.send_json({'ok': True, 'models': llm.list_models(str(body.get('base_url') or ''))})
+            if not llm.available():
+                return self.send_error_json('AI 助手没有打开（设置 → AI 助手）')
+            if path == '/api/ai/ask':
+                return self.send_json({'ok': True, 'reply': llm.ask(body.get('q') or {}, body.get('messages') or [])})
+            if path == '/api/ai/organize':
+                return self.send_json({'ok': True, 'text': llm.organize(str(body.get('text') or ''))})
+
         self.send_error_json('接口不存在', 404)
 
     def api_skills(self, method, path):
@@ -463,6 +486,73 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_error_json('接口不存在', 404)
         except (ValueError, KeyError) as e:
             return self.send_error_json(str(e.args[0]) if e.args else str(e))
+
+    # ---- 导入整理台（static/app.js viewUpload）：文件 -> 文字，文字 -> 实时预览，确认后入库
+    def api_import(self, method, path, qs):
+        if method == 'POST' and path == '/api/import/extract':          # 原始文件体，文件名放 query
+            name = unquote(qs.get('name', [''])[0] or '未命名.docx')
+            data = self.read_body()
+            if not data:
+                return self.send_error_json('文件是空的')
+            if name.lower().endswith('.doc') and data[:2] != b'PK':
+                data = doc_to_docx(data)
+            paras = docparse.extract_any(data, name)
+            text = '\n'.join(ln.rstrip() for p in paras for ln in p.split('\n'))
+            if qs.get('answer', [''])[0] == '1':      # 单独的答案文件：只取答案表（1.C2.A…、1-5 CABDA），接在卷子后面
+                key, _ = docparse.extract_answer_key(text.split('\n'))
+                return self.send_json({'ok': True, 'keys': len(key), 'text': '参考答案：' + ' '.join(
+                    '%d.%s' % (k, key[k]) for k in sorted(key)) + '\n' if key else ''})
+            return self.send_json({'ok': True, 'text': re.sub(r'\n{3,}', '\n\n', text).strip() + '\n',
+                                   'images': text.count('[图片]')})
+        if method == 'POST' and path == '/api/import/parse':
+            body = self.read_json_body()
+            r = docparse.parse_lines(str(body.get('text') or '').split('\n'))
+            return self.send_json({'ok': True, 'questions': r['questions'], 'by_type': r['by_type'],
+                                   'title': r['title'], 'mode': r['mode'], 'unused_key': sorted(r['unused_key'])})
+        # 已导入的卷子直接填答案（答题卡）：读题目、粘贴的答案表按题号拆开、保存
+        if method == 'GET' and path == '/api/import/answers':
+            p, qs_ = db.paper_questions(int(qs.get('paper_id', ['0'])[0] or 0))
+            if not p:
+                return self.send_error_json('卷子不存在', 404)
+            if not p['key'].startswith('upload-'):
+                return self.send_error_json('题库自带的卷子答案以官方为准，不能在这里改')
+            return self.send_json({'ok': True, 'paper': {'id': p['id'], 'name': p['name'], 'key': p['key']},
+                                   'questions': [{k: q.get(k) for k in ('key', 'qno', 'type', 'stem', 'options', 'answer', 'material')}
+                                                 for q in qs_]})
+        if method == 'POST' and path == '/api/import/keyparse':
+            body = self.read_json_body()
+            lines = ['参考答案：' + ln.strip() for ln in str(body.get('text') or '').split('\n') if ln.strip()]
+            key, _ = docparse.extract_answer_key(lines)
+            return self.send_json({'ok': True, 'key': {str(k): v for k, v in key.items()}})
+        if method == 'POST' and path == '/api/import/answers':
+            body = self.read_json_body()
+            ans = body.get('answers') or {}
+            if not isinstance(ans, dict):
+                raise ValueError('答案格式不对')
+            return self.send_json({'ok': True, 'changed': db.set_answers(int(body.get('paper_id') or 0), ans)})
+        if method == 'POST' and path == '/api/import/save':
+            body = self.read_json_body()
+            r = docparse.parse_lines(str(body.get('text') or '').split('\n'))
+            if not r['questions']:
+                return self.send_error_json('没有识别出题目')
+            key = str(body.get('key') or '')
+            if key and not key.startswith('upload-'):
+                return self.send_error_json('题库自带的卷子不能在这里改')
+            name = str(body.get('name') or '').strip() or r['title'] or '导入的卷子'
+            pid, name = db.add_upload(name, r, body.get('subject') or 'general', key or None)
+            return self.send_json({'ok': True, 'paper': {'id': pid, 'name': name, 'total': len(r['questions'])},
+                                   'no_answer': sum(1 for q in r['questions'] if not q['answer'])})
+        if method == 'GET' and path == '/api/import/text':                # 已导入的卷子转回标准格式，补答案、改题
+            p, qs_ = db.paper_questions(int(qs.get('paper_id', ['0'])[0] or 0))
+            if not p:
+                return self.send_error_json('卷子不存在', 404)
+            if not p['key'].startswith('upload-'):
+                return self.send_error_json('题库自带的卷子不能在这里改')
+            return self.send_json({'ok': True, 'text': docparse.to_text(qs_), 'name': p['name'],
+                                   'subject': p.get('subject') or 'general', 'key': p['key']})
+        if method == 'GET' and path == '/api/import/prompt':
+            return self.send_json({'ok': True, 'prompt': docparse.AI_PROMPT, 'tips': docparse.AI_TIPS})
+        return self.send_error_json('不支持的请求', 404)
 
     def api_upload(self, qs):
         import llm
@@ -550,6 +640,31 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
         if isinstance(sys.exc_info()[1], (ConnectionResetError, ConnectionAbortedError, BrokenPipeError)):
             return
         super().handle_error(request, client_address)
+
+
+def doc_to_docx(data):
+    """旧版 .doc（老师发的卷子很多是这种）：用这台电脑上的 Word 另存成 .docx。
+    通过 PowerShell 调 Word，不需要 pywin32；Word 本来就开着时会连到同一个 Word，所以只关自己打开的文档，
+    Word 里没有别的文档了才退出。没装 Word 或者转换失败，提示手动另存"""
+    import subprocess
+    import tempfile
+    d = tempfile.mkdtemp(prefix='zx-doc-')
+    src, dst = os.path.join(d, 'in.doc'), os.path.join(d, 'out.docx')
+    q = lambda s: s.replace("'", "''")
+    ps = ("$ErrorActionPreference='Stop';$w=New-Object -ComObject Word.Application;"
+          "try{$doc=$w.Documents.Open('%s',$false,$true,$false);$doc.SaveAs2('%s',16);$doc.Close($false)}"
+          "finally{if($w.Documents.Count -eq 0){$w.Quit()}}") % (q(src), q(dst))
+    try:
+        with open(src, 'wb') as f:
+            f.write(data)
+        subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-Command', ps], capture_output=True, timeout=120,
+                       creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        with open(dst, 'rb') as f:
+            return f.read()
+    except Exception:
+        raise ValueError('旧版 .doc 没能自动转换（这台电脑可能没装 Word）。请用 Word 或 WPS 打开，另存为 .docx 再导入')
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
 
 
 def configured_url():

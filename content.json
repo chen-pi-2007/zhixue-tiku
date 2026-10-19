@@ -1,6 +1,6 @@
 {
- "content_version": 71,
- "created": "2026-10-17 20:24:35",
+ "content_version": 72,
+ "created": "2026-10-19 09:55:45",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,28 +1571,28 @@
    17784
   ],
   "db.py": [
-   "9d3d4b833302013b791ad7eba9b9f7d7b6632bf8edcef220a9b90ab0127cd16c",
-   49514
+   "49d8e36d4cfa0aa332dd965442ddf1f7c59cfff3703b99ecf7fd0a3d2d7953d2",
+   51917
   ],
   "docparse.py": [
-   "63e4be0889e172f8e2a790afac315ed3af526efe63720e567596acdb810ff955",
-   15673
+   "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
+   29308
   ],
   "exam.py": [
    "a8b10c4c05d8d1a56f222204cb90da21f9c404b1d3a47367f5ca87f91f4ff425",
    9344
   ],
   "llm.py": [
-   "3a73611c437237d01d5d89a1d2524a8a01201acd2fb7999cbeefdbfe762184ff",
-   3586
+   "251aa2787de58ee031eedf5fd457e25f8595ab611248f4fef915117c4959afa4",
+   13051
   ],
   "mobile/local.js": [
    "8a8b952e748416beb6f471e4b5e04ab3974b7440f657b2e2b4187aa75fc1e53e",
    68874
   ],
   "server.py": [
-   "72b230a4838c6664489917cd9cc8bf501360a5b39fc1913e6d9bb4d1aae8b155",
-   25679
+   "48c07c5817c7d6730207a53f9a9fc62548a4bd27d032ee8c7f5e6735759045cd",
+   33372
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "2d43ad3f4e9ae75e9395ec4ff27adc21fa638dfdfbafc6748a28a0fb26624be4",
-   187481
+   "e80f845547e70b249a769367b6c964c879a5484fc544ef4719542c46135b49a9",
+   244668
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,12 +1647,12 @@
    27524
   ],
   "static/style.css": [
-   "ed1b66920896127e8d9fd4362449454627577295b957be5c36727e1093de1898",
-   58736
+   "8218f450b2c0a4a8bc68b00dfa71f9ef3dd0deeb40ac4e2f98a8087653a02175",
+   71422
   ],
   "static/word.js": [
-   "393bad801d456efda0603b45740b08c26cbb56260676acf58d006dffa4da7931",
-   19180
+   "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
+   20289
   ],
   "sync.py": [
    "e9b777bc72ea481055611923480c91ae798947c6f8f51dbf8243531b083ccd7e",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "错题再出现时保证正确答案换到别的字母上（原来随机打乱约 1/4 还在原位置，看着像没打乱）；全部乱序保证顺序和原卷不同",
+ "notes": "启动快了将近 3 倍（双击到窗口出现 4.4 秒→1.5 秒）；新的导入试卷：左边原文右边实时预览，没题号、没题型标记的卷子也能认，老版 .doc 自动转换，可复制提示词让免费 AI 整理格式；导入的卷子可以直接填答案 / 改答案（改原有答案会先确认）；导出 Word 可以多张卷子一起导出，能按题型、只导错题筛选；接着上次做时，上次做错的题过几题再考一次；选中的选项去掉边框，整篇阅读的小题不再套框；可选的 AI 助手（设置里打开，支持 DeepSeek、智谱、通义、Kimi、本机 Ollama 等），做题时可以问 AI",
  "py_shell_api": 1,
- "tag": "content-71"
+ "tag": "content-72"
 }

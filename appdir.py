@@ -40,7 +40,51 @@ DATA_DIR = os.path.join(HOME_DIR, 'data')
 CONFIG_PATH = os.path.join(HOME_DIR, 'config.json')
 LOG_PATH = os.path.join(HOME_DIR, 'server.log')
 CONTENT_DIR = os.path.join(HOME_DIR, 'content')            # 热更新：current/ 正在用的，next/ 正在下载的
-BUNDLED_DIR = os.path.join(RES_DIR, 'content') if FROZEN else APP_DIR
+
+
+def _unpack_bundled():
+    """1.7.0 起程序自带的内容（界面、题库、图片，四十多 MB、四百多个文件）不放进 PyInstaller 每次启动都要
+    解压到临时目录的那部分，而是压成 zip 接在 exe 文件末尾（build_exe.py）。原来每次启动光解压就要三四秒。
+    这里第一次运行（或换了新版 exe）时把它解压到 HOME_DIR/content/bundled/<版本>-<清单摘要>/，以后直接用。
+    每一份内容单独一个文件夹：新旧两个 exe 同时开着也不会抢同一批文件；别的旧文件夹顺手删掉（正在用的删不掉就算了）。
+    exe 末尾没有 zip（老的打包方式）、或者解压失败，就用 PyInstaller 临时目录里的 content/。"""
+    import hashlib
+    import json
+    import zipfile
+    fallback = os.path.join(RES_DIR, 'content')
+    try:
+        zf = zipfile.ZipFile(sys.executable)
+        raw = zf.read(content.CONTENT_FILE)
+        ver = json.loads(raw.decode('utf-8')).get('content_version', 0)
+    except (OSError, KeyError, ValueError, zipfile.BadZipFile):
+        return fallback
+    base = os.path.join(CONTENT_DIR, 'bundled')
+    dst = os.path.join(base, '%s-%s' % (ver, hashlib.sha256(raw).hexdigest()[:12]))
+    done = os.path.join(dst, '.ok')                 # 解压完整才写这个标记；半截的（断电、被杀）下次重来
+    if not os.path.exists(done):
+        tmp = dst + '.tmp%d' % os.getpid()
+        try:
+            shutil.rmtree(tmp, ignore_errors=True)
+            zf.extractall(tmp)
+            open(os.path.join(tmp, '.ok'), 'w').close()
+            if os.path.exists(done):                # 同时双击了两次：另一个已经解压好了，用它的
+                shutil.rmtree(tmp, ignore_errors=True)
+            else:
+                shutil.rmtree(dst, ignore_errors=True)
+                os.replace(tmp, dst)
+        except OSError as e:
+            shutil.rmtree(tmp, ignore_errors=True)
+            if not os.path.exists(done):
+                print('解压程序自带的内容失败，改用临时目录里的：%s' % e)
+                return fallback
+    for name in os.listdir(base):
+        p = os.path.join(base, name)
+        if p != dst and '.tmp' not in name:          # 别的进程正在解压的临时文件夹不动
+            shutil.rmtree(p, ignore_errors=True)
+    return dst
+
+
+BUNDLED_DIR = _unpack_bundled() if FROZEN else APP_DIR
 
 SEED_ITEMS = ('bank.json', 'media', 'skills')      # data/ 下属于题库的文件；progress.json（做题记录）永远不在这里
 
