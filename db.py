@@ -442,12 +442,26 @@ def _filter(paper_id=None, subject=None, qtype=None, search=None):
         yield q
 
 
-def get_questions(paper_id=None, qtype=None, search=None, limit=50, offset=0, subject=None):
+def _rec_ok(c, rec):
+    """搜索题目按做题记录筛：wrong 错过的（错过至少一次）、inwrong 在错题本里、done 做过的、new 没做过的"""
+    if rec == 'wrong':
+        return bool(c and c.get('wrong'))
+    if rec == 'inwrong':
+        return bool(c and c.get('in_wrong'))
+    if rec == 'done':
+        return bool(c and (c.get('wrong') or c.get('right')))
+    if rec == 'new':
+        return not (c and (c.get('wrong') or c.get('right')))
+    return True
+
+
+def get_questions(paper_id=None, qtype=None, search=None, limit=50, offset=0, subject=None, rec=None):
     with _lock:
         _load()
         papers = _papers_by_id()
         rank = _paper_rank()
-        qs = sorted(_filter(paper_id, subject, qtype, search), key=lambda x: (rank.get(x['paper_id'], 1 << 30), x['qno'], x['id']))
+        qs = [q for q in _filter(paper_id, subject, qtype, search) if not rec or _rec_ok(_prog['cards'].get(_ck(q)), rec)]
+        qs = sorted(qs, key=lambda x: (rank.get(x['paper_id'], 1 << 30), x['qno'], x['id']))
         return [_view(q, papers) for q in qs[offset:offset + limit]], len(qs)
 
 

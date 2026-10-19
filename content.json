@@ -1,6 +1,6 @@
 {
- "content_version": 72,
- "created": "2026-10-19 09:55:45",
+ "content_version": 73,
+ "created": "2026-10-19 19:28:39",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "49d8e36d4cfa0aa332dd965442ddf1f7c59cfff3703b99ecf7fd0a3d2d7953d2",
-   51917
+   "a1906ee13b0e1b2d8e8ab1ee0dc8f4f6cb6289afdbe454a3d55b273a7120db42",
+   52497
   ],
   "docparse.py": [
    "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
@@ -1587,12 +1587,12 @@
    13051
   ],
   "mobile/local.js": [
-   "8a8b952e748416beb6f471e4b5e04ab3974b7440f657b2e2b4187aa75fc1e53e",
-   68874
+   "7ebb62a7ec772b68d41240ce51c9011d725fc93114c6520ddf91ee6b4db279f0",
+   69313
   ],
   "server.py": [
-   "48c07c5817c7d6730207a53f9a9fc62548a4bd27d032ee8c7f5e6735759045cd",
-   33372
+   "a8dc038bc58d4a2791b181a36b84429680d65bebafd4ebb1ee32cbc19821b45b",
+   33417
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "e80f845547e70b249a769367b6c964c879a5484fc544ef4719542c46135b49a9",
-   244668
+   "d03c450b79953ccaf36a0143a4ba174183c2579d4d98d12f01890c954b84ac03",
+   247592
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "8218f450b2c0a4a8bc68b00dfa71f9ef3dd0deeb40ac4e2f98a8087653a02175",
-   71422
+   "df43d466fbb5979937844dfe359b26345a043971450d6d0aecf5b321f7991dff",
+   71463
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "启动快了将近 3 倍（双击到窗口出现 4.4 秒→1.5 秒）；新的导入试卷：左边原文右边实时预览，没题号、没题型标记的卷子也能认，老版 .doc 自动转换，可复制提示词让免费 AI 整理格式；导入的卷子可以直接填答案 / 改答案（改原有答案会先确认）；导出 Word 可以多张卷子一起导出，能按题型、只导错题筛选；接着上次做时，上次做错的题过几题再考一次；选中的选项去掉边框，整篇阅读的小题不再套框；可选的 AI 助手（设置里打开，支持 DeepSeek、智谱、通义、Kimi、本机 Ollama 等），做题时可以问 AI",
+ "notes": "打乱选项后解析里的字母跟着换（原来答案是 A 解析却写故选 C）；做题时“以前做错过”的提示默认不显示，设置里可以打开；多选题不能双击确认，判断题判完马上点正确答案就下一题；搜索题目能筛选错过的、错题本里的、做过的、没做过的题，并显示做对几次、做错几次",
  "py_shell_api": 1,
- "tag": "content-72"
+ "tag": "content-73"
 }

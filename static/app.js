@@ -433,10 +433,11 @@ function streakText(streak) {
   return left ? '还要分 ' + left + ' 天答对才移出错题本' : '再答对一次就移出错题本';
 }
 
+// 这题做过几次：做对几次、做错几次（用户：显示对错次数，不要“还要分几天答对才移出错题本”）；错过的标红，在错题本里的鼠标停上去有说明
 function recBadge(q) {
-  if (!q.wrong_count && !q.right_count) return '';
-  if (q.in_wrong) return '<span class="rec-badge bad" title="这题以前做错过，在错题本里">以前做错过 · ' + streakText(q.streak) + '</span>';
-  return '<span class="rec-badge">对' + q.right_count + ' 错' + q.wrong_count + '</span>';
+  if (!q.wrong_count && !q.right_count) return '<span class="rec-badge">没做过</span>';
+  return '<span class="rec-badge' + (q.wrong_count ? ' bad' : ' good') + '"' + (q.in_wrong ? ' title="在错题本里，' + streakText(q.streak) + '"' : '') + '>' +
+    '做对 ' + q.right_count + ' 次 · 做错 ' + q.wrong_count + ' 次</span>';
 }
 
 function ansHtml(q) {
@@ -1420,6 +1421,9 @@ async function viewBank() {
       '<input class="inp" id="f-q" placeholder="搜索题干或材料" value="' + esc(b.q) + '" style="flex:1;min-width:140px">' +
       '<button class="chip' + (b.showAns ? ' on' : '') + '" id="f-ans">显示答案</button>' +
     '</div>' +
+    // 按做题记录筛（用户：找出我曾经错过的题）
+    '<div class="filters">' + [['', '全部'], ['wrong', '错过的'], ['inwrong', '错题本里的'], ['done', '做过的'], ['new', '没做过的']].map(r =>
+      '<button class="chip' + ((b.rec || '') === r[0] ? ' on' : '') + '" data-rec="' + r[0] + '">' + r[1] + '</button>').join('') + '</div>' +
     '<div class="filters">' +
       [''].concat(bankTypes(b, plist)).map(t =>
         '<button class="chip' + (b.type === t ? ' on' : '') + '" data-t="' + t + '">' + (t ? TYPE_NAME[t] : '全部题型') + '</button>').join('') +
@@ -1429,6 +1433,7 @@ async function viewBank() {
   $('#f-subj').addEventListener('change', e => { b.subject = e.target.value; b.paper_id = 0; reload(); });
   $('#f-paper').addEventListener('change', e => { b.paper_id = +e.target.value; reload(); });
   $$('.chip[data-t]').forEach(c => c.addEventListener('click', () => { b.type = c.dataset.t; reload(); }));
+  $$('.chip[data-rec]').forEach(c => c.addEventListener('click', () => { b.rec = c.dataset.rec; reload(); }));
   $('#f-ans').addEventListener('click', () => { b.showAns = !b.showAns; reload(); });
   let timer = null;
   $('#f-q').addEventListener('input', e => {
@@ -1444,7 +1449,7 @@ async function viewBank() {
 async function practiceSearch() {
   const b = state.bank;
   const base = '/api/questions?paper_id=' + b.paper_id + (b.subject ? '&subject=' + b.subject : '') +
-    (b.type ? '&type=' + b.type : '') + (b.q ? '&q=' + encodeURIComponent(b.q) : '');
+    (b.type ? '&type=' + b.type : '') + (b.q ? '&q=' + encodeURIComponent(b.q) : '') + (b.rec ? '&rec=' + b.rec : '');
   let all = [];
   try {
     for (let off = 0; ; off += 200) {
@@ -1456,7 +1461,8 @@ async function practiceSearch() {
   const list = all.filter(q => q.answer);
   if (!list.length) { toast('这些题没有标准答案，只能浏览', 'bad'); return; }
   const paper = b.paper_id ? b.papers.find(p => p.id === b.paper_id) : null;
-  const parts = [paper ? paper.name : (b.subject ? SUBJECT_NAME[b.subject] : ''), b.type ? TYPE_NAME[b.type] : '', b.q ? '“' + b.q + '”' : ''].filter(Boolean);
+  const REC = { wrong: '错过的', inwrong: '错题本里的', done: '做过的', new: '没做过的' };
+  const parts = [paper ? paper.name : (b.subject ? SUBJECT_NAME[b.subject] : ''), b.type ? TYPE_NAME[b.type] : '', b.q ? '“' + b.q + '”' : '', REC[b.rec] || ''].filter(Boolean);
   const title = '搜索 · ' + (parts.join(' · ') || '全部题目');
   beginPractice(list, title, 'practice');
   allowSave(Object.assign(b.paper_id ? { paper_id: b.paper_id } : { subject: b.subject, type: b.type }, { scope: 'search' }), title);
@@ -1473,12 +1479,14 @@ async function loadMore() {
     d = await api('/api/questions?paper_id=' + b.paper_id +
       (b.subject ? '&subject=' + b.subject : '') +
       (b.type ? '&type=' + b.type : '') +
-      (b.q ? '&q=' + encodeURIComponent(b.q) : '') +
+      (b.q ? '&q=' + encodeURIComponent(b.q) : '') + (b.rec ? '&rec=' + b.rec : '') +
       '&limit=30&offset=' + b.items.length);
   } catch (e) {
     box.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
     return;
   }
+  // 老版电脑程序（没重启换上新后台）不认 rec，会把全部题返回：提示一下
+  if (b.rec && !d.rec) { box.innerHTML = '<div class="empty">按做题记录筛选要重启一下程序（托盘图标右键退出，再打开）</div>'; return; }
   b.items = b.items.concat(d.items);
   b.total = d.total;
   box.innerHTML = b.items.length
@@ -1717,7 +1725,19 @@ function shuffleQuestion(q, moveAns) {
   });
   if (q.options_cn) c.options_cn = perm.map(j => q.options_cn[j]);
   if (q.option_notes) c.option_notes = perm.map(j => q.option_notes[j]);
+  if (q.analysis) { c.analysis = remapLetters(q.analysis, newKey, q.subject); c.anaMapped = true; }
   return c;
+}
+
+// 打乱后解析里提到的选项字母跟着换（用户报：答案是 A，解析却写“故选 C”）。
+// 语文、思政、数字媒体的解析里单独的 A～F 都是指选项，全换；数学解析里还有“集合 A、点 A”，只换“A 项”“B、C 两项”“故选 A”这种
+const OPT_RUN = /(?<![A-Za-z])[A-F](?:\s*[、，,和与及]\s*[A-F])*\s*(?:两|三|四)?(?:项|选项)/g;
+const OPT_SEL = /(?:故选|应选|所以选|因此选|答案为|答案是|答案选|选)\s*[A-F]{1,4}(?![A-Za-z])/g;
+function remapLetters(t, map, subject) {
+  const one = s => s.replace(/[A-F]/g, k => map[k] || k);
+  if (subject === 'chinese' || subject === 'politics' || subject === 'media')
+    return t.replace(/(?<![A-Za-z])[A-F](?![A-Za-z0-9₀-₉])/g, k => map[k] || k);
+  return t.replace(OPT_RUN, one).replace(OPT_SEL, one);
 }
 
 /* ---- 错题穿插（用户要求：做错的题过几题再蹦出来，以前高频错的题也穿插进来，选项重新打乱，加深记忆）----
@@ -1734,7 +1754,9 @@ const OLD_EVERY = 5, OLD_MAX = 8;
 function againOn() { return store.get('quiz.again') !== false; }
 function mixOldOn() { return store.get('quiz.mixold') !== false; }
 function extraCopy(q, kind) { return Object.assign({}, shuffleQuestion(q, true), { extra: kind }); }
+function hintOn() { return !!store.get('quiz.hint'); }
 function extraBadge(q) {
+  if (!hintOn()) return '';
   return '<span class="rec-badge bad">' + (q.extra === 'old' ? '以前错过' + (q.wrong_count ? ' ' + q.wrong_count + ' 次' : '') + '，再练一次' :
                                      q.extra === 'last' ? '上次做错，再考一次' : '刚才做错，再来一次') +
     (q.shuffled ? ' · 选项已打乱' : '') + '</span>';
@@ -2216,7 +2238,7 @@ function gradeGroup(replay) {
       '<div class="ans-line">' + (ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
       (ok ? rightBox(q) : whyBox(q, sel)) +
       (q.analysis ? '<div class="analysis">' + rich(q.analysis) + '</div>' +
-        (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
+        (q.shuffled && !q.anaMapped && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
       evidenceBox(q) + pointBox(q) + phraseBox(q) + '</div>';
   });
   if (!replay) {
@@ -2263,7 +2285,7 @@ function renderQ() {
       '<div class="qhead">' +
         '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
         '<span class="qsrc">' + esc(q.paper_name) + ' 第' + q.qno + '题</span>' +
-        (q.extra ? extraBadge(q) : recBadge(q)) +
+        (q.extra ? extraBadge(q) : hintOn() ? recBadge(q) : '') +
         '<span class="spacer"></span>' + cnBtn(q) + aiBtn(q) +
       '</div>' +
       materialBox(q) +
@@ -2324,13 +2346,14 @@ function optTap(btn) {
   if (!p) return;
   if (p.answered) {
     // 只有点绿色的正确答案才进下一题。判完 0.6 秒内不算：双击确认时手快多点了一下，不会连解析都没看就跳到下一题
-    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 600) nextQ();
+    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 250) nextQ();
     return;
   }
   const now = Date.now();
   // 新题刚出来 0.6 秒内点选项不算：点正确答案翻页时手指多点了一下，不会直接点到下一题的选项上
   if (now - (p.shownAt || 0) < 600) { lastTap = { btn: null, t: 0 }; return; }
-  const dbl = lastTap.btn === btn && now - lastTap.t < 400;
+  // 双击确认只给单选、判断用；多选要一个个点，双击容易误触，只能按「确认答案」或回车（用户）
+  const dbl = lastTap.btn === btn && now - lastTap.t < 400 && p.list[p.idx].type !== 'multi';
   lastTap = { btn: dbl ? null : btn, t: now };
   if (!dbl) return pickOpt(btn);
   btn.classList.add('sel');                       // 双击的第二下：不再切换（多选题第一下可能刚好取消了它），直接确认
@@ -2394,7 +2417,7 @@ function gradeAndShow(selKeys, replay) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
-  p.gradedAt = Date.now();
+  p.gradedAt = lastTap.btn === null && Date.now() - lastTap.t < 50 ? Date.now() : 0;   // 双击确认的那一下：250ms 内再点不算翻页
   $('.qcard-main').classList.add('answered');
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
@@ -2416,7 +2439,7 @@ function gradeAndShow(selKeys, replay) {
     '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
     (isRight ? rightBox(q) : whyBox(q, selKeys)) +
     (q.analysis ? '<div class="analysis">' + (isRight ? '' : '<b>怎么解：</b>') + rich(q.analysis) + '</div>' +
-      (q.shuffled && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
+      (q.shuffled && !q.anaMapped && /[A-F]/.test(q.analysis) ? '<div class="muted">选项已打乱，解析里提到的字母是原卷的顺序</div>' : '') : '') +
     evidenceBox(q) + pointBox(q) + phraseBox(q);
   $('#qbody').insertBefore(fb, $('#qact'));
   markEvidence(q);
@@ -3399,6 +3422,8 @@ async function viewSettings() {
     '<div class="set-group-t">做题</div><div class="set-list">' +
       '<label class="set-item"><span class="set-main">答题后自动显示翻译</span>' +
         '<input type="checkbox" class="switch" id="cn-after"' + (cnAfterOn() ? ' checked' : '') + '></label>' +
+      '<label class="set-item"><span class="set-main">提示这题以前做错过</span>' +
+        '<input type="checkbox" class="switch" id="hint-on"' + (hintOn() ? ' checked' : '') + '></label>' +
       '<label class="set-item"><span class="set-main">做错的题过几题再考一次</span>' +
         '<input type="checkbox" class="switch" id="again-on"' + (againOn() ? ' checked' : '') + '></label>' +
       '<label class="set-item"><span class="set-main">穿插以前错过的题</span>' +
@@ -3457,7 +3482,8 @@ async function viewSettings() {
     else if (!upd.busy && !upd.html) updShow('<div class="upd-box"><b>后台程序的更新还没生效</b><div class="muted">重启题库后生效，几秒钟，做题记录不受影响。</div>' +
       '<button class="btn" onclick="restartApp()">现在重启</button></div>');
   }
-  [['#again-on', 'quiz.again', '做错的题过几题会再考一次', '做错的题不再穿插（今日复习照旧在后面再来一次）'],
+  [['#hint-on', 'quiz.hint', '做题时题目上会标出“以前做错过 / 刚才做错，再来一次”', '做题时不再标出这题以前做错过（和考试一样）'],
+   ['#again-on', 'quiz.again', '做错的题过几题会再考一次', '做错的题不再穿插（今日复习照旧在后面再来一次）'],
    ['#mixold-on', 'quiz.mixold', '练习和背题时会穿插以前错过的题', '不再穿插以前错过的题']].forEach(([id, key, on, off]) => {
     const el = $(id);
     if (el) el.addEventListener('change', () => { store.set(key, el.checked); toast(el.checked ? '已打开：' + on : '已关闭：' + off); });

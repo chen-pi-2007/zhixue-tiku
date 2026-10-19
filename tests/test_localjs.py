@@ -90,6 +90,30 @@ class LocalJsSameAsDbTest(unittest.TestCase):
                          [q['key'] for q in db.practice_set(subject='chinese', qtype='reading', shuffle=False)])
         self.assertEqual([q['key'].split('#')[0] for q in res[1]['items']], found)
 
+    def test_search_by_record(self):
+        """搜索题目按做题记录筛（错过的 / 错题本里的 / 做过的 / 没做过的），电脑和手机筛出来一样"""
+        qs = db.get_questions(subject='chinese', limit=200)[0]
+        plan = [(qs[0]['id'], False), (qs[1]['id'], True), (qs[2]['id'], False), (qs[2]['id'], True), (qs[3]['id'], True)]
+        for qid, ok in plan:
+            db.record_answer(qid, ok)
+        want = {}
+        for rec in ('wrong', 'inwrong', 'done', 'new'):
+            items, total = db.get_questions(subject='chinese', limit=200, rec=rec)
+            want[rec] = [q['key'] for q in items]
+            self.assertEqual(total, len(items))
+        self.assertEqual(want['wrong'], [qs[0]['key'], qs[2]['key']])          # 错过的：错过至少一次，后来做对了也算
+        self.assertEqual(want['inwrong'], [qs[0]['key'], qs[2]['key']])
+        self.assertEqual(want['done'], [q['key'] for q in qs[:4]])
+        self.assertEqual(len(want['new']), len(qs) - 4)
+        if not NODE:
+            self.skipTest('没装 node')
+        calls = [['/api/record', {'method': 'POST', 'body': {'question_id': qid, 'correct': ok}}] for qid, ok in plan]
+        calls += [['/api/questions?subject=chinese&limit=200&rec=' + r, {}] for r in ('wrong', 'inwrong', 'done', 'new')]
+        res = self.run_js(calls)[len(plan):]
+        for rec, r in zip(('wrong', 'inwrong', 'done', 'new'), res):
+            self.assertEqual([q['key'] for q in r['items']], want[rec], rec)
+            self.assertEqual(r['rec'], rec)
+
     def check_exam(self, e):
         with open(db.BANK_PATH, encoding='utf-8') as f:
             bank = json.load(f)

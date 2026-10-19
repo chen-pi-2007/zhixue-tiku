@@ -206,10 +206,18 @@
     });
   }
 
-  function getQuestions(paperId, qtype, search, limit, offset, subject) {
+  // 搜索题目按做题记录筛，同 db.py _rec_ok
+  function recOk(c, rec) {
+    if (rec === 'wrong') return !!(c && c.wrong);
+    if (rec === 'inwrong') return !!(c && c.in_wrong);
+    if (rec === 'done') return !!(c && (c.wrong || c.right));
+    if (rec === 'new') return !(c && (c.wrong || c.right));
+    return true;
+  }
+  function getQuestions(paperId, qtype, search, limit, offset, subject, rec) {
     const papers = papersById();
     const rank = paperRank();
-    const qs = filter(paperId, subject, qtype, search).sort((a, b) => rank(a.paper_id) - rank(b.paper_id) || a.qno - b.qno || a.id - b.id);
+    const qs = filter(paperId, subject, qtype, search).filter(q => !rec || recOk(prog.cards[ck(q)], rec)).sort((a, b) => rank(a.paper_id) - rank(b.paper_id) || a.qno - b.qno || a.id - b.id);
     return { items: qs.slice(offset, offset + limit).map(q => view(q, papers)), total: qs.length };
   }
 
@@ -1099,7 +1107,8 @@
     if (method === 'GET' && path === '/api/papers') return { papers: listPapers() };
     if (method === 'GET' && path === '/api/questions') {
       const r = getQuestions(iarg('paper_id') || null, arg('type') || null, arg('q') || null,
-                             Math.min(Math.max(iarg('limit', 50), 0), 200), Math.max(iarg('offset'), 0), arg('subject') || null);
+                             Math.min(Math.max(iarg('limit', 50), 0), 200), Math.max(iarg('offset'), 0), arg('subject') || null, arg('rec') || null);
+      r.rec = arg('rec') || '';
       return r;
     }
     if (method === 'GET' && path === '/api/practice')

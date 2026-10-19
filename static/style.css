@@ -191,6 +191,7 @@ select option, select optgroup { background-color: var(--layer-1); color: var(--
 .tag { display: inline-block; padding: 0 8px; border-radius: 9999px; background: var(--layer-2); color: var(--ink-2); font-size: 12px; line-height: 22px; flex: none; }
 .rec-badge { font-size: 12px; color: var(--ink-3); }
 .rec-badge.bad { color: var(--red); }
+.rec-badge.good { color: var(--green); }
 
 /* ---------------------------------------------------------------- 首页（参照力扣题库页） */
 .home { display: flex; gap: 24px; align-items: flex-start; }

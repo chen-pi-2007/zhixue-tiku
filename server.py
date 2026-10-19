@@ -273,8 +273,8 @@ class Handler(BaseHTTPRequestHandler):
         if method == 'GET' and path == '/api/questions':
             items, total = db.get_questions(iarg('paper_id') or None, arg('type') or None,
                                             arg('q') or None, min(iarg('limit', 50), 200),
-                                            iarg('offset'), arg('subject') or None)
-            return self.send_json({'ok': True, 'items': items, 'total': total})
+                                            iarg('offset'), arg('subject') or None, arg('rec') or None)
+            return self.send_json({'ok': True, 'items': items, 'total': total, 'rec': arg('rec') or ''})
 
         if method == 'GET' and path == '/api/practice':
             items = db.practice_set(iarg('paper_id') or None, arg('scope', 'all'),
