@@ -37,6 +37,12 @@ EOF
 
 cat > /etc/nginx/sites-available/zhixue <<EOF
 # 智学题库 账号同步（内测）。EdgeOne 回源到本机 80，按域名进这里，再转给只听 127.0.0.1 的同步服务。
+# 网页版：js / css / 题库地址带 ?v=内容版本，同一个地址内容永远不变，EdgeOne 和浏览器都长期缓存（弱网下不用每次回源）；
+# 页面、sw.js、content.json 不带 ?v=，每次都问一下有没有新的（没变只回 304）
+map \$arg_v \$zx_web_cc {
+    ""      "no-cache";
+    default "public, max-age=31536000, immutable";
+}
 server {
     listen 80;
     listen [::]:80;
@@ -53,6 +59,8 @@ server {
     gzip on;
     gzip_types application/json application/javascript text/css image/svg+xml;
     gzip_min_length 1024;
+    # 跳转只写路径（/web/），不然 nginx 会拼成 http://，经 EdgeOne 再跳一次 https
+    absolute_redirect off;
     location = /web {
         return 301 /web/;
     }
@@ -63,7 +71,7 @@ server {
             alias /opt/zhixue-web/media/;
             add_header Cache-Control "public, max-age=604800";
         }
-        add_header Cache-Control "no-cache";
+        add_header Cache-Control \$zx_web_cc;
     }
     location / {
         return 302 /web/;
