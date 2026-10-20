@@ -1,6 +1,6 @@
 {
- "content_version": 74,
- "created": "2026-10-20 16:42:46",
+ "content_version": 75,
+ "created": "2026-10-20 17:00:44",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1587,8 +1587,8 @@
    13051
   ],
   "mobile/local.js": [
-   "7ebb62a7ec772b68d41240ce51c9011d725fc93114c6520ddf91ee6b4db279f0",
-   69313
+   "870cdc369bde36e14c4a12ab81dd9561e2c961474cc19e3fb03e2b4c86ad656e",
+   70059
   ],
   "server.py": [
    "a8dc038bc58d4a2791b181a36b84429680d65bebafd4ebb1ee32cbc19821b45b",
@@ -1635,20 +1635,20 @@
    3659
   ],
   "static/app.js": [
-   "a72f59d7abbdb865301961f6d70dcfdbfc951c81e3cb6f5861a4efc8b3e58015",
-   249462
+   "cae08d348f635b831bd9e504f875cd1134ad80daf1fae9a82ecae70becbfec0e",
+   253602
   ],
   "static/index.html": [
-   "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
-   7018
+   "2f68f8401c8b124d1af8f80a62da1fc405ca54abed685ba515c261d2d924f1ad",
+   7148
   ],
   "static/skills.js": [
    "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
    27524
   ],
   "static/style.css": [
-   "df43d466fbb5979937844dfe359b26345a043971450d6d0aecf5b321f7991dff",
-   71463
+   "fce59a554657472282a1f6aebefd417d48c9affc0a20dc4dbd077ea2f7c42522",
+   71888
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "全部乱序也能保存进度了：中途退出后下次可以接着做，也能手动存档、读档，选项顺序和退出前一样（原来全部乱序退出就从头开始）",
+ "notes": "为网页版做准备：界面能在浏览器里登录账号后使用（电脑版、手机 App 不受影响）",
  "py_shell_api": 1,
- "tag": "content-74"
+ "tag": "content-75"
 }

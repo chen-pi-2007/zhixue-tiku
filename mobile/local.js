@@ -34,7 +34,7 @@
   function load() {
     if (bank) return Promise.resolve();
     if (!loading) {
-      loading = fetch('bank.json').then(r => r.json()).then(b => {
+      loading = fetch('bank.json' + (window.ZX_WEB ? '?v=' + window.ZX_WEB.v : '')).then(r => r.json()).then(b => {
         bank = b;
         bank.papers = bank.papers || [];
         bank.questions = bank.questions || [];
@@ -924,6 +924,7 @@
   // ---- 网络和账号
   function syncEndpoint() {
     try { const u = localStorage.getItem('zx.sync.url'); if (u) return u.replace(/\/+$/, ''); } catch (e) { /* ignore */ }
+    if (window.ZX_WEB) return (window.ZX_WEB.sync || location.origin).replace(/\/+$/, '');   // 网页版和同步服务在同一个域名下
     try { return ((window.ZXStore && ZXStore.syncEndpoint && ZXStore.syncEndpoint()) || '').replace(/\/+$/, ''); } catch (e) { return ''; }
   }
   function syncAccount() { try { const a = JSON.parse(localStorage.getItem(ACC_KEY) || 'null'); return a && a.token ? a : null; } catch (e) { return null; } }
@@ -1049,7 +1050,7 @@
         if (!user || !pw) throw new SyncError('请输入用户名和密码');
         const owner = prog.sync_owner || '', count = localCount();
         // 先到服务器验证用户名密码（同 sync.py login）
-        const dev = 'android-' + newUid().slice(0, 6);
+        const dev = (window.ZX_WEB ? 'web-' : 'android-') + newUid().slice(0, 6);
         const r = await syncPost('/v1/login', { user: user, pass: pw, device: dev });
         const name = r.user || user;
         let need = null;
@@ -1071,11 +1072,15 @@
         const a = syncAccount();
         if (a) { try { await syncOnce(); } catch (e) { /* 断网也能退出，没传的留在本机 */ } }
         if (a) { try { await syncPost('/v1/logout', {}, a.token); } catch (e) { /* 断网也能退出 */ } }
+        const left = unsentCount();
         syncDropAccount();
         syncStopAccount();
         clearTimeout(syncState.timer);
         Object.assign(syncState, { last_ok: '', last_err: '', fails: 0 });
-        return syncStatus();
+        // 网页版可能是别人的电脑、学校机房：退出就把这台浏览器里的记录清掉（都在服务器上）。
+        // 没传上去的（断网）不清，留着下次登录同一个账号时补传
+        if (window.ZX_WEB && !left) { prog = { cards: {}, attempts: [], exams: [], settings: prog.settings }; ensureIds(); save(); }
+        return Object.assign(syncStatus(), { wiped: !!window.ZX_WEB && !left, left: left });
       }
       if (path === '/api/sync/now') {
         syncState.fails = 0;
@@ -1157,7 +1162,7 @@
     }
     if (method === 'GET' && path === '/api/app')
       return { version: APP_VERSION, content_version: ((await currentManifest()) || {}).content_version || 0,
-               frozen: false, mobile: true, data_dir: '本机，卸载 App 会一起删除', data_note: window.ZXStore && ZXStore.shareProgress ? '换手机或重装前，先分享一份到微信或文件里备份' : '', repo: 'https://github.com/' + REPO };
+               frozen: false, mobile: true, web: !!window.ZX_WEB, data_dir: window.ZX_WEB ? '账号里（服务器上）' : '本机，卸载 App 会一起删除', data_note: window.ZXStore && ZXStore.shareProgress ? '换手机或重装前，先分享一份到微信或文件里备份' : '', repo: 'https://github.com/' + REPO };
     if (method === 'GET' && path === '/api/content/check') return contentCheck();
     if (method === 'POST' && path === '/api/content/update') return contentStart();
     if (method === 'GET' && path === '/api/content/progress') return Object.assign({}, job);

@@ -964,3 +964,9 @@ main.page-in { animation: page-in .22s ease-out; }
   .qcard-main .qactions > .btn, .rc-acts > .btn { flex: none; }
 }
 .rc-kbd { margin-top: 8px; font-size: 12.5px; }
+
+/* 网页版登录页：没登录时只有这一页，收起导航 */
+body.login-page #side, body.login-page #top-set, body.login-page #top-days { display: none; }
+.web-login { max-width: 380px; margin: 8vh auto 0; }
+.web-login-logo { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 700; }
+.web-login-sub { text-align: center; color: var(--muted); margin: 6px 0 22px; }

@@ -150,6 +150,8 @@ function zoomImg(src) {
 
 // 手机 App 里没有 Python 服务，请求交给 mobile/local.js 在本地处理
 const IS_APP = !!window.LocalAPI;
+// 网页版（放在同步服务器上，用账号登录才能用，记录都在账号里）：界面和手机 App 一样跑 local.js
+const IS_WEB = !!window.ZX_WEB;
 function openExternal(url) {
   if (window.ZXStore && window.ZXStore.openUrl) window.ZXStore.openUrl(url);
   else window.open(url, '_blank');
@@ -476,6 +478,7 @@ const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: vi
                  practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers };
 
 function route() {
+  if (IS_WEB && !state.webUser) return webGate();
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
   const name = routes[parts[0]] ? parts[0] : 'home';
   const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home' };
@@ -3433,7 +3436,7 @@ async function viewSettings() {
   const item = (main, val, attrs, cls) =>
     '<' + (attrs ? 'button' : 'div') + ' class="set-item' + (cls ? ' ' + cls : '') + '"' + (attrs || '') + '>' +
       '<span class="set-main">' + main + '</span>' + (val ? '<span class="set-val">' + val + '</span>' : '') + '</' + (attrs ? 'button' : 'div') + '>';
-  const canUpd = a.frozen || a.mobile;
+  const canUpd = (a.frozen || a.mobile) && !a.web;
   const backLabel = state.backTo ? (state.backTo === '#/recite' ? '返回背题' : '返回做题') : '返回';
   app.innerHTML =
     // 从做题 / 背题进来的：左上角的返回就是回到刚才那道题（goBack 里处理），不另放按钮（用户：多一个「返回做题」很奇怪）
@@ -3458,26 +3461,26 @@ async function viewSettings() {
       '以前错过的题：整卷、题型练习和背题时，每隔几题穿插一道同科以前错过的题（错题本里的、错得多的优先），选项打乱。</div>' +
 
     '<div class="set-group-t">更新</div><div class="set-list">' +
-      item('当前版本', 'v' + esc(a.version) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
+      item('当前版本', (a.web ? '网页版' : 'v' + esc(a.version)) + (a.content_version ? ' · 内容第 ' + a.content_version + ' 版' : '')) +   // 程序版本只在发安装包时变，平时的题库 / 界面更新看内容版本
       (canUpd ? '<label class="set-item"><span class="set-main">自动更新题库和界面</span>' +
         '<input type="checkbox" class="switch" id="auto-upd"' + (autoUpdOn() ? ' checked' : '') + '></label>' : '') +
-      '<button class="set-item set-link" id="upd-check"' + (canUpd ? '' : ' disabled data-off="1"') + '><span class="set-main upd-label">检查更新</span></button>' +
+      (a.web ? '' : '<button class="set-item set-link" id="upd-check"' + (canUpd ? '' : ' disabled data-off="1"') + '><span class="set-main upd-label">检查更新</span></button>') +
     '</div>' +
     '<div id="upd-out"></div>' +
-    '<div class="set-foot">' + (canUpd ? '打开自动更新后，题库和界面有新版时会在后台自己下载装好（只下载改动的部分）；正在做题、背题、模拟考时不打断，' +
+    '<div class="set-foot">' + (a.web ? '网页版总是最新的：有新版时在首页等页面自动刷新换上，做题时不打断。' : canUpd ? '打开自动更新后，题库和界面有新版时会在后台自己下载装好（只下载改动的部分）；正在做题、背题、模拟考时不打断，' +
       '回到首页等页面才换上。做题记录不会受影响。新版程序（安装包）要重新安装，有的话「检查更新」上会有小红点。' : '源码运行，用 git pull 更新。') + '</div>' +
 
-    (sy && sy.available ? '<div class="set-group-t">账号同步（内测）</div><div id="sync-box">' + syncBoxHtml(sy) + '</div>' : '') +
+    (sy && sy.available ? '<div class="set-group-t">' + (IS_WEB ? '账号' : '账号同步（内测）') + '</div><div id="sync-box">' + syncBoxHtml(sy) + '</div>' : '') +
 
     (aic ? aiSettingsHtml(aic) : '') +
 
     '<div class="set-group-t">我的数据</div><div class="set-list">' +
-      (a.mobile ? item('保存位置', '本机') : '<div class="set-item set-col"><span class="set-main">保存位置</span><span class="set-sub">' + esc(a.data_dir) + '</span></div>') +
+      (a.web ? item('保存位置', '账号里（服务器上）') : a.mobile ? item('保存位置', '本机') : '<div class="set-item set-col"><span class="set-main">保存位置</span><span class="set-sub">' + esc(a.data_dir) + '</span></div>') +
       (a.open_data ? item('打开数据文件夹', '', ' onclick="openDataDir()"', 'set-link') : '') +
       (canShareProgress() ? item('分享做题记录', '', ' onclick="shareProgress()"', 'set-link') : '') +
-      item('清除做题记录', '', ' onclick="clearMyData()"', 'set-link set-danger') +
+      (a.web ? '' : item('清除做题记录', '', ' onclick="clearMyData()"', 'set-link set-danger')) +   // 网页版的记录在账号里，清本机没意义
     '</div>' +
-    '<div class="set-foot">' + (a.mobile
+    '<div class="set-foot">' + (a.web ? '做题记录存在账号里，换电脑、清浏览器缓存都不会丢。' : a.mobile
       ? '卸载 App 会一起删除做题记录' + (canShareProgress() ? '，换手机或重装前先分享一份备份' : '') + '。清除前会自动留一份备份。'
       : '清除会清空复习进度、错题本、模拟考和技能实操记录，清除前自动备份到数据文件夹的 backups 里。') + '</div>' +
 
@@ -3548,7 +3551,7 @@ function syncBoxHtml(sy) {
       '<button class="set-item set-link" onclick="syncPwForm()"><span class="set-main">修改密码</span></button>' +
       '<button class="set-item set-link set-danger" onclick="syncLogout()"><span class="set-main">退出登录</span></button>' +
     '</div><div id="sync-pw"></div>' +
-    '<div class="set-foot">做完题会自动同步，每 5 分钟也会同步一次。退出登录不会删本机的做题记录。</div>';
+    '<div class="set-foot">做完题会自动同步，每 5 分钟也会同步一次。' + (IS_WEB ? '退出登录会清掉这台浏览器里的记录（账号里的不动）。' : '退出登录不会删本机的做题记录。') + '</div>';
 }
 
 function syncRender(sy) { const b = $('#sync-box'); if (b) b.innerHTML = syncBoxHtml(sy); }
@@ -3563,6 +3566,7 @@ async function syncLogin(mode) {
     if (sy.need) return syncAskOwner(sy, u.trim());
     if (mode === 'fresh') lsClearLocal();            // 本机的练习存档也是原来那个人的
     lsPushAll();
+    if (IS_WEB) return webEnter(sy);
     syncRender(sy);
     toast(sy.backup ? '登录成功。本机原来的记录已备份并清空，正在下载这个账号的记录' : '登录成功，正在同步', 'good');
     syncNow();
@@ -3636,8 +3640,19 @@ async function syncChangePw() {
 }
 
 async function syncLogout() {
-  if (!confirm('退出同步账号？本机的做题记录会保留。')) return;
-  try { syncRender(await api('/api/sync/logout', { method: 'POST', body: {} })); toast('已退出'); }
+  if (!confirm(IS_WEB ? '退出登录？做题记录都在账号里，这台浏览器里的会清掉，下次登录再下载回来。' : '退出同步账号？本机的做题记录会保留。')) return;
+  try {
+    const sy = await api('/api/sync/logout', { method: 'POST', body: {} });
+    if (IS_WEB) {
+      if (sy.wiped) lsClearLocal();
+      else if (sy.left) alert('有 ' + sy.left + ' 条记录还没传上服务器（可能断网了），先留在这台浏览器里，下次登录同一个账号会自动补传。');
+      state.webUser = null;
+      location.hash = '#/home';
+      return route();
+    }
+    syncRender(sy);
+    toast('已退出');
+  }
   catch (e) { toast(e.message, 'bad'); }
 }
 
@@ -4280,15 +4295,63 @@ function applyTheme(pref) {
   applyTheme(document.documentElement.getAttribute('data-theme-pref') || 'auto');
 })();
 
+/* ================================================================ 网页版登录
+   网页版必须登录（用户：不然记录容易丢——浏览器缓存一清就没了）。账号就是电脑 / 手机「账号同步」用的那个，
+   做题记录存在服务器上，三边互通。没登录只显示登录页；退出登录时清掉这台浏览器里的记录（可能是别人的电脑）。 */
+async function webGate() {
+  let sy = {};
+  try { sy = await api('/api/sync/status'); } catch (e) { /* ignore */ }
+  if (sy.user) { state.webUser = sy.user; document.body.classList.remove('login-page'); return route(); }
+  document.body.classList.add('login-page');
+  app.innerHTML =
+    '<div class="web-login">' +
+      '<div class="web-login-logo"><span class="seal">题</span>智学题库</div>' +
+      '<div class="web-login-sub">江苏中职学测刷题 · 网页版</div>' +
+      '<div class="set-list"><div class="set-item set-col sync-form">' +
+        '<input class="input" id="sync-user" autocomplete="username" placeholder="用户名">' +
+        '<input class="input" id="sync-pass" type="password" autocomplete="current-password" placeholder="密码">' +
+        '<button class="btn" id="web-login-btn">登录</button></div></div>' +
+      '<div class="set-foot">登录后做题记录、错题本、复习进度都存在账号里，换电脑、清浏览器缓存都不会丢，和电脑版、手机 App 登录同一个账号的记录互通。<br>' +
+        '账号找管理员要。</div>' +
+    '</div>';
+  const go = () => syncLogin();
+  $('#web-login-btn').addEventListener('click', go);
+  $('#sync-pass').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  $('#sync-user').focus();
+}
+
+// 网页版登录成功：先把账号里的记录下载下来，再进首页（不然首页一开始是空的）
+async function webEnter(sy) {
+  app.innerHTML = '<div class="empty">登录成功，正在下载你的做题记录…</div>';
+  try { await api('/api/sync/now', { method: 'POST', body: {} }); await lsPull(); }
+  catch (e) { toast('记录还没下载完：' + e.message + '，稍后会自动再试', 'bad'); }
+  state.webUser = sy.user;
+  document.body.classList.remove('login-page');
+  if (!/^#\/(home)?$/.test(location.hash)) location.hash = '#/home';
+  route();
+}
+
+// 网页版：内容更新了（服务器上换了新版）就在空闲页面自动刷新，每 10 分钟看一次
+function webWatchUpdate() {
+  setInterval(async () => {
+    try {
+      const r = await fetch('content.json', { cache: 'no-store' });
+      const v = (await r.json()).content_version || 0;
+      if (v > (window.ZX_WEB.v || 0)) { state.pendingReload = v; if (RELOAD_OK.indexOf(state.lastPage) >= 0) reloadIfIdle(); }
+    } catch (e) { /* ignore */ }
+  }, 10 * 60 * 1000);
+}
+
 /* ================================================================ 启动 */
 
 window.addEventListener('DOMContentLoaded', () => {
   route();
   loadAi().then(() => { if (state.ai.on) route(); });
   lsPull();                 // 别的设备的练习存档（登录了同步才有）
-  // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时不查
+  if (IS_WEB) webWatchUpdate();
+  // 打包好的程序（exe / 手机 App）每天自动查一次更新；源码运行时、网页版不查（网页版刷新就是最新）
   api('/api/app').then(a => {
-    if (!(a.frozen || a.mobile)) return;
+    if (!(a.frozen || a.mobile) || a.web) return;
     setTimeout(() => autoCheckUpdate(a), 1500);
     // 开着不关的也每小时查一次（autoCheckUpdate 里按上次检查的时间节流）
     setInterval(() => api('/api/app').then(autoCheckUpdate).catch(() => {}), 10 * 60 * 1000);
