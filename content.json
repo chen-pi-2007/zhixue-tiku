@@ -1,6 +1,6 @@
 {
- "content_version": 75,
- "created": "2026-10-20 17:00:44",
+ "content_version": 76,
+ "created": "2026-10-20 19:10:25",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1587,8 +1587,8 @@
    13051
   ],
   "mobile/local.js": [
-   "870cdc369bde36e14c4a12ab81dd9561e2c961474cc19e3fb03e2b4c86ad656e",
-   70059
+   "4372822bfcfcfe640423a1bd16579b8c3a6a0dcabf36b583e83b80e09d87c259",
+   71069
   ],
   "server.py": [
    "a8dc038bc58d4a2791b181a36b84429680d65bebafd4ebb1ee32cbc19821b45b",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "cae08d348f635b831bd9e504f875cd1134ad80daf1fae9a82ecae70becbfec0e",
-   253602
+   "013be69e4f13c1a2fe48b8e073d13b67f4aeb822ad41e23b2add415f6eb1fccf",
+   259606
   ],
   "static/index.html": [
    "2f68f8401c8b124d1af8f80a62da1fc405ca54abed685ba515c261d2d924f1ad",
@@ -1647,8 +1647,8 @@
    27524
   ],
   "static/style.css": [
-   "fce59a554657472282a1f6aebefd417d48c9affc0a20dc4dbd077ea2f7c42522",
-   71888
+   "5f8935f171a749713fbe7c5085451ce4b52e9f1ad01dc88d7d82dfb926a0e4dc",
+   75494
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "为网页版做准备：界面能在浏览器里登录账号后使用（电脑版、手机 App 不受影响）",
+ "notes": "完形等并排的短选项不再把单词从中间截断（手机调大字体也一样）；提示不再一条条叠起来；网页版：新登录页、断网弱网也能做题、联网自动补传、图片路径修正",
  "py_shell_api": 1,
- "tag": "content-75"
+ "tag": "content-76"
 }

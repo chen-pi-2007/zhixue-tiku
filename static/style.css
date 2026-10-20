@@ -759,6 +759,7 @@ input.switch:checked::before { transform: translateX(18px); }
 .gq.cur { display: block; }
 .gq-pane { touch-action: pan-y; }
 .gq .opts-short { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--ow, 150px), 1fr)); }   /* --ow：按最长选项算的一列宽，放不下就少排几列 */
+.gq .opts-short .opt > span:last-child { word-break: normal; overflow-wrap: normal; }   /* 英文单词不从中间截断；放不下由 app.js fitOpts 加宽 */
 @media (max-width: 760px) {
   .g-mat .g-orig { max-height: 36vh; }
   .g-mat .g-orig-cn { max-height: 26vh; }
@@ -967,6 +968,45 @@ main.page-in { animation: page-in .22s ease-out; }
 
 /* 网页版登录页：没登录时只有这一页，收起导航 */
 body.login-page #side, body.login-page #top-set, body.login-page #top-days { display: none; }
-.web-login { max-width: 380px; margin: 8vh auto 0; }
-.web-login-logo { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 700; }
-.web-login-sub { text-align: center; color: var(--muted); margin: 6px 0 22px; }
+.web-login { min-height: calc(100vh - 140px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 0; }
+.wl-card { width: 100%; max-width: 820px; display: flex; border-radius: 16px; overflow: hidden; background: var(--layer-1); box-shadow: var(--pop); }
+.wl-brand { flex: 1 1 0; padding: 40px 36px; background: var(--fill); color: var(--fill-ink); display: flex; flex-direction: column; gap: 32px; }
+.wl-logo { display: flex; align-items: center; gap: 14px; }
+.wl-logo b { display: block; font-size: 24px; letter-spacing: 2px; }
+.wl-logo small { display: block; font-size: 13px; opacity: .65; margin-top: 2px; }
+.wl-seal { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; border-radius: 12px; background: var(--fill-ink); color: var(--fill); font-size: 26px; font-weight: 700; }
+.wl-feat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.wl-feat li { position: relative; padding-left: 20px; }
+.wl-feat li::before { content: ''; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.wl-feat b { display: block; font-size: 15px; }
+.wl-feat span { display: block; font-size: 13px; opacity: .65; margin-top: 2px; line-height: 1.6; }
+.wl-form { flex: 1 1 0; padding: 40px 36px; display: flex; flex-direction: column; gap: 14px; }
+.wl-h { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.wl-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.wl-field .input { width: 100%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--layer-2); color: var(--ink); font: inherit; font-size: 15px; outline: none; transition: border-color .15s, background .15s; }
+.wl-field .input:focus { border-color: var(--ink-3); background: transparent; }
+.wl-pw { position: relative; display: block; }
+.wl-pw .input { padding-right: 44px; }
+.wl-eye { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: none; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.wl-eye.on { color: var(--ink); }
+.wl-err { padding: 8px 12px; border-radius: 8px; background: var(--red-soft); color: var(--red); font-size: 13px; line-height: 1.6; }
+.wl-btn { width: 100%; height: 44px; font-size: 15px; justify-content: center; margin-top: 4px; }
+.wl-btn:disabled { opacity: .6; }
+.wl-tip { font-size: 12px; color: var(--ink-3); line-height: 1.7; }
+.wl-foot { margin-top: 18px; font-size: 12px; color: var(--ink-3); }
+.wl-msg { max-width: 360px; flex-direction: column; align-items: center; padding: 36px 28px; gap: 10px; text-align: center; }
+.wl-msg-t { font-size: 18px; font-weight: 700; }
+.wl-msg-d { color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+.wl-msg .wl-btn { margin-top: 10px; max-width: 200px; }
+@media (max-width: 760px) {
+  .web-login { min-height: 0; justify-content: flex-start; padding: 8px 0 24px; }
+  .wl-card { flex-direction: column; border-radius: 14px; }
+  .wl-brand { padding: 24px 22px; gap: 18px; }
+  .wl-feat { gap: 10px; }
+  .wl-feat span { display: none; }
+  .wl-form { padding: 24px 22px 26px; }
+}
+/* 网页版顶栏：断网 / 有记录没传上去 */
+.web-net { margin-left: 10px; height: 28px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--layer-2); color: var(--ink-2); font: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.web-net.off { background: rgba(255, 183, 0, .16); color: var(--yellow); }
+body.login-page .web-net { display: none; }

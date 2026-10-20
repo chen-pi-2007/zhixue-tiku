@@ -34,7 +34,10 @@
   function load() {
     if (bank) return Promise.resolve();
     if (!loading) {
-      loading = fetch('bank.json' + (window.ZX_WEB ? '?v=' + window.ZX_WEB.v : '')).then(r => r.json()).then(b => {
+      loading = fetch('bank.json' + (window.ZX_WEB ? '?v=' + window.ZX_WEB.v : '')).then(r => {
+        if (!r.ok) throw new Error('题库下载失败（' + r.status + '）');
+        return r.json();
+      }).then(b => {
         bank = b;
         bank.papers = bank.papers || [];
         bank.questions = bank.questions || [];
@@ -50,6 +53,9 @@
         const acc = syncAccount();
         if (acc && !prog.sync_owner) { prog.sync_owner = acc.user; save(); }
         syncSchedule(3);           // 登录了同步：打开 App 后同步一次
+      }).catch(e => {
+        loading = null;            // 网不好没下完：下次再试，不能一直卡在失败上
+        throw new Error(/题库/.test(e.message) ? e.message : '题库没下载下来，检查一下网络再点一次');
       });
     }
     return loading;
@@ -885,7 +891,7 @@
     return allEvents().filter(e => !e.s).length + Object.keys(prog.sync.dirty || {}).length;
   }
   function syncOutbox() {
-    const evs = allEvents().filter(e => !e.s).slice(0, 5000).map(e => { const x = Object.assign({}, e); delete x.s; return x; });
+    const evs = allEvents().filter(e => !e.s).slice(0, 1000).map(e => { const x = Object.assign({}, e); delete x.s; return x; });
     const kv = {};
     Object.keys(prog.sync.dirty || {}).forEach(k => {
       const cur = kvGet(k);
@@ -934,7 +940,7 @@
     const url = syncEndpoint();
     if (!url) throw new SyncError('这个版本没有配置同步服务器');
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 20000);
+    const timer = setTimeout(() => ctl.abort(), 30000);      // 弱网多等一会儿；一次最多传 1000 条，不会太大
     let r;
     try {
       r = await fetch(url + path, { method: 'POST', signal: ctl.signal, body: JSON.stringify(body),
@@ -1012,6 +1018,11 @@
     }, sec * 1000);
   }
   function syncKick() { if (syncAccount() && !syncState.fails) syncSchedule(10); }
+  // 断网时做题照常记在本机；网一恢复就补传，不用等退避的十几分钟
+  if (window.addEventListener) window.addEventListener('online', () => { if (syncAccount()) { syncState.fails = 0; syncSchedule(1); } });
+  if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && prog && prog.sync && syncAccount() && syncPending() && !syncState.busy) syncOnce().catch(() => {});
+  });
   // 本机记录属于哪个账号：绝不把一个人的记录并进另一个人的账号（规则同 sync.py login）
   const localCount = () => allEvents().length + prog.exams.filter(e => e.finished).length;
   const unsentCount = () => allEvents().filter(e => !e.s).length;
@@ -1028,7 +1039,7 @@
   function syncStatus() {
     const a = syncAccount();
     return { available: !!syncEndpoint(), user: a ? a.user : '', owner: prog.sync_owner || '', running: syncState.running, last_ok: syncState.last_ok,
-             last_err: syncState.last_err, last_got: syncState.last_got, pending: a ? syncPending() : 0 };
+             last_err: syncState.last_err, last_got: syncState.last_got, pending: a && prog.sync ? syncPending() : 0 };
   }
   async function syncHandle(method, path, body) {
     if (method === 'GET' && path === '/api/sync/status') return syncStatus();
@@ -1072,7 +1083,7 @@
         const a = syncAccount();
         if (a) { try { await syncOnce(); } catch (e) { /* 断网也能退出，没传的留在本机 */ } }
         if (a) { try { await syncPost('/v1/logout', {}, a.token); } catch (e) { /* 断网也能退出 */ } }
-        const left = unsentCount();
+        const left = a ? syncPending() : 0;      // 没传上去的做题记录和存档、设置
         syncDropAccount();
         syncStopAccount();
         clearTimeout(syncState.timer);

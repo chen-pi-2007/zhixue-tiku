@@ -21,7 +21,7 @@ const esc = v => String(v == null ? '' : v)
 function rich(s) {
   return esc(s)
     .replace(/\[\[img:([^\]]+)\]\]/g, (m, p) =>
-      '<img class="qimg" loading="lazy" src="/media/' + p.split('/').map(encodeURIComponent).join('/') + '" onclick="zoomImg(this.src)">')
+      '<img class="qimg" loading="lazy" src="' + (window.ZX_WEB ? '' : '/') + 'media/' + p.split('/').map(encodeURIComponent).join('/') + '" onclick="zoomImg(this.src)">')
     .replace(/「([^「」]*)」/g, '<u>$1</u>')
     .replace(/〔([^〔〕]*)〕/g, '<span class="emph">$1</span>')
     .replace(/\\\((.+?)\\\)/g, (m, t) => '<span class="math">' + mathHtml(t) + '</span>');
@@ -236,11 +236,15 @@ const SUBJECT_NAME = { chinese: '语文', math: '数学', english: '英语', pol
 const SUBJECT_ICON = { chinese: '语', math: '数', english: '英', politics: '政', media: '媒', general: '其' };
 const MASTER_STREAK = 3;
 
+// 同一句提示不重复叠；最多同时留 2 条（用户：点多了提示一条条往上堆，叠好高一串）
 function toast(msg, cls) {
+  const box = $('#toasts');
+  Array.from(box.children).forEach(o => { if (o.textContent === msg) o.remove(); });
+  while (box.children.length >= 2) box.removeChild(box.firstChild);
   const d = document.createElement('div');
   d.className = 'toast ' + (cls || '');
   d.textContent = msg;
-  $('#toasts').appendChild(d);
+  box.appendChild(d);
   setTimeout(() => { d.style.opacity = '0'; d.style.transition = '.4s'; }, 2200);
   setTimeout(() => d.remove(), 2700);
 }
@@ -2083,7 +2087,7 @@ function renderGroup() {
   const width = t => (t || '').replace(/[^\x00-\xff]/g, 'xx').length;
   const short = q => q.type !== 'judge' && optionList(q).every(o => width(o[1]) <= 20 && !/<img|\\\(|【图/.test(o[1] || ''));
   // 一列至少要多宽：按最长的选项算（一个宽度单位约 8px，加上字母、内边距），放得下一整行才并排，选项文字不折行（用户：挤成两行很丑）
-  const colW = q => Math.max.apply(null, optionList(q).map(o => width(o[1]))) * 8 + 64;
+  const colW = q => Math.max.apply(null, optionList(q).map(o => width(o[1]))) * 10 + 72;
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
@@ -2137,6 +2141,7 @@ function renderGroup() {
     gGo(0);
     groupLeft();
   }
+  fitOpts();
 }
 
 // 电脑宽屏：左右分栏，小题全部列出（和 style.css 里 .g-wrap 的断点一致）
@@ -2158,6 +2163,7 @@ function gGo(k, noScroll) {
   p.group.cur = k;
   divs.forEach((d, i) => d.classList.toggle('cur', i === k));
   tabs.forEach((t, i) => t.classList.toggle('cur', i === k));
+  fitOpts();
   if (gSplit() && !noScroll) scrollInBox($('#gq-pane'), divs[k], 8, true);
   if (p.answered) {                 // 判完以后：材料里只标黄这道小题的原文依据，并滚到那里
     clearEvidence();
@@ -2166,6 +2172,18 @@ function gGo(k, noScroll) {
     const box = $('.g-mat .g-orig');
     scrollInBox(box, box && box.querySelector('mark.evidence'), 40);
   }
+}
+// 并排的短选项：上面按字数估的列宽不一定够（手机字体调大、字母宽），单词会被从中间截断（用户：一个单词还要换行，很难看）。
+// 看得见的这几组量一下：放不下就把列宽加到正好放得下，一行一个都放不下就改回一行一个
+function fitOpts() {
+  $$('.opts-short').forEach(box => {
+    if (!box.offsetWidth) return;                  // 手机上没切到的小题是隐藏的，切过去时再量
+    const opts = Array.from(box.querySelectorAll('.opt'));
+    const need = Math.max.apply(null, opts.map(o => o.scrollWidth));
+    if (opts.every(o => o.scrollWidth <= o.clientWidth + 1)) return;
+    if (need > box.clientWidth) box.classList.remove('opts-short');
+    else box.style.setProperty('--ow', Math.ceil(need) + 'px');
+  });
 }
 // 电脑上点到某道小题上（选项或题干）：它就是当前这道
 function gPick(k) {
@@ -3560,7 +3578,9 @@ function syncRender(sy) { const b = $('#sync-box'); if (b) b.innerHTML = syncBox
 // 后台不会直接登录，而是回 need，这里让用户选：合并（是自己的记录）/ 备份后清空本机再下载账号里的
 async function syncLogin(mode) {
   const u = ($('#sync-user') || {}).value || '', p = ($('#sync-pass') || {}).value || '';
-  if (!u.trim() || !p) { toast('请输入用户名和密码', 'bad'); return; }
+  if (!u.trim() || !p) { if (!(IS_WEB && webLoginErr('请输入用户名和密码'))) toast('请输入用户名和密码', 'bad'); return; }
+  const lb = $('#web-login-btn');
+  if (lb) { if (lb.disabled) return; lb.disabled = true; lb.textContent = '登录中…'; }
   try {
     const sy = await api('/api/sync/login', { method: 'POST', body: { user: u, pass: p, mode: mode || '' } });
     if (sy.need) return syncAskOwner(sy, u.trim());
@@ -3570,7 +3590,8 @@ async function syncLogin(mode) {
     syncRender(sy);
     toast(sy.backup ? '登录成功。本机原来的记录已备份并清空，正在下载这个账号的记录' : '登录成功，正在同步', 'good');
     syncNow();
-  } catch (e) { toast(e.message, 'bad'); }
+  } catch (e) { if (!(IS_WEB && webLoginErr(e.message))) toast(e.message, 'bad'); }
+  finally { const b = $('#web-login-btn'); if (b) { b.disabled = false; b.textContent = '登录'; } }
 }
 
 function syncAskOwner(sy, user) {
@@ -4298,37 +4319,115 @@ function applyTheme(pref) {
 /* ================================================================ 网页版登录
    网页版必须登录（用户：不然记录容易丢——浏览器缓存一清就没了）。账号就是电脑 / 手机「账号同步」用的那个，
    做题记录存在服务器上，三边互通。没登录只显示登录页；退出登录时清掉这台浏览器里的记录（可能是别人的电脑）。 */
+const WEB_EYE = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 async function webGate() {
-  let sy = {};
-  try { sy = await api('/api/sync/status'); } catch (e) { /* ignore */ }
-  if (sy.user) { state.webUser = sy.user; document.body.classList.remove('login-page'); return route(); }
+  let sy = null;
+  app.innerHTML = '<div class="empty">正在打开…</div>';
+  try { sy = await api('/api/sync/status'); }
+  catch (e) {                       // 弱网：题库没下下来。别显示登录页（可能已经登录过），给个重试
+    document.body.classList.add('login-page');
+    app.innerHTML = '<div class="web-login"><div class="wl-card wl-msg"><div class="wl-msg-t">网络不太好</div>' +
+      '<div class="wl-msg-d">' + esc(e.message) + '</div><button class="btn wl-btn" onclick="webGate()">再试一次</button></div></div>';
+    return;
+  }
+  if (sy.user) { state.webUser = sy.user; document.body.classList.remove('login-page'); webNetWatch(); return route(); }
   document.body.classList.add('login-page');
+  const feat = (t, d) => '<li><b>' + t + '</b><span>' + d + '</span></li>';
   app.innerHTML =
-    '<div class="web-login">' +
-      '<div class="web-login-logo"><span class="seal">题</span>智学题库</div>' +
-      '<div class="web-login-sub">江苏中职学测刷题 · 网页版</div>' +
-      '<div class="set-list"><div class="set-item set-col sync-form">' +
-        '<input class="input" id="sync-user" autocomplete="username" placeholder="用户名">' +
-        '<input class="input" id="sync-pass" type="password" autocomplete="current-password" placeholder="密码">' +
-        '<button class="btn" id="web-login-btn">登录</button></div></div>' +
-      '<div class="set-foot">登录后做题记录、错题本、复习进度都存在账号里，换电脑、清浏览器缓存都不会丢，和电脑版、手机 App 登录同一个账号的记录互通。<br>' +
-        '账号找管理员要。</div>' +
-    '</div>';
+    '<div class="web-login"><div class="wl-card">' +
+      '<div class="wl-brand">' +
+        '<div class="wl-logo"><span class="wl-seal">题</span><span><b>智学题库</b><small>江苏中职学测刷题 · 网页版</small></span></div>' +
+        '<ul class="wl-feat">' +
+          feat('记录存在账号里', '换电脑、清浏览器缓存都不会丢') +
+          feat('三端互通', '电脑版、手机 App 登录同一个账号，记录自动合并') +
+          feat('断网也能做', '记录先存在这台浏览器里，联网后自动上传') +
+        '</ul>' +
+      '</div>' +
+      '<form class="wl-form" onsubmit="return false" autocomplete="on">' +
+        '<div class="wl-h">登录</div>' +
+        '<label class="wl-field"><span>用户名</span><input class="input" id="sync-user" name="username" autocomplete="username" autocapitalize="off" spellcheck="false"></label>' +
+        '<label class="wl-field"><span>密码</span><span class="wl-pw"><input class="input" id="sync-pass" name="password" type="password" autocomplete="current-password">' +
+          '<button type="button" class="wl-eye" id="wl-eye" title="显示密码" aria-label="显示密码">' + WEB_EYE + '</button></span></label>' +
+        '<div class="wl-err" id="web-login-err" hidden></div>' +
+        '<button type="submit" class="btn wl-btn" id="web-login-btn">登录</button>' +
+        '<div class="wl-tip">账号找管理员要。在学校机房、别人的电脑上用完记得到「设置」里退出登录。</div>' +
+      '</form>' +
+    '</div>' +
+    '<div class="wl-foot">作者 十三、chen_pi</div></div>';
   const go = () => syncLogin();
   $('#web-login-btn').addEventListener('click', go);
-  $('#sync-pass').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  $('#wl-eye').addEventListener('click', () => {
+    const i = $('#sync-pass'), show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    $('#wl-eye').classList.toggle('on', show);
+  });
+  ['#sync-user', '#sync-pass'].forEach(k => $(k).addEventListener('input', () => { $('#web-login-err').hidden = true; }));
   $('#sync-user').focus();
 }
+// 登录页上的出错提示直接写在表单里（不用一闪就没的 toast）
+function webLoginErr(msg) {
+  const b = $('#web-login-err');
+  if (!b) return false;
+  b.textContent = msg;
+  b.hidden = false;
+  return true;
+}
 
-// 网页版登录成功：先把账号里的记录下载下来，再进首页（不然首页一开始是空的）
+// 网页版登录成功：先把账号里的记录下载下来，再进首页（不然首页一开始是空的）。
+// 弱网时最多等 8 秒，下不完就先进去，后台接着同步（做题照常记，不会丢）
 async function webEnter(sy) {
-  app.innerHTML = '<div class="empty">登录成功，正在下载你的做题记录…</div>';
-  try { await api('/api/sync/now', { method: 'POST', body: {} }); await lsPull(); }
-  catch (e) { toast('记录还没下载完：' + e.message + '，稍后会自动再试', 'bad'); }
+  app.innerHTML = '<div class="web-login"><div class="wl-card wl-msg"><div class="wl-msg-t">登录成功</div><div class="wl-msg-d">正在下载你的做题记录…</div></div></div>';
+  const sync = api('/api/sync/now', { method: 'POST', body: {} }).then(() => lsPull());
+  const slow = new Promise(r => setTimeout(() => r('slow'), 8000));
+  try {
+    if (await Promise.race([sync, slow]) === 'slow') toast('网络有点慢，记录在后台接着下载，先做题不影响');
+  } catch (e) { toast('记录还没下载完：' + e.message + '，联网后会自动再试', 'bad'); }
+  sync.catch(() => {});
   state.webUser = sy.user;
   document.body.classList.remove('login-page');
+  webNetWatch();
   if (!/^#\/(home)?$/.test(location.hash)) location.hash = '#/home';
   route();
+}
+
+// 网页版顶栏上的网络状态：断网、有记录没传上去时显示，点一下立即同步。
+// 关页面时还有没传上去的，浏览器会问一句（记录在这台浏览器里不会丢，只是别的设备暂时看不到）
+let webNetTimer = null;
+function webNetWatch() {
+  if (webNetTimer) return;
+  let pill = $('#web-net');
+  if (!pill) {
+    pill = document.createElement('button');
+    pill.id = 'web-net';
+    pill.className = 'web-net';
+    pill.hidden = true;
+    const days = $('#top-days');
+    days.parentNode.insertBefore(pill, days.nextSibling);
+    pill.addEventListener('click', async () => {
+      if (!navigator.onLine) { toast('现在没网：做题照常，记录先存在这台浏览器里，联网后自动上传'); return; }
+      pill.textContent = '同步中…';
+      try { await api('/api/sync/now', { method: 'POST', body: {} }); toast('已同步', 'good'); }
+      catch (e) { toast(e.message, 'bad'); }
+      upd();
+    });
+  }
+  let last = { pending: 0 };
+  async function upd() {
+    try { last = await api('/api/sync/status'); } catch (e) { return; }
+    if (!last.user) { pill.hidden = true; return; }
+    const off = !navigator.onLine;
+    pill.hidden = !off && !(last.pending && last.last_err);
+    pill.classList.toggle('off', off);
+    pill.textContent = off ? '离线' + (last.pending ? ' · ' + last.pending + ' 条未上传' : '') : last.pending + ' 条未上传';   // 手机顶栏窄，字要短
+    pill.title = off ? '没网也能做题，记录先存在这台浏览器里，联网后自动上传' : (last.last_err || '') + '（点一下重试）';
+  }
+  window.addEventListener('online', () => setTimeout(upd, 1500));
+  window.addEventListener('offline', upd);
+  window.addEventListener('beforeunload', e => {
+    if (state.webUser && last.pending && (!navigator.onLine || last.last_err)) { e.preventDefault(); e.returnValue = ''; }
+  });
+  webNetTimer = setInterval(upd, 15000);
+  upd();
 }
 
 // 网页版：内容更新了（服务器上换了新版）就在空闲页面自动刷新，每 10 分钟看一次
