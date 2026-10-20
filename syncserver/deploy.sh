@@ -49,8 +49,24 @@ server {
         proxy_set_header X-Forwarded-For \$remote_addr;
         proxy_read_timeout 60s;
     }
+    # 网页版（web/deploy_web.sh 部署到 /opt/zhixue-web；那个脚本也会重写这个文件，两边的 nginx 配置保持一样）
+    gzip on;
+    gzip_types application/json application/javascript text/css image/svg+xml;
+    gzip_min_length 1024;
+    location = /web {
+        return 301 /web/;
+    }
+    location /web/ {
+        alias /opt/zhixue-web/;
+        index index.html;
+        location /web/media/ {
+            alias /opt/zhixue-web/media/;
+            add_header Cache-Control "public, max-age=604800";
+        }
+        add_header Cache-Control "no-cache";
+    }
     location / {
-        return 404;
+        return 302 /web/;
     }
 }
 EOF
