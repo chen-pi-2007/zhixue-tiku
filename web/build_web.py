@@ -38,11 +38,22 @@ def build():
         html = f.read()
     head = '<meta charset="utf-8">'
     assert html.count(head) == 1
-    html = html.replace(head, head + '\n<script>window.ZX_WEB = { v: %d };</script>' % ver)
+    # 离线缓存（web/sw.js）：弱网、断网也能打开、接着做
+    html = html.replace(head, head + '\n<script>window.ZX_WEB = { v: %d };\n'
+                        "if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));"
+                        '</script>' % ver)
     html, n = re.subn(r'(src|href)="(app\.js|word\.js|skills\.js|style\.css)"', r'\1="\2?v=%d"' % ver, html)
     assert n == 4, n
     with open(path, 'w', encoding='utf-8', newline='') as f:
         f.write(html)
+
+    files = ['./', 'index.html'] + ['%s?v=%d' % (n, ver) for n in ('app.js', 'word.js', 'skills.js', 'style.css', 'local.js', 'bank.json')]
+    with open(os.path.join(HERE, 'sw.js'), encoding='utf-8') as f:
+        sw = f.read()
+    assert '__V__' in sw and '__FILES__' in sw
+    sw = sw.replace('__V__', str(ver)).replace('__FILES__', json.dumps(files))
+    with open(os.path.join(OUT, 'sw.js'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write(sw)
 
     tar = os.path.join(ROOT, '_build', 'zhixue-web.tar.gz')
     with tarfile.open(tar, 'w:gz') as t:
