@@ -1629,7 +1629,7 @@ async function startPractice(opts) {
     toast(/^wrong/.test(opts.scope) ? '现在没有待消灭的错题' : (opts.scope === 'new' ? '这里的题都做过了' : '该范围暂无可练习的题目'));
     return;
   }
-  let list = sortUnits(opts.shuffleOpts ? d.items.map(shuffleQuestion) : d.items);
+  let list = sortUnits(opts.shuffleOpts ? d.items.map(q => shuffleQuestion(q, true)) : d.items);
   let olds = [];
   if (mixOldOn() && ['all', 'new'].indexOf(opts.scope || 'all') >= 0) {
     const tmp = { list: list }, starts = [];
@@ -1638,8 +1638,8 @@ async function startPractice(opts) {
     list = spreadIn(list, starts, olds.map(q => extraCopy(q, 'old')));
   }
   beginPractice(list, opts.title || '练习', 'practice');
-  // 除了全部乱序（选项每次重新打乱），平时的练习都能手动存档；模拟考试另有自己的进度保存
-  if (!opts.shuffleOpts) allowSave(opts, opts.title);
+  // 平时的练习都能手动存档；全部乱序连打乱后的选项顺序一起存（用户报：全部乱序做到一半退出，进度没了）。模拟考试另有自己的进度保存
+  allowSave(opts.shuffleOpts ? Object.assign({}, opts, { mix: true }) : opts, opts.title);
   if (olds.length) toast('穿插了 ' + olds.length + ' 道以前错过的题，选项已打乱');
   if (opts.scope === 'wrongmix') {
     const w = d.items.filter(q => q.in_wrong).length;
@@ -1651,7 +1651,7 @@ async function startPractice(opts) {
 // 这一轮练习可以存档：存档按练习的来源（卷子 / 科目 / 题型 / 复习……）分开存，读档时按存下的题目顺序还原
 function allowSave(src, title) {
   state.practice.saveKey = saveKeyOf(src);
-  state.practice.saveOpts = Object.assign(practiceSrc(src), { title: title });
+  state.practice.saveOpts = Object.assign(practiceSrc(src), { title: title }, src.mix ? { mix: true } : {});
   // 从整卷 / 题型入口进来的练习，每答一题自动记下做到哪（和手动存档分开），下次进来可以接着做
   state.practice.autoKey = src.auto ? autoKeyOf(state.practice.saveKey) : null;
   if (location.hash === '#/practice') route();
@@ -1674,7 +1674,7 @@ function practiceSrc(o) {
                     : { subject: o.subject || '', type: o.type || '' };
 }
 function saveKeyOf(o) {
-  const scope = o.scope && o.scope !== 'all' ? '.' + o.scope : '';
+  const scope = (o.scope && o.scope !== 'all' ? '.' + o.scope : '') + (o.mix ? '.mix' : '');
   if (o.paper_key) return 'zx.save.paper.' + o.paper_key + scope;    // 整卷：zx.save.paper.<卷子key>
   if (o.paper_id) return 'zx.save.' + o.paper_id + scope;           // 旧的整卷存档：zx.save.<卷子id>（只在存的那台设备上对得上）
   return 'zx.save.' + (o.subject || 'all') + '.' + (o.type || '') + scope;
@@ -1715,18 +1715,32 @@ function shuffleQuestion(q, moveAns) {
     const stay = moveAns && ans.length < opts.length && ans.some(i => perm[i] === i);   // 正确答案还在原来的字母上（全选的多选题没法挪）
     if (!same && !stay) break;
   }
+  return permuteQuestion(q, perm);
+}
+
+// 按给定排列重排选项（perm[i] = 新的第 i 项是原来的第几项）；c.order 记原卷字母顺序（如 "CADB"），全部乱序存档靠它还原同样的选项顺序
+function permuteQuestion(q, perm) {
+  const opts = q.options || [];
   const L = i => String.fromCharCode(65 + i);
   const newKey = {};
   perm.forEach((j, i) => { newKey[opts[j][0]] = L(i); });
   const c = Object.assign({}, q, {
     options: perm.map((j, i) => [L(i), opts[j][1]]),
     answer: (q.answer || '').split('').map(k => newKey[k] || k).sort().join(''),
-    shuffled: true,
+    shuffled: true, order: perm.map(j => opts[j][0]).join(''),
   });
   if (q.options_cn) c.options_cn = perm.map(j => q.options_cn[j]);
   if (q.option_notes) c.option_notes = perm.map(j => q.option_notes[j]);
   if (q.analysis) { c.analysis = remapLetters(q.analysis, newKey, q.subject); c.anaMapped = true; }
   return c;
+}
+
+// 读档时按存下的字母顺序重排；题目改过（选项数对不上）就返回 null
+function reorderQuestion(q, order) {
+  const opts = q.options || [];
+  const perm = (order || '').split('').map(k => opts.findIndex(o => o[0] === k));
+  if (perm.length !== opts.length || perm.some(j => j < 0) || new Set(perm).size !== perm.length) return null;
+  return permuteQuestion(q, perm);
 }
 
 // 打乱后解析里提到的选项字母跟着换（用户报：答案是 A，解析却写“故选 C”）。
@@ -1797,7 +1811,9 @@ async function openModeSheet(src, name) {
   const key = saveKeyOf(src);
   const save = store.get(key);
   const auto = store.get(autoKeyOf(key));
-  const go = o => startPractice(Object.assign(practiceSrc(src), { scope: 'all', auto: !o.shuffleOpts }, o));
+  const mixKey = saveKeyOf(Object.assign({}, src, { mix: true }));
+  const mixSave = store.get(mixKey), mixAuto = store.get(autoKeyOf(mixKey));
+  const go = o => startPractice(Object.assign(practiceSrc(src), { scope: 'all', auto: true }, o));
   const at = s => '第 ' + (s.idx + 1) + '/' + s.ids.length + ' 题，' + esc(s.t.slice(5, 16));
   const sheet = document.createElement('div');
   sheet.className = 'sheet-mask';
@@ -1814,8 +1830,10 @@ async function openModeSheet(src, name) {
         '<div class="sheet-row"><button class="btn' + (auto ? ' ghost' : '') + '" data-act="seq">' + (src.paper_id ? '按原卷顺序' : '按卷子顺序') + '</button>' +
         '<button class="btn ghost" data-act="rand">题目打乱</button></div></div>' +
       '<div class="sheet-sec"><div class="sheet-t">全部乱序</div>' +
-        '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。</div>' +
-        '<button class="btn ghost block" data-act="all">开始</button></div>' +
+        '<div class="sheet-d">题目顺序和选项顺序都打乱，检验是不是真会，而不是记住了答案的位置。同样自动记进度，也能存档。</div>' +
+        (mixAuto ? '<button class="btn block" data-act="mix-continue">接着上次做（' + at(mixAuto) + '）</button>' : '') +
+        (mixSave ? '<button class="btn ghost block" data-act="mix-resume">读档（存档点：' + at(mixSave) + ' 存）</button>' : '') +
+        '<button class="btn ghost block" data-act="all">' + (mixAuto ? '重新开始' : '开始') + '</button></div>' +
       '<div class="sheet-sec"><div class="sheet-t">背题</div>' +
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
@@ -1848,12 +1866,14 @@ async function openModeSheet(src, name) {
     if (act === 'answers') { location.hash = '#/answers/' + src.paper_id; return; }
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
+    else if (act === 'mix-continue') loadSave(autoKeyOf(mixKey));
+    else if (act === 'mix-resume') loadSave(mixKey);
     else if (act === 'seq' || act === 'rand') {
       store.del(autoKeyOf(key));              // 选了重新做，上次的进度作废（手动存档还留着）
       if (act === 'seq') go({ order: 'seq', title: name });
       else go({ order: 'random', title: name + '·题目打乱' });
     }
-    else go({ order: 'random', shuffleOpts: true, title: name + '·全部乱序' });
+    else { store.del(autoKeyOf(mixKey)); go({ order: 'random', shuffleOpts: true, title: name + '·全部乱序' }); }
   });
   document.body.appendChild(sheet);
 }
@@ -1874,8 +1894,10 @@ function snapshot(p) {
   const last = {};
   (p.pend || []).forEach(k => { last[k] = false; });
   p.results.forEach(r => { if (SELF_TYPES.indexOf(r.q.type) < 0) last[r.q.key] = r.correct; });
+  const shuf = {};
+  keep.forEach(q => { if (q.order) shuf[q.key] = q.order; });
   return {
-    v: 2, ids: keep.map(q => q.key), idx: Math.max(idx, 0), done: done,
+    v: 2, ids: keep.map(q => q.key), idx: Math.max(idx, 0), done: done, shuf: shuf,
     pend: Object.keys(last).filter(k => last[k] === false),
     results: rs.map(r => [r.q.key, r.correct]), correct: rs.filter(r => r.correct).length,
     title: p.title, opts: p.saveOpts, auto: p.autoKey || null, t: nowText(),
@@ -1918,7 +1940,9 @@ async function loadSave(key) {
   // 新存档（v: 2）按题目 key 对；以前的存档记的是题目 id，只有在存的那台设备上对得上
   const byId = {};
   d.items.forEach(q => { byId[sv.v === 2 ? q.key : q.id] = q; });
-  const list = ids.map(id => byId[id]).filter(Boolean);
+  // 全部乱序的存档：每道题按存下的选项顺序重排，和退出前看到的一样（做过的题回看时选的字母也对得上）
+  const shuf = sv.shuf || {};
+  const list = ids.map(id => byId[id] && (shuf[id] ? reorderQuestion(byId[id], shuf[id]) : byId[id])).filter(Boolean);
   if (!list.length || list.length !== ids.length) {
     toast(sv.v === 2 ? '题目变过了，这个存档用不了' : '这是旧版本存的档，题目对不上（可能是在别的设备上存的），用不了', 'bad');
     return;

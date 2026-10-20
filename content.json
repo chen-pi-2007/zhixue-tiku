@@ -1,6 +1,6 @@
 {
- "content_version": 73,
- "created": "2026-10-19 19:28:39",
+ "content_version": 74,
+ "created": "2026-10-20 16:42:46",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "d03c450b79953ccaf36a0143a4ba174183c2579d4d98d12f01890c954b84ac03",
-   247592
+   "a72f59d7abbdb865301961f6d70dcfdbfc951c81e3cb6f5861a4efc8b3e58015",
+   249462
   ],
   "static/index.html": [
    "ffae0a9e6ff2dd0416427c81eb7a6f0858c30d81145649e6d8756ee91a98808d",
@@ -1661,7 +1661,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "打乱选项后解析里的字母跟着换（原来答案是 A 解析却写故选 C）；做题时“以前做错过”的提示默认不显示，设置里可以打开；多选题不能双击确认，判断题判完马上点正确答案就下一题；搜索题目能筛选错过的、错题本里的、做过的、没做过的题，并显示做对几次、做错几次",
+ "notes": "全部乱序也能保存进度了：中途退出后下次可以接着做，也能手动存档、读档，选项顺序和退出前一样（原来全部乱序退出就从头开始）",
  "py_shell_api": 1,
- "tag": "content-73"
+ "tag": "content-74"
 }
