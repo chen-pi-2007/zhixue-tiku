@@ -1093,3 +1093,53 @@ mark.hl-3 { --hlc: var(--hl-3); }
 .xp-page .xp-list { flex: none; height: calc(100vh / var(--z) - 400px); min-height: 260px; }
 .io-head ~ .im .im-body { height: calc(100vh / var(--z) - 270px); }   /* 上面多了一排导入 / 导出标签，整理台跟着矮一点，一屏放得下 */
 .xp-page .xp-right { overflow: visible; }
+
+/* ---------------------------------------------------------------- 完形：正在做的空用荧光笔标出来 */
+.blank { border-radius: 4px; transition: background .25s, box-shadow .25s; }
+.blank.on { background: var(--hl-2, rgba(255, 206, 38, .75)); color: var(--ink); box-shadow: 0 0 0 2px var(--hl-2, rgba(255, 206, 38, .75)); font-weight: 700; }
+[data-theme="dark"] .blank.on { color: #1f1f1f; }
+.blank-tip { display: inline-block; margin-left: 10px; padding: 0 8px; border-radius: 6px; font-size: 12px; line-height: 22px; vertical-align: 2px;
+  background: var(--hl-1, rgba(255, 221, 64, .55)); color: var(--ink); }
+[data-theme="dark"] .blank-tip { color: #1f1f1f; }
+
+/* ---------------------------------------------------------------- 配对类整篇卡片（学习通样式）：选项列一次，每题一排字母 */
+.g-match .gq-tabs { display: none; }
+.g-match .gq-pane .gq { display: block; }
+.mbank { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.mbank-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; font-size: 15px; line-height: 1.6; color: var(--ink); }
+.mbank-k { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 1px;
+  border-radius: 6px; background: var(--layer-2); font-weight: 700; font-size: 13px; }
+.mbank-t { flex: 1; min-width: 0; }
+.mbank-ph .mbank-t .opt-cn { display: inline; margin: 0; font-size: 14px; color: var(--ink-2); }
+.cn-off .mbank-ph { display: none; }
+.cn-off .cn-show .mbank-ph { display: block; }
+.gq-m { padding: 14px 4px 14px 0; border-bottom: 1px solid var(--line); }
+.gq-m:last-child { border-bottom: 0; }
+.gm-row { display: flex; align-items: baseline; gap: 12px; }
+.gm-no { flex: none; min-width: 24px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.gm-stem { flex: 1; min-width: 0; font-size: 16px; line-height: 1.7; color: var(--ink); }
+.gm-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 0 36px; }
+.gq-m .opt.chip { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 38px; min-height: 0; padding: 0; border-radius: 10px; line-height: 1; }
+.gq-m .opt.chip .key { display: block; width: auto; height: auto; margin: 0; padding: 0; background: none; color: var(--ink-2); font-size: 15px; font-weight: 700; line-height: 1; }
+.gq-m .opt.chip.sel { background: var(--fill); }
+.gq-m .opt.chip.sel .key { color: var(--fill-ink); background: none; }
+.gq-m .opt.chip.used:not(.sel) .key { opacity: .35; }
+.gq-m .opt.chip.ok { background: var(--green); }
+.gq-m .opt.chip.ok .key { color: #fff; }
+.gq-m .opt.chip.bad { background: var(--red); }
+.gq-m .opt.chip.bad .key { color: #fff; }
+.gm-pick { flex: 1 1 200px; min-width: 0; margin-left: 6px; font-size: 14px; color: var(--ink-2); line-height: 1.5; }
+.gq-m .gq-fb { margin-left: 36px; }
+@media (max-width: 760px) {
+  .gm-chips { margin-left: 0; }
+  .gq-m .gq-fb { margin-left: 0; }
+  .g-match .g-orig { max-height: none; }          /* 配对题左边只有要求和选项，不用框里滚动 */
+  .gm-pick { flex-basis: 100%; margin-left: 0; }
+}
+.blank.filled { padding: 0 4px; border-bottom: 2px solid var(--ink-3); border-radius: 0; font-weight: 600; color: var(--ink); }
+.blank.filled i { font-style: normal; font-size: .72em; vertical-align: super; margin-right: 2px; color: var(--ink-3); }
+.blank.filled.on { border-radius: 4px; border-bottom-color: transparent; }
+.blank.filled.on i { color: inherit; }
+.blank.filled.ok { color: var(--green); border-bottom-color: var(--green); }
+.blank.filled.bad { color: var(--red); border-bottom-color: var(--red); text-decoration: line-through; }
+.blank.filled.on.ok, .blank.filled.on.bad { text-decoration: none; }

@@ -1,6 +1,6 @@
 {
- "content_version": 78,
- "created": "2026-10-21 10:56:37",
+ "content_version": 79,
+ "created": "2026-10-21 11:11:59",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "c93d156117aa63280b6bdde4ccf2ef1d883ec80b9d9608e8176b51473e16bd80",
-   273139
+   "a60957fcb1854347492a0e378c86ff179c2aa0356d57ad9eba33393b5e157108",
+   277820
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1651,8 +1651,8 @@
    27524
   ],
   "static/style.css": [
-   "9b240cdd9f7b67cdbafe309391ece2f4e069b8accfe303799db8b63748d68aaa",
-   82183
+   "73bd1d42323b78ce207ea4be524a436ec855733db6961d355d86ec2463c73555",
+   85985
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "账号：每个账号有了固定的账号 ID，改用户名不影响记录，设置里可以自己改用户名，其他设备同步时自动换成新名字；支持强制更新；导出 Word 统一放到左边栏「导入 / 导出」",
+ "notes": "英语配对类（交际对话问答配对、书面表达、信息匹配）改成学习通样式：选项只列一次，每题一排字母点选；完形在原文里用荧光笔标出正在做的空，选的词直接填进原文，提交后按对错上色；错题再考时写明原文第几空",
  "py_shell_api": 1,
- "tag": "content-78"
+ "tag": "content-79"
 }

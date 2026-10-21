@@ -418,6 +418,20 @@ function optNotesBox(q) {
 
 // 阅读材料/情境材料展示框
 // fold:长材料默认折叠(错题本、报告里同一篇材料会重复出现)
+// 完形原文里的空（__3__）包一层 span，做哪一空就用荧光笔标哪一空（用户：错题再出时题号和直觉对不上，不好找位置）
+const markBlanks = html => html.replace(/_{2,}\s*(\d+)\s*_{2,}/g, '<span class="blank" data-b="$1">$&</span>');
+const blankNo = q => ((q && q.stem || '').match(/第(\d+)空/) || [])[1] || '';
+function hlBlank(root, q, scroll) {
+  if (!root) return;
+  root.querySelectorAll('.blank.on').forEach(b => b.classList.remove('on'));
+  const n = blankNo(q);
+  const b = n && root.querySelector('.blank[data-b="' + n + '"]');
+  if (!b) return;
+  b.classList.add('on');
+  const box = b.closest('.g-orig, .material-box');
+  if (scroll && box && box.scrollHeight > box.clientHeight + 4) scrollInBox(box, b, 60);
+}
+
 function materialBox(q, fold) {
   if (!q.material || !q.material.trim()) return '';
   if (fold && q.material.length > 160) {
@@ -426,7 +440,7 @@ function materialBox(q, fold) {
       '<div class="material-body">' + rich(q.material) + '</div>' + materialCn(q) + '</details>';
   }
   return '<div class="material-box"><div class="material-title">材料</div>' +
-    '<div class="material-body">' + rich(q.material) + '</div>' + materialCn(q) + '</div>';
+    '<div class="material-body">' + markBlanks(rich(q.material)) + '</div>' + materialCn(q) + '</div>';
 }
 
 function materialCn(q) {
@@ -2218,6 +2232,16 @@ function renderGroup() {
   const short = q => q.type !== 'judge' && optionList(q).every(o => width(o[1]) <= 20 && !/<img|\\\(|【图/.test(o[1] || ''));
   // 一列至少要多宽：按最长的选项算（一个宽度单位约 8px，加上字母、内边距），放得下一整行才并排，选项文字不折行（用户：挤成两行很丑）
   const colW = q => Math.max.apply(null, optionList(q).map(o => width(o[1]))) * 10 + 72;
+  // 配对类（交际对话的问答配对、书面表达、阅读的信息匹配）：几道小题共用同一组 A～E。
+  // 照学习通：选项只在左边列一次，右边每道小题一行，后面一排字母点选（用户：每题都重印一遍 A～E 太难看、做起来麻烦）
+  const optKey = q => JSON.stringify(optionList(q).map(o => o[1]));
+  const match = qs.length >= 2 && qs.every(q => q.type === 'single' && optionList(q).length >= 3 && optKey(q) === optKey(q0));
+  const placeholder = match && optionList(q0).every(o => /见材料/.test(o[1] || ''));     // 书面表达：选项印在图里
+  const bank = !match ? '' : '<div class="mbank' + (placeholder ? ' mbank-ph material-cn' : '') + '">' +
+    '<div class="material-title">' + (placeholder ? '选项意思（选项原文在上面的图里）' : '选项') + '</div>' +
+    optionList(q0).map((o, i) => '<div class="mbank-row"><span class="mbank-k">' + esc(o[0]) + '</span><span class="mbank-t">' +
+      (placeholder ? '' : rich(o[1])) + optCn(q0, i) + '</span></div>').join('') + '</div>';
+  const mStem = q => rich(q.stem.replace(/^第\d+[组篇]\s*/, '').replace(/\s*\/\s*第\d+句\s*$/, ''));
   app.innerHTML =
     '<div class="crumb crumb-row"><span class="crumb-t"><span class="crumb-pre">当前位置：</span><a href="#/home">首页</a> &gt; ' + esc(p.title) + '</span>' +
       '<span class="crumb-acts">' +
@@ -2225,7 +2249,7 @@ function renderGroup() {
           (store.get(p.saveKey) ? '<a href="javascript:void(0)" onclick="loadSave(' + jsq(p.saveKey) + ')">读档</a>' : '') : '') +
         '<a class="crumb-exit" href="javascript:void(0)" onclick="quitPractice()">退出练习</a></span></div>' +
     '<div class="pbar-wrap"><div class="pbar"><i style="width:' + pct + '%"></i></div></div>' +
-    '<div class="card qcard-main group-card">' +
+    '<div class="card qcard-main group-card' + (match ? ' g-match' : '') + '">' +
       '<div class="qhead">' +
         '<span class="tag t-' + q0.type + '">' + (TYPE_NAME[q0.cat] || TYPE_NAME[q0.type]) + '</span>' +
         '<span class="qsrc">' + esc(q0.paper_name) + ' 第' + q0.qno + '–' + qs[qs.length - 1].qno + '题 · 第 ' + no[0] + ' / ' + no[1] + ' 篇</span>' +
@@ -2235,15 +2259,22 @@ function renderGroup() {
       '</div>' +
       '<div class="g-wrap">' +
         // 原文和参考译文分成上下两个框，各自滚动（译文不接在原文末尾，要看不用滚到底）
-        '<div class="g-mat"><div class="material-box g-orig"><div class="material-title">原文</div>' +
-          '<div class="material-body">' + rich(q0.material) + '</div></div>' +
+        '<div class="g-mat"><div class="material-box g-orig"><div class="material-title">' + (match ? '题目' : '原文') + '</div>' +
+          '<div class="material-body">' + markBlanks(rich(q0.material)) + '</div>' + bank + '</div>' +
           (q0.material_cn ? '<div class="material-box g-orig-cn material-cn"><div class="material-title">参考译文</div>' + rich(q0.material_cn) + '</div>' : '') +
         '</div>' +
         '<div class="g-qs">' +
           '<div class="gq-tabs">' + qs.map((q, k) =>
             '<button class="gq-tab" onclick="gGo(' + k + ')">' + (k + 1) + '</button>').join('') + '</div>' +
-          '<div class="gq-pane" id="gq-pane">' + qs.map((q, k) =>
-            '<div class="gq" data-i="' + (s + k) + '" onclick="gPick(' + k + ')">' +
+          '<div class="gq-pane" id="gq-pane">' + qs.map((q, k) => match
+            ? '<div class="gq gq-m" data-i="' + (s + k) + '" onclick="gPick(' + k + ')">' +
+                '<div class="gm-row"><span class="gm-no">' + (k + 1) + '</span><div class="gm-stem">' + mStem(q) + stemCn(q) + '</div></div>' +
+                '<div class="gm-chips">' + optionList(q).map(o =>
+                  '<button class="opt chip" data-k="' + esc(o[0]) + '" onclick="gTap(this)"><span class="key">' + esc(o[0]) + '</span></button>').join('') +
+                  '<span class="gm-pick"></span></div>' +
+                '<div class="gq-fb"></div>' +
+              '</div>'
+            : '<div class="gq" data-i="' + (s + k) + '" onclick="gPick(' + k + ')">' +
               '<div class="stem">' + (k + 1) + '/' + qs.length + '、' + rich(q.stem.replace(/^第\d+篇\s*/, '')) +
                 (q.type === 'multi' ? '（多选）' : '') + '</div>' + stemCn(q) +
               (q.type === 'judge'
@@ -2294,6 +2325,7 @@ function gGo(k, noScroll) {
   divs.forEach((d, i) => d.classList.toggle('cur', i === k));
   tabs.forEach((t, i) => t.classList.toggle('cur', i === k));
   fitOpts();
+  hlBlank($('.g-orig'), p.list[+divs[k].dataset.i], true);
   if (gSplit() && !noScroll) scrollInBox($('#gq-pane'), divs[k], 8, true);
   if (p.answered) {                 // 判完以后：材料里只标黄这道小题的原文依据，并滚到那里
     clearEvidence();
@@ -2347,10 +2379,32 @@ function groupLeft() {
   const p = state.practice;
   const divs = $$('.gq'), tabs = $$('.gq-tab');
   const picked = divs.map(div => !!div.querySelector('.opt.sel'));
+  if ($('.g-match')) {
+    const used = {};
+    divs.forEach(div => { const b = div.querySelector('.opt.sel'); if (b) used[b.dataset.k] = 1; });
+    divs.forEach(div => {
+      const b = div.querySelector('.opt.sel'), q = p.list[+div.dataset.i];
+      div.querySelectorAll('.opt.chip').forEach(c => c.classList.toggle('used', !!used[c.dataset.k] && c !== b));
+      const o = b && optionList(q).find(x => x[0] === b.dataset.k);
+      const cn = o && ((q.options_cn || [])[optionList(q).indexOf(o)] || '').replace(/[（(【].*$/, '');
+      div.querySelector('.gm-pick').innerHTML = !o ? '' : /见材料/.test(o[1] || '') ? esc(cn) : rich(o[1]);   // 书面表达的选项在图里：显示中文意思
+    });
+  }
+  // 完形：选好的词直接填进原文的空里（学习通也是这样），读一遍就知道通不通
+  const orig = $('.g-orig');
+  if (orig) divs.forEach(div => {
+    const q = p.list[+div.dataset.i], n = blankNo(q);
+    const b = n && orig.querySelector('.blank[data-b="' + n + '"]');
+    if (!b) return;
+    if (!b.dataset.o) b.dataset.o = b.textContent;
+    const s = div.querySelector('.opt.sel'), o = s && optionList(q).find(x => x[0] === s.dataset.k);
+    b.classList.toggle('filled', !!o);
+    b.innerHTML = o ? '<i>' + n + '</i>' + esc(o[1]) : esc(b.dataset.o);
+  });
   picked.forEach((x, i) => tabs[i] && tabs[i].classList.toggle('picked', x));
   const n = divs.length, got = picked.filter(Boolean).length;
   const tip = $('#g-left');
-  if (tip) tip.textContent = got < n ? '已选 ' + got + '/' + n + ' 题，' + (TOUCH ? '左右滑动或点题号切换' : '点题号或按 ← → 切换') + '，全部选完再提交'
+  if (tip) tip.textContent = got < n ? '已选 ' + got + '/' + n + ' 题，' + ($('.g-match') ? '' : TOUCH ? '左右滑动或点题号切换，' : '点题号或按 ← → 切换，') + '全部选完再提交'
                                      : '都选好了，' + (TOUCH ? '点「提交本篇」' : '点「提交本篇」或按回车');
   const ok = $('#confirm-btn');
   if (ok) ok.disabled = got < n;
@@ -2409,6 +2463,8 @@ function gradeGroup(replay) {
       else if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('bad');
     });
     if (tabs[k]) tabs[k].classList.add(ok ? 'ok' : 'bad');
+    const bl = blankNo(q) && $('.g-orig .blank[data-b="' + blankNo(q) + '"]');   // 完形原文里填的词按对错上色
+    if (bl) bl.classList.add(ok ? 'ok' : 'bad');
     div.querySelector('.gq-fb').innerHTML = '<div class="feedback ' + (ok ? 'good' : 'bad') + '">' +
       '<div class="ans-line">' + (ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
       (ok ? rightBox(q) : whyBox(q, sel)) +
@@ -2421,7 +2477,7 @@ function gradeGroup(replay) {
     autoSave();
     toast('本篇 ' + n + ' 题，答对 ' + right + ' 题', right === n ? 'good' : '');
   }
-  $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + '/' + n + ' 题，点题号看每题的解析</span><div class="spacer"></div>' +
+  $('#qact').innerHTML = prevBtn(p).replace('上一题', '上一篇') + '<span class="muted kbd-tip">本篇答对 ' + right + '/' + n + ' 题' + ($('.g-match') ? '，解析在每题下面' : '，点题号看每题的解析') + '</span><div class="spacer"></div>' +
     '<button class="btn" id="nextbtn" onclick="nextQ()">' + (p.group.e >= p.list.length ? '查看结果' : '下一篇') + '</button>';
   cnAfterAnswer();
   gGo(firstBad >= 0 ? firstBad : 0);     // 先看第一道做错的
@@ -2464,11 +2520,15 @@ function renderQ() {
         '<span class="spacer"></span>' + cnBtn(q) + aiBtn(q) +
       '</div>' +
       materialBox(q) +
-      '<div class="stem">' + unitNo(p) + '、' + rich(q.stem) + '</div>' + stemCn(q) +
+      // 完形的一个空单独出来（错题再考）：不写“2/10、第1篇 第7空”（进度和空号放一起容易看混），直接说原文第几空、标黄了
+      (blankNo(q) && q.material && /_{2,}\s*\d+\s*_{2,}/.test(q.material)
+        ? '<div class="stem">原文第 ' + blankNo(q) + ' 空<span class="blank-tip">上面黄色标出的那一空</span></div>'
+        : '<div class="stem">' + unitNo(p) + '、' + rich(q.stem) + '</div>') + stemCn(q) +
       '<div id="qbody"></div>' +
       '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +
     '</div>';
 
+  hlBlank($('.qcard-main'), q, true);
   const body = $('#qbody');
   if (SELF_TYPES.indexOf(q.type) >= 0) {
     const ph = { dictation: '在纸上或这里默写诗句，再对照答案（选填）…',
