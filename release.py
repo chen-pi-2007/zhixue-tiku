@@ -9,6 +9,9 @@
         --version 1.5.0                        指定程序版本号（默认最后一位加 1）
         --needs-new-app                        这次的界面用到了新程序才有的接口：
                                                旧程序的用户收不到这份内容，会被提示先更新程序
+        --force                                强制更新（content / app 都能加）：比这一版旧的客户端一查到就马上下载，
+                                               弹出关不掉的“必须更新”，装好才能接着用（断网下不来的先放行，联网再试）。
+                                               只在修了会丢记录、记错账、答案错这类问题时用。content.json 的 force_min，之后发布一直沿用
 
 什么时候发哪种：
   - 只改了 static/、data/（题库、图片、技能卷素材）、mobile/local.js → content
@@ -112,9 +115,14 @@ def preflight(kind):
     print('  通过')
 
 
-def write_manifest(v, notes):
+def write_manifest(v, notes, force=False):
     ns = read_versions()
+    old = content.read_manifest(os.path.join(ROOT, content.CONTENT_FILE)) or {}
     m = content.build_manifest(ROOT, v, ns['CONTENT_MIN_APP'], ns['CONTENT_MIN_ANDROID'], notes=notes)
+    # 强制更新的门槛：低于这一版的客户端必须更新（app.js forceContentUpdate）。不加 --force 就沿用上次的
+    m['force_min'] = v if force else int(old.get('force_min') or 0)
+    if force:
+        print('  强制更新：低于第 %d 版的客户端必须更新' % v)
     content.write_manifest(os.path.join(ROOT, content.CONTENT_FILE), m)
     print('  内容第 %d 版：%d 个文件' % (v, len(m['files'])))
 
@@ -135,12 +143,12 @@ def undo_versions():
     subprocess.run(['git', 'checkout', '--', 'version.py', content.CONTENT_FILE], cwd=ROOT)
 
 
-def release_content(notes):
+def release_content(notes, force=False):
     preflight('content')
     v = read_versions()['CONTENT_VERSION'] + 1
     try:
         set_version('CONTENT_VERSION', v)
-        write_manifest(v, notes)
+        write_manifest(v, notes, force)
     except BaseException:
         undo_versions()
         raise
@@ -186,7 +194,7 @@ def bump(ver):
     return '%d.%d.%d' % (a, b, c + 1)
 
 
-def release_app(notes, version=None, needs_new_app=False):
+def release_app(notes, version=None, needs_new_app=False, force=False):
     preflight('app')
     ns = read_versions()
     new = version or bump(ns['APP_VERSION'])
@@ -201,7 +209,7 @@ def release_app(notes, version=None, needs_new_app=False):
         if needs_new_app:
             set_version('CONTENT_MIN_APP', new)
             set_version('CONTENT_MIN_ANDROID', new)
-        write_manifest(cv, notes)
+        write_manifest(cv, notes, force)
         print('== 打包电脑版')
         sh(os.path.join(ROOT, '_build', 'venv', 'Scripts', 'python.exe'), 'build_exe.py')
         print('== 打包安卓版')
@@ -239,9 +247,9 @@ def main():
     if not notes:
         die('写一句这次改了什么，比如：python release.py content "改正英语阅读第 3 题的答案"')
     if args[0] == 'content':
-        release_content(notes)
+        release_content(notes, '--force' in args)
     else:
-        release_app(notes, version, '--needs-new-app' in args)
+        release_app(notes, version, '--needs-new-app' in args, '--force' in args)
 
 
 if __name__ == '__main__':

@@ -180,6 +180,8 @@ class OwnerTest(unittest.TestCase):
                     code, r = sync_server.api_ids(uid, body)
                 elif path == '/v1/fetch':
                     code, r = sync_server.api_fetch(uid, body)
+                elif path == '/v1/rename':
+                    code, r = sync_server.api_rename(uid, body)
                 else:
                     code, r = sync_server.api_logout(uid, th)
             if code != 200:
@@ -257,6 +259,91 @@ class OwnerTest(unittest.TestCase):
         r = self.sync.login('alice', 'pw123456')                 # 同一个人重新登录：直接登录，不用选
         self.assertNotIn('need', r)
         self.assertEqual(len(db._prog['attempts']), 1)
+
+    def test_renamed_account_still_mine(self):
+        """管理员改了用户名：设备靠账号 ID 认人，同步时自动换成新名字，用新名字登录不用选、记录还在"""
+        self.sync.login('alice', 'pw123456')
+        db.record_answer(1, True)
+        self.sync.sync_once()
+        aid = db.sync_owner_aid()
+        self.assertTrue(aid)
+        sync_server.rename('alice', 'alice2')
+        self.sync.sync_once()
+        self.assertEqual(db.sync_owner(), 'alice2')
+        self.assertEqual(self.sync.account()['user'], 'alice2')
+        self.sync.logout()
+        r = self.sync.login('alice2', 'pw123456')
+        self.assertNotIn('need', r)
+        self.assertEqual(len(db._prog['attempts']), 1)
+        self.assertEqual(db.sync_owner_aid(), aid)
+
+    def test_min_content_blocks_old_clients(self):
+        """管理员设了 mincontent：内容版本低的（旧版本不带 cv 算 0）登录 / 同步被拒（426），够新的照常"""
+        sync_server.mincontent(80)
+        code, r = sync_server.api_login({'user': 'alice', 'pass': 'pw123456', 'device': 'x'}, '127.0.0.1')
+        self.assertEqual((code, r.get('need_update')), (426, 80))
+        code, r = sync_server.api_login({'user': 'alice', 'pass': 'pw123456', 'device': 'x', 'cv': 79}, '127.0.0.1')
+        self.assertEqual(code, 426)
+        code, r = sync_server.api_login({'user': 'alice', 'pass': 'pw123456', 'device': 'x', 'cv': 80}, '127.0.0.1')
+        self.assertEqual(code, 200)
+        self.assertEqual(sync_server.api_sync(1, {'events': [], 'kv': {}})[0], 426)
+        self.assertEqual(sync_server.api_sync(1, {'events': [], 'kv': {}, 'cv': 81})[0], 200)
+        sync_server.mincontent(0)
+        self.assertEqual(sync_server.api_sync(1, {'events': [], 'kv': {}})[0], 200)
+
+    def test_change_own_name(self):
+        """自己在设置里改用户名：要当前密码、不能和别人重名，改完本机马上换名字，记录还在"""
+        self.sync.login('alice', 'pw123456')
+        db.record_answer(1, True)
+        self.sync.sync_once()
+        with self.assertRaises(self.sync.SyncError):
+            self.sync.change_name('alice2', 'wrong-pw')
+        with self.assertRaises(self.sync.SyncError):
+            self.sync.change_name('bob', 'pw123456')             # 重名
+        with self.assertRaises(self.sync.SyncError):
+            self.sync.change_name('a b', 'pw123456')             # 有空格
+        r = self.sync.change_name('爱丽丝', 'pw123456')
+        self.assertEqual(r['user'], '爱丽丝')
+        self.assertEqual(db.sync_owner(), '爱丽丝')
+        self.assertEqual(self.server_count('爱丽丝'), 1)
+        self.sync.logout()
+        r = self.sync.login('爱丽丝', 'pw123456')
+        self.assertNotIn('need', r)
+        with self.assertRaises(self.sync.SyncError):
+            self.sync.login('alice', 'pw123456')                  # 旧名字登录不了了
+
+    def test_renamed_while_logged_out(self):
+        """退出登录期间被改名：用新名字登录，账号 ID 对得上，直接登录"""
+        self.sync.login('alice', 'pw123456')
+        db.record_answer(1, True)
+        self.sync.sync_once()
+        self.sync.logout()
+        sync_server.rename('alice', 'alice2')
+        r = self.sync.login('alice2', 'pw123456')
+        self.assertNotIn('need', r)
+        self.assertEqual(db.sync_owner(), 'alice2')
+
+    def test_recreated_same_name_is_another_person(self):
+        """删了账号再建一个同名的：是另一个人，账号 ID 不同，必须先选，不能直接并进去"""
+        self.sync.login('alice', 'pw123456')
+        db.record_answer(1, True)
+        self.sync.sync_once()
+        self.sync.logout()
+        sync_server.deluser('alice')
+        sync_server.adduser('alice', 'pw123456')
+        r = self.sync.login('alice', 'pw123456')
+        self.assertEqual(r.get('need'), 'switch')
+        self.assertEqual(self.server_count('alice'), 0)
+
+    def test_old_binding_without_aid(self):
+        """旧版本绑定的（只有用户名）：用户名对得上照常登录，并补上账号 ID"""
+        self.sync.login('alice', 'pw123456')
+        self.sync.logout()
+        db.sync_set_owner('alice')                                # 模拟旧版本：只记了用户名
+        self.assertEqual(db.sync_owner_aid(), '')
+        r = self.sync.login('alice', 'pw123456')
+        self.assertNotIn('need', r)
+        self.assertTrue(db.sync_owner_aid())
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,13 +15,17 @@
     python3 sync_server.py adduser 用户名 密码
     python3 sync_server.py passwd 用户名 新密码
     python3 sync_server.py deluser 用户名
-    python3 sync_server.py users
+    python3 sync_server.py rename 旧用户名 新用户名      （记录不动；设备靠账号 ID 认人，改名后自动换成新名字）
+    python3 sync_server.py users                      （登录设备按网页 / 手机 / 电脑分开数）
+    python3 sync_server.py devices 用户名             （这个账号登录着的每台设备、最后一次用的时间）
+    python3 sync_server.py mincontent N               （强制更新：内容低于第 N 版的客户端登录 / 同步时被拒，并立刻自动更新；0 = 关掉）
     python3 sync_server.py serve [--port 8790]
 """
 import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import sqlite3
 import sys
@@ -67,6 +71,12 @@ def init_db():
     CREATE INDEX IF NOT EXISTS ev_uid_seq ON events(uid, seq);
     CREATE INDEX IF NOT EXISTS kv_uid_seq ON kv(uid, seq);
     ''')
+    # 账号 ID（aid）：随机生成、永远不变。设备按它认“本机记录是谁的”，改用户名不影响；
+    # 不用自增的 uid，免得数据库重建后新账号撞上老编号，把一个人的记录认成另一个人的
+    if 'aid' not in [r[1] for r in c.execute('PRAGMA table_info(users)')]:
+        c.execute('ALTER TABLE users ADD COLUMN aid TEXT')
+    for (uid,) in c.execute('SELECT uid FROM users WHERE aid IS NULL OR aid=?', ('',)).fetchall():
+        c.execute('UPDATE users SET aid=? WHERE uid=?', (secrets.token_hex(12), uid))
     c.commit()
 
 
@@ -93,8 +103,8 @@ def adduser(name, pw):
     init_db()
     c = conn()
     salt = secrets.token_hex(16)
-    c.execute('INSERT INTO users(name, salt, hash, created) VALUES(?,?,?,?)',
-              (name, salt, _hash_pw(pw, salt), int(time.time())))
+    c.execute('INSERT INTO users(name, salt, hash, created, aid) VALUES(?,?,?,?,?)',
+              (name, salt, _hash_pw(pw, salt), int(time.time()), secrets.token_hex(12)))
     c.commit()
     print('已创建账号', name)
 
@@ -111,6 +121,21 @@ def passwd(name, pw):
     print('已改密码' if n else '没有这个账号', name)
 
 
+def rename(old, new):
+    init_db()
+    c = conn()
+    new = new.strip()
+    if not valid_name(new):
+        print('用户名 1～32 个字，只能用汉字、字母、数字、下划线、点、减号')
+        return
+    if c.execute('SELECT 1 FROM users WHERE name=?', (new,)).fetchone():
+        print('已经有账号叫', new)
+        return
+    n = c.execute('UPDATE users SET name=? WHERE name=?', (new, old)).rowcount
+    c.commit()
+    print('已改名 %s → %s' % (old, new) if n else '没有这个账号 ' + old)
+
+
 def deluser(name):
     init_db()
     c = conn()
@@ -125,13 +150,37 @@ def deluser(name):
     print('已删除账号和数据', name)
 
 
+def device_kind(device):
+    """登录时客户端报的设备名：网页版是 web-xxxxxx，安卓 App 是 android-xxxxxx，电脑版是“电脑名-xxxxxx”"""
+    d = device or ''
+    return '网页' if d.startswith('web-') else '手机' if d.startswith('android-') else '电脑'
+
+
 def users():
     init_db()
     c = conn()
-    for uid, name, created in c.execute('SELECT uid, name, created FROM users ORDER BY uid'):
+    for uid, name, created in c.execute('SELECT uid, name, created FROM users ORDER BY uid').fetchall():
         n = c.execute('SELECT COUNT(*) FROM events WHERE uid=?', (uid,)).fetchone()[0]
-        d = c.execute('SELECT COUNT(*) FROM tokens WHERE uid=?', (uid,)).fetchone()[0]
-        print('%-16s 事件 %6d  已登录设备 %d  创建于 %s' % (name, n, d, time.strftime('%Y-%m-%d', time.localtime(created))))
+        k = {'网页': 0, '手机': 0, '电脑': 0}
+        for (dev,) in c.execute('SELECT device FROM tokens WHERE uid=?', (uid,)):
+            k[device_kind(dev)] += 1
+        print('%-16s 事件 %6d  登录中：网页 %d · 手机 %d · 电脑 %d  创建于 %s' % (
+            name, n, k['网页'], k['手机'], k['电脑'], time.strftime('%Y-%m-%d', time.localtime(created))))
+
+
+def devices(name):
+    init_db()
+    c = conn()
+    row = c.execute('SELECT uid FROM users WHERE name=?', (name,)).fetchone()
+    if not row:
+        print('没有这个账号', name)
+        return
+    rows = c.execute('SELECT device, created, seen FROM tokens WHERE uid=? ORDER BY seen DESC', (row[0],)).fetchall()
+    if not rows:
+        print(name, '没有登录中的设备')
+    fmt = lambda t: time.strftime('%Y-%m-%d %H:%M', time.localtime(t)) if t else '-'
+    for dev, created, seen in rows:
+        print('%s  %-40s 登录于 %s  最后使用 %s' % (device_kind(dev), dev or '(没报名字)', fmt(created), fmt(seen)))
 
 
 # ---------------------------------------------------------------- 接口
@@ -152,12 +201,36 @@ def _failed(ip):
     _fails[ip] = (n + 1, t0)
 
 
+def min_content():
+    row = conn().execute("SELECT v FROM meta WHERE k='min_content'").fetchone()
+    return int(row[0]) if row else 0
+
+
+def mincontent(n):
+    init_db()
+    c = conn()
+    c.execute("INSERT OR REPLACE INTO meta(k, v) VALUES('min_content', ?)", (str(int(n)),))
+    c.commit()
+    print('已设置：内容低于第 %d 版的客户端必须先更新' % int(n) if int(n) else '已关掉强制更新')
+
+
+def too_old(d):
+    """客户端在请求里带 cv（内容版本，旧版本不带算 0）。低于管理员设的门槛就拒绝，客户端收到 426 会马上去更新"""
+    m = min_content()
+    if m and int(d.get('cv') or 0) < m:
+        return 426, {'error': '这个版本太旧了，需要先更新（会自动更新，也可以在设置里点「检查更新」）', 'need_update': m}
+    return None
+
+
 def api_login(d, ip):
     if _too_many(ip):
         return 429, {'error': '登录失败次数太多，10 分钟后再试'}
+    old = too_old(d)
+    if old:
+        return old
     name, pw = str(d.get('user') or '').strip(), str(d.get('pass') or '')
     c = conn()
-    row = c.execute('SELECT uid, salt, hash FROM users WHERE name=?', (name,)).fetchone()
+    row = c.execute('SELECT uid, salt, hash, aid FROM users WHERE name=?', (name,)).fetchone()
     if not row or not hmac.compare_digest(_hash_pw(pw, row[1]), row[2]):
         _failed(ip)
         return 401, {'error': '用户名或密码不对'}
@@ -167,7 +240,7 @@ def api_login(d, ip):
         c.execute('INSERT INTO tokens(th, uid, device, created, seen) VALUES(?,?,?,?,?)',
                   (hashlib.sha256(tok.encode()).hexdigest(), row[0], str(d.get('device') or '')[:80], now, now))
         c.commit()
-    return 200, {'token': tok, 'user': name}
+    return 200, {'token': tok, 'user': name, 'aid': row[3] or ''}
 
 
 def auth(headers):
@@ -193,6 +266,9 @@ def _clean_event(e):
 
 def api_sync(uid, d):
     """收客户端的新事件和改过的键值，回 游标之后 别的设备写的东西 + 两边对账用的校验值"""
+    old = too_old(d)
+    if old:
+        return old
     c = conn()
     evs = d.get('events') or []
     kv = d.get('kv') or {}
@@ -225,8 +301,10 @@ def api_sync(uid, d):
     out_kv = {k: [t, json.loads(v)] for _, k, t, v in krows}
     new_kc = krows[-1][0] if krows else kc
     n, h = digest(c, uid)
+    me = c.execute('SELECT name, aid FROM users WHERE uid=?', (uid,)).fetchone() or ('', '')
     return 200, {'events': out_ev, 'ecursor': new_ec, 'more': more, 'kv': out_kv, 'kcursor': new_kc,
-                 'count': n, 'hash': h, 'added': added, 'kv_changed': changed, 'server_time': int(time.time() * 1000)}
+                 'count': n, 'hash': h, 'added': added, 'kv_changed': changed, 'server_time': int(time.time() * 1000),
+                 'user': me[0], 'aid': me[1] or ''}       # 现在的用户名（管理员可能改过名）和账号 ID
 
 
 def api_ids(uid, d):
@@ -268,6 +346,29 @@ def api_password(uid, d):
         c.execute('UPDATE users SET salt=?, hash=? WHERE uid=?', (salt, _hash_pw(new, salt), uid))
         c.commit()
     return 200, {'ok': True}
+
+
+def valid_name(name):
+    """用户名：1～32 个字，汉字、字母、数字、下划线、点、减号（不能有空格，免得登录时看不出来）"""
+    return bool(re.fullmatch(r'[\w.\-]{1,32}', name or ''))
+
+
+def api_rename(uid, d):
+    """自己改用户名（要输当前密码）。记录按账号存，设备按账号 ID 认人，改名不影响做题记录"""
+    new, pw = str(d.get('name') or '').strip(), str(d.get('pass') or '')
+    if not valid_name(new):
+        return 400, {'error': '用户名 1～32 个字，只能用汉字、字母、数字、下划线、点、减号'}
+    c = conn()
+    row = c.execute('SELECT name, salt, hash, aid FROM users WHERE uid=?', (uid,)).fetchone()
+    if not row or not hmac.compare_digest(_hash_pw(pw, row[1]), row[2]):
+        return 401, {'error': '密码不对'}
+    if new != row[0]:
+        with _write_lock:
+            if c.execute('SELECT 1 FROM users WHERE name=? AND uid<>?', (new, uid)).fetchone():
+                return 409, {'error': '这个用户名已经有人用了'}
+            c.execute('UPDATE users SET name=? WHERE uid=?', (new, uid))
+            c.commit()
+    return 200, {'ok': True, 'user': new, 'aid': row[3] or ''}
 
 
 class H(BaseHTTPRequestHandler):
@@ -322,6 +423,8 @@ class H(BaseHTTPRequestHandler):
                 return self._send(*api_logout(uid, th))
             if path == '/v1/password':
                 return self._send(*api_password(uid, d))
+            if path == '/v1/rename':
+                return self._send(*api_rename(uid, d))
             self._send(404, {'error': 'not found'})
         except Exception as e:      # noqa: BLE001  出错只回这一个请求，服务不挂
             sys.stderr.write('error %s %r\n' % (path, e))
@@ -349,8 +452,14 @@ if __name__ == '__main__':
         adduser(a[1], a[2])
     elif a[0] == 'passwd' and len(a) == 3:
         passwd(a[1], a[2])
+    elif a[0] == 'rename' and len(a) == 3:
+        rename(a[1], a[2])
     elif a[0] == 'deluser' and len(a) == 2:
         deluser(a[1])
+    elif a[0] == 'mincontent' and len(a) == 2:
+        mincontent(a[1])
+    elif a[0] == 'devices' and len(a) == 2:
+        devices(a[1])
     elif a[0] == 'users':
         users()
     else:
