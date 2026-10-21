@@ -421,6 +421,16 @@ function optNotesBox(q) {
 // 完形原文里的空（__3__）包一层 span，做哪一空就用荧光笔标哪一空（用户：错题再出时题号和直觉对不上，不好找位置）
 const markBlanks = html => html.replace(/_{2,}\s*(\d+)\s*_{2,}/g, '<span class="blank" data-b="$1">$&</span>');
 const blankNo = q => ((q && q.stem || '').match(/第(\d+)空/) || [])[1] || '';
+// 完形原文里的空做成定宽的“格子”：宽度按这道题最长的选项量好一次就固定，填进不同长短的词文章也不跳（用户报：填词时整段跟着动，影响阅读）
+function blankSlot(b, n, q) {
+  if (b.dataset.fw) return;
+  b.classList.add('slot', 'filled');
+  let mx = 0;
+  optionList(q).forEach(o => { b.innerHTML = '<i>' + n + '</i>' + esc(o[1]); mx = Math.max(mx, b.getBoundingClientRect().width); });
+  b.classList.remove('filled');
+  if (mx) { b.style.width = Math.ceil(mx + 2) + 'px'; b.dataset.fw = '1'; }    // 看不见（宽 0）时下次再量
+}
+
 function hlBlank(root, q, scroll) {
   if (!root) return;
   root.querySelectorAll('.blank.on').forEach(b => b.classList.remove('on'));
@@ -2412,10 +2422,16 @@ function groupLeft() {
     const q = p.list[+div.dataset.i], n = blankNo(q);
     const b = n && orig.querySelector('.blank[data-b="' + n + '"]');
     if (!b) return;
-    if (!b.dataset.o) b.dataset.o = b.textContent;
+    blankSlot(b, n, q);
     const s = div.querySelector('.opt.sel'), o = s && optionList(q).find(x => x[0] === s.dataset.k);
     b.classList.toggle('filled', !!o);
-    b.innerHTML = o ? '<i>' + n + '</i>' + esc(o[1]) : esc(b.dataset.o);
+    const word = o ? o[1] : '';
+    if (word && b.dataset.w !== undefined && b.dataset.w !== word) {      // 刚选 / 换了词：从上面落进空里
+      b.classList.remove('fx-drop'); void b.offsetWidth; b.classList.add('fx-drop');
+      setTimeout(() => b.classList.remove('fx-drop'), 250);
+    }
+    b.dataset.w = word;
+    b.innerHTML = '<i>' + n + '</i>' + (o ? esc(o[1]) : '');
   });
   picked.forEach((x, i) => tabs[i] && tabs[i].classList.toggle('picked', x));
   const n = divs.length, got = picked.filter(Boolean).length;
@@ -2457,6 +2473,15 @@ function submitGroup() {
   gradeGroup(false);
 }
 
+// 判分反馈动画（2026-10-21 用户要求：只加在有意思、一次性的地方）：答对的选项亮一下、答错的抖一下，播完把类去掉；
+// 重新渲染（replay）不播。幅度都很小，和古诗文的荧光笔一样不看系统的“减少动态效果”（用户电脑关了系统动画，照样要看到）
+function flashOpt(b, kind) {
+  b.classList.remove('fx-ok', 'fx-bad', 'fx-drop');
+  void b.offsetWidth;
+  b.classList.add(kind === 'ok' ? 'fx-ok' : 'fx-bad');
+  setTimeout(() => b.classList.remove('fx-ok', 'fx-bad'), 400);     // 不靠 animationend：页面在后台时动画不跑、事件不来
+}
+
 function gradeGroup(replay) {
   const p = state.practice;
   const divs = $$('.gq'), tabs = $$('.gq-tab');
@@ -2477,10 +2502,11 @@ function gradeGroup(replay) {
       b.disabled = true;
       if (ans.indexOf(b.dataset.k) >= 0) b.classList.add('ok');
       else if (sel.indexOf(b.dataset.k) >= 0) b.classList.add('bad');
+      if (!replay && sel.indexOf(b.dataset.k) >= 0) flashOpt(b, ans.indexOf(b.dataset.k) >= 0 ? 'ok' : 'bad');
     });
     if (tabs[k]) tabs[k].classList.add(ok ? 'ok' : 'bad');
     const bl = blankNo(q) && $('.g-orig .blank[data-b="' + blankNo(q) + '"]');   // 完形原文里填的词按对错上色
-    if (bl) bl.classList.add(ok ? 'ok' : 'bad');
+    if (bl) { bl.classList.add(ok ? 'ok' : 'bad'); if (!replay) flashOpt(bl, ok ? 'ok' : 'bad'); }
     div.querySelector('.gq-fb').innerHTML = '<div class="feedback ' + (ok ? 'good' : 'bad') + '">' +
       '<div class="ans-line">' + (ok ? '✓ 答对了' : '✗ 答错了') + '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
       (ok ? rightBox(q) : whyBox(q, sel)) +
@@ -2596,8 +2622,9 @@ function optTap(btn) {
   const p = state.practice;
   if (!p) return;
   if (p.answered) {
-    // 只有点绿色的正确答案才进下一题。判完 0.6 秒内不算：双击确认时手快多点了一下，不会连解析都没看就跳到下一题
-    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 250) nextQ();
+    // 只有点绿色的正确答案才进下一题。双击确认后 0.15 秒内不算：手快连点成三下时第三下不会把解析跳过去；
+    // 原来是 0.25 秒，用户说双击确认后马上点答案“会卡一会”（那一下被吞了，要再点一次），2026-10-21 缩短
+    if (btn.classList.contains('ok') && Date.now() - (p.gradedAt || 0) > 150) nextQ();
     return;
   }
   const now = Date.now();
@@ -2668,7 +2695,7 @@ function gradeAndShow(selKeys, replay) {
     ? selKeys.slice().sort().join('') === q.answer.split('').sort().join('')
     : selKeys[0] === q.answer;
   p.answered = true;
-  p.gradedAt = lastTap.btn === null && Date.now() - lastTap.t < 50 ? Date.now() : 0;   // 双击确认的那一下：250ms 内再点不算翻页
+  p.gradedAt = lastTap.btn === null && Date.now() - lastTap.t < 50 ? Date.now() : 0;   // 双击确认的那一下：150ms 内再点不算翻页
   $('.qcard-main').classList.add('answered');
   if (!replay) {
     p.done[p.idx] = selKeys.slice();
@@ -2682,10 +2709,11 @@ function gradeAndShow(selKeys, replay) {
     b.disabled = !inAns;                         // 正确答案还能点，点它进入下一题
     if (inAns) b.classList.add('ok');
     else if (selKeys.indexOf(k) >= 0) b.classList.add('bad');
+    if (!replay && selKeys.indexOf(k) >= 0) flashOpt(b, inAns ? 'ok' : 'bad');
   });
 
   const fb = document.createElement('div');
-  fb.className = 'feedback ' + (isRight ? 'good' : 'bad');
+  fb.className = 'feedback ' + (isRight ? 'good' : 'bad') + (replay ? '' : ' fx-in');
   fb.innerHTML = '<div class="ans-line">' + (isRight ? '✓ 答对了' : '✗ 答错了') +
     '<span class="ans-key">正确答案 <b>' + esc(q.answer) + '</b></span></div>' +
     (isRight ? rightBox(q) : whyBox(q, selKeys)) +
@@ -2804,6 +2832,7 @@ function renderFinish() {
           '</div>';
         }).join('')
       : '');
+  countUpRing($('.finish .ring'), pct, color);
 }
 
 /* ================================================================ 模拟考试 */
@@ -3033,6 +3062,8 @@ async function viewExamReport(id) {
   const wrongs = [];
   e.sections.forEach(s => s.items.forEach(q => { if (!q.correct) wrongs.push(q); }));
   const bt = e.by_type || {};
+  const secs = e.by_section || [], types = Object.keys(bt);
+  window.__examAgain = e;
   app.innerHTML =
     '<div class="crumb"><a href="#/exam">模拟考</a> / 成绩报告</div>' +
     '<div class="card finish">' +
@@ -3040,18 +3071,18 @@ async function viewExamReport(id) {
         '<span class="v" style="color:' + color + '">' + pct + '</span></div>' +
       '<h2>' + esc(e.title) + '</h2>' +
       '<div class="muted">答对 ' + e.correct + '/' + e.total + ' · 用时 ' + fmtDur(e.used_seconds) + (e.minutes ? '(限时 ' + e.minutes + ' 分钟)' : '（不限时）') + ' · ' + esc(e.finished) + '</div>' +
-      '<div class="report-grid">' +
-        (e.by_section || []).map(s => {
+      (secs.length < 2 ? '' : '<div class="report-grid">' +
+        secs.map(s => {
           const p = s.total ? Math.round(100 * s.correct / s.total) : 0;
           const pts = s.points || 1;
           return '<div class="report-cell"><div class="rc-name">' + esc(s.name) + '</div><div class="rc-num">' + s.correct + '/' + s.total +
             (pts !== 1 ? '<span class="muted"> · ' + fmtPts(s.correct * pts) + '/' + fmtPts(s.total * pts) + ' 分</span>' : '') + '</div>' + bar(p, p < 60 ? 'red' : '') + '</div>';
         }).join('') +
-      '</div>' +
-      '<div class="muted" style="margin-top:8px">按题型：' + Object.keys(bt).map(t =>
-        (TYPE_NAME[t] || t) + ' ' + bt[t].correct + '/' + bt[t].total).join(' · ') + '</div>' +
+      '</div>') +
+      (types.length < 2 ? '' : '<div class="muted" style="margin-top:8px">按题型：' + types.map(t =>
+        (TYPE_NAME[t] || t) + ' ' + bt[t].correct + '/' + bt[t].total).join(' · ') + '</div>') +
       '<div class="acts">' +
-        '<button class="btn" onclick="startExam(\'' + e.subject + '\',\'standard\')">再考一场</button>' +
+        '<button class="btn" onclick="examAgain()">' + (e.minutes ? '再考一场' : '再考一遍') + '</button>' +
         (wrongs.length ? '<button class="btn danger" onclick="practiceExamWrongs()">重练这次的错题(' + wrongs.length + ')</button>' : '') +
         '<a class="btn ghost" href="#/home">返回首页</a>' +
       '</div>' +
@@ -3068,6 +3099,38 @@ async function viewExamReport(id) {
           '<div class="ansbox">' + ansHtml(q) + '</div>' +
         '</div>').join('') : '');
   window.__examWrongs = wrongs;
+  countUpRing($('.finish .ring'), pct, color);
+}
+
+// 成绩报告的圆环从 0 画到分数、中间数字跟着跑（约 1 秒，先快后慢）；每场只看一次，不嫌慢
+function countUpRing(ring, pct, color) {
+  if (!ring || !pct) return;
+  const v = ring.querySelector('.v'), t0 = performance.now(), dur = 900 + pct * 4;
+  const step = now => {
+    if (!ring.isConnected) return;
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3), x = pct * e;
+    ring.style.background = 'conic-gradient(' + color + ' 0 ' + x + '%, var(--track) ' + x + '% 100%)';
+    v.textContent = Math.round(x);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  ring.style.background = 'conic-gradient(var(--track) 0 100%)';
+  v.textContent = '0';
+  requestAnimationFrame(step);
+}
+
+// 再考：模拟考试重新组一套；考试模式（不限时，minutes=0）用同样这些题再考一遍，选项打乱
+async function examAgain() {
+  const e = window.__examAgain;
+  if (!e) return;
+  if (e.minutes) return startExam(e.subject, 'standard');
+  if (store.get('quiz.exam') && !confirm('还有一场没交卷的考试，放弃它并开始新的？')) return;
+  const keys = [];
+  e.sections.forEach(s => s.items.forEach(q => keys.push(q.key)));
+  let d;
+  try { d = await api('/api/exam/start', { method: 'POST', body: { keys: keys, title: e.title, shuffle: true } }); }
+  catch (err) { toast(err.message, 'bad'); return; }
+  store.set('quiz.exam', { exam: d.exam, answers: {}, startedAt: Date.now(), deadline: 0 });
+  location.hash = '#/exam/run';
 }
 
 function practiceExamWrongs() {
