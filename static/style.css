@@ -1069,3 +1069,27 @@ mark.hl-3 { --hlc: var(--hl-3); }
   .po-body { font-size: 17.5px; line-height: 2.2; }
   .po-t { font-size: 20px; }
 }
+
+/* 强制更新窗口：关不掉，只有「立即更新」 */
+.force-upd { z-index: 200; }
+.force-notes { white-space: pre-wrap; max-height: 30vh; overflow: auto; padding: 8px 10px; border-radius: 8px; background: var(--layer-2); }
+.force-bar { height: 6px; border-radius: 9999px; background: var(--layer-2); overflow: hidden; margin: 12px 0 4px; }
+.force-bar i { display: block; height: 100%; background: var(--green); transition: width .4s; }
+
+/* ---------------------------------------------------------------- 导入 / 导出（#/upload、#/export 顶上的两个大标签） */
+.io-head { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.io-tab { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; background: var(--layer-1); color: var(--ink);
+  text-decoration: none; border: 1.5px solid transparent; transition: border-color .15s, background .15s; }
+.io-tab:hover { background: var(--layer-3); opacity: 1; }
+.io-tab.on { border-color: var(--fill); }
+.io-ic { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px;
+  background: var(--layer-2); color: var(--ink-2); }
+.io-ic .ico { width: 22px; height: 22px; }
+.io-tab.on .io-ic { background: var(--fill); color: var(--fill-ink); }
+.io-tab b { display: block; font-size: 15.5px; }
+.io-tab small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--ink-3); }
+.xp-page { padding: 20px 24px 24px; }
+.xp-page .xp-body { padding-top: 0; }
+.xp-page .xp-list { flex: none; height: calc(100vh / var(--z) - 400px); min-height: 260px; }
+.io-head ~ .im .im-body { height: calc(100vh / var(--z) - 270px); }   /* 上面多了一排导入 / 导出标签，整理台跟着矮一点，一屏放得下 */
+.xp-page .xp-right { overflow: visible; }

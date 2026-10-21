@@ -941,6 +941,7 @@
     if (!url) throw new SyncError('这个版本没有配置同步服务器');
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 30000);      // 弱网多等一会儿；一次最多传 1000 条，不会太大
+    body = Object.assign({}, body, { cv: await contentVer() });   // 内容版本：服务器据此要求太旧的先更新（426）
     let r;
     try {
       r = await fetch(url + path, { method: 'POST', signal: ctl.signal, body: JSON.stringify(body),
@@ -949,8 +950,15 @@
     finally { clearTimeout(timer); }
     let d = {};
     try { d = await r.json(); } catch (e) { /* ignore */ }
+    if (r.status === 426) syncState.need_update = true;      // 界面看到就马上强制更新（app.js autoCheckUpdate）
     if (!r.ok) throw new SyncError(d.error || '服务器返回 ' + r.status, r.status);
     return d;
+  }
+  let cvCache = 0;
+  async function contentVer() {
+    if (window.ZX_WEB) return window.ZX_WEB.v || 0;
+    if (!cvCache) cvCache = ((await currentManifest()) || {}).content_version || 0;
+    return cvCache;
   }
   const syncState = { running: false, last_ok: '', last_err: '', last_got: 0, fails: 0, timer: null, busy: null };
   function syncStartAccount() {
@@ -982,6 +990,7 @@
             throw e;
           }
           const r = syncApply(out, resp);
+          syncNoteAccount(a, resp);
           got += r.got + r.kv;
           if (r.more || syncPending()) continue;
           if (r.match || reconciled) break;
@@ -999,11 +1008,23 @@
             got += n;
           }
         }
-        Object.assign(syncState, { last_ok: nowStr(), last_err: '', last_got: got, fails: 0 });
+        Object.assign(syncState, { last_ok: nowStr(), last_err: '', last_got: got, fails: 0, need_update: false });
         return { got: got };
       } finally { syncState.running = false; syncState.busy = null; }
     })();
     return syncState.busy;
+  }
+  // 服务器回的现在的用户名和账号 ID：管理员改了名就跟着换，旧版本绑定的补上 ID（同 sync.py _note_account）
+  function syncNoteAccount(a, resp) {
+    const name = resp.user || '', aid = resp.aid || '';
+    if (!name || !aid) return;
+    const owner = prog.sync_owner || '', ownerAid = prog.sync_owner_aid || '';
+    if ((ownerAid ? ownerAid === aid : owner === a.user) && (owner !== name || ownerAid !== aid)) {
+      prog.sync_owner = name;
+      prog.sync_owner_aid = aid;
+      save();
+    }
+    if (a.user !== name) { a.user = name; try { localStorage.setItem(ACC_KEY, JSON.stringify(a)); } catch (e) { /* ignore */ } }
   }
   function syncSchedule(sec) {
     clearTimeout(syncState.timer);
@@ -1039,7 +1060,8 @@
   function syncStatus() {
     const a = syncAccount();
     return { available: !!syncEndpoint(), user: a ? a.user : '', owner: prog.sync_owner || '', running: syncState.running, last_ok: syncState.last_ok,
-             last_err: syncState.last_err, last_got: syncState.last_got, pending: a && prog.sync ? syncPending() : 0 };
+             last_err: syncState.last_err, last_got: syncState.last_got, pending: a && prog.sync ? syncPending() : 0,
+             need_update: !!syncState.need_update };
   }
   async function syncHandle(method, path, body) {
     if (method === 'GET' && path === '/api/sync/status') return syncStatus();
@@ -1063,9 +1085,11 @@
         // 先到服务器验证用户名密码（同 sync.py login）
         const dev = (window.ZX_WEB ? 'web-' : 'android-') + newUid().slice(0, 6);
         const r = await syncPost('/v1/login', { user: user, pass: pw, device: dev });
-        const name = r.user || user;
+        const name = r.user || user, aid = r.aid || '', ownerAid = prog.sync_owner_aid || '';
+        // 是不是同一个人：两边都有账号 ID 就比 ID（改过用户名也认得），否则比用户名（同 sync.py login）
+        const same = ownerAid && aid ? ownerAid === aid : owner === name;
         let need = null;
-        if (owner && owner !== name && mode !== 'fresh') need = { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
+        if (owner && !same && mode !== 'fresh') need = { need: 'switch', owner: owner, count: count, unsent: unsentCount() };
         else if (!owner && count && mode !== 'merge' && mode !== 'fresh') need = { need: 'merge', count: count };
         if (need) {
           try { await syncPost('/v1/logout', {}, r.token); } catch (e) { /* ignore */ }
@@ -1075,6 +1099,7 @@
         if (mode === 'fresh' && count) backup = resetForAccount();
         localStorage.setItem(ACC_KEY, JSON.stringify({ user: name, token: r.token, device: dev }));
         prog.sync_owner = name;
+        if (aid) prog.sync_owner_aid = aid; else delete prog.sync_owner_aid;
         syncStartAccount();
         syncSchedule(0);
         return Object.assign(syncStatus(), { backup: backup });
@@ -1097,6 +1122,13 @@
         syncState.fails = 0;
         try { const r = await syncOnce(); syncSchedule(300); return Object.assign(syncStatus(), { result: r }); }
         catch (e) { syncState.last_err = e.message; throw e; }
+      }
+      if (path === '/api/sync/rename') {
+        const a = syncAccount();
+        if (!a) throw new SyncError('还没登录');
+        const r = await syncPost('/v1/rename', { name: String(body.name || '').trim(), pass: body.pass || '' }, a.token);
+        syncNoteAccount(a, r);
+        return syncStatus();
       }
       if (path === '/api/sync/password') {
         const a = syncAccount();
@@ -1325,6 +1357,7 @@
     const curVer = (cur || {}).content_version || 0;
     const ok = cmpTuple(ver(APP_VERSION), ver(latest.min_android_version || '0')) >= 0;
     return { current: curVer, latest: latest.content_version || 0, has_update: ok && (latest.content_version || 0) > curVer,
+             force: ok && (latest.content_version || 0) > curVer && (latest.force_min || 0) > curVer,
              compatible: ok, min_app_version: latest.min_android_version, files: c.changed.length,
              bytes: c.changed.reduce((a, w) => a + c.nf[w][1], 0), notes: latest.notes || '' };
   }

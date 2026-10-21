@@ -479,13 +479,13 @@ const state = {
 };
 
 const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: viewWrong,
-                 practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers, poems: viewPoems };
+                 practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers, poems: viewPoems, export: viewExport };
 
 function route() {
   if (IS_WEB && !state.webUser) return webGate();
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
   const name = routes[parts[0]] ? parts[0] : 'home';
-  const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home', poems: 'home' };
+  const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home', poems: 'home', export: 'upload' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
   document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
   document.body.classList.toggle('workpage', name === 'practice' || name === 'recite');   // 手机上做题 / 背题页：按钮条固定在屏幕最底下（style.css）
@@ -598,7 +598,6 @@ async function viewHome() {
         '<div class="list-tools">' +
           '<label class="search-pill">' + icon('search') + '<input id="home-q" placeholder="搜索卷子" value="' + esc(h.q) + '"></label>' +
           '<span class="spacer"></span>' +
-          (IS_APP ? '' : '<button class="icon-btn" title="导出 Word（可以多张卷子一起）" onclick="homeExport()">' + icon('download') + '</button>') +
           (canShuffle ?
             '<button class="icon-btn" title="随机练一组" onclick="startPractice({subject:' + jsq(h.subj) + ',scope:\'all\',title:\'随机练习\'})">' + icon('shuffle') + '</button>' : '') +
         '</div>' +
@@ -625,16 +624,6 @@ async function viewHome() {
   if (np) np.addEventListener('change', async () => {
     try { await api('/api/settings', { method: 'POST', body: { new_per_day: +np.value } }); viewHome(); } catch (e) { toast(e.message, 'bad'); }
   });
-}
-
-// 首页的导出按钮：选了某一科就先勾上这一科的卷子
-async function homeExport() {
-  let pre = [];
-  const sj = state.home.subj;
-  if (sj && sj.indexOf('skill:') !== 0) {
-    try { pre = (await api('/api/papers')).papers.filter(p => p.subject === sj).map(p => p.key); } catch (e) { /* 不预选 */ }
-  }
-  openExportSheet(pre);
 }
 
 // 某一科的题型卡片：单做一种题型最练记忆，点进去选练习方式（能存档）
@@ -849,7 +838,6 @@ async function viewSubject(args) {
         (subj !== 'general' ? '<a class="btn ghost" href="#/exam/new/' + subj + '">模拟考</a>' : '') +
         '<button class="btn ghost" onclick="goBank(0,\'' + subj + '\')">浏览题目</button>' +
         (subj === 'chinese' ? '<a class="btn ghost" href="#/poems">古诗文划重点</a>' : '') +
-        (IS_APP || !papers.length ? '' : '<button class="btn ghost" onclick="openExportSheet(' + esc(JSON.stringify(papers.map(p => p.key))) + ')">导出 Word</button>') +
       '</div>' +
     '</div>' +
 
@@ -1064,7 +1052,7 @@ async function viewUpload(args) {
   }
   state.imp = { st: st, res: null, seq: 0 };
   app.innerHTML =
-    '<div class="crumb"><a href="#/home">首页</a> / ' + (st.key ? '修改导入的卷子' : '导入试卷') + '</div>' +
+    (st.key ? '<div class="crumb"><a href="#/home">首页</a> / 修改导入的卷子</div>' : ioTabs('upload')) +
     '<div class="im">' +
       '<div class="im-bar">' +
         '<input class="inp im-name" id="im-name" placeholder="卷子名称（不填就用文件名）" value="' + esc(st.name) + '">' +
@@ -2000,12 +1988,6 @@ async function openModeSheet(src, name) {
           '改了题号不变，做题记录还在。</div>' +
         '<div class="sheet-row"><button class="btn' + (src.missing ? '' : ' ghost') + '" data-act="answers">' + (src.missing ? '填答案' : '改答案') + '</button>' +
         '<button class="btn ghost" data-act="edit">改题目</button></div></div>' : '') +
-      // 导出 Word 只在电脑上有（用户：手机上用不上）
-      (IS_APP ? '' : '<div class="sheet-sec"><div class="sheet-t">导出 Word</div>' +
-        '<div class="sheet-d">按原卷顺序导出成 Word 文档，可以打印出来做。答案卷用红字标出答案，最后附答案速查（不带解析）。</div>' +
-        '<div class="sheet-row"><button class="btn ghost" data-act="wd-blank">空白卷</button>' +
-        '<button class="btn ghost" data-act="wd-ans">答案卷</button></div>' +
-        (src.paper_key ? '<button class="btn ghost block xp-more" data-act="wd-many">多张卷子一起导出…</button>' : '') + '</div>') +
     '</div>';
   const close = () => sheet.remove();
   sheet.addEventListener('click', e => {
@@ -2016,8 +1998,6 @@ async function openModeSheet(src, name) {
     if (!act) return;
     close();
     if (act === 'rc-seq' || act === 'rc-rand') return startRecite(practiceSrc(src), name, act === 'rc-seq' ? 'seq' : 'random');
-    if (act === 'wd-blank' || act === 'wd-ans') return exportWord(practiceSrc(src), name, act === 'wd-ans');
-    if (act === 'wd-many') return openExportSheet([src.paper_key]);
     if (act === 'edit') { location.hash = '#/upload/' + src.paper_id; return; }
     if (act === 'answers') { location.hash = '#/answers/' + src.paper_id; return; }
     if (act === 'poems') { location.hash = '#/poems'; return; }
@@ -3095,17 +3075,6 @@ function saveBlob(blob, fname) {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
 }
 
-// 一张卷子或一个题型
-async function exportWord(src, name, ans) {
-  let qs;
-  try { qs = await exportQs(src); } catch (e) { toast(e.message, 'bad'); return; }
-  if (!qs.length) { toast('这里没有题目'); return; }
-  toast('正在生成 Word……');
-  const fname = fileSafe(name) + '（' + (ans ? '答案' : '空白卷') + '）.docx';
-  try { saveBlob(await WX.build(name, qs, ans, exportSec), fname); } catch (e) { toast('生成失败：' + e.message, 'bad'); return; }
-  toast('已导出：' + fname, 'good');
-}
-
 // 多张卷子一起导出：搜索 / 按科目勾卷子，可以只要某几种题型、只要错题本里的题；
 // 空白卷 / 答案卷 / 两种都要，合成一个 Word 或每张一个（不止一个文件就打包成 zip）。
 // 上次选的导出内容、文件方式记在本机 localStorage quiz.export（只图方便，不同步）
@@ -3114,7 +3083,25 @@ function exportPrefs() {
   try { o = JSON.parse(localStorage.getItem('quiz.export') || 'null'); } catch (e) { /* 读不了就用默认 */ }
   return Object.assign({ kind: 'blank', split: false }, o || {});
 }
-async function openExportSheet(pre) {
+/* ---- 导入 / 导出（用户要求 2026-10-21：导出统一放到左边栏，和导入合在一起，别处不再放导出入口）----
+   左边栏「导入 / 导出」→ 上面两个大标签切换：#/upload 导入试卷（导入整理台），#/export 导出 Word（多张卷子一起导出）。 */
+function ioTabs(cur) {
+  const tab = (k, href, ic, t, d) => '<a class="io-tab' + (cur === k ? ' on' : '') + '" href="' + href + '">' +
+    '<span class="io-ic">' + icon(ic) + '</span><span><b>' + t + '</b><small>' + d + '</small></span></a>';
+  return '<div class="io-head">' +
+    tab('upload', '#/upload', 'upload', '导入试卷', '拖进 Word / 粘贴文字，自动识别成题库') +
+    tab('export', '#/export', 'download', '导出 Word', '空白卷、答案卷，多张卷子一起导出') +
+  '</div>';
+}
+
+async function viewExport() {
+  if (IS_APP) { app.innerHTML = '<div class="empty">导出 Word 只在电脑版上有</div>'; return; }
+  app.innerHTML = ioTabs('export') + '<div id="xp-host"><div class="empty">加载中…</div></div>';
+  openExportSheet(null, $('#xp-host'));
+}
+
+// host：渲染进页面（导入 / 导出页）；不给就是弹窗
+async function openExportSheet(pre, host) {
   let papers, subjects;
   try {
     await loadHidden();
@@ -3135,10 +3122,10 @@ async function openExportSheet(pre) {
   const seg = (name, cur, opts) => '<div class="xp-seg" data-name="' + name + '">' + opts.map(o =>
     '<button class="pill-tab' + (cur === o[0] ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
   const sheet = document.createElement('div');
-  sheet.className = 'sheet-mask';
+  sheet.className = host ? 'xp-page-wrap' : 'sheet-mask';
   sheet.innerHTML =
-    '<div class="sheet xp" role="dialog">' +
-      '<div class="sheet-h"><b>导出 Word</b><button class="sheet-x" aria-label="关闭">×</button></div>' +
+    '<div class="' + (host ? 'card xp xp-page' : 'sheet xp') + '" role="' + (host ? 'region' : 'dialog') + '">' +
+      (host ? '' : '<div class="sheet-h"><b>导出 Word</b><button class="sheet-x" aria-label="关闭">×</button></div>') +
       '<div class="xp-body"><div class="xp-left">' +
         '<div class="sheet-t xp-t"><span>选卷子<span class="xp-n"></span></span>' +
           '<span class="xp-links"><a href="javascript:void(0)" data-all="1">全选列表里的</a><a href="javascript:void(0)" data-all="0">清空</a></span></div>' +
@@ -3206,7 +3193,7 @@ async function openExportSheet(pre) {
     go.textContent = !n ? '先在左边勾选卷子' : noType ? '至少留一种题型' : '导出（' + n + ' 张卷子）';
   };
   let busy = false;
-  const close = () => { if (!busy) sheet.remove(); };
+  const close = () => { if (!busy && !host) sheet.remove(); };
   sheet.addEventListener('change', e => {
     const b = e.target;
     if (b.dataset.key) sel[b.dataset.key] = b.checked ? 1 : 0;
@@ -3238,10 +3225,10 @@ async function openExportSheet(pre) {
     go.disabled = true;
     const types = pickedTypes().filter(x => !offTypes[x]);
     const filt = types.length === pickedTypes().length ? null : types;
-    try { await exportMany(picked(), { kind: pf.kind, split: pf.split, wrong: wrongOnly, types: filt }, x => { go.textContent = x; }); busy = false; sheet.remove(); }
+    try { await exportMany(picked(), { kind: pf.kind, split: pf.split, wrong: wrongOnly, types: filt }, x => { go.textContent = x; }); busy = false; if (host) refresh(); else sheet.remove(); }
     catch (er) { busy = false; toast('导出失败：' + er.message, 'bad'); refresh(); }
   });
-  document.body.appendChild(sheet);
+  if (host) { host.innerHTML = ''; host.appendChild(sheet); } else document.body.appendChild(sheet);
   refresh();
 }
 
@@ -3716,6 +3703,7 @@ function syncBoxHtml(sy) {
       '<div class="set-item"><span class="set-main">状态</span><span class="set-val' + (sy.last_err ? ' sync-err' : '') + '">' + esc(syncStateText(sy)) + '</span></div>' +
       (sy.pending ? '<div class="set-item"><span class="set-main">等待上传</span><span class="set-val">' + sy.pending + ' 条</span></div>' : '') +
       '<button class="set-item set-link" onclick="syncNow(this)"><span class="set-main">立即同步</span></button>' +
+      '<button class="set-item set-link" onclick="syncNameForm()"><span class="set-main">修改用户名</span></button>' +
       '<button class="set-item set-link" onclick="syncPwForm()"><span class="set-main">修改密码</span></button>' +
       '<button class="set-item set-link set-danger" onclick="syncLogout()"><span class="set-main">退出登录</span></button>' +
     '</div><div id="sync-pw"></div>' +
@@ -3800,6 +3788,27 @@ function syncPwForm() {
     '<input class="input" id="sync-old" type="password" placeholder="原密码">' +
     '<input class="input" id="sync-new" type="password" placeholder="新密码（至少 6 位）">' +
     '<button class="btn" onclick="syncChangePw()">确认修改</button></div></div>';
+}
+
+// 改用户名：记录按账号存、设备按账号 ID 认，改名不影响做题记录；别的设备下次同步时自动换成新名字
+function syncNameForm() {
+  const o = $('#sync-pw');
+  if (!o) return;
+  o.innerHTML = '<div class="set-list"><div class="set-item set-col sync-form">' +
+    '<input class="input" id="sync-newname" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="新用户名（汉字、字母、数字都行）">' +
+    '<input class="input" id="sync-namepw" type="password" autocomplete="current-password" placeholder="当前密码">' +
+    '<button class="btn" onclick="syncChangeName()">确认修改</button></div></div>' +
+    '<div class="set-foot">做题记录不受影响。电脑、手机、网页上登录着这个账号的，下次同步时自动换成新名字；以后登录用新用户名。</div>';
+  $('#sync-newname').focus();
+}
+
+async function syncChangeName() {
+  try {
+    const sy = await api('/api/sync/rename', { method: 'POST', body: { name: $('#sync-newname').value, pass: $('#sync-namepw').value } });
+    if (IS_WEB) state.webUser = sy.user;
+    syncRender(sy);
+    toast('用户名已改成 ' + sy.user + '，以后登录用新名字', 'good');
+  } catch (e) { toast(e.message, 'bad'); }
 }
 
 async function syncChangePw() {
@@ -3982,6 +3991,10 @@ function noticeFrom(app, cont) {
 }
 
 async function autoCheckUpdate(a) {
+  // 同步服务器说这个版本太旧（管理员设了 mincontent）：不等一小时，马上查、马上强制更新
+  let urgent = false;
+  try { urgent = !!(await api('/api/sync/status')).need_update; } catch (e) { /* ignore */ }
+  if (urgent) store.del('zx.lastAutoCheck');
   let n = store.get('zx.updNotice');
   // 已经更新过了（程序或内容版本追上了提示里的版本），提示作废
   if (n && ((n.kind === 'app' && cmpVer(n.latest, a.version) <= 0) ||
@@ -3994,7 +4007,52 @@ async function autoCheckUpdate(a) {
     api('/api/content/check').catch(() => ({ failed: true })),
   ]);
   syncUpdNotice(app, cont, app.failed, cont.failed);
+  if (!cont.failed && (cont.force || (urgent && cont.has_update))) return forceContentUpdate(cont);
   if (!cont.failed) autoContentUpdate(cont);
+}
+
+/* ---- 强制更新（用户要求：我们要能在一定程度上控制大家的更新）----
+   两个开关：发布时 release.py --force（content.json 的 force_min），或者服务器上 zhixue-user mincontent N（同步时回 426）。
+   低于门槛的：不管自动更新开没开、在不在做题，马上下载，弹出关不掉的窗口，装好点「立即更新」刷新换上。
+   作答每点一下就已经存了，刷新不丢记录。下载失败（断网）不锁人：关掉窗口照常用，过几分钟再试。 */
+let forcing = false;
+async function forceContentUpdate(cont) {
+  if (forcing || IS_WEB) return;
+  forcing = true;
+  const mask = document.createElement('div');
+  mask.className = 'sheet-mask force-upd';
+  mask.innerHTML = '<div class="sheet" role="alertdialog"><div class="sheet-h"><b>需要更新</b></div>' +
+    '<div class="sheet-d">这次更新修正了重要问题，必须更新到第 ' + esc(cont.latest) + ' 版才能接着用。做题记录不受影响。</div>' +
+    (cont.notes ? '<div class="sheet-d force-notes">' + esc(cont.notes) + '</div>' : '') +
+    '<div class="force-bar"><i style="width:0"></i></div><div class="sheet-d" id="force-st">正在下载…</div>' +
+    '<button class="btn block" id="force-go" hidden>立即更新</button></div>';
+  document.body.appendChild(mask);
+  const st = mask.querySelector('#force-st'), bar = mask.querySelector('.force-bar i'), go = mask.querySelector('#force-go');
+  try {
+    let p = await api('/api/content/update', { method: 'POST' });
+    while (p.state === 'downloading') {
+      bar.style.width = (p.total ? Math.round(100 * p.done / p.total) : 5) + '%';
+      st.textContent = '正在下载…' + (p.total ? ' ' + fmtMB(p.done) + ' / ' + fmtMB(p.total) : '');
+      await new Promise(r => setTimeout(r, 1000));
+      p = await api('/api/content/progress');
+    }
+    if (p.state !== 'done') throw new Error(p.error || '没下载完');
+    bar.style.width = '100%';
+    if (p.restart && !IS_APP) store.set('zx.needRestart', p.version);
+    st.textContent = p.restart && !IS_APP ? '下载好了。点下面的按钮刷新；电脑版还要从托盘退出再打开一次题库，后台部分才换成新的。' : '下载好了，点下面的按钮换上新版。';
+    go.hidden = false;
+    go.onclick = () => { store.set('zx.updDone', p.version || cont.latest); location.reload(); };
+  } catch (e) {
+    st.textContent = '没下载下来（' + e.message + '）。先接着用，联网后会自动再试。';
+    const close = document.createElement('button');
+    close.className = 'btn ghost block';
+    close.textContent = '先接着用';
+    close.onclick = () => mask.remove();
+    mask.querySelector('.sheet').appendChild(close);
+    forcing = false;
+    store.del('zx.lastAutoCheck');
+    setTimeout(() => api('/api/app').then(autoCheckUpdate).catch(() => {}), 5 * 60 * 1000);
+  }
 }
 
 /* ---- 自动更新题库和界面（用户要求：很多人不会自己去更新）----
@@ -4564,6 +4622,7 @@ function webNetWatch() {
   let last = { pending: 0 };
   async function upd() {
     try { last = await api('/api/sync/status'); } catch (e) { return; }
+    if (last.need_update) return webForceReload(0);           // 服务器要求先更新：网页刷新就是最新版
     if (!last.user) { pill.hidden = true; return; }
     const off = !navigator.onLine;
     pill.hidden = !off && !(last.pending && last.last_err);
@@ -4580,12 +4639,24 @@ function webNetWatch() {
   upd();
 }
 
+// 网页版强制更新：刷新一次就是最新版。同一个版本只刷一次，免得服务器上的网页还没换新时一直刷
+function webForceReload(v) {
+  let done = '';
+  try { done = sessionStorage.getItem('zx.forceReloaded') || ''; } catch (e) { /* ignore */ }
+  if (done === String(window.ZX_WEB.v)) return;
+  try { sessionStorage.setItem('zx.forceReloaded', String(window.ZX_WEB.v)); } catch (e) { /* ignore */ }
+  if (v) store.set('zx.updDone', v);
+  location.reload();
+}
+
 // 网页版：内容更新了（服务器上换了新版）就在空闲页面自动刷新，每 10 分钟看一次
 function webWatchUpdate() {
   setInterval(async () => {
     try {
       const r = await fetch('content.json', { cache: 'no-store' });
-      const v = (await r.json()).content_version || 0;
+      const m = await r.json(), v = m.content_version || 0;
+      // 强制更新（force_min 比这个页面新）：不等空闲页面，马上刷新（作答点一下就存了，不丢）
+      if ((m.force_min || 0) > (window.ZX_WEB.v || 0)) return webForceReload(v);
       if (v > (window.ZX_WEB.v || 0)) { state.pendingReload = v; if (RELOAD_OK.indexOf(state.lastPage) >= 0) reloadIfIdle(); }
     } catch (e) { /* ignore */ }
   }, 10 * 60 * 1000);

@@ -85,10 +85,18 @@ def _openers():
     return [urllib.request.build_opener(), urllib.request.build_opener(urllib.request.ProxyHandler({}))]
 
 
+def _cv():
+    try:
+        return appdir.content_version()
+    except Exception:            # noqa: BLE001
+        return 0
+
+
 def _post(path, body, token=None):
     url = endpoint()
     if not url:
         raise SyncError('这个版本没有配置同步服务器')
+    body = dict(body, cv=_cv())  # 内容版本：服务器据此要求太旧的先更新（426）
     data = json.dumps(body, ensure_ascii=False).encode('utf-8')
     headers = {'Content-Type': 'application/json', 'User-Agent': 'zhixue-tiku'}
     if token:
@@ -107,6 +115,8 @@ def _post(path, body, token=None):
             if not msg and (e.code >= 500 or e.code == 407):
                 last = '服务器返回 %d' % e.code      # 多半是代理软件回的，换直连再试
                 continue
+            if e.code == 426:
+                _state['need_update'] = True      # 界面看到就马上强制更新（app.js autoCheckUpdate）
             raise SyncError(msg or '服务器返回 %d' % e.code, e.code)
         except (urllib.error.URLError, socket.timeout, OSError, ValueError) as e:
             last = e
@@ -126,9 +136,13 @@ def login(user, pw, mode=''):
     # 先到服务器验证用户名密码（错了马上提示，不会先弹“这些记录是你的吗”让人以为已经登录）
     dev = '%s-%s' % (platform.node()[:30], os.urandom(3).hex())
     r = _post('/v1/login', {'user': user, 'pass': pw, 'device': dev})
-    name = r.get('user') or user
+    name, aid = r.get('user') or user, r.get('aid') or ''
+    owner_aid = db.sync_owner_aid()
+    # 是不是同一个人：两边都有账号 ID 就比 ID（管理员改过用户名也认得；删了账号再建个同名的认不成同一个人），
+    # 旧版本绑定的、或者服务器还没有 ID，才比用户名
+    same = owner_aid == aid if owner_aid and aid else owner == name
     need = None
-    if owner and owner != name and mode != 'fresh':
+    if owner and not same and mode != 'fresh':
         need = {'need': 'switch', 'owner': owner, 'count': count, 'unsent': db.sync_unsent()}
     elif not owner and count and mode not in ('merge', 'fresh'):
         need = {'need': 'merge', 'count': count}
@@ -142,10 +156,24 @@ def login(user, pw, mode=''):
     if mode == 'fresh' and count:
         backup = db.sync_reset_for_account(owner)
     _save_account({'user': name, 'token': r['token'], 'device': dev})
-    db.sync_set_owner(name)
+    db.sync_set_owner(name, aid)
     db.sync_start_account()      # 本机的记录（这时一定是这个账号自己的）全部（再）传一遍，服务器按 id 去重
     kick(0)
     return dict(status(), backup=backup)
+
+
+def _note_account(a, resp):
+    """服务器回的现在的用户名和账号 ID：管理员改了名就跟着换；旧版本绑定的记录在这时补上账号 ID。
+    令牌就是这个账号的，本机记录登录时已确认是它的，所以只在“本机绑的就是这个账号”时才改"""
+    name, aid = resp.get('user') or '', resp.get('aid') or ''
+    if not name or not aid:
+        return                   # 老服务器
+    owner, owner_aid = db.sync_owner(), db.sync_owner_aid()
+    if (owner_aid == aid if owner_aid else owner == a.get('user')) and (owner, owner_aid) != (name, aid):
+        db.sync_set_owner(name, aid)
+    if a.get('user') != name:
+        a['user'] = name
+        _save_account(a)
 
 
 def logout():
@@ -163,6 +191,16 @@ def logout():
     db.sync_stop_account()
     _state.update({'last_ok': '', 'last_err': '', 'fails': 0})
     return status()
+
+
+def change_name(name, pw):
+    """改自己的用户名（要当前密码）。本机记录按账号 ID 认，改完马上换成新名字"""
+    a = account()
+    if not a:
+        raise SyncError('还没登录')
+    r = _post('/v1/rename', {'name': (name or '').strip(), 'pass': pw or ''}, a['token'])
+    _note_account(a, r)
+    return dict(status(), ok=True)
 
 
 def change_password(old, new):
@@ -203,6 +241,7 @@ def sync_once():
                         raise SyncError('登录已失效，请重新登录')
                     raise
                 r = db.sync_apply(out, resp)
+                _note_account(a, resp)
                 got += r['got'] + r['kv']
                 if r['more'] or db.sync_pending():
                     continue
@@ -215,7 +254,7 @@ def sync_once():
                 for i in range(0, len(missing), 2000):
                     evs = _post('/v1/fetch', {'ids': missing[i:i + 2000]}, a['token']).get('events') or []
                     got += db.sync_merge_fetched(evs)
-            _state.update({'last_ok': db.now(), 'last_err': '', 'last_got': got, 'fails': 0})
+            _state.update({'last_ok': db.now(), 'last_err': '', 'last_got': got, 'fails': 0, 'need_update': False})
             return {'got': got}
         finally:
             _state['running'] = False
@@ -280,4 +319,4 @@ def status():
     return {'available': bool(endpoint()), 'user': a['user'] if a else '', 'owner': db.sync_owner(),
             'running': _state['running'],
             'last_ok': _state['last_ok'], 'last_err': _state['last_err'], 'last_got': _state['last_got'],
-            'pending': db.sync_pending() if a else 0}
+            'pending': db.sync_pending() if a else 0, 'need_update': bool(_state.get('need_update'))}

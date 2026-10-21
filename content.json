@@ -1,6 +1,6 @@
 {
- "content_version": 77,
- "created": "2026-10-21 10:30:27",
+ "content_version": 78,
+ "created": "2026-10-21 10:56:37",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "a1906ee13b0e1b2d8e8ab1ee0dc8f4f6cb6289afdbe454a3d55b273a7120db42",
-   52497
+   "bbe537554da3249963e104a55eb1dc9a4c03a862698a56a21e486bd05743d6e3",
+   52891
   ],
   "docparse.py": [
    "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
@@ -1587,12 +1587,12 @@
    13051
   ],
   "mobile/local.js": [
-   "4372822bfcfcfe640423a1bd16579b8c3a6a0dcabf36b583e83b80e09d87c259",
-   71069
+   "315e086bee9709ff96c820829ac636a5483e514cd256b160911763864641e6b8",
+   73070
   ],
   "server.py": [
-   "a8dc038bc58d4a2791b181a36b84429680d65bebafd4ebb1ee32cbc19821b45b",
-   33417
+   "effd530d6438f8ab49bebda0677e0999fb3d2f14c7308e80ae5ec54f544ac354",
+   34352
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,12 +1635,12 @@
    3659
   ],
   "static/app.js": [
-   "57b6f47d1b13389dc19106bdbbfcc59f29c59d0926f182bd8d740f9cc061b7da",
-   268261
+   "c93d156117aa63280b6bdde4ccf2ef1d883ec80b9d9608e8176b51473e16bd80",
+   273139
   ],
   "static/index.html": [
-   "2f68f8401c8b124d1af8f80a62da1fc405ca54abed685ba515c261d2d924f1ad",
-   7148
+   "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
+   7176
   ],
   "static/poems.js": [
    "0541006986f3c26a0911969d0c7241bbecbeb9e2b46321babcd69c3881ccb1d4",
@@ -1651,21 +1651,22 @@
    27524
   ],
   "static/style.css": [
-   "3a74654e11c188393ddd45e612721ba3fcace9f6d2dde87cd93df8975f193181",
-   80318
+   "9b240cdd9f7b67cdbafe309391ece2f4e069b8accfe303799db8b63748d68aaa",
+   82183
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
    20289
   ],
   "sync.py": [
-   "e9b777bc72ea481055611923480c91ae798947c6f8f51dbf8243531b083ccd7e",
-   10899
+   "30ed05a0c78ad261fee63b7738a477297ea1343f086104a8eab18ab0ca07b2ba",
+   12830
   ]
  },
+ "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "语文新增「古诗文划重点」：默写考到的 6 篇古诗文全文，所有卷子考过的句子用荧光笔画出来（考得越多颜色越深），点句子看是哪几张卷子考的，可以遮住考点自己默一遍",
+ "notes": "账号：每个账号有了固定的账号 ID，改用户名不影响记录，设置里可以自己改用户名，其他设备同步时自动换成新名字；支持强制更新；导出 Word 统一放到左边栏「导入 / 导出」",
  "py_shell_api": 1,
- "tag": "content-77"
+ "tag": "content-78"
 }

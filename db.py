@@ -793,6 +793,7 @@ def _dirty(key):
 def _logout_hook():
     _prog['sync'] = {}
     _prog.pop('sync_owner', None)
+    _prog.pop('sync_owner_aid', None)
     for f in on_progress_cleared:
         try:
             f()
@@ -945,10 +946,21 @@ def sync_owner():
         return _prog.get('sync_owner') or ''
 
 
-def sync_set_owner(name):
+def sync_owner_aid():
+    """本机记录所属账号的 ID（服务器给的，随机、不变）。旧版本绑定的没有，按用户名认"""
+    with _lock:
+        _load()
+        return _prog.get('sync_owner_aid') or ''
+
+
+def sync_set_owner(name, aid=''):
     with _lock:
         _load()
         _prog['sync_owner'] = name
+        if aid:
+            _prog['sync_owner_aid'] = aid
+        else:
+            _prog.pop('sync_owner_aid', None)
         _save_prog()
 
 

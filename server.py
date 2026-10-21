@@ -65,6 +65,31 @@ MIME = {
 }
 
 
+def content_check():
+    """检查内容更新 = hotupdate.check()（外壳里的，旧 exe 也有）+ 强制更新标记 force：
+    清单里的 force_min 比本机内容新，就必须更新（app.js forceContentUpdate）。
+    hotupdate.check 不回清单本身，这里借它下载时顺手留一份，不多请求一次"""
+    import hotupdate
+    got = {}
+    orig = hotupdate._fetch
+
+    def keep(*a, **k):
+        b = orig(*a, **k)
+        got['m'] = b
+        return b
+    hotupdate._fetch = keep
+    try:
+        r = hotupdate.check()
+    finally:
+        hotupdate._fetch = orig
+    try:
+        fm = int(json.loads(got['m'].decode('utf-8')).get('force_min') or 0)
+    except Exception:          # noqa: BLE001
+        fm = 0
+    r['force'] = bool(r.get('has_update') and fm > (r.get('current') or 0))
+    return r
+
+
 def load_server_config():
     path = appdir.CONFIG_PATH
     if os.path.exists(path):
@@ -227,6 +252,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(dict(sync.sync_now(), ok=True))
             if path == '/api/sync/password':
                 return self.send_json(sync.change_password(data.get('old'), data.get('new')))
+            if path == '/api/sync/rename':
+                return self.send_json(sync.change_name(data.get('name'), data.get('pass')))
             if path == '/api/sync/ls':
                 ok = db.ls_put(str(data.get('key') or ''), int(data.get('t') or 0), data.get('v'))
                 if ok:
@@ -391,8 +418,7 @@ class Handler(BaseHTTPRequestHandler):
 
         # 热更新（界面 + 题库）：检查、开始下载、查进度
         if method == 'GET' and path == '/api/content/check':
-            import hotupdate
-            return self.send_json(dict(ok=True, **hotupdate.check()))
+            return self.send_json(dict(ok=True, **content_check()))
 
         if method == 'POST' and path == '/api/content/update':
             import hotupdate
