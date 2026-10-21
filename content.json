@@ -1,10 +1,10 @@
 {
- "content_version": 82,
- "created": "2026-10-21 15:48:13",
+ "content_version": 83,
+ "created": "2026-10-21 16:36:34",
  "files": {
   "data/bank.json": [
-   "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
-   3213948
+   "c0f96625215e1b27be24f3c8928e8dd5764ea054d422e7dbdf8238fe777bb33e",
+   3215015
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "古诗文划重点：「重新遮住」按钮只在点开过句子后出现，写明会遮回几句",
+ "notes": "语文模拟试卷(8) 补上第 28 题作文《那一次，我流泪了》",
  "py_shell_api": 1,
- "tag": "content-82"
+ "tag": "content-83"
 }
