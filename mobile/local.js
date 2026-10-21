@@ -612,13 +612,39 @@
   };
   const nextId = items => items.reduce((m, x) => Math.max(m, x.id || 0), 0) + 1;
 
-  function examStart(subject, preset) {
-    const papers = bank.papers.filter(p => p.subject === subject);
-    const pids = new Set(papers.map(p => p.id));
-    const qs = bank.questions.filter(q => pids.has(q.paper_id) && OBJECTIVE.indexOf(q.type) >= 0 && !q.same_as);
-    const [title, minutes, sections] = compose(qs, papers, subject, preset);
+  // 考试模式（做完再判）：练习那份题目列表原样做成一场考试，不限时（同 db.py _sections_from_keys）
+  const EXAM_SEC_NAME = { single: '单项选择题', multi: '多项选择题', judge: '判断题' };
+  function sectionsFromKeys(keys) {
+    const byKey = {};
+    bank.questions.forEach(q => { byKey[q.key] = q; });
+    const secs = [], seen = new Set();
+    (keys || []).forEach(k => {
+      let q = byKey[k];
+      if (!q || OBJECTIVE.indexOf(q.type) < 0 || !q.answer) return;
+      const name = q.section || EXAM_SEC_NAME[q.type] || '选择题';
+      q = byKey[q.same_as] || q;
+      if (seen.has(q.key)) return;
+      seen.add(q.key);
+      if (!secs.length || secs[secs.length - 1][0] !== name) secs.push([name, [], 1]);
+      secs[secs.length - 1][1].push(q);
+    });
+    return secs;
+  }
+  function examStart(subject, preset, keys, title, shuffle) {
+    let minutes, sections;
+    if (keys && keys.length) {
+      sections = sectionsFromKeys(keys);
+      if (!sections.length) throw new Error('这里没有能自动判分的选择题、判断题');
+      subject = (papersById()[sections[0][1][0].paper_id] || {}).subject || '';
+      title = String(title || '考试模式').slice(0, 60); minutes = 0; preset = 'scope';
+    } else {
+      const papers = bank.papers.filter(p => p.subject === subject);
+      const pids = new Set(papers.map(p => p.id));
+      const qs = bank.questions.filter(q => pids.has(q.paper_id) && OBJECTIVE.indexOf(q.type) >= 0 && !q.same_as);
+      [title, minutes, sections] = compose(qs, papers, subject, preset);
+    }
     const perms = {};
-    sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));
+    if (shuffle !== false) sections.forEach(([, g]) => g.forEach(q => { const pm = shufflePerm(q); if (pm) perms[q.key] = pm; }));
     const e = { id: nextId(prog.exams), uid: newUid(), subject: subject, preset: preset, title: title, minutes: minutes,
                 started: nowStr(), finished: '', perms: perms,
                 sections: sections.map(([n, g, pts]) => ({ name: n, keys: g.map(q => q.key), points: pts })) };
@@ -1194,7 +1220,8 @@
       markMastered(qid, body.mastered == null ? true : !!body.mastered);
       return {};
     }
-    if (method === 'POST' && path === '/api/exam/start') return { exam: examStart(body.subject || '', body.preset || 'standard') };
+    if (method === 'POST' && path === '/api/exam/start')
+      return { exam: examStart(body.subject || '', body.preset || 'standard', body.keys || null, body.title || '', body.shuffle !== false) };
     if (method === 'POST' && path === '/api/exam/submit') return { exam: examSubmit(parseInt(body.id || 0, 10), body.answers || {}, body.used_seconds || 0) };
     if (method === 'GET' && path === '/api/exams') return { items: prog.exams.slice().reverse().map(examSummary) };
     let m = path.match(/^\/api\/exams\/(\d+)$/);

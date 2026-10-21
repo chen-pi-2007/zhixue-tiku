@@ -1228,19 +1228,51 @@ def _exam_summary(e):
                                   'total', 'correct', 'score', 'used_seconds')}
 
 
-def exam_start(subject, preset='standard'):
+EXAM_SEC_NAME = {'single': '单项选择题', 'multi': '多项选择题', 'judge': '判断题'}
+
+
+def _sections_from_keys(keys):
+    """考试模式（做完再判）：练习那份题目列表原样做成一场考试。只要能自动判分的（选择、判断）；
+    学习通卷的题换成题库原题（same_as），成绩记在原题上；连着的同一种大题算一节，每题 1 分"""
+    by_key = {q['key']: q for q in _bank['questions']}
+    secs, seen = [], set()
+    for k in keys or []:
+        q = by_key.get(k)
+        if not q or q['type'] not in exam_mod.OBJECTIVE or not q.get('answer'):
+            continue
+        name = q.get('section') or EXAM_SEC_NAME.get(q['type'], '选择题')
+        q = by_key.get(q.get('same_as')) or q
+        if q['key'] in seen:
+            continue
+        seen.add(q['key'])
+        if not secs or secs[-1][0] != name:
+            secs.append((name, [], 1))
+        secs[-1][1].append(q)
+    return secs
+
+
+def exam_start(subject, preset='standard', keys=None, title='', shuffle=True):
+    """模拟考试：按科目组卷、限时。给了 keys 就是考试模式（做完再判）：用这些题、不限时（minutes=0）"""
     with _lock:
         _load()
-        papers = [p for p in _bank['papers'] if p.get('subject') == subject]
-        pids = set(p['id'] for p in papers)
-        qs = [q for q in _bank['questions'] if q['paper_id'] in pids and q['type'] in exam_mod.OBJECTIVE
-              and not q.get('same_as')]
-        title, minutes, sections = exam_mod.compose(qs, papers, subject, preset)
+        if keys:
+            sections = _sections_from_keys(keys)
+            if not sections:
+                raise ValueError('这里没有能自动判分的选择题、判断题')
+            pb = _papers_by_id()
+            subject = (pb.get(sections[0][1][0]['paper_id']) or {}).get('subject', '')
+            title, minutes, preset = (title or '考试模式')[:60], 0, 'scope'
+        else:
+            papers = [p for p in _bank['papers'] if p.get('subject') == subject]
+            pids = set(p['id'] for p in papers)
+            qs = [q for q in _bank['questions'] if q['paper_id'] in pids and q['type'] in exam_mod.OBJECTIVE
+                  and not q.get('same_as')]
+            title, minutes, sections = exam_mod.compose(qs, papers, subject, preset)
         rng = random.Random()
         perms = {}                       # 选项打乱：题目key -> 显示顺序
         for _, g, _pts in sections:
             for q in g:
-                pm = exam_mod.shuffle_perm(q, rng)
+                pm = exam_mod.shuffle_perm(q, rng) if shuffle else None
                 if pm:
                     perms[q['key']] = pm
         eid = _next_id(_prog['exams'])

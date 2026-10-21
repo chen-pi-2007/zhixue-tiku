@@ -139,6 +139,24 @@ class LocalJsSameAsDbTest(unittest.TestCase):
         for r in res:
             self.check_exam(r['exam'])
 
+    def test_scope_exam_same_as_desktop(self):
+        """考试模式（做完再判）：手机 / 网页（local.js）和电脑出的题、顺序、分节一样，交卷判分一样"""
+        keys = [q['key'] for q in db.practice_set(paper_id=db.list_papers()[0]['id'], shuffle=False)]
+        e = db.exam_start('', keys=keys, title='T', shuffle=False)
+        want = [(s['name'], [i['key'] for i in s['items']]) for s in e['sections']]
+        if not NODE:
+            self.skipTest('没装 node')
+        res = self.run_js([['/api/exam/start', {'method': 'POST', 'body': {'keys': keys, 'title': 'T', 'shuffle': False}}]])
+        je = res[0]['exam']
+        self.assertEqual([(s['name'], [i['key'] for i in s['items']]) for s in je['sections']], want)
+        self.assertEqual((je['minutes'], je['title']), (0, 'T'))
+        first = je['sections'][0]['items'][0]
+        res = self.run_js([['/api/exam/start', {'method': 'POST', 'body': {'keys': keys, 'title': 'T', 'shuffle': False}}],
+                           ['/api/exam/submit', {'method': 'POST', 'body': {'id': 1, 'answers': {str(first['id']): first['options'][0][0]}}}]])
+        r = res[1]['exam']
+        d = db.exam_submit(e['id'], {str(first['id']): first['options'][0][0]})
+        self.assertEqual((r['total'], r['correct']), (d['total'], d['correct']))
+
 
 # static/app.js 里整篇卡片分组的几个纯函数（groupKey … sortUnits），取出来在 node 里跑
 GROUP_JS = r'''

@@ -1989,6 +1989,10 @@ async function openModeSheet(src, name) {
         (mixAuto ? '<button class="btn block" data-act="mix-continue">接着上次做（' + at(mixAuto) + '）</button>' : '') +
         (mixSave ? '<button class="btn ghost block" data-act="mix-resume">读档（存档点：' + at(mixSave) + ' 存）</button>' : '') +
         '<button class="btn ghost block" data-act="all">' + (mixAuto ? '重新开始' : '开始') + '</button></div>' +
+      '<div class="sheet-sec"><div class="sheet-t">考试模式 · 做完再判</div>' +
+        '<div class="sheet-d">像学习通考试：一路做下去不显示对错，答题卡看进度、随时跳题改答案，交卷后一起出分数和每题解析，做错的进错题本。不限时，只考选择、判断题。</div>' +
+        '<div class="sheet-row"><button class="btn ghost" data-act="ex-seq">选项不变</button>' +
+        '<button class="btn ghost" data-act="ex-mix">选项打乱</button></div></div>' +
       '<div class="sheet-sec"><div class="sheet-t">背题</div>' +
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
@@ -2015,6 +2019,7 @@ async function openModeSheet(src, name) {
     if (act === 'edit') { location.hash = '#/upload/' + src.paper_id; return; }
     if (act === 'answers') { location.hash = '#/answers/' + src.paper_id; return; }
     if (act === 'poems') { location.hash = '#/poems'; return; }
+    if (act === 'ex-seq' || act === 'ex-mix') return startScopeExam(src, name, act === 'ex-mix');
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
     else if (act === 'mix-continue') loadSave(autoKeyOf(mixKey));
@@ -2845,6 +2850,19 @@ async function startExam(subject, preset) {
   location.hash = '#/exam/run';
 }
 
+// 考试模式（做完再判，用户要求：像学习通考试，不是做一题判一题）：把这张卷子 / 这个题型的题按顺序做成一场不限时的考试，
+// 用的是模拟考试那一套（答题卡、交卷、成绩报告、做错进错题本）
+async function startScopeExam(src, name, shuffle) {
+  if (store.get('quiz.exam') && !confirm('还有一场没交卷的考试，放弃它并开始新的？')) return;
+  let d;
+  try {
+    const items = await exportQs(practiceSrc(src));
+    d = await api('/api/exam/start', { method: 'POST', body: { keys: items.map(q => q.key), title: name + ' · 考试', shuffle: !!shuffle } });
+  } catch (e) { toast(e.message, 'bad'); return; }
+  store.set('quiz.exam', { exam: d.exam, answers: {}, startedAt: Date.now(), deadline: 0 });     // deadline 0 = 不限时
+  location.hash = '#/exam/run';
+}
+
 function abandonExam() {
   if (!confirm('放弃这场考试？作答不会被记录。')) return;
   store.del('quiz.exam');
@@ -2925,9 +2943,14 @@ function renderExamRun() {
   function tick() {
     const s = store.get('quiz.exam');
     if (!s) { stopExamTimer(); return; }
-    const left = Math.max(0, Math.round((s.deadline - Date.now()) / 1000));
     const el = $('#timer');
     if (!el) { stopExamTimer(); return; }
+    if (!s.deadline) {                     // 不限时（考试模式）：显示已经用了多久
+      const used = Math.round((Date.now() - s.startedAt) / 1000);
+      el.textContent = '用时 ' + String(Math.floor(used / 60)).padStart(2, '0') + ':' + String(used % 60).padStart(2, '0');
+      return;
+    }
+    const left = Math.max(0, Math.round((s.deadline - Date.now()) / 1000));
     el.textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0');
     el.classList.toggle('urgent', left <= 300);
     if (left <= 0) { stopExamTimer(); toast('时间到，自动交卷'); submitExam(true); }
@@ -2974,7 +2997,7 @@ async function submitExam(auto) {
   }
   submitting = true;
   try {
-    const used = Math.round((Math.min(Date.now(), st.deadline) - st.startedAt) / 1000);
+    const used = Math.round(((st.deadline ? Math.min(Date.now(), st.deadline) : Date.now()) - st.startedAt) / 1000);
     const d = await api('/api/exam/submit', { method: 'POST', body: { id: st.exam.id, answers: st.answers, used_seconds: used } });
     store.del('quiz.exam');
     stopExamTimer();
@@ -3005,7 +3028,7 @@ async function viewExamReport(id) {
       '<div class="ring" style="background:conic-gradient(' + color + ' 0 ' + pct + '%, var(--track) ' + pct + '% 100%)">' +
         '<span class="v" style="color:' + color + '">' + pct + '</span></div>' +
       '<h2>' + esc(e.title) + '</h2>' +
-      '<div class="muted">答对 ' + e.correct + '/' + e.total + ' · 用时 ' + fmtDur(e.used_seconds) + '(限时 ' + e.minutes + ' 分钟)· ' + esc(e.finished) + '</div>' +
+      '<div class="muted">答对 ' + e.correct + '/' + e.total + ' · 用时 ' + fmtDur(e.used_seconds) + (e.minutes ? '(限时 ' + e.minutes + ' 分钟)' : '（不限时）') + ' · ' + esc(e.finished) + '</div>' +
       '<div class="report-grid">' +
         (e.by_section || []).map(s => {
           const p = s.total ? Math.round(100 * s.correct / s.total) : 0;

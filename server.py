@@ -344,7 +344,8 @@ class Handler(BaseHTTPRequestHandler):
         if method == 'POST' and path == '/api/exam/start':
             data = self.read_json_body()
             try:
-                e = db.exam_start(data.get('subject') or '', data.get('preset') or 'standard')
+                e = db.exam_start(data.get('subject') or '', data.get('preset') or 'standard',
+                                  data.get('keys') or None, data.get('title') or '', data.get('shuffle', True) is not False)
             except ValueError as ex:
                 return self.send_error_json(str(ex))
             return self.send_json({'ok': True, 'exam': e})

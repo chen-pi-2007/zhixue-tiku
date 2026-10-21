@@ -1,6 +1,6 @@
 {
- "content_version": 79,
- "created": "2026-10-21 11:11:59",
+ "content_version": 80,
+ "created": "2026-10-21 11:26:08",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1571,8 +1571,8 @@
    17784
   ],
   "db.py": [
-   "bbe537554da3249963e104a55eb1dc9a4c03a862698a56a21e486bd05743d6e3",
-   52891
+   "3e385a1536a55102b69372ae5010e3aaaf3530cb3e20947dea682cf89fcacf81",
+   54473
   ],
   "docparse.py": [
    "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
@@ -1587,12 +1587,12 @@
    13051
   ],
   "mobile/local.js": [
-   "315e086bee9709ff96c820829ac636a5483e514cd256b160911763864641e6b8",
-   73070
+   "1ff884253fc005dd3b7981c1e2f09f46f04c9645d21deb00deb46458dde8f958",
+   74402
   ],
   "server.py": [
-   "effd530d6438f8ab49bebda0677e0999fb3d2f14c7308e80ae5ec54f544ac354",
-   34352
+   "89046be674ed24b4d6f8674e1011da164ebf8d6d2fc5ae04c095fad3b8c352da",
+   34477
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "a60957fcb1854347492a0e378c86ff179c2aa0356d57ad9eba33393b5e157108",
-   277820
+   "753b4f2c7f5b5f73abcf6d55cf2057596c7b365d247813fa288d2415d3f38c3b",
+   279685
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "英语配对类（交际对话问答配对、书面表达、信息匹配）改成学习通样式：选项只列一次，每题一排字母点选；完形在原文里用荧光笔标出正在做的空，选的词直接填进原文，提交后按对错上色；错题再考时写明原文第几空",
+ "notes": "新增「考试模式 · 做完再判」：任何一张卷子、任何一个题型都能像学习通考试那样一路做到底，交卷后一起出分数和解析，做错的进错题本（练习方式弹窗里）",
  "py_shell_api": 1,
- "tag": "content-79"
+ "tag": "content-80"
 }

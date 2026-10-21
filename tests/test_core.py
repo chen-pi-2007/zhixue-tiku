@@ -279,6 +279,22 @@ class DbFlowTest(unittest.TestCase):
         # 按老师卷子的分值：单选每题 2.825 分，满分 100
         self.assertEqual(db.dashboard()['exams'][0]['score'], round(2.825, 1))
 
+    def test_scope_exam_judge_after_all(self):
+        """考试模式（做完再判）：一张卷子的题按原顺序做成不限时考试，交卷才判，做错的进错题本"""
+        items = db.practice_set(paper_id=db.list_papers()[0]['id'], shuffle=False)
+        keys = [q['key'] for q in items]
+        e = db.exam_start('', keys=keys, title='卷子 · 考试', shuffle=False)
+        got = [i['key'] for s in e['sections'] for i in s['items']]
+        self.assertEqual(got, [k for k in keys if k in got])            # 原卷顺序
+        self.assertTrue(got and e['minutes'] == 0 and e['title'] == '卷子 · 考试')
+        self.assertTrue(all(i['answer'] == '' for s in e['sections'] for i in s['items']))
+        first = e['sections'][0]['items'][0]
+        r = db.exam_submit(e['id'], {str(first['id']): first['options'][0][0]}, 30)
+        self.assertEqual(r['total'], len(got))
+        self.assertEqual(len(db.wrong_list(0)), len(got) - r['correct'])
+        with self.assertRaises(ValueError):
+            db.exam_start('', keys=['没有这道题'])
+
     def test_hidden_subjects_leave_review_and_wrong_book(self):
         db.upsert_paper('english-1', '英语1', 'english',
                         [{'type': 'single', 'stem': 'e%d' % i, 'options': [['A', '1'], ['B', '2']], 'answer': 'A'}
