@@ -1,6 +1,6 @@
 {
- "content_version": 80,
- "created": "2026-10-21 11:26:08",
+ "content_version": 81,
+ "created": "2026-10-21 11:33:32",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "753b4f2c7f5b5f73abcf6d55cf2057596c7b365d247813fa288d2415d3f38c3b",
-   279685
+   "cd4be1f630c5357972126da68136133ab66ed3806308b770636ae627e64fb24e",
+   280088
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1651,8 +1651,8 @@
    27524
   ],
   "static/style.css": [
-   "73bd1d42323b78ce207ea4be524a436ec855733db6961d355d86ec2463c73555",
-   85985
+   "e23dd4f63654d5b9760884619fb434e00f351583c62d729228df74a60db76357",
+   86275
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增「考试模式 · 做完再判」：任何一张卷子、任何一个题型都能像学习通考试那样一路做到底，交卷后一起出分数和解析，做错的进错题本（练习方式弹窗里）",
+ "notes": "语文的「古诗文划重点」在首页选语文后的题型卡片里也能直接点进去",
  "py_shell_api": 1,
- "tag": "content-80"
+ "tag": "content-81"
 }

@@ -1143,3 +1143,7 @@ mark.hl-3 { --hlc: var(--hl-3); }
 .blank.filled.ok { color: var(--green); border-bottom-color: var(--green); }
 .blank.filled.bad { color: var(--red); border-bottom-color: var(--red); text-decoration: line-through; }
 .blank.filled.on.ok, .blank.filled.on.bad { text-decoration: none; }
+/* 首页 / 科目页题型卡片里的「古诗文划重点」入口 */
+.typebtn.po-entry { text-decoration: none; color: var(--ink); }
+.typebtn.po-entry .tn mark.hl { cursor: inherit; padding: 0 .15em; }
+.typebtn.po-entry .ti { font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", serif; }

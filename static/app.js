@@ -651,7 +651,12 @@ function typeGrid(s, subj) {
       '<span class="tn">' + (TYPE_NAME[t.type] || t.type) + '</span>' +
       '<span class="tc">' + (t.units && t.units < t.total && SELF_TYPES.indexOf(t.type) < 0 ? t.units + ' 篇 · ' : '') + t.total + ' 题 · 掌握 ' + t.mastery + '%' + (t.accuracy != null ? ' · 对 ' + t.accuracy + '%' : '') + '</span>' +
       bar(t.mastery, 'thin') +
-    '</button>').join('') + '</div>';
+    '</button>').join('') +
+    // 语文：古诗文划重点也放在题型卡片里（用户：原来只在科目页和弹窗里，不好找）
+    (subj === 'chinese' ? '<a class="typebtn po-entry" href="#/poems">' +
+      '<span class="ti">记</span><span class="tn"><mark class="hl hl-2 on">古诗文划重点</mark></span>' +
+      '<span class="tc">默写考到的全文 · 考过的句子标出来</span></a>' : '') +
+    '</div>';
 }
 
 // 首页选了某一科时，卷子列表上面先放这一科的题型卡片（手机上没有科目页的入口，这里就是入口）
