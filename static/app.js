@@ -329,6 +329,8 @@ function optCn(q, i) {
   if (!s.replace(CN_HINT, '').replace(/【[^】]*】/g, '').trim()) return '<span class="opt-cn after">' + esc(cnForm(s)) + '</span>';
   return '<span class="opt-cn">' + cnForm(esc(s).replace(CN_HINT, m => '<span class="after">' + m + '</span>')) + '</span>';
 }
+// 行内的一小段中文译文（句中、答案后面），和其他译文一样跟「译」开关走：没开翻译时不显示
+const cnIn = s => s ? '<span class="cn-in">' + s + '</span>' : '';
 function pointBox(q) { return q.point ? '<div class="point-box"><b>知识点</b><div>' + rich(q.point) + '</div></div>' : ''; }
 
 // 某个选项的说明：专门写的“为什么对 / 错”（option_notes），英语没写的话用选项的中文翻译（里面带着语法提示）
@@ -2397,7 +2399,8 @@ function gSwipe(el) {
     if (x0 === null) return;
     const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
     x0 = null;
-    if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) gGo(state.practice.group.cur + (dx < 0 ? 1 : -1));
+    const p = state.practice;
+    if (p && p.group && Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) gGo(p.group.cur + (dx < 0 ? 1 : -1));
   });
 }
 
@@ -2413,7 +2416,8 @@ function groupLeft() {
       div.querySelectorAll('.opt.chip').forEach(c => c.classList.toggle('used', !!used[c.dataset.k] && c !== b));
       const o = b && optionList(q).find(x => x[0] === b.dataset.k);
       const cn = o && ((q.options_cn || [])[optionList(q).indexOf(o)] || '').replace(/[（(【].*$/, '');
-      div.querySelector('.gm-pick').innerHTML = !o ? '' : /见材料/.test(o[1] || '') ? esc(cn) : rich(o[1]);   // 书面表达的选项在图里：显示中文意思
+      // 书面表达的选项在图里：所选那句只能显示中文意思，属于翻译，跟「译」开关走（用户报：没点译就出现中文）
+      div.querySelector('.gm-pick').innerHTML = !o ? '' : /见材料/.test(o[1] || '') ? cnIn(esc(cn)) : rich(o[1]);
     });
   }
   // 完形：选好的词直接填进原文的空里（学习通也是这样），读一遍就知道通不通
@@ -2460,7 +2464,9 @@ function gTap(btn) {
   // 单选选好了：稍停一下跳到后面第一道还没选的小题（都选完了就停在这里）
   let nk = -1;
   for (let i = 1; i < picked.length && nk < 0; i++) { const j = (k + i) % picked.length; if (!picked[j]) nk = j; }
-  if (nk >= 0) setTimeout(() => { if (state.practice === p && !p.answered && p.group.cur === k) gGo(nk); }, 280);
+  // 0.28 秒里可能已经提交、翻到下一篇或单题（p.group 换了 / 没了）：只在还是这一篇时才跳
+  const g = p.group;
+  if (nk >= 0) setTimeout(() => { if (state.practice === p && !p.answered && p.group === g && g.cur === k) gGo(nk); }, 280);
 }
 
 function submitGroup() {
@@ -2527,7 +2533,8 @@ function gradeGroup(replay) {
 
 // 整篇卡片的键盘：← → 切小题，1-6 / A-F 给当前小题选选项，回车提交 / 下一篇
 function groupKey2(e) {
-  const p = state.practice, g = p.group;
+  const p = state.practice, g = p && p.group;
+  if (!g) return;
   if (e.key === 'ArrowLeft') return gGo(g.cur - 1);
   if (e.key === 'ArrowRight') return gGo(g.cur + 1);
   if (e.key === 'Enter') { e.preventDefault(); return p.answered ? nextQ() : submitGroup(); }
@@ -3191,12 +3198,12 @@ function rcAnsTexts(q) {
   return optionList(q).filter(o => (q.answer || '').indexOf(o[0]) >= 0).map(o => o[1]);
 }
 function rcAnsLabel(q) {
-  // 答案的“内容”：选项文字；选项文字在材料图里（“见材料”）的，用中文释义
+  // 答案的“内容”（返回 HTML）：选项文字；选项文字在材料图里（“见材料”）的，显示字母，中文释义跟「译」开关
   return optionList(q).filter(o => (q.answer || '').indexOf(o[0]) >= 0).map(o => {
     const i = optionList(q).indexOf(o);
-    if (/见材料/.test(o[1])) return (q.options_cn && q.options_cn[i] && cnForm(q.options_cn[i])) || o[1];
-    return o[1];
-  }).join('；') || q.answer;
+    if (/见材料/.test(o[1])) return esc(o[0]) + ' ' + cnIn(esc(cnForm((q.options_cn && q.options_cn[i]) || '')));
+    return rich(o[1]);
+  }).join('；') || esc(q.answer);
 }
 // 单选：把答案填进题干的空里（“A; B”两空的按顺序填）。填不进去返回 null
 function rcFillStem(q) {
@@ -3517,7 +3524,7 @@ function rcBody(g) {
     const rest = g.filter(q => !used[(q.stem.match(/第(\d+)空/) || [])[1]]);
     return '<div class="material-box"><div class="material-body">' + rcMark(rich(mat)) + '</div>' + materialCn(q0) + '</div>' +
       (rest.length ? '<div class="rc-list">' + rest.map(q => '<div class="rc-row"><span class="rc-k">' + esc(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
-        '<b class="rc-ans">' + rich(q.answer + '　' + rcAnsLabel(q)) + '</b></div>').join('') + '</div>' : '') +
+        '<b class="rc-ans">' + esc(q.answer) + '　' + rcAnsLabel(q) + '</b></div>').join('') + '</div>' : '') +
       rcPoints(g);
   }
   // 配对题、阅读匹配：一问一答
@@ -3525,7 +3532,7 @@ function rcBody(g) {
   const mat = q0.material ? materialBox(q0) : '';
   if (shared && q0.type !== 'judge') {
     return mat + '<div class="rc-list">' + g.map(q => '<div class="rc-row"><span class="rc-k">' + q.qno + '. ' + rich(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
-      '<b class="rc-ans">→ ' + rich(rcAnsLabel(q)) + '</b></div>').join('') + '</div>' + rcPoints(g);
+      '<b class="rc-ans">→ ' + rcAnsLabel(q) + '</b></div>').join('') + '</div>' + rcPoints(g);
   }
   // 阅读理解等：材料 + 每题问题和答案
   if (g.length > 1 || q0.material) {
@@ -3542,14 +3549,14 @@ function rcOne(q, inGroup) {
       const on = (q.answer || '').indexOf(o[0]) >= 0;
       const cn = (q.options_cn && q.options_cn[i]) || '';
       return '<div class="rc-row' + (on ? ' rc-hit' : '') + '"><span class="rc-k">' + rich(o[1]) + '</span>' +
-        (on ? '<b class="rc-ans">' + esc(cn) + '（读音不同）</b>' : '<span class="muted rc-more">' + esc(cn) + '</span>') + '</div>';
+        (on ? '<b class="rc-ans">' + cnIn(esc(cn)) + '（读音不同）</b>' : '<span class="muted rc-more">' + cnIn(esc(cn)) + '</span>') + '</div>';
     }).join('') + '</div>' + rcPoints([q]);
   }
   const filled = rcFillStem(q);
   if (filled) return '<div class="stem">' + num + rcMark(rich(filled)) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' peek', ' ') + '</div>' + rcPoints([q]);
-  const label = q.type === 'judge' ? q.answer : (q.type === 'multi' || q.type === 'single' ? rcAnsLabel(q) : q.answer);
+  const label = q.type === 'multi' || q.type === 'single' ? rcAnsLabel(q) : rich(q.answer);
   return '<div class="stem">' + num + rich(q.stem) + '</div>' + '<div class="rc-more">' + stemCn(q).replace(' peek', ' ') + '</div>' +
-    '<div class="rc-row"><span class="rc-k">答案</span><b class="rc-ans">' + rich(label) + '</b></div>' + rcPoints([q]);
+    '<div class="rc-row"><span class="rc-k">答案</span><b class="rc-ans">' + label + '</b></div>' + rcPoints([q]);
 }
 
 function rcPoints(g) {

@@ -649,6 +649,8 @@ body.subpage #side, body.subpage #topbar { display: none; }
 body.subpage main { max-width: none; }
 body.subpage .page-h { position: sticky; top: 0; z-index: 50; height: var(--top); margin: -22px -28px 22px; padding: 0 28px 0 16px; gap: 2px; font-weight: 600;
   background: var(--layer-1); border-bottom: 1px solid var(--line); font-size: 18px; }
+/* 手机上的边距要跟 main 的 12px 对上（上面 760px 媒体查询里那条写在前面、被这里盖掉了，标题左右各多出 16px，设置页能左右晃） */
+@media (max-width: 760px) { body.subpage .page-h { margin: -14px -12px 14px; padding: 0 12px 0 4px; font-size: 17px; } }
 body.subpage .page-back { display: inline-flex; margin-left: 0; }
 body.subpage .set-page { margin: 0 auto; }
 .set-group-t { margin: 22px 4px 8px; font-size: 13px; color: var(--ink-3); }
@@ -1113,6 +1115,8 @@ mark.hl-3 { --hlc: var(--hl-3); }
 .mbank-ph .mbank-t .opt-cn { display: inline; margin: 0; font-size: 14px; color: var(--ink-2); }
 .cn-off .mbank-ph { display: none; }
 .cn-off .cn-show .mbank-ph { display: block; }
+.cn-off .cn-in { display: none; }
+.cn-off .cn-show .cn-in { display: inline; }
 .gq-m { padding: 14px 4px 14px 0; border-bottom: 1px solid var(--line); }
 .gq-m:last-child { border-bottom: 0; }
 .gm-row { display: flex; align-items: baseline; gap: 12px; }

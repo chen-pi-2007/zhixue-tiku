@@ -1,6 +1,6 @@
 {
- "content_version": 84,
- "created": "2026-10-21 21:21:16",
+ "content_version": 85,
+ "created": "2026-10-21 22:21:37",
  "files": {
   "data/bank.json": [
    "c0f96625215e1b27be24f3c8928e8dd5764ea054d422e7dbdf8238fe777bb33e",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "b6c9e448290956a9fb5e7d2aea555c69b78195a035955d7803296f45d0b3b8cc",
-   284053
+   "793c2c052fd7e268fa8c48adfda7188ff9edbcff4a6c254d0b92408692dd3c69",
+   284611
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1651,8 +1651,8 @@
    27524
   ],
   "static/style.css": [
-   "aae8d837c85f23028a809651abc0ba6a002f571eba67e54549df3be4dbf8c877",
-   87761
+   "890a768364f757c74a3ac75c7de64b72e4c1a1f3edc928abc424518710bb663e",
+   88139
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "判对错、完形填词、成绩报告加了简短的动画（不影响下一题）；完形原文里的空改成定宽格子，填词时文章不再跳动，当前空改成灰底；成绩报告排版优化，考试模式可「再考一遍」；双击确认后马上点答案不再要点两次",
+ "notes": "修复：书面表达选了答案后，没点「译」也显示中文；背题里语音题的词义、书面表达答案的中文也改成跟「译」走；手机上设置页能左右晃；手机上整篇卡片快速提交翻页时偶尔报错",
  "py_shell_api": 1,
- "tag": "content-84"
+ "tag": "content-85"
 }
