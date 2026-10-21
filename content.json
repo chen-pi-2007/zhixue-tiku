@@ -1,6 +1,6 @@
 {
- "content_version": 76,
- "created": "2026-10-20 19:10:25",
+ "content_version": 77,
+ "created": "2026-10-21 10:30:27",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,20 +1635,24 @@
    3659
   ],
   "static/app.js": [
-   "013be69e4f13c1a2fe48b8e073d13b67f4aeb822ad41e23b2add415f6eb1fccf",
-   259606
+   "57b6f47d1b13389dc19106bdbbfcc59f29c59d0926f182bd8d740f9cc061b7da",
+   268261
   ],
   "static/index.html": [
    "2f68f8401c8b124d1af8f80a62da1fc405ca54abed685ba515c261d2d924f1ad",
    7148
+  ],
+  "static/poems.js": [
+   "0541006986f3c26a0911969d0c7241bbecbeb9e2b46321babcd69c3881ccb1d4",
+   5821
   ],
   "static/skills.js": [
    "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
    27524
   ],
   "static/style.css": [
-   "5f8935f171a749713fbe7c5085451ce4b52e9f1ad01dc88d7d82dfb926a0e4dc",
-   75494
+   "3a74654e11c188393ddd45e612721ba3fcace9f6d2dde87cd93df8975f193181",
+   80318
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1661,7 +1665,7 @@
  },
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "完形等并排的短选项不再把单词从中间截断（手机调大字体也一样）；提示不再一条条叠起来；网页版：新登录页、断网弱网也能做题、联网自动补传、图片路径修正",
+ "notes": "语文新增「古诗文划重点」：默写考到的 6 篇古诗文全文，所有卷子考过的句子用荧光笔画出来（考得越多颜色越深），点句子看是哪几张卷子考的，可以遮住考点自己默一遍",
  "py_shell_api": 1,
- "tag": "content-76"
+ "tag": "content-77"
 }

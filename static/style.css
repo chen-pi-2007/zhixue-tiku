@@ -1010,3 +1010,62 @@ body.login-page #side, body.login-page #top-set, body.login-page #top-days { dis
 .web-net { margin-left: 10px; height: 28px; padding: 0 12px; border: 0; border-radius: 9999px; background: var(--layer-2); color: var(--ink-2); font: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
 .web-net.off { background: rgba(255, 183, 0, .16); color: var(--yellow); }
 body.login-page .web-net { display: none; }
+
+/* ---------------------------------------------------------------- 古诗文划重点（#/poems） */
+:root { --hl-1: rgba(255, 221, 64, .55); --hl-2: rgba(255, 206, 38, .75); --hl-3: rgba(255, 174, 28, .78); }
+/* 深色：半透明黄压在深灰上发脏，改成真荧光笔那样亮色整块涂满、字变深色 */
+[data-theme="dark"] { --hl-1: #f3d464; --hl-2: #ffc53d; --hl-3: #ffa940; }
+[data-theme="dark"] mark.hl { background-position: 0 50%; background-size: 0 100%; }
+[data-theme="dark"] .drawn mark.hl, [data-theme="dark"] mark.hl.on, [data-theme="dark"] .po-hide mark.hl { background-size: 100% 100%; color: #1f1f1f; }
+[data-theme="dark"] .po-hide mark.hl:not(.open) { color: transparent; }
+.po-hero { padding: 22px 24px; }
+.po-hero-t { font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", serif; font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+.po-hero-d { color: var(--ink-2); font-size: 13.5px; margin-top: 4px; }
+.po-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 13px; color: var(--ink-2); }
+.po-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.po-tools .seg { display: inline-flex; padding: 3px; border-radius: 9999px; background: var(--layer-2); }
+.po-tools .seg button { height: 30px; padding: 0 14px; border: 0; border-radius: 9999px; background: none; color: var(--ink-2); font: inherit; font-size: 13.5px; cursor: pointer; }
+#po-reset[hidden] { display: none; }
+.po-tools .seg button.on { background: var(--fill); color: var(--fill-ink); }
+.po-nav { display: flex; gap: 8px; margin-top: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.po-nav::-webkit-scrollbar { display: none; }
+.po-nav a { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 9999px; background: var(--layer-2); color: var(--ink); font-size: 13px; text-decoration: none; }
+.po-nav a i { font-style: normal; font-size: 11px; color: var(--ink-3); }
+.po-card { position: relative; padding: 22px 26px 26px; scroll-margin-top: 70px; }
+.po-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.po-t { font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", serif; font-size: 22px; font-weight: 700; }
+.po-a { color: var(--ink-3); font-size: 13px; margin-top: 3px; }
+.po-stat { flex: none; font-size: 12.5px; color: var(--ink-2); background: var(--layer-2); border-radius: 9999px; padding: 3px 10px; }
+.po-stat b { color: var(--ink); }
+.po-body { font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", "Songti SC", serif; font-size: 19px; line-height: 2.3; color: var(--ink); }
+.po-body:not(.prose) { text-align: center; }
+.po-line { white-space: pre-wrap; }
+.po-gap { height: 14px; }
+.po-p { margin: 0 0 6px; text-indent: 2em; text-align: justify; }
+/* 荧光笔：一条斜着的半透明色带，卡片滚进屏幕时从左往右画出来（--d 是第几笔，依次延迟） */
+mark.hl { color: inherit; background-color: transparent; padding: 0 .1em; margin: 0 -.05em; border-radius: .35em .2em .4em .25em;
+  background-image: linear-gradient(100deg, transparent 0, var(--hlc) .25em, var(--hlc) calc(100% - .25em), transparent 100%);
+  background-repeat: no-repeat; background-position: 0 85%; background-size: 0 64%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  transition: background-size .5s cubic-bezier(.3, .7, .3, 1) calc(var(--d, 0) * 70ms), color .25s; cursor: pointer; }
+mark.hl-1 { --hlc: var(--hl-1); }
+mark.hl-2 { --hlc: var(--hl-2); }
+mark.hl-3 { --hlc: var(--hl-3); }
+.drawn mark.hl, mark.hl.on { background-size: 100% 64%; }
+.hl-n { font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; color: #d48806; margin-left: 1px; }
+[data-theme="dark"] .hl-n { color: #ffc53d; }
+.po-ctx { text-decoration: underline dashed var(--ink-3); text-decoration-thickness: 1px; text-underline-offset: .4em; }
+/* 遮住考点：只剩色带，点一下揭开 */
+.po-hide mark.hl { color: transparent; background-size: 100% 64%; transition: color .25s; }
+.po-hide mark.hl.open { color: inherit; }
+.po-hide mark.hl:not(.open) { background-image: linear-gradient(var(--hlc), var(--hlc)); }
+.po-tip { position: absolute; z-index: 5; min-width: 150px; max-width: 260px; padding: 10px 12px; border-radius: 10px; background: var(--fill); color: var(--fill-ink);
+  font-size: 13px; line-height: 1.8; box-shadow: var(--pop); }
+.po-tip b { display: block; font-size: 12px; opacity: .7; font-weight: 600; }
+@media (max-width: 760px) {
+  .po-hero { padding: 18px; }
+  .po-hero-t { font-size: 21px; }
+  .po-card { padding: 18px 16px 20px; }
+  .po-body { font-size: 17.5px; line-height: 2.2; }
+  .po-t { font-size: 20px; }
+}

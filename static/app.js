@@ -479,13 +479,13 @@ const state = {
 };
 
 const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: viewWrong,
-                 practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers };
+                 practice: viewPractice, exam: viewExam, upload: viewUpload, answers: viewAnswers, poems: viewPoems };
 
 function route() {
   if (IS_WEB && !state.webUser) return webGate();
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
   const name = routes[parts[0]] ? parts[0] : 'home';
-  const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home' };
+  const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home', poems: 'home' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
   document.body.classList.toggle('subpage', name === 'settings');   // 手机上设置是二级页面：收起底下的导航，标题带返回
   document.body.classList.toggle('workpage', name === 'practice' || name === 'recite');   // 手机上做题 / 背题页：按钮条固定在屏幕最底下（style.css）
@@ -848,6 +848,7 @@ async function viewSubject(args) {
         (s.wrong_open ? '<button class="btn danger" onclick="startPractice({subject:\'' + subj + '\',scope:\'wrongmix\',title:\'' + name + '·错题\'})">错题重练(' + s.wrong_open + ')</button>' : '') +
         (subj !== 'general' ? '<a class="btn ghost" href="#/exam/new/' + subj + '">模拟考</a>' : '') +
         '<button class="btn ghost" onclick="goBank(0,\'' + subj + '\')">浏览题目</button>' +
+        (subj === 'chinese' ? '<a class="btn ghost" href="#/poems">古诗文划重点</a>' : '') +
         (IS_APP || !papers.length ? '' : '<button class="btn ghost" onclick="openExportSheet(' + esc(JSON.stringify(papers.map(p => p.key))) + ')">导出 Word</button>') +
       '</div>' +
     '</div>' +
@@ -886,6 +887,151 @@ async function delPaper(pid, name) {
     toast('已删除');
     route();
   } catch (e) { toast(e.message, 'bad'); }
+}
+
+/* ================================================================ 古诗文划重点
+   用户要求（2026-10-20）：语文默写考到的古诗文全文都列出来，像荧光笔一样把所有卷子考过的句子画出来。
+   全文在 static/poems.js（进这页才加载）；考点从题库的默写题实时算：要默写的句子 = 荧光笔（考得越多颜色越深，
+   旁边小字是考过几次），题目里给出的上下句 = 虚线。点画出来的句子看是哪几张卷子的第几题；
+   「遮住考点」把要默写的句子盖住，点一下揭开，自己先默一遍再看。 */
+const PO_HIDE = 'zx.poems.hide';
+function loadPoems() {
+  if (window.ZX_POEMS) return Promise.resolve(window.ZX_POEMS);
+  return new Promise((ok, bad) => {
+    const sc = document.createElement('script');
+    sc.src = 'poems.js' + (window.ZX_WEB ? '?v=' + window.ZX_WEB.v : '');
+    sc.onload = () => ok(window.ZX_POEMS || []);
+    sc.onerror = () => { sc.remove(); bad(new Error('全文没加载出来，检查一下网络再进来')); };
+    document.head.appendChild(sc);
+  });
+}
+
+// 每篇每个字：被哪些题当答案考过（ans）、是不是题目给出的上下句（ctx）
+function poemMarks(poems, qs) {
+  const info = poems.map(p => ({ p: p, ans: p.text.split('').map(() => null), ctx: p.text.split('').map(() => 0), qs: [] }));
+  qs.forEach(q => {
+    const it = info.find(x => q.stem.indexOf(x.p.match) >= 0);
+    if (!it) return;
+    it.qs.push(q);
+    const mark = (str, fn) => {
+      const i = it.p.text.indexOf(str);
+      if (i < 0) { console.warn('古诗文划重点：原文里找不到', it.p.t, str); return; }
+      for (let k = i; k < i + str.length; k++) fn(k);
+    };
+    String(q.answer || '').split(/\s*\/\s*/).filter(Boolean)
+      .forEach(a => mark(a, k => { (it.ans[k] = it.ans[k] || []).push(q); }));
+    q.stem.replace(/（[^（）]*《[^》]*》[^（）]*）\s*$/, '').split(/[▲，。；、,.;：:！？!?“”"\s]+/)
+      .filter(g => g.length >= 2 && g.indexOf('《') < 0).forEach(g => mark(g, k => { it.ctx[k] = 1; }));
+  });
+  return info;
+}
+
+const poQName = q => q.paper_name.replace(/^《语文》/, '') + ' 第' + q.qno + '题';
+function poemHtml(it, tips) {
+  const t = it.p.text;
+  let html = '', d = 0;
+  const run = (from, to) => {                     // 一行里按“考没考、被哪几道题考”切段
+    let i = from;
+    while (i < to) {
+      const a = it.ans[i], sig = a ? 'a' + a.map(q => q.id).join(',') : it.ctx[i] ? 'c' : '';
+      let j = i + 1;
+      while (j < to && (it.ans[j] ? 'a' + it.ans[j].map(q => q.id).join(',') : it.ctx[j] ? 'c' : '') === sig) j++;
+      const txt = esc(t.slice(i, j));
+      if (a) {
+        const n = a.length;
+        tips.push(a);
+        html += '<mark class="hl hl-' + Math.min(n, 3) + '" data-tip="' + (tips.length - 1) + '" style="--d:' + Math.min(d++, 24) + '">' + txt + '</mark>' +
+          (n > 1 ? '<sup class="hl-n">' + n + '</sup>' : '');
+      } else html += sig === 'c' ? '<span class="po-ctx">' + txt + '</span>' : txt;
+      i = j;
+    }
+  };
+  let at = 0;
+  t.split('\n').forEach(line => {
+    if (!line) html += '<div class="po-gap"></div>';
+    else { html += it.p.prose ? '<p class="po-p">' : '<div class="po-line">'; run(at, at + line.length); html += it.p.prose ? '</p>' : '</div>'; }
+    at += line.length + 1;
+  });
+  return html;
+}
+
+async function viewPoems() {
+  app.innerHTML = '<div class="empty">加载中…</div>';
+  let poems, qs;
+  try {
+    poems = await loadPoems();
+    qs = (await api('/api/questions?subject=chinese&type=dictation&limit=200')).items;
+  } catch (e) { app.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+  const info = poemMarks(poems, qs).filter(it => it.qs.length);
+  const tips = [];
+  const papers = new Set(qs.map(q => q.paper_id)).size;
+  const cards = info.map((it, i) =>
+    '<section class="card po-card" id="po-' + i + '">' +
+      '<header class="po-head"><div><div class="po-t">' + esc(it.p.t) + '</div>' +
+        '<div class="po-a">' + esc(it.p.d) + ' · ' + esc(it.p.a) + '</div></div>' +
+        '<div class="po-stat">考过 <b>' + it.qs.length + '</b> 题</div></header>' +
+      '<div class="po-body' + (it.p.prose ? ' prose' : '') + '">' + poemHtml(it, tips) + '</div>' +
+    '</section>').join('');
+  const nSent = tips.length;
+  let hide = false;
+  try { hide = localStorage.getItem(PO_HIDE) === '1'; } catch (e) { /* ignore */ }
+  app.innerHTML =
+    '<div class="crumb"><a href="#/home">首页</a> / <a href="#/subject/chinese">语文</a> / 古诗文划重点</div>' +
+    '<div class="card po-hero">' +
+      '<div class="po-hero-t">古诗文默写 · 全文划重点</div>' +
+      '<div class="po-hero-d">' + info.length + ' 篇 · ' + papers + ' 张卷子考过 ' + qs.length + ' 题 · 画出 ' + nSent + ' 处要默写的句子</div>' +
+      '<div class="po-legend"><span><mark class="hl hl-1 on">考过一次</mark></span><span><mark class="hl hl-3 on">考过多次</mark><sup class="hl-n">3</sup></span>' +
+        '<span><span class="po-ctx">题目给出的上下句</span></span></div>' +
+      '<div class="po-tools"><div class="seg" id="po-mode">' +
+        '<button data-m="0"' + (hide ? '' : ' class="on"') + '>看全文</button><button data-m="1"' + (hide ? ' class="on"' : '') + '>遮住考点</button></div>' +
+        '<button class="btn ghost sm" id="po-reset"' + (hide ? '' : ' hidden') + '>全部重新遮住</button></div>' +
+      '<div class="po-nav">' + info.map((it, i) => '<a href="javascript:void(0)" data-go="' + i + '">' + esc(it.p.t.replace(/（节选）/, '')) + '<i>' + it.qs.length + '</i></a>').join('') + '</div>' +
+    '</div>' +
+    '<div class="po-list' + (hide ? ' po-hide' : '') + '" id="po-list">' + cards + '</div>';
+
+  const list = $('#po-list');
+  // 荧光笔：卡片滚进屏幕时一笔笔画出来
+  const draw = el => el.classList.add('drawn');
+  if (window.IntersectionObserver) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { draw(e.target); io.unobserve(e.target); } }), { threshold: .15 });
+    $$('.po-card').forEach(c => io.observe(c));
+  } else $$('.po-card').forEach(draw);
+
+  const tipBox = document.createElement('div');
+  tipBox.className = 'po-tip';
+  tipBox.hidden = true;
+  const closeTip = () => { tipBox.hidden = true; };
+  app.querySelector('.po-hero').addEventListener('click', e => {
+    const m = e.target.closest('#po-mode button');
+    if (m) {
+      const h = m.dataset.m === '1';
+      $$('#po-mode button').forEach(b => b.classList.toggle('on', b === m));
+      list.classList.toggle('po-hide', h);
+      $$('#po-list mark.open').forEach(x => x.classList.remove('open'));
+      $('#po-reset').hidden = !h;
+      try { localStorage.setItem(PO_HIDE, h ? '1' : '0'); } catch (err) { /* ignore */ }
+      closeTip();
+      return;
+    }
+    if (e.target.closest('#po-reset')) { $$('#po-list mark.open').forEach(x => x.classList.remove('open')); return; }
+    const g = e.target.closest('[data-go]');
+    if (g) { const c = $('#po-' + g.dataset.go); draw(c); c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  list.addEventListener('click', e => {
+    const m = e.target.closest('mark.hl');
+    if (!m) return closeTip();
+    if (list.classList.contains('po-hide') && !m.classList.contains('open')) { m.classList.add('open'); closeTip(); return; }
+    const qsOf = tips[+m.dataset.tip];
+    const card = m.closest('.po-card');
+    tipBox.innerHTML = '<b>' + (qsOf.length > 1 ? '考过 ' + qsOf.length + ' 次' : '考过 1 次') + '</b>' +
+      qsOf.map(q => '<div>' + esc(poQName(q)) + '</div>').join('');
+    card.appendChild(tipBox);
+    tipBox.hidden = false;
+    const r = m.getBoundingClientRect(), c = card.getBoundingClientRect();
+    const w = tipBox.offsetWidth;
+    tipBox.style.left = Math.max(8, Math.min(c.width - w - 8, r.left - c.left + r.width / 2 - w / 2)) + 'px';
+    tipBox.style.top = (r.bottom - c.top + 8) + 'px';
+  });
 }
 
 function goBank(pid, subject) {
@@ -1845,6 +1991,9 @@ async function openModeSheet(src, name) {
         '<div class="sheet-d">不用选，直接看题目和答案内容，记住答案本身，选项怎么打乱都不怕。每题点「记住了 / 没记住」，没记住的会进复习。</div>' +
         '<div class="sheet-row"><button class="btn ghost" data-act="rc-seq">按顺序背</button>' +
         '<button class="btn ghost" data-act="rc-rand">打乱背</button></div></div>' +
+      (src.type === 'dictation' || /^chinese-/.test(src.paper_key || '') ? '<div class="sheet-sec"><div class="sheet-t">古诗文划重点</div>' +
+        '<div class="sheet-d">默写考到的古诗文全文都列出来，所有卷子考过的句子用荧光笔画出来，考得越多颜色越深；还能遮住考点自己默一遍。</div>' +
+        '<button class="btn ghost block" data-act="poems">打开古诗文划重点</button></div>' : '') +
       // 自己导入的卷子（upload-…）：缺答案的题练习时跳过，在这里进导入整理台补上
       (!IS_APP && /^upload-/.test(src.paper_key || '') ? '<div class="sheet-sec"><div class="sheet-t">答案 / 题目</div>' +
         '<div class="sheet-d">' + (src.missing ? '这张卷子有 <b>' + src.missing + '</b> 题还没有答案，练习时会先跳过，填上就能练。' : '自己导入的卷子，答案和题目都可以改。') +
@@ -1871,6 +2020,7 @@ async function openModeSheet(src, name) {
     if (act === 'wd-many') return openExportSheet([src.paper_key]);
     if (act === 'edit') { location.hash = '#/upload/' + src.paper_id; return; }
     if (act === 'answers') { location.hash = '#/answers/' + src.paper_id; return; }
+    if (act === 'poems') { location.hash = '#/poems'; return; }
     if (act === 'continue') loadSave(autoKeyOf(key));
     else if (act === 'resume') loadSave(key);
     else if (act === 'mix-continue') loadSave(autoKeyOf(mixKey));
