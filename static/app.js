@@ -991,7 +991,8 @@ async function viewPoems() {
         '<span><span class="po-ctx">题目给出的上下句</span></span></div>' +
       '<div class="po-tools"><div class="seg" id="po-mode">' +
         '<button data-m="0"' + (hide ? '' : ' class="on"') + '>看全文</button><button data-m="1"' + (hide ? ' class="on"' : '') + '>遮住考点</button></div>' +
-        '<button class="btn ghost sm" id="po-reset"' + (hide ? '' : ' hidden') + '>全部重新遮住</button></div>' +
+        // 遮住模式下点开过几句才出现：一键把点开的再盖回去，重新默一遍（原来一直显示，用户看不懂它干嘛的）
+        '<button class="btn ghost sm" id="po-reset" hidden></button></div>' +
       '<div class="po-nav">' + info.map((it, i) => '<a href="javascript:void(0)" data-go="' + i + '">' + esc(it.p.t.replace(/（节选）/, '')) + '<i>' + it.qs.length + '</i></a>').join('') + '</div>' +
     '</div>' +
     '<div class="po-list' + (hide ? ' po-hide' : '') + '" id="po-list">' + cards + '</div>';
@@ -1008,6 +1009,11 @@ async function viewPoems() {
   tipBox.className = 'po-tip';
   tipBox.hidden = true;
   const closeTip = () => { tipBox.hidden = true; };
+  const syncReset = () => {
+    const n = $$('#po-list mark.open').length, b = $('#po-reset');
+    b.hidden = !n;
+    b.textContent = '把点开的 ' + n + ' 句重新遮住';
+  };
   app.querySelector('.po-hero').addEventListener('click', e => {
     const m = e.target.closest('#po-mode button');
     if (m) {
@@ -1015,19 +1021,19 @@ async function viewPoems() {
       $$('#po-mode button').forEach(b => b.classList.toggle('on', b === m));
       list.classList.toggle('po-hide', h);
       $$('#po-list mark.open').forEach(x => x.classList.remove('open'));
-      $('#po-reset').hidden = !h;
+      syncReset();
       try { localStorage.setItem(PO_HIDE, h ? '1' : '0'); } catch (err) { /* ignore */ }
       closeTip();
       return;
     }
-    if (e.target.closest('#po-reset')) { $$('#po-list mark.open').forEach(x => x.classList.remove('open')); return; }
+    if (e.target.closest('#po-reset')) { $$('#po-list mark.open').forEach(x => x.classList.remove('open')); syncReset(); return; }
     const g = e.target.closest('[data-go]');
     if (g) { const c = $('#po-' + g.dataset.go); draw(c); c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
   list.addEventListener('click', e => {
     const m = e.target.closest('mark.hl');
     if (!m) return closeTip();
-    if (list.classList.contains('po-hide') && !m.classList.contains('open')) { m.classList.add('open'); closeTip(); return; }
+    if (list.classList.contains('po-hide') && !m.classList.contains('open')) { m.classList.add('open'); syncReset(); closeTip(); return; }
     const qsOf = tips[+m.dataset.tip];
     const card = m.closest('.po-card');
     tipBox.innerHTML = '<b>' + (qsOf.length > 1 ? '考过 ' + qsOf.length + ' 次' : '考过 1 次') + '</b>' +

@@ -1,6 +1,6 @@
 {
- "content_version": 81,
- "created": "2026-10-21 11:33:32",
+ "content_version": 82,
+ "created": "2026-10-21 15:48:13",
  "files": {
   "data/bank.json": [
    "6b5e3101ee25f642a2b5f7c6b34937f2fef9cb592fe6a15e6afe1fb87f0cbc04",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "cd4be1f630c5357972126da68136133ab66ed3806308b770636ae627e64fb24e",
-   280088
+   "4d977704f400f7a925636d5efd0812fae430885d4cd048e8c5f1b7cf08820e30",
+   280394
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "语文的「古诗文划重点」在首页选语文后的题型卡片里也能直接点进去",
+ "notes": "古诗文划重点：「重新遮住」按钮只在点开过句子后出现，写明会遮回几句",
  "py_shell_api": 1,
- "tag": "content-81"
+ "tag": "content-82"
 }
