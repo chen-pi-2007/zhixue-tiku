@@ -281,7 +281,26 @@ select option, select optgroup { background-color: var(--layer-1); color: var(--
 .home-types { margin-top: 18px; }
 .home-types .sec-h { margin: 0 0 10px; font-size: 15px; }
 .home-types .typegrid + .sec-h { margin-top: 20px; }
-.bank-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; }
+/* 搜索结果的工具条：滑下去也一直在顶上（找到几题、跳到第几题、全部显示答案、练这些题） */
+.bank-bar { position: sticky; top: var(--top); z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 4px 0 12px;
+  padding: 8px 0; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bank-bar .spacer { flex: 1; }
+.bank-jump { display: inline-flex; align-items: center; gap: 6px; }
+.bank-jump .inp { width: 84px; height: 30px; padding: 0 8px; }
+.bank-no { flex: none; min-width: 26px; height: 24px; padding: 0 6px; border-radius: 6px; background: var(--fill); color: var(--fill-ink);
+  font-size: 13px; line-height: 24px; text-align: center; }
+/* 手机上挤成一行：“找到 N 题”不显示（「练这 N 题」里有），按钮字缩短 */
+@media (max-width: 760px) {
+  .bank-bar { flex-wrap: nowrap; gap: 6px; }
+  .bank-bar .bank-n, .bank-bar .wide { display: none; }
+  .bank-jump .inp { width: 58px; }
+  .bank-bar .chip, .bank-bar .btn { white-space: nowrap; }
+}
+.qh-btn { flex: none; height: 24px; min-width: 28px; padding: 0 8px; border: 0; border-radius: 5px; background: var(--layer-2); color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; }
+.qh-btn:hover { background: var(--layer-3); }
+.qh-btn.on { background: var(--fill); color: var(--fill-ink); }
+.card.jump-hit { animation: jump-hit 1.2s ease-out; }
+@keyframes jump-hit { 0%, 30% { box-shadow: 0 0 0 2px var(--ink-2); } 100% { box-shadow: 0 0 0 2px transparent; } }
 .sec-links { display: flex; gap: 16px; font-size: 13px; font-weight: 400; }
 .sec-links a { color: var(--ink-2); }
 .sec-links .danger-link { color: var(--red); }

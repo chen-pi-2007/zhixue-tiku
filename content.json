@@ -1,6 +1,6 @@
 {
- "content_version": 85,
- "created": "2026-10-21 22:21:37",
+ "content_version": 86,
+ "created": "2026-10-22 14:14:09",
  "files": {
   "data/bank.json": [
    "c0f96625215e1b27be24f3c8928e8dd5764ea054d422e7dbdf8238fe777bb33e",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "793c2c052fd7e268fa8c48adfda7188ff9edbcff4a6c254d0b92408692dd3c69",
-   284611
+   "bb23ae24338b52b32e80006b8001be575c040216cc893a33f9c0931aa50ac32e",
+   290153
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1651,8 +1651,8 @@
    27524
   ],
   "static/style.css": [
-   "890a768364f757c74a3ac75c7de64b72e4c1a1f3edc928abc424518710bb663e",
-   88139
+   "6b2ed5534fe5cbb7d9a5efc93b5091bc60b930101037e6f3ae2494ac690765e5",
+   89560
   ],
   "static/word.js": [
    "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "修复：书面表达选了答案后，没点「译」也显示中文；背题里语音题的词义、书面表达答案的中文也改成跟「译」走；手机上设置页能左右晃；手机上整篇卡片快速提交翻页时偶尔报错",
+ "notes": "搜索题目：每道题可以单独看答案；顶上工具条一直在（跳到第几题、全部显示答案、练这些题）；题号放大；切出去再回来还在刚才那一题；滑到底自动加载",
  "py_shell_api": 1,
- "tag": "content-85"
+ "tag": "content-86"
 }

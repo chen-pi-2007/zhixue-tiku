@@ -498,7 +498,7 @@ function jsq(s) { return JSON.stringify(s == null ? '' : s).replace(/"/g, '&quot
 /* ================================================================ 路由 */
 
 const state = {
-  bank: { paper_id: 0, subject: '', type: '', q: '', showAns: false, offset: 0, items: [], total: 0, papers: [] },
+  bank: { paper_id: 0, subject: '', type: '', q: '', showAns: false, offset: 0, items: [], total: 0, papers: [], revealed: {}, anchor: null },
   wrongTab: 0,
   wrongSubject: '',
   practice: null,
@@ -521,6 +521,7 @@ function route() {
   if (name === 'settings') {
     if (WORK_PAGES[state.lastPage] && WORK_PAGES[state.lastPage]()) state.backTo = '#/' + state.lastPage;
   } else state.backTo = null;
+  if (state.lastPage === 'bank' && name !== 'bank') bankSaveAnchor();
   window.scrollTo(0, 0);
   // 换页时淡入一下（同一页内重绘不播放）
   if (name !== state.lastPage) {
@@ -1060,7 +1061,7 @@ async function viewPoems() {
 }
 
 function goBank(pid, subject) {
-  Object.assign(state.bank, { paper_id: pid || 0, subject: subject || '', offset: 0, items: [], papers: [] });
+  Object.assign(state.bank, { paper_id: pid || 0, subject: subject || '', offset: 0, items: [], papers: [], revealed: {}, anchor: null });
   location.hash = '#/bank';
 }
 
@@ -1597,7 +1598,6 @@ async function viewBank() {
         plist.map(p => '<option value="' + p.id + '"' + (b.paper_id === p.id ? ' selected' : '') + '>' + esc(p.name) + '(' + p.total + ')</option>').join('') +
       '</select>' +
       '<input class="inp" id="f-q" placeholder="搜索题干或材料" value="' + esc(b.q) + '" style="flex:1;min-width:140px">' +
-      '<button class="chip' + (b.showAns ? ' on' : '') + '" id="f-ans">显示答案</button>' +
     '</div>' +
     // 按做题记录筛（用户：找出我曾经错过的题）
     '<div class="filters">' + [['', '全部'], ['wrong', '错过的'], ['inwrong', '错题本里的'], ['done', '做过的'], ['new', '没做过的']].map(r =>
@@ -1612,15 +1612,79 @@ async function viewBank() {
   $('#f-paper').addEventListener('change', e => { b.paper_id = +e.target.value; reload(); });
   $$('.chip[data-t]').forEach(c => c.addEventListener('click', () => { b.type = c.dataset.t; reload(); }));
   $$('.chip[data-rec]').forEach(c => c.addEventListener('click', () => { b.rec = c.dataset.rec; reload(); }));
-  $('#f-ans').addEventListener('click', () => { b.showAns = !b.showAns; reload(); });
   let timer = null;
   $('#f-q').addEventListener('input', e => {
     clearTimeout(timer);
     timer = setTimeout(() => { b.q = e.target.value.trim(); reload(); }, 300);
   });
 
-  function reload() { b.offset = 0; b.items = []; viewBank(); }
-  await loadMore();
+  function reload() { b.offset = 0; b.items = []; b.revealed = {}; b.anchor = null; viewBank(); }
+  // 从别的页面回来：列表还在就不重新加载，回到刚才看的那一题，点开的答案也还开着
+  if (b.items.length) { renderBankList(); bankRestoreAnchor(); }
+  else await loadMore();
+}
+
+// 记下屏幕最上面那道题和它离顶部多远（比记滚动高度稳：图片晚加载、答案展开都不影响）
+function bankSaveAnchor() {
+  const b = state.bank, top = bankStickyBottom();
+  const card = $$('#q-list .card[id^="qc"]').find(c => c.getBoundingClientRect().bottom > top + 4);
+  b.anchor = card ? { id: card.id, off: card.getBoundingClientRect().top } : null;
+}
+function bankRestoreAnchor() {
+  const a = state.bank.anchor;
+  if (a) bankPin(a.id, () => a.off);
+}
+// 把某道题放到屏幕上某个位置；图片加载完高度会变，用户没动过就过一会儿再对齐两次
+function bankPin(id, offOf) {
+  const go = () => { const el = document.getElementById(id); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - offOf()); };
+  go();
+  let moved = false;
+  const mark = () => { moved = true; };
+  ['wheel', 'touchmove', 'keydown', 'mousedown'].forEach(ev => window.addEventListener(ev, mark, { once: true, passive: true }));
+  [300, 900].forEach(t => setTimeout(() => { if (!moved && location.hash.startsWith('#/bank')) go(); }, t));
+}
+function bankStickyBottom() {
+  const bar = $('.bank-bar');
+  return bar ? bar.getBoundingClientRect().bottom : 0;
+}
+
+// 跳到第 N 题：选了卷子按卷子里的题号，没选按列表里的第几道；还没加载到就接着加载
+async function bankJump() {
+  const b = state.bank, inp = $('#bank-jump');
+  const n = parseInt(inp && inp.value, 10);
+  if (!n || n < 1) { if (inp) inp.focus(); return; }
+  const find = () => b.paper_id ? b.items.find(q => q.qno === n) : b.items[n - 1];
+  let q = find();
+  for (let guard = 0; !q && b.items.length < b.total && guard < 400; guard++) {
+    if (b.loading) await new Promise(r => setTimeout(r, 100));     // 滑到底正在自动加载：等它
+    else if (!(await loadMore())) break;
+    q = find();
+  }
+  if (!q) { toast(b.paper_id ? '这张卷子的第 ' + n + ' 题不在现在的筛选结果里' : '一共只有 ' + b.total + ' 题', 'bad'); return; }
+  const el = $('#qc' + q.id);
+  bankPin(el.id, () => bankStickyBottom() + 8);
+  el.classList.remove('jump-hit'); void el.offsetWidth; el.classList.add('jump-hit');
+  inp.blur();
+}
+
+// 一道题的答案单独看 / 收起（用户：原来只能回最上面点一下全部显示）
+function bankToggleAns(qid) {
+  const b = state.bank;
+  const q = b.items.find(x => x.id === qid);
+  if (!q) return;
+  const open = !(b.showAns || b.revealed[qid]);
+  if (open) b.revealed[qid] = true; else { delete b.revealed[qid]; if (b.showAns) { b.showAns = false; renderBankList(); return; } }
+  const el = $('#qc' + qid), cn = el.classList.contains('cn-show');
+  el.outerHTML = qCard(q, b.items.indexOf(q));
+  if (cn) $('#qc' + qid).classList.add('cn-show');      // 这题点了「译」的，换完还开着
+}
+function bankAllAns() {
+  const b = state.bank;
+  b.showAns = !b.showAns;
+  b.revealed = {};
+  bankSaveAnchor();
+  renderBankList();
+  bankRestoreAnchor();
 }
 
 // 搜到的题直接拿来练：按列表顺序，能存档
@@ -1650,9 +1714,10 @@ async function practiceSearch() {
 async function loadMore() {
   const b = state.bank;
   const box = $('#q-list');
-  if (!box) return;
+  if (!box || b.loading) return false;
   if (!b.items.length) box.innerHTML = '<div class="empty">加载中…</div>';
   let d;
+  b.loading = true;
   try {
     d = await api('/api/questions?paper_id=' + b.paper_id +
       (b.subject ? '&subject=' + b.subject : '') +
@@ -1660,50 +1725,88 @@ async function loadMore() {
       (b.q ? '&q=' + encodeURIComponent(b.q) : '') + (b.rec ? '&rec=' + b.rec : '') +
       '&limit=30&offset=' + b.items.length);
   } catch (e) {
+    b.loading = false;
     box.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
-    return;
+    return false;
   }
+  b.loading = false;
   // 老版电脑程序（没重启换上新后台）不认 rec，会把全部题返回：提示一下
-  if (b.rec && !d.rec) { box.innerHTML = '<div class="empty">按做题记录筛选要重启一下程序（托盘图标右键退出，再打开）</div>'; return; }
+  if (b.rec && !d.rec) { box.innerHTML = '<div class="empty">按做题记录筛选要重启一下程序（托盘图标右键退出，再打开）</div>'; return false; }
+  const first = !b.items.length;
   b.items = b.items.concat(d.items);
   b.total = d.total;
-  box.innerHTML = b.items.length
-    ? '<div class="bank-bar"><span class="muted">找到 ' + b.total + ' 题</span>' +
-        '<button class="btn sm" onclick="practiceSearch()">练这 ' + b.total + ' 题</button></div>' +
-      b.items.map(qCard).join('') +
-      (b.items.length < b.total
-        ? '<div class="loadmore"><button class="btn ghost" onclick="loadMore()">加载更多(' + b.items.length + '/' + b.total + ')</button></div>'
-        : '<div class="muted" style="text-align:center;padding:10px">共 ' + b.total + ' 题</div>')
-    : '<div class="empty">没有符合条件的题目，换个题型或关键词试试。</div>';
+  if (first) renderBankList();
+  else {                                  // 接着往下加：只追加新的几道，已经在看的不重画、位置不动
+    const more = box.querySelector('.loadmore, .bank-end');
+    if (more) more.outerHTML = d.items.map((q, i) => qCard(q, b.items.length - d.items.length + i)).join('') + bankTail();
+    bankWatchTail();
+  }
+  return d.items.length > 0;
 }
 
-function qCard(q) {
-  const show = state.bank.showAns && q.answer;
+// 搜索结果：顶上一条吸顶的工具条（找到几题、跳到第几题、全部显示答案、练这些题），下面是题目卡片
+function renderBankList() {
+  const b = state.bank, box = $('#q-list');
+  if (!box) return;
+  if (!b.items.length) { box.innerHTML = '<div class="empty">没有符合条件的题目，换个题型或关键词试试。</div>'; return; }
+  box.innerHTML =
+    '<div class="bank-bar">' +
+      '<span class="muted bank-n">找到 ' + b.total + ' 题</span>' +
+      '<span class="bank-jump"><input class="inp" id="bank-jump" type="number" min="1" inputmode="numeric" placeholder="' +
+        (b.paper_id ? '题号' : '第几道') + '" onkeydown="if(event.key===\'Enter\')bankJump()"><button class="btn ghost sm" onclick="bankJump()">跳转</button></span>' +
+      '<span class="spacer"></span>' +
+      '<button class="chip' + (b.showAns ? ' on' : '') + '" onclick="bankAllAns()">' + (b.showAns ? '收起<span class="wide">全部</span>答案' : '全部<span class="wide">显示</span>答案') + '</button>' +
+      '<button class="btn sm" onclick="practiceSearch()">练这 ' + b.total + ' 题</button>' +
+    '</div>' +
+    b.items.map((q, i) => qCard(q, i)).join('') + bankTail();
+  bankBarTop();
+  bankWatchTail();
+}
+// 吸顶条贴在顶栏下面；手机上顶栏下面还有一排导航（也是吸顶的），要贴在它下面，不然被它盖住
+function bankBarTop() {
+  const bar = $('.bank-bar');
+  if (!bar) return;
+  const top = $('#topbar'), side = $('#side');
+  let t = top ? top.offsetHeight : 0;
+  if (side && side.offsetWidth >= window.innerWidth * 0.8 && getComputedStyle(side).position === 'sticky') t += side.offsetHeight;
+  bar.style.top = t + 'px';
+}
+window.addEventListener('resize', () => { if (location.hash.startsWith('#/bank')) bankBarTop(); });
+function bankTail() {
+  const b = state.bank;
+  return b.items.length < b.total
+    ? '<div class="loadmore"><button class="btn ghost" onclick="loadMore()">加载更多(' + b.items.length + '/' + b.total + ')</button></div>'
+    : '<div class="muted bank-end" style="text-align:center;padding:10px">共 ' + b.total + ' 题</div>';
+}
+// 滑到底附近自动加载下一批（按钮还留着，老 WebView 没有 IntersectionObserver 时点它）
+function bankWatchTail() {
+  const el = $('#q-list .loadmore');
+  if (!el || !window.IntersectionObserver) return;
+  const io = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)) { io.disconnect(); if (el.isConnected) loadMore(); }
+  }, { rootMargin: '600px 0px' });
+  io.observe(el);
+}
+
+function qCard(q, i) {
+  const b = state.bank;
+  const show = (b.showAns || b.revealed[q.id]) && q.answer;
+  // 大号题号：选了卷子就是卷子里的题号，没选就是列表里的第几道（用户：灰色小字“第 x 题”不好找）
+  const no = b.paper_id ? q.qno : (i >= 0 ? i + 1 : q.qno);
   return '<div class="card' + (show ? '' : ' ans-hidden') + '" id="qc' + q.id + '">' +
     '<div class="qhead">' +
+      '<b class="bank-no">' + no + '</b>' +
       '<span class="tag t-' + q.type + '">' + (TYPE_NAME[q.cat] || TYPE_NAME[q.type]) + '</span>' +
       '<span class="qsrc">' + esc(q.paper_name) + ' · 第' + q.qno + '题' + (q.answer ? '' : ' · 无答案') + '</span>' +
-      recBadge(q) + '<span class="spacer"></span>' + cnBtn(q) + aiBtn(q) +
+      recBadge(q) + '<span class="spacer"></span>' +
+      (q.answer ? '<button class="qh-btn ans-btn' + (show ? ' on' : '') + '" onclick="bankToggleAns(' + q.id + ')">' + (show ? '收起答案' : '看答案') + '</button>' : '') +
+      cnBtn(q) + aiBtn(q) +
     '</div>' +
     materialBox(q) +
     '<div class="stem">' + rich(q.stem) + '</div>' + stemCn(q) +
     (show ? optsStatic(q) + '<div class="ansbox">' + ansHtml(q) + '</div>'
-      : optsStatic({ type: q.type, options: q.options, options_cn: q.options_cn, answer: '' }) +
-        '<div style="margin-top:10px"><button class="btn ghost sm" onclick="revealAns(' + q.id + ',this)">显示答案</button></div>') +
+      : optsStatic({ type: q.type, options: q.options, options_cn: q.options_cn, answer: '' })) +
     '</div>';
-}
-
-function revealAns(qid, btn) {
-  const q = state.bank.items.find(x => x.id === qid);
-  if (!q) return;
-  const card = $('#qc' + qid);
-  card.classList.remove('ans-hidden');
-  const opts = card.querySelector('.opts');
-  if (opts) opts.outerHTML = optsStatic(q);
-  const div = document.createElement('div');
-  div.className = 'ansbox';
-  div.innerHTML = ansHtml(q);
-  btn.replaceWith(div);
 }
 
 /* ================================================================ 错题本 */
