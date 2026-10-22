@@ -1,6 +1,6 @@
 {
- "content_version": 86,
- "created": "2026-10-22 14:14:09",
+ "content_version": 87,
+ "created": "2026-10-22 14:22:01",
  "files": {
   "data/bank.json": [
    "c0f96625215e1b27be24f3c8928e8dd5764ea054d422e7dbdf8238fe777bb33e",
@@ -1635,8 +1635,8 @@
    3659
   ],
   "static/app.js": [
-   "bb23ae24338b52b32e80006b8001be575c040216cc893a33f9c0931aa50ac32e",
-   290153
+   "54575e66a8e8b32f882055e7f85f8badcfb60c82bb45b0caa2799b5dae778aaa",
+   291828
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1666,7 +1666,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "搜索题目：每道题可以单独看答案；顶上工具条一直在（跳到第几题、全部显示答案、练这些题）；题号放大；切出去再回来还在刚才那一题；滑到底自动加载",
+ "notes": "搜索题目：全部显示答案时收起一道只收这一道；从搜索里练完回来，做对做错次数会更新",
  "py_shell_api": 1,
- "tag": "content-86"
+ "tag": "content-87"
 }

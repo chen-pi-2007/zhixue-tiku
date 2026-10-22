@@ -1620,8 +1620,32 @@ async function viewBank() {
 
   function reload() { b.offset = 0; b.items = []; b.revealed = {}; b.anchor = null; viewBank(); }
   // 从别的页面回来：列表还在就不重新加载，回到刚才看的那一题，点开的答案也还开着
-  if (b.items.length) { renderBankList(); bankRestoreAnchor(); }
+  if (b.items.length) { renderBankList(); bankRestoreAnchor(); bankRefresh(); }
   else await loadMore();
+}
+
+// 从搜索里点「练这些题」做完回来，卡片上的“做对 / 做错几次”要是新的：按已加载的条数重新取一遍（一次最多 200）
+async function bankRefresh() {
+  const b = state.bank, n = b.items.length, key = JSON.stringify([b.paper_id, b.subject, b.type, b.q, b.rec]);
+  const base = '/api/questions?paper_id=' + b.paper_id + (b.subject ? '&subject=' + b.subject : '') +
+    (b.type ? '&type=' + b.type : '') + (b.q ? '&q=' + encodeURIComponent(b.q) : '') + (b.rec ? '&rec=' + b.rec : '');
+  let fresh = [], total = b.total;
+  try {
+    for (let off = 0; off < n; off += 200) {
+      const d = await api(base + '&limit=' + Math.min(200, n - off) + '&offset=' + off);
+      fresh = fresh.concat(d.items);
+      total = d.total;
+      if (d.items.length < Math.min(200, n - off)) break;
+    }
+  } catch (e) { return; }                 // 取不到就先用缓存的，不打扰
+  // 这期间换了筛选、离开了页面、或者又往下加载了：作废
+  if (!location.hash.startsWith('#/bank') || b.items.length !== n || JSON.stringify([b.paper_id, b.subject, b.type, b.q, b.rec]) !== key) return;
+  if (JSON.stringify(fresh) === JSON.stringify(b.items) && total === b.total) return;
+  bankSaveAnchor();
+  b.items = fresh;
+  b.total = total;
+  renderBankList();
+  bankRestoreAnchor();
 }
 
 // 记下屏幕最上面那道题和它离顶部多远（比记滚动高度稳：图片晚加载、答案展开都不影响）
@@ -1673,7 +1697,16 @@ function bankToggleAns(qid) {
   const q = b.items.find(x => x.id === qid);
   if (!q) return;
   const open = !(b.showAns || b.revealed[qid]);
-  if (open) b.revealed[qid] = true; else { delete b.revealed[qid]; if (b.showAns) { b.showAns = false; renderBankList(); return; } }
+  if (open) b.revealed[qid] = true;
+  else {
+    if (b.showAns) {                      // 全部显示着、收起其中一道：其余的照样开着，只是不再算“全部显示”
+      b.showAns = false;
+      b.items.forEach(x => { b.revealed[x.id] = true; });
+      const chip = $('.bank-bar .chip');
+      if (chip) { chip.classList.remove('on'); chip.innerHTML = '全部<span class="wide">显示</span>答案'; }
+    }
+    delete b.revealed[qid];
+  }
   const el = $('#qc' + qid), cn = el.classList.contains('cn-show');
   el.outerHTML = qCard(q, b.items.indexOf(q));
   if (cn) $('#qc' + qid).classList.add('cn-show');      // 这题点了「译」的，换完还开着
