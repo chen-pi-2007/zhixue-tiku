@@ -1,10 +1,10 @@
 {
- "content_version": 88,
- "created": "2026-10-22 14:39:20",
+ "content_version": 89,
+ "created": "2026-10-26 11:13:09",
  "files": {
   "data/bank.json": [
-   "277c357a691d4eb86645e7728fae441d1787e5a0195fa07a3352471d4c946c89",
-   3215293
+   "b01b5750e3a4d5aa22d88a36d2a99c8ef05db73212defedf6aff10eae8baef4d",
+   3498639
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -729,6 +729,58 @@
   "data/media/media-tools/005.png": [
    "1400661819d6349e18b4b5e9e1e7adc1aff0dfdcdb48f594a3675d17abd8e3c5",
    199558
+  ],
+  "data/media/network-electric/001.png": [
+   "12a4a373bb57e7de5f727d8491fdcd8858f12e87e05e59b9bbb05f7d0efd113b",
+   3392
+  ],
+  "data/media/network-electric/002.png": [
+   "71fd3cb472d17a266f693fc00bd3082c2622aa93ff2102c81122ff3ecd95ec12",
+   20998
+  ],
+  "data/media/network-electric/003.png": [
+   "5ca4aba79e53ddfa85e17162ed3564a6bc5dc6c41441a1c4474efca0a0baa806",
+   2176
+  ],
+  "data/media/network-electric/004.png": [
+   "cb33ca1321b8028415e840be6b7ab5654ce5c4dce1abb2e99835edc8d2ad2977",
+   979
+  ],
+  "data/media/network-electric/005.png": [
+   "849898732ab44397da68f16e5493dc439b94793e7ed6044b8d5871a952da6f4b",
+   901
+  ],
+  "data/media/network-electric/006.png": [
+   "f37e22f4606cfda9d1822bcc0a8bb3739d934d718bdaf98ac4e7bba85faa8fc2",
+   5995
+  ],
+  "data/media/network-electric/007.png": [
+   "09b90f1b2ea2ba92a2b1fb87a2c12a981c60400a40720e9d2fbb2e160b687f45",
+   1375
+  ],
+  "data/media/network-electric/008.png": [
+   "8f48a21bd4f02de54fdd7a1c95acae2997515629c6a9ac8cac2205d447f44f2d",
+   922
+  ],
+  "data/media/network-electric/009.png": [
+   "bb1d1dee13a46c07eddfbbecbe264acb83b7ff199e826f4e55167c3825d76940",
+   179379
+  ],
+  "data/media/network-law/001.png": [
+   "dbd7a84d256fe773b3bd44744769077a96c2791785088f532f2cfedebb7e3f22",
+   15370
+  ],
+  "data/media/network-law/002.png": [
+   "e0677aaabdab2e50a869444028ae0cbb88158d9bf665d0c6b66d16163b067a28",
+   18167
+  ],
+  "data/media/network-law/003.png": [
+   "c958e50ac6579f23abeca7b4664500fec647453992bf135ee897d08504e6957e",
+   15866
+  ],
+  "data/media/network-law/004.png": [
+   "5d34c5278a40396e1f3fc233ee4a8e25eaf083d0637216ceb67c500e4ef7580a",
+   12306
   ],
   "data/skills/comp-1/answer/web/bottom.html": [
    "f7f4f3f7bd41f31856c246518aca9587ce2c0b022058898cc01463cf92f8e13c",
@@ -1571,28 +1623,28 @@
    17784
   ],
   "db.py": [
-   "3e385a1536a55102b69372ae5010e3aaaf3530cb3e20947dea682cf89fcacf81",
-   54473
+   "eed1fd6b9db975fe384ff58843c3e84d177bb8944177c3527a64ebcebb0b4801",
+   55867
   ],
   "docparse.py": [
-   "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
-   29308
+   "549a653b16ee2c83ea237e984b0387e5e13064cac9b774d8939743cb50c7a78f",
+   30003
   ],
   "exam.py": [
-   "a8b10c4c05d8d1a56f222204cb90da21f9c404b1d3a47367f5ca87f91f4ff425",
-   9344
+   "6ba43888d133e7e264a096bce1942be62e857198f17f31728d84fb76bf5ccc05",
+   9630
   ],
   "llm.py": [
-   "251aa2787de58ee031eedf5fd457e25f8595ab611248f4fef915117c4959afa4",
-   13051
+   "7d87f2c82c0170fc7fbf427f31662d0a8c5ccef41123f20828ca98e76a1dc676",
+   13302
   ],
   "mobile/local.js": [
-   "1ff884253fc005dd3b7981c1e2f09f46f04c9645d21deb00deb46458dde8f958",
-   74402
+   "6a972ea9d4a443d3c5a26aa660ab86db9b5c96f33d2887f3e396fb23f46d515c",
+   76108
   ],
   "server.py": [
-   "89046be674ed24b4d6f8674e1011da164ebf8d6d2fc5ae04c095fad3b8c352da",
-   34477
+   "1172b45973cc4074c57b3d2b662b2c3ed5cd5cf2a3a202a50a701a3274a9058e",
+   35209
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1603,16 +1655,16 @@
    54955
   ],
   "skills/grader.py": [
-   "8e47af08185c79fdc9d89cf8691a254fab7406aff46ddcb541d10874f897bf7b",
-   1664
+   "a2e4e90b0ba8c0185f51032577c65aa9a56f96ceb027d0e694cda55183a15ea7",
+   1720
   ],
   "skills/net_answers.py": [
-   "4197186f901c46fbbfdca890efadb71eacd76038565cc8415822c30f31879a22",
-   6980
+   "c971e68e0e80fcaeaf23a543d7eae4075d55f28bfc85fd0c1afde1c221bde5b9",
+   7296
   ],
   "skills/netcheck.py": [
-   "a41f1e399e87e06bb627c9dabafffcf887c947191626d182e796006364c66774",
-   16756
+   "d1e22abaa80a81ec07118a6588e58a506b427f9b79f16541f6ecc0d8f3d7fe63",
+   17135
   ],
   "skills/ooxml.py": [
    "1399ccdd68a67a4181dfd0b6d3f4acc1b5dbcdb730f6f538991df782e2cf76aa",
@@ -1623,50 +1675,50 @@
    15724
   ],
   "skills/specs_comp.py": [
-   "0f4256283c5b81861fe723c72cc7e86393e96cae2f350f449a7edbea78a2dfec",
-   23675
+   "faf92e091d01e1d76722115d1d5eec5fecc638771115f2ba043d30e5a2f7b7ce",
+   23973
   ],
   "skills/web.py": [
    "c80b4684871d9aa41b599b6b6211f9bcd4815001d4e2ab019a49d54b671be79e",
    5959
   ],
   "srs.py": [
-   "513776a1d40dbb98029980bb9ed4bbf0de457e8f221b576225c9e3963b826c1c",
-   3659
+   "174b267a7ec0fafdc2b6fd2c29e0ce932162daf02922355b3d7fbd9b23075e34",
+   3765
   ],
   "static/app.js": [
-   "54575e66a8e8b32f882055e7f85f8badcfb60c82bb45b0caa2799b5dae778aaa",
-   291828
+   "be7bf5b5b796bc0b9a0942fb7a66cfe257a3630a5343e5e3c7549f90be63f48c",
+   297130
   ],
   "static/index.html": [
-   "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
-   7176
+   "566add6280eccbd1908beef6acbcd7a7946915a3ba83f37062dd184b2d6bac15",
+   7247
   ],
   "static/poems.js": [
-   "2561b4c1646668c0add7fc4387a7beebf7ddfc0c2d837b52998eb41d33c68630",
-   5821
+   "f469b49887b528f23624f81344503c386ed5040fedcdfa9a41100cc50b7d380d",
+   5865
   ],
   "static/skills.js": [
-   "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
-   27524
+   "962ad458cc0972496273eb6d5d40947d3c4242ed647dc3eec52968a16f0ea3c0",
+   27990
   ],
   "static/style.css": [
-   "6b2ed5534fe5cbb7d9a5efc93b5091bc60b930101037e6f3ae2494ac690765e5",
-   89560
+   "e4758c2902ca5c2067aa51bd03e0d5b37eb2cf25cd93c1123bc86f2599a569ab",
+   90784
   ],
   "static/word.js": [
-   "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
-   20289
+   "5980a40c6330ffb1dcb8b739454a220ee90f44c90d98090cab5d13f0dee6bcb8",
+   20620
   ],
   "sync.py": [
-   "30ed05a0c78ad261fee63b7738a477297ea1343f086104a8eab18ab0ca07b2ba",
-   12830
+   "ebf144d969c3d3e5b270a7b074100155e2053fc2147dedab4ee7fa500468c44e",
+   13152
   ]
  },
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "语文《将进酒》默写：按课本改成",
+ "notes": "新增计算机与网络技术类理论题库（10 个题库 747 题），首页新增“技能理论”分类",
  "py_shell_api": 1,
- "tag": "content-88"
+ "tag": "content-89"
 }

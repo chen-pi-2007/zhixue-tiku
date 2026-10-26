@@ -13,7 +13,7 @@
 (function () {
   const APP_VERSION = (window.ZXStore && ZXStore.appVersion && ZXStore.appVersion()) || 'dev';   // App 的版本号
   const REPO = 'chen-pi-2007/zhixue-tiku';
-  const SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general'];
+  const SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'network', 'general'];
   const SELF = ['qa', 'dictation', 'essay', 'blank', 'solution'];
   const STUDY_FIELDS = ['stem_cn', 'options_cn', 'material_cn', 'point', 'option_notes', 'phrases', 'evidence'];
 
@@ -518,6 +518,8 @@
       ['完形填空', 'english-cloze', ['single'], 10, 1],
       ['阅读理解', 'english-reading', ['single', 'judge'], 20, 1.75, 'comp']] } },
     media: { standard: { title: '数字媒体理论 模拟卷', minutes: 60, sections: [
+      ['单项选择题', '', ['single'], 30], ['多项选择题', '', ['multi'], 10], ['判断题', '', ['judge'], 20]] } },
+    network: { standard: { title: '计算机与网络技术理论 模拟卷', minutes: 60, sections: [
       ['单项选择题', '', ['single'], 30], ['多项选择题', '', ['multi'], 10], ['判断题', '', ['judge'], 20]] } },
   };
 

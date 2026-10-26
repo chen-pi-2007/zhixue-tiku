@@ -30,7 +30,7 @@ BANK_PATH = os.path.join(DATA_DIR, 'bank.json')
 PROGRESS_PATH = os.path.join(DATA_DIR, 'progress.json')
 MEDIA_DIR = os.path.join(DATA_DIR, 'media')
 
-SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'general']
+SUBJECTS = ['chinese', 'math', 'english', 'politics', 'media', 'network', 'general']
 SELF_TYPES = ('qa', 'dictation', 'essay', 'blank', 'solution')
 STUDY_FIELDS = ('stem_cn', 'options_cn', 'material_cn', 'point', 'option_notes', 'phrases', 'evidence')   # 平时练习才显示：翻译、知识点、每个选项错在哪、词组、阅读题的原文依据
 # 旧版卷子 → key（第一次升级时用）

@@ -231,9 +231,9 @@ const TYPE_ICON = { single: '单', reading: '阅', poem: '诗', dictation: '默'
                     solution: '解', multi: '多', judge: '判',
                     en_phon: '音', en_vocab: '单', en_pic: '图', en_dia: '话', en_cloze: '完', en_read: '阅', en_write: '写' };
 const SUBJECT_NAME = { chinese: '语文', math: '数学', english: '英语', politics: '思想政治',
-                       media: '数字媒体', general: '其他' };
+                       media: '数字媒体', network: '计算机与网络技术', general: '其他' };
 // 科目印章字
-const SUBJECT_ICON = { chinese: '语', math: '数', english: '英', politics: '政', media: '媒', general: '其' };
+const SUBJECT_ICON = { chinese: '语', math: '数', english: '英', politics: '政', media: '媒', network: '网', general: '其' };
 const MASTER_STREAK = 3;
 
 // 同一句提示不重复叠；最多同时留 2 条（用户：点多了提示一条条往上堆，叠好高一串）
@@ -591,7 +591,7 @@ async function viewHome() {
   h.group = h.group || '';
   if (h.subj && isHidden(h.subj)) h.subj = '';
   const unfinished = store.get('quiz.exam');
-  // 科目条目：各科卷子 + 技能卷方向（计算机应用、网络技术，筛选值 skill:<方向>），分成文化课、专业技能两类
+  // 科目条目：各科卷子 + 技能卷方向（计算机应用、网络技术，筛选值 skill:<方向>），分成文化课、技能理论、专业技能三类
   const entries = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, group: subjectGroup(s.subject),
                                          dot: 's-' + s.subject, count: s.total, href: '#/subject/' + s.subject }));
   skills.forEach(s => {
@@ -612,8 +612,8 @@ async function viewHome() {
     '<div class="home">' +
       '<section class="home-main">' +
         (unfinished ? '<div class="notice">有一场模拟考还没交卷：' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
-        tagRow('culture') + tagRow('pro') +
-        '<div class="group-tabs">' + [['', '全部'], ['culture', GROUP_NAME.culture], ['pro', GROUP_NAME.pro]].map(g =>
+        GROUPS.map(tagRow).join('') +
+        '<div class="group-tabs">' + [['', '全部']].concat(GROUPS.map(g => [g, GROUP_NAME[g]])).map(g =>
           '<button class="group-tab' + (h.group === g[0] ? ' on' : '') + '" data-g="' + g[0] + '">' + g[1] + '</button>').join('') +
         '</div>' +
         '<div class="pill-row">' +
@@ -702,12 +702,15 @@ function paperRow(p, i) {
 }
 
 const SKILL_DIR_NAME = { comp: '计算机应用', net: '网络技术' };
-// 首页的两大类：文化课（公共基础课）和专业技能；自己导入的"其他"卷子只在"全部"里出现
-const GROUP_NAME = { culture: '文化课', pro: '专业技能' };
+// 首页的三大类：文化课（公共基础课）、技能理论（专业类理论题库）、专业技能（技能实操卷）；自己导入的"其他"卷子只在"全部"里出现
+const GROUP_NAME = { culture: '文化课', theory: '技能理论', pro: '专业技能' };
+const GROUPS = ['culture', 'theory', 'pro'];
 const CULTURE_SUBJECTS = ['chinese', 'math', 'english', 'politics'];
+const THEORY_SUBJECTS = ['media', 'network'];
 function subjectGroup(subj) {
   if (CULTURE_SUBJECTS.indexOf(subj) >= 0) return 'culture';
-  if (subj === 'media' || subj.indexOf('skill:') === 0) return 'pro';
+  if (THEORY_SUBJECTS.indexOf(subj) >= 0) return 'theory';
+  if (subj.indexOf('skill:') === 0) return 'pro';
   return 'other';
 }
 
@@ -2058,12 +2061,12 @@ function reorderQuestion(q, order) {
 }
 
 // 打乱后解析里提到的选项字母跟着换（用户报：答案是 A，解析却写“故选 C”）。
-// 语文、思政、数字媒体的解析里单独的 A～F 都是指选项，全换；数学解析里还有“集合 A、点 A”，只换“A 项”“B、C 两项”“故选 A”这种
+// 语文、思政、数字媒体、计算机与网络的解析里单独的 A～F 都是指选项，全换；数学解析里还有“集合 A、点 A”，只换“A 项”“B、C 两项”“故选 A”这种
 const OPT_RUN = /(?<![A-Za-z])[A-F](?:\s*[、，,和与及]\s*[A-F])*\s*(?:两|三|四)?(?:项|选项)/g;
 const OPT_SEL = /(?:故选|应选|所以选|因此选|答案为|答案是|答案选|选)\s*[A-F]{1,4}(?![A-Za-z])/g;
 function remapLetters(t, map, subject) {
   const one = s => s.replace(/[A-F]/g, k => map[k] || k);
-  if (subject === 'chinese' || subject === 'politics' || subject === 'media')
+  if (subject === 'chinese' || subject === 'politics' || subject === 'media' || subject === 'network')
     return t.replace(/(?<![A-Za-z])[A-F](?![A-Za-z0-9₀-₉])/g, k => map[k] || k);
   return t.replace(OPT_RUN, one).replace(OPT_SEL, one);
 }
@@ -3872,7 +3875,7 @@ async function viewSettings() {
   let aic = null;
   if (!IS_APP) try { aic = await api('/api/ai/config'); } catch (e) { /* 老版本程序：没有 AI 助手 */ }
   state.hidden = d.settings.hidden_subjects || [];
-  // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 专业技能 / 其他分组
+  // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 技能理论 / 专业技能 / 其他分组
   const subjOpts = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, note: s.total + ' 题' }));
   skills.forEach(s => {
     const k = 'skill:' + s.direction;
@@ -3898,7 +3901,7 @@ async function viewSettings() {
     '<h2 class="page-h"><a class="page-back" href="javascript:void(0)" onclick="goBack()" aria-label="' + backLabel + '" title="' + backLabel + '">' +
       '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
     '<div class="set-page">' +
-    subjList('culture') + subjList('pro') + subjList('other') +
+    GROUPS.map(subjList).join('') + subjList('other') +
     '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +
 
     '<div class="set-group-t">做题</div><div class="set-list">' +

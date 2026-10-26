@@ -54,6 +54,12 @@ BLUEPRINTS = {
             ('多项选择题', '', ['multi'], 10),
             ('判断题', '', ['judge'], 20)]},
     },
+    'network': {
+        'standard': {'title': '计算机与网络技术理论 模拟卷', 'minutes': 60, 'sections': [
+            ('单项选择题', '', ['single'], 30),
+            ('多项选择题', '', ['multi'], 10),
+            ('判断题', '', ['judge'], 20)]},
+    },
 }
 QUICK = {'title': '快速小测', 'minutes': 15, 'count': 20}
 

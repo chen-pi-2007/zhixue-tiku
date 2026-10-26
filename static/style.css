@@ -219,6 +219,7 @@ select option, select optgroup { background-color: var(--layer-1); color: var(--
 .s-english { background: #9b59ff; }
 .s-politics { background: #ffb700; }
 .s-media { background: #1cbaba; }
+.s-network { background: #3d6bff; }
 .s-skill-comp { background: #2db55d; }
 .s-skill-net { background: #ff7a45; }
 .s-general { background: #999; }
