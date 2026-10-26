@@ -1,6 +1,6 @@
 {
- "content_version": 89,
- "created": "2026-10-26 11:13:09",
+ "content_version": 90,
+ "created": "2026-10-26 11:26:27",
  "files": {
   "data/bank.json": [
    "b01b5750e3a4d5aa22d88a36d2a99c8ef05db73212defedf6aff10eae8baef4d",
@@ -1623,28 +1623,28 @@
    17784
   ],
   "db.py": [
-   "eed1fd6b9db975fe384ff58843c3e84d177bb8944177c3527a64ebcebb0b4801",
-   55867
+   "53f36ee68ddb054344dde7f1728ad24ea1ba572d3279371fc59f8f93567a486b",
+   54484
   ],
   "docparse.py": [
-   "549a653b16ee2c83ea237e984b0387e5e13064cac9b774d8939743cb50c7a78f",
-   30003
+   "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
+   29308
   ],
   "exam.py": [
    "6ba43888d133e7e264a096bce1942be62e857198f17f31728d84fb76bf5ccc05",
    9630
   ],
   "llm.py": [
-   "7d87f2c82c0170fc7fbf427f31662d0a8c5ccef41123f20828ca98e76a1dc676",
-   13302
+   "251aa2787de58ee031eedf5fd457e25f8595ab611248f4fef915117c4959afa4",
+   13051
   ],
   "mobile/local.js": [
-   "6a972ea9d4a443d3c5a26aa660ab86db9b5c96f33d2887f3e396fb23f46d515c",
-   76108
+   "95c8609d97b3276f47a115b10e557a6c43aa0eb6aecbc98e6261bdb9d27f01f7",
+   74642
   ],
   "server.py": [
-   "1172b45973cc4074c57b3d2b662b2c3ed5cd5cf2a3a202a50a701a3274a9058e",
-   35209
+   "89046be674ed24b4d6f8674e1011da164ebf8d6d2fc5ae04c095fad3b8c352da",
+   34477
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1655,16 +1655,16 @@
    54955
   ],
   "skills/grader.py": [
-   "a2e4e90b0ba8c0185f51032577c65aa9a56f96ceb027d0e694cda55183a15ea7",
-   1720
+   "8e47af08185c79fdc9d89cf8691a254fab7406aff46ddcb541d10874f897bf7b",
+   1664
   ],
   "skills/net_answers.py": [
-   "c971e68e0e80fcaeaf23a543d7eae4075d55f28bfc85fd0c1afde1c221bde5b9",
-   7296
+   "4197186f901c46fbbfdca890efadb71eacd76038565cc8415822c30f31879a22",
+   6980
   ],
   "skills/netcheck.py": [
-   "d1e22abaa80a81ec07118a6588e58a506b427f9b79f16541f6ecc0d8f3d7fe63",
-   17135
+   "a41f1e399e87e06bb627c9dabafffcf887c947191626d182e796006364c66774",
+   16756
   ],
   "skills/ooxml.py": [
    "1399ccdd68a67a4181dfd0b6d3f4acc1b5dbcdb730f6f538991df782e2cf76aa",
@@ -1675,50 +1675,50 @@
    15724
   ],
   "skills/specs_comp.py": [
-   "faf92e091d01e1d76722115d1d5eec5fecc638771115f2ba043d30e5a2f7b7ce",
-   23973
+   "0f4256283c5b81861fe723c72cc7e86393e96cae2f350f449a7edbea78a2dfec",
+   23675
   ],
   "skills/web.py": [
    "c80b4684871d9aa41b599b6b6211f9bcd4815001d4e2ab019a49d54b671be79e",
    5959
   ],
   "srs.py": [
-   "174b267a7ec0fafdc2b6fd2c29e0ce932162daf02922355b3d7fbd9b23075e34",
-   3765
+   "513776a1d40dbb98029980bb9ed4bbf0de457e8f221b576225c9e3963b826c1c",
+   3659
   ],
   "static/app.js": [
-   "be7bf5b5b796bc0b9a0942fb7a66cfe257a3630a5343e5e3c7549f90be63f48c",
-   297130
+   "c94de98fead6dc940131a4eef16d15e09742f056a4822656b9d9163c167ae7a7",
+   292146
   ],
   "static/index.html": [
-   "566add6280eccbd1908beef6acbcd7a7946915a3ba83f37062dd184b2d6bac15",
-   7247
+   "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
+   7176
   ],
   "static/poems.js": [
-   "f469b49887b528f23624f81344503c386ed5040fedcdfa9a41100cc50b7d380d",
-   5865
+   "2561b4c1646668c0add7fc4387a7beebf7ddfc0c2d837b52998eb41d33c68630",
+   5821
   ],
   "static/skills.js": [
-   "962ad458cc0972496273eb6d5d40947d3c4242ed647dc3eec52968a16f0ea3c0",
-   27990
+   "6bb3dac083af864f0b6145c9ff280261714ffb874087d2203bb6ecdeb4cf0429",
+   27524
   ],
   "static/style.css": [
-   "e4758c2902ca5c2067aa51bd03e0d5b37eb2cf25cd93c1123bc86f2599a569ab",
-   90784
+   "03d467126ddbca123100daf478540836f32c6181a7ad7f89421ec82e90faa671",
+   89596
   ],
   "static/word.js": [
-   "5980a40c6330ffb1dcb8b739454a220ee90f44c90d98090cab5d13f0dee6bcb8",
-   20620
+   "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
+   20289
   ],
   "sync.py": [
-   "ebf144d969c3d3e5b270a7b074100155e2053fc2147dedab4ee7fa500468c44e",
-   13152
+   "30ed05a0c78ad261fee63b7738a477297ea1343f086104a8eab18ab0ca07b2ba",
+   12830
   ]
  },
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增计算机与网络技术类理论题库（10 个题库 747 题），首页新增“技能理论”分类",
+ "notes": "修复第 89 版部分文件校验不通过，无法更新的问题",
  "py_shell_api": 1,
- "tag": "content-89"
+ "tag": "content-90"
 }
