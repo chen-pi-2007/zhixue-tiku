@@ -87,5 +87,54 @@ class StandardFormatTest(unittest.TestCase):
                                  [[k, t.strip()] for k, t in b['options']], a['key'])
 
 
+def mini_docx(body, rels, files):
+    """拼一个最小的 Word 文件：body 是 <w:body> 里的段落，rels 是 {rId: 图片路径}，files 是 {路径: 字节}"""
+    import io
+    import zipfile
+    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+          'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
+          'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+          'xmlns:v="urn:schemas-microsoft-com:vml" '
+          'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"')
+    b = io.BytesIO()
+    with zipfile.ZipFile(b, 'w') as z:
+        z.writestr('word/document.xml', '<w:document %s><w:body>%s</w:body></w:document>' % (ns, body))
+        z.writestr('word/_rels/document.xml.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+                   ''.join('<Relationship Id="%s" Target="%s"/>' % kv for kv in rels.items()) + '</Relationships>')
+        for k, v in files.items():
+            z.writestr(k, v)
+    return b.getvalue()
+
+
+class ImageTest(unittest.TestCase):
+    def test_images_extracted_in_place(self):
+        """Word 里的图片取出来、原位置写 [[img:]]；新版 Word 同一张图的老版本备份（mc:Fallback）不重复；
+        EMF 这种浏览器显示不了的、公式对象，留 [图片] 记号"""
+        drawing = '<w:r><w:drawing><a:blip r:embed="%s"/></w:drawing></w:r>'
+        body = ('<w:p><w:r><w:t>1. 下图是（ ）</w:t></w:r></w:p>'
+                '<w:p><mc:AlternateContent><mc:Choice>' + drawing % 'rId1' + '</mc:Choice>'
+                '<mc:Fallback><w:r><w:pict><v:imagedata r:id="rId1"/></w:pict></w:r></mc:Fallback></mc:AlternateContent></w:p>'
+                '<w:p><w:r><w:t>A.甲</w:t></w:r></w:p><w:p><w:r><w:t>B.</w:t></w:r>' + drawing % 'rId2' + '</w:p>'
+                '<w:p><w:r><w:t>答案：B</w:t></w:r></w:p>'
+                '<w:p><w:r><w:t>2. 公式</w:t></w:r><w:r><w:object><v:imagedata r:id="rId3"/></w:object></w:r>' + drawing % 'rId4' + '</w:p>')
+        data = mini_docx(body, {'rId1': 'media/image1.png', 'rId2': 'media/image2.jpeg', 'rId3': 'media/image3.wmf', 'rId4': 'media/image4.emf'},
+                         {'word/media/image1.png': b'png1', 'word/media/image2.jpeg': b'jpg2', 'word/media/image3.wmf': b'w', 'word/media/image4.emf': b'e'})
+        saved = []
+
+        def save(ext, b):
+            saved.append((ext, b))
+            return 'x/%d%s' % (len(saved), ext)
+        qs = docparse.parse_lines([ln for p in docparse.extract_any(data, 'a.docx', save) for ln in p.split('\n')])['questions']
+        self.assertEqual(saved, [('.png', b'png1'), ('.jpeg', b'jpg2')])
+        self.assertIn('[[img:x/1.png]]', qs[0]['stem'])
+        self.assertEqual(qs[0]['options'], [['A', '甲'], ['B', '[[img:x/2.jpeg]]']])
+        self.assertEqual(qs[0]['answer'], 'B')
+        self.assertEqual(qs[1]['stem'].count('[图片]'), 2)
+        self.assertIn('has_image', qs[1]['flags'])
+        # 不传存图函数（老接口）：图片一律写成 [图片]
+        plain = '\n'.join(docparse.extract_any(data, 'a.docx'))
+        self.assertNotIn('[[img:', plain)
+
+
 if __name__ == '__main__':
     unittest.main()

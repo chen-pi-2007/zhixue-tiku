@@ -60,6 +60,8 @@ MIME = {
     '.jpeg': 'image/jpeg',
     '.pdf': 'application/pdf',
     '.gif': 'image/gif',
+    '.bmp': 'image/bmp',            # 导入的 Word 里可能有这几种图
+    '.webp': 'image/webp',
     '.ico': 'image/x-icon',
     '.json': 'application/json; charset=utf-8',
 }
@@ -324,9 +326,9 @@ class Handler(BaseHTTPRequestHandler):
                 db.set_setting('new_per_day', max(0, min(200, int(data['new_per_day']))))
             if re.match(r'^\d{4}-\d{2}-\d{2}$', str(data.get('exam_date', ''))):
                 db.set_setting('exam_date', data['exam_date'])
-            if isinstance(data.get('hidden_subjects'), list):     # 不学的科目
-                db.set_setting('hidden_subjects', sorted({str(s) for s in data['hidden_subjects']
-                                                          if re.match(r'^[\w:-]{1,40}$', str(s))}))
+            for name in ('hidden_subjects', 'home_hidden'):       # 不学的科目 / 只在首页不显示的科目
+                if isinstance(data.get(name), list):
+                    db.set_setting(name, sorted({str(s) for s in data[name] if re.match(r'^[\w:-]{1,40}$', str(s))}))
             return self.send_json({'ok': True})
 
         if method == 'GET' and path == '/api/wrong':
@@ -523,14 +525,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_error_json('文件是空的')
             if name.lower().endswith('.doc') and data[:2] != b'PK':
                 data = doc_to_docx(data)
-            paras = docparse.extract_any(data, name)
+            paras = docparse.extract_any(data, name, import_image_saver())
             text = '\n'.join(ln.rstrip() for p in paras for ln in p.split('\n'))
             if qs.get('answer', [''])[0] == '1':      # 单独的答案文件：只取答案表（1.C2.A…、1-5 CABDA），接在卷子后面
                 key, _ = docparse.extract_answer_key(text.split('\n'))
                 return self.send_json({'ok': True, 'keys': len(key), 'text': '参考答案：' + ' '.join(
                     '%d.%s' % (k, key[k]) for k in sorted(key)) + '\n' if key else ''})
             return self.send_json({'ok': True, 'text': re.sub(r'\n{3,}', '\n\n', text).strip() + '\n',
-                                   'images': text.count('[图片]')})
+                                   'images': text.count('[图片]'), 'pictures': text.count('[[img:')})
         if method == 'POST' and path == '/api/import/parse':
             body = self.read_json_body()
             r = docparse.parse_lines(str(body.get('text') or '').split('\n'))
@@ -559,14 +561,17 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'changed': db.set_answers(int(body.get('paper_id') or 0), ans)})
         if method == 'POST' and path == '/api/import/save':
             body = self.read_json_body()
-            r = docparse.parse_lines(str(body.get('text') or '').split('\n'))
-            if not r['questions']:
-                return self.send_error_json('没有识别出题目')
             key = str(body.get('key') or '')
             if key and not key.startswith('upload-'):
                 return self.send_error_json('题库自带的卷子不能在这里改')
+            key = key or 'upload-%d' % int(time.time() * 1000)
+            # 导入时取出来的图片还在临时文件夹（media/_import/…），挪进这张卷子自己的图片文件夹 media/<key>/
+            text = claim_import_images(str(body.get('text') or ''), key)
+            r = docparse.parse_lines(text.split('\n'))
+            if not r['questions']:
+                return self.send_error_json('没有识别出题目')
             name = str(body.get('name') or '').strip() or r['title'] or '导入的卷子'
-            pid, name = db.add_upload(name, r, body.get('subject') or 'general', key or None)
+            pid, name = db.add_upload(name, r, clean_subject(body.get('subject')), key)
             return self.send_json({'ok': True, 'paper': {'id': pid, 'name': name, 'total': len(r['questions'])},
                                    'no_answer': sum(1 for q in r['questions'] if not q['answer'])})
         if method == 'GET' and path == '/api/import/text':                # 已导入的卷子转回标准格式，补答案、改题
@@ -667,6 +672,57 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
         if isinstance(sys.exc_info()[1], (ConnectionResetError, ConnectionAbortedError, BrokenPipeError)):
             return
         super().handle_error(request, client_address)
+
+
+IMPORT_TMP = '_import'          # media/_import/<批次>/：导入整理台读 Word 时取出来的图片，入库时挪到 media/<卷子 key>/
+
+
+def import_image_saver():
+    """读一个 Word 时用的存图函数：图片存进 media/_import/<随机批次>/001.png，返回 [[img:]] 里写的路径。
+    顺手删掉两天前的临时批次（读了没导入的）"""
+    import secrets
+    base = os.path.join(db.MEDIA_DIR, IMPORT_TMP)
+    try:
+        for n in os.listdir(base):
+            p = os.path.join(base, n)
+            if time.time() - os.path.getmtime(p) > 2 * 86400:
+                shutil.rmtree(p, ignore_errors=True)
+    except OSError:
+        pass
+    batch = secrets.token_hex(4)
+    count = [0]
+
+    def save(ext, data):
+        count[0] += 1
+        name = '%03d%s' % (count[0], ext)
+        d = os.path.join(base, batch)
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, name), 'wb') as f:
+            f.write(data)
+        return '%s/%s/%s' % (IMPORT_TMP, batch, name)
+    return save
+
+
+def claim_import_images(text, key):
+    """文字里引用的临时图片 [[img:_import/<批次>/001.png]] 复制到 media/<key>/<批次>-001.png，引用改成新路径。
+    同一张卷子改题再保存时，已经挪过的图片（[[img:<key>/…]]）不动；临时图片找不到了（被清掉）就变回 [图片] 记号"""
+    def move(m):
+        batch, name = m.group(1), m.group(2)
+        src = os.path.join(db.MEDIA_DIR, IMPORT_TMP, batch, name)
+        new = '%s-%s' % (batch, name)
+        dst = os.path.join(db.MEDIA_DIR, key, new)
+        if os.path.exists(src) and not os.path.exists(dst):
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copyfile(src, dst)
+        return '[[img:%s/%s]]' % (key, new) if os.path.exists(dst) else '[图片]'
+    return re.sub(r'\[\[img:%s/([0-9a-f]+)/([\w.]+)\]\]' % IMPORT_TMP, move, text)
+
+
+def clean_subject(s):
+    """导入时填的科目：可以选现有的（chinese、math…），也可以自己起名（“会计基础”）。
+    自己起的名字直接当科目的 key：只留汉字、字母、数字、_ -，最长 20 个字（设置里按科目隐藏也认这个写法）"""
+    s = re.sub(r'[^\w\-]', '', str(s or ''))[:20]
+    return s or 'general'
 
 
 def doc_to_docx(data):

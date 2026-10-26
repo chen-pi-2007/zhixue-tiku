@@ -1,6 +1,6 @@
 {
- "content_version": 91,
- "created": "2026-10-26 19:43:05",
+ "content_version": 92,
+ "created": "2026-10-26 20:11:28",
  "files": {
   "data/bank.json": [
    "f8b4044dde8c0f30fa9b0ce8ca27d438d9ca0639c5ad06ab00b44fbaf3a8cf34",
@@ -1619,8 +1619,8 @@
    54484
   ],
   "docparse.py": [
-   "6af0ec451974e942a5b831386d133308d10944b6f6a6b26818171554b6e0aab9",
-   29308
+   "554ef5896c4f0676c9b1011deae13f55b110b129ba665825257ad33d991d45a7",
+   31626
   ],
   "exam.py": [
    "6ba43888d133e7e264a096bce1942be62e857198f17f31728d84fb76bf5ccc05",
@@ -1631,12 +1631,12 @@
    13051
   ],
   "mobile/local.js": [
-   "95c8609d97b3276f47a115b10e557a6c43aa0eb6aecbc98e6261bdb9d27f01f7",
-   74642
+   "9b70ae3fe199f668d9eca98f72be6fe9fca3caa6d8978380e4eebb10c792cede",
+   74831
   ],
   "server.py": [
-   "89046be674ed24b4d6f8674e1011da164ebf8d6d2fc5ae04c095fad3b8c352da",
-   34477
+   "ded42c1c658fa512a22ae93bbb656fe9e4be2c404237e3cd0d32093a0c4e6651",
+   37189
   ],
   "skills/__init__.py": [
    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1679,8 +1679,8 @@
    3659
   ],
   "static/app.js": [
-   "c94de98fead6dc940131a4eef16d15e09742f056a4822656b9d9163c167ae7a7",
-   292146
+   "4efb1fb83ae78162a5fed4a929d8b24ae5a3268f85708f84c7dc59b4b3b000ae",
+   300189
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1695,12 +1695,12 @@
    27524
   ],
   "static/style.css": [
-   "03d467126ddbca123100daf478540836f32c6181a7ad7f89421ec82e90faa671",
-   89596
+   "89e2398d05750e591fb6ee57b0361dde92c2aaaafaadfa77db14d7ae548f46fc",
+   91426
   ],
   "static/word.js": [
-   "0312d5a3aa4d10b53f9e891eb63930ad862ae9468ece4aeb359cf848b8779a6a",
-   20289
+   "e4d530a6b84480e9bd40a0e87b7f04a20c0454aaea5386dea09f79d6dd2b98a5",
+   21363
   ],
   "sync.py": [
    "30ed05a0c78ad261fee63b7738a477297ea1343f086104a8eab18ab0ca07b2ba",
@@ -1710,7 +1710,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "计算机与网络技术：电工题的两个公式改成清晰的公式显示，修正几道题干的乱码和看不出来的填空（如",
+ "notes": "导入试卷：Word 里的图片跟着题目一起导进来（预览里就能看到，导出 Word 也带着）；科目可以自己起名（如“会计基础”），首页多一个“我导入的”分类；一次选好几个 Word 可以批量导入，“XX答案”文件自动配给同名卷子；整个导入页都能拖文件。设置里每个科目可以选「显示 / 首页不显示 / 都不显示」，整类科目都关掉后首页不再留一个空的分类",
  "py_shell_api": 1,
- "tag": "content-91"
+ "tag": "content-92"
 }

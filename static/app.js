@@ -509,7 +509,8 @@ const routes = { home: viewHome, subject: viewSubject, bank: viewBank, wrong: vi
 
 function route() {
   if (IS_WEB && !state.webUser) return webGate();
-  const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/');
+  // 自己起的中文科目名会出现在地址里（#/subject/会计基础），浏览器给的是编码过的，解回来
+  const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('/').map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
   const name = routes[parts[0]] ? parts[0] : 'home';
   const navOf = { practice: 'home', subject: 'home', recite: 'home', answers: 'home', poems: 'home', export: 'upload' };
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.v === (navOf[name] || name)));
@@ -584,12 +585,14 @@ async function viewHome() {
   }
   try { skills = (await api('/api/skills')).items; } catch (e) { /* 没有技能题库时首页照常显示 */ }
   state.hidden = d.settings.hidden_subjects || [];
-  d.subjects = d.subjects.filter(s => !s.hidden);
-  papers = papers.filter(p => !isHidden(p.subject));
-  skills = skills.filter(s => !isHidden('skill:' + s.direction));
+  state.homeHidden = d.settings.home_hidden || [];
+  noteSubjects(papers);
+  d.subjects = d.subjects.filter(s => !s.hidden && !isHomeHidden(s.subject));
+  papers = papers.filter(p => !isHomeHidden(p.subject));
+  skills = skills.filter(s => !isHomeHidden('skill:' + s.direction));
   const h = state.home;
   h.group = h.group || '';
-  if (h.subj && isHidden(h.subj)) h.subj = '';
+  if (h.subj && isHomeHidden(h.subj)) h.subj = '';
   const unfinished = store.get('quiz.exam');
   // 科目条目：各科卷子 + 技能卷方向（计算机应用、网络技术，筛选值 skill:<方向>），分成文化课、技能理论、专业技能三类
   const entries = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, group: subjectGroup(s.subject),
@@ -601,6 +604,9 @@ async function viewHome() {
                                dot: 's-skill-' + s.direction, count: 0, unit: ' 套', href: '#/skills' });
     e.count++;
   });
+  // 分类标签只列有科目的（科目全关掉的分类不留一个点进去是空的标签）；自己导入的“其他”科目有了才出现
+  const groups = GROUPS.concat(['other']).filter(g => entries.some(e => e.group === g));
+  if (h.group && groups.indexOf(h.group) < 0) { h.group = ''; h.subj = ''; }
   const inGroup = e => !h.group || e.group === h.group;
   const tagRow = g => {
     const es = entries.filter(e => e.group === g);
@@ -612,12 +618,12 @@ async function viewHome() {
     '<div class="home">' +
       '<section class="home-main">' +
         (unfinished ? '<div class="notice">有一场模拟考还没交卷：' + esc(unfinished.exam.title) + ' <a href="#/exam/run">继续作答</a></div>' : '') +
-        GROUPS.map(tagRow).join('') +
-        '<div class="group-tabs">' + [['', '全部']].concat(GROUPS.map(g => [g, GROUP_NAME[g]])).map(g =>
+        groups.map(tagRow).join('') +
+        '<div class="group-tabs">' + [['', '全部']].concat(groups.map(g => [g, GROUP_NAME[g]])).map(g =>
           '<button class="group-tab' + (h.group === g[0] ? ' on' : '') + '" data-g="' + g[0] + '">' + g[1] + '</button>').join('') +
         '</div>' +
         '<div class="pill-row">' +
-          '<button class="pill-tab' + (h.subj === '' ? ' on' : '') + '" data-s="">' + (h.group ? '全部' + GROUP_NAME[h.group] : '全部卷子') + '</button>' +
+          '<button class="pill-tab' + (h.subj === '' ? ' on' : '') + '" data-s="">' + (h.group ? (h.group === 'other' ? '全部' : '全部' + GROUP_NAME[h.group]) : '全部卷子') + '</button>' +
           entries.filter(inGroup).map(e => '<button class="pill-tab' + (h.subj === e.key ? ' on' : '') + '" data-s="' + e.key + '">' +
             '<span class="dot ' + e.dot + '"></span>' + esc(e.name) + '</button>').join('') +
         '</div>' +
@@ -703,7 +709,7 @@ function paperRow(p, i) {
 
 const SKILL_DIR_NAME = { comp: '计算机应用', net: '网络技术' };
 // 首页的三大类：文化课（公共基础课）、技能理论（专业类理论题库）、专业技能（技能实操卷）；自己导入的"其他"卷子只在"全部"里出现
-const GROUP_NAME = { culture: '文化课', theory: '技能理论', pro: '专业技能' };
+const GROUP_NAME = { culture: '文化课', theory: '技能理论', pro: '专业技能', other: '我导入的' };
 const GROUPS = ['culture', 'theory', 'pro'];
 const CULTURE_SUBJECTS = ['chinese', 'math', 'english', 'politics'];
 const THEORY_SUBJECTS = ['media', 'network'];
@@ -723,7 +729,15 @@ async function loadHidden() {
   return state.hidden;
 }
 function isHidden(subj) { return !!state.hidden && state.hidden.indexOf(subj) >= 0; }
-function shownSubjectKeys() { return Object.keys(SUBJECT_NAME).filter(k => !isHidden(k)); }
+// 只在首页不显示（设置里的「首页不显示」）：错题本、搜索、复习、模拟考照常有；全部不显示的当然首页也不显示
+state.homeHidden = [];
+function isHomeHidden(subj) { return isHidden(subj) || state.homeHidden.indexOf(subj) >= 0; }
+// 自己导入时起的科目（“会计基础”）：看到卷子列表时记下来，科目下拉框（搜索、错题本）里也能选
+state.customSubjects = [];
+function noteSubjects(papers) {
+  (papers || []).forEach(p => { if (!SUBJECT_NAME[p.subject] && state.customSubjects.indexOf(p.subject) < 0) state.customSubjects.push(p.subject); });
+}
+function shownSubjectKeys() { return Object.keys(SUBJECT_NAME).concat(state.customSubjects).filter(k => !isHidden(k)); }
 
 // 技能卷行：题数一栏写模块数，掌握度用最好成绩占总分的比例，点开进技能实操
 function skillRow(s, i) {
@@ -1092,16 +1106,22 @@ async function viewUpload(args) {
     st.key = '';
   }
   state.imp = { st: st, res: null, seq: 0 };
+  // 科目候选：自带的科目 + 以前导入时自己起的科目名（卷子列表里出现过的）
+  let custom = [];
+  try { custom = (await api('/api/papers')).papers.map(p => p.subject).filter(k => !SUBJECT_NAME[k]); } catch (e) { /* 拿不到就只列自带的 */ }
+  state.imp.subjects = Object.keys(SUBJECT_NAME).filter(k => k !== 'general').concat(custom.filter((k, i) => custom.indexOf(k) === i));
   app.innerHTML =
     (st.key ? '<div class="crumb"><a href="#/home">首页</a> / 修改导入的卷子</div>' : ioTabs('upload')) +
     '<div class="im">' +
       '<div class="im-bar">' +
         '<input class="inp im-name" id="im-name" placeholder="卷子名称（不填就用文件名）" value="' + esc(st.name) + '">' +
-        '<select class="inp" id="im-subj">' + Object.keys(SUBJECT_NAME).map(k =>
-          '<option value="' + k + '"' + (k === st.subject ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') + '</select>' +
+        '<label class="im-subj-w">科目 <input class="inp" id="im-subj" list="im-subjs" autocomplete="off" placeholder="选一个，或者打新科目名" value="' +
+          esc(st.subject && st.subject !== 'general' ? subjName(st.subject) : '') + '"></label>' +
+        '<datalist id="im-subjs">' + state.imp.subjects.map(k => '<option value="' + esc(subjName(k)) + '">').join('') + '</datalist>' +
         '<span class="spacer"></span>' +
         '<button class="btn ghost sm" id="im-file">' + icon('upload') + '选择文件</button>' +
         '<input type="file" id="im-fi" multiple accept=".docx,.doc,.txt,.md" hidden>' +
+        '<span class="im-hint muted">可以一次选好几个文件批量导入</span>' +
       '</div>' +
       '<div class="im-body">' +
         '<section class="im-left">' +
@@ -1135,10 +1155,10 @@ async function viewUpload(args) {
   $('#im-subj').addEventListener('change', imDraft);
   $('#im-file').addEventListener('click', () => $('#im-fi').click());
   $('#im-fi').addEventListener('change', e => { imFiles(e.target.files); e.target.value = ''; });
-  const left = $('.im-left');
-  left.addEventListener('dragover', e => { e.preventDefault(); left.classList.add('drag'); });
-  left.addEventListener('dragleave', () => left.classList.remove('drag'));
-  left.addEventListener('drop', e => {
+  const left = $('.im-left'), page = $('.im');
+  page.addEventListener('dragover', e => { e.preventDefault(); left.classList.add('drag'); });
+  page.addEventListener('dragleave', e => { if (!page.contains(e.relatedTarget)) left.classList.remove('drag'); });
+  page.addEventListener('drop', e => {
     left.classList.remove('drag');
     if (e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); imFiles(e.dataTransfer.files); }
   });
@@ -1167,7 +1187,7 @@ function imDraft() {
   const im = state.imp;
   if (!im || im.st.key) return;                // 改已导入的卷子不存草稿
   try {
-    localStorage.setItem(IM_DRAFT, JSON.stringify({ text: $('#im-text').value, name: $('#im-name').value, subject: $('#im-subj').value }));
+    localStorage.setItem(IM_DRAFT, JSON.stringify({ text: $('#im-text').value, name: $('#im-name').value, subject: imSubject() }));
   } catch (e) { /* 存不了就算了 */ }
 }
 
@@ -1175,6 +1195,10 @@ function imDraft() {
 async function imFiles(files) {
   const ta = $('#im-text');
   const list = Array.from(files).sort((a, b) => /答案/.test(a.name) - /答案/.test(b.name));
+  const papers = list.filter(f => !/答案/.test(f.name));
+  if (papers.length > 1 && !state.imp.st.key &&
+      confirm('选了 ' + papers.length + ' 张卷子，每个文件导入成一张卷子（批量导入）吗？\n' +
+              '名字带“答案”的文件会自动配给同名的卷子。\n\n选“取消”就把它们放进左边一起整理。')) return imBatch(list);
   for (const f of list) {
     const isKey = /答案/.test(f.name) && list.length > 1 || (/答案/.test(f.name) && ta.value.trim());
     toast('正在读取 ' + f.name + (/\.doc$/i.test(f.name) ? '（老版 .doc 要先用 Word 转换，稍等几秒）' : '') + '……');
@@ -1191,11 +1215,64 @@ async function imFiles(files) {
       if (ta.value.trim() && !confirm('左边已经有内容了，用「' + f.name + '」替换掉吗？\n（选“取消”就接在后面）')) ta.value = ta.value.replace(/\s*$/, '\n\n') + d.text;
       else ta.value = d.text;
       if (!$('#im-name').value.trim()) $('#im-name').value = f.name.replace(/\.(docx?|txt|md)$/i, '');
-      if (d.images) toast('原卷有 ' + d.images + ' 处图片或公式（显示成 [图片]），导不进来，这些题右边会标出来', 'bad');
+      if (d.pictures) toast('从 ' + f.name + ' 里取出了 ' + d.pictures + ' 张图片，导入后跟着题目显示', 'good');
+      if (d.images) toast('原卷有 ' + d.images + ' 处公式或特殊图片（显示成 [图片]）导不进来，这些题右边会标出来', 'bad');
     }
   }
   imDraft();
   imParse();
+}
+
+// 批量导入：每个卷子文件一张卷子，科目用上面填的；名字去掉“答案”后和卷子同名的答案文件接在后面。
+// 直接入库，最后列出每张认出几题、缺几题答案，哪张不对点进整理台改（导入的卷子都能「改题目」「填答案」）
+async function imBatch(files) {
+  const base = n => n.replace(/\.(docx?|txt|md)$/i, '').replace(/[（(]?\s*(参考)?答案\s*[)）]?/g, '').replace(/\s+/g, '');
+  const papers = files.filter(f => !/答案/.test(f.name)), keys = files.filter(f => /答案/.test(f.name));
+  const subject = imSubject();
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet-mask';
+  sheet.innerHTML = '<div class="sheet im-batch" role="dialog"><div class="sheet-h"><b>批量导入 ' + papers.length + ' 张卷子</b></div>' +
+    '<div class="sheet-d">科目：' + esc(subject === 'general' ? '其他' : subjName(subject)) + '。导完可以点每一张进去改题目、填答案。</div>' +
+    '<div class="im-blist"></div><div class="sheet-row" style="margin-top:12px"><button class="btn" data-act="done" disabled>正在导入……</button></div></div>';
+  document.body.appendChild(sheet);
+  const listEl = sheet.querySelector('.im-blist');
+  const row = (f, html, cls) => {
+    let r = listEl.querySelector('[data-f="' + CSS.escape(f.name) + '"]');
+    if (!r) { r = document.createElement('div'); r.className = 'im-brow'; r.dataset.f = f.name; listEl.appendChild(r); }
+    r.className = 'im-brow' + (cls ? ' ' + cls : '');
+    r.innerHTML = '<span class="im-bname">' + esc(f.name) + '</span><span class="im-bres">' + html + '</span>';
+  };
+  papers.forEach(f => row(f, '等待中'));
+  let ok = 0;
+  for (const f of papers) {
+    row(f, '正在读取' + (/\.doc$/i.test(f.name) ? '（老版 .doc 转换要几秒）' : '') + '……');
+    try {
+      let text = (await api('/api/import/extract?name=' + encodeURIComponent(f.name), { method: 'POST', body: await f.arrayBuffer() })).text;
+      const kf = keys.find(k => base(k.name) === base(f.name));
+      let keyNote = '';
+      if (kf) {
+        const kd = await api('/api/import/extract?name=' + encodeURIComponent(kf.name) + '&answer=1', { method: 'POST', body: await kf.arrayBuffer() });
+        if (kd.keys) { text = text.replace(/\s*$/, '\n\n') + kd.text; keyNote = '，配上了「' + kf.name + '」的答案'; }
+      }
+      const d = await api('/api/import/save', { method: 'POST', body: { text: text, name: f.name.replace(/\.(docx?|txt|md)$/i, ''), subject: subject } });
+      ok++;
+      row(f, '认出 <b>' + d.paper.total + '</b> 题' + keyNote + (d.no_answer ? '，<span class="bad-t">' + d.no_answer + ' 题没答案</span>' : '') +
+        ' · <a href="#/upload/' + d.paper.id + '">改题目</a>' + (d.no_answer ? ' · <a href="#/answers/' + d.paper.id + '">填答案</a>' : ''),
+        d.no_answer ? 'warn' : 'ok');
+    } catch (e) { row(f, '<span class="bad-t">没导进去：' + esc(e.message) + '</span>（可以单独拖进整理台看看）', 'bad'); }
+  }
+  const done = sheet.querySelector('[data-act="done"]');
+  done.disabled = false;
+  done.textContent = '完成（导入了 ' + ok + ' 张）';
+  sheet.addEventListener('click', e => {
+    if (e.target.closest('a')) { sheet.remove(); return; }
+    if (e.target.closest('[data-act="done"]')) {
+      sheet.remove();
+      state.home.subj = subject;
+      state.home.group = '';
+      location.hash = '#/home';
+    }
+  });
 }
 
 async function imParse() {
@@ -1245,8 +1322,8 @@ function imRow(q, i) {
     '<div class="im-qh"><b>' + q.qno + '.</b><span class="im-type">' + (TYPE_NAME[q.type] || q.type) + '</span>' +
       fl.map(f => '<span class="im-chip ' + IM_FLAG[f][1] + '">' + IM_FLAG[f][0] + '</span>').join('') + '</div>' +
     (q.material ? '<div class="im-mat">材料：' + esc(q.material.replace(/\s+/g, ' ').slice(0, 40)) + '…</div>' : '') +
-    '<div class="im-stem">' + esc(q.stem.replace(/\s+/g, ' ')) + '</div>' +
-    (q.options.length ? '<div class="im-opts">' + q.options.map(o => '<span><b>' + o[0] + '</b> ' + esc(o[1].replace(/\s+/g, ' ')) + '</span>').join('') + '</div>' : '') +
+    '<div class="im-stem">' + rich(q.stem.replace(/\s+/g, ' ')) + '</div>' +
+    (q.options.length ? '<div class="im-opts">' + q.options.map(o => '<span><b>' + o[0] + '</b> ' + rich(o[1].replace(/\s+/g, ' ')) + '</span>').join('') + '</div>' : '') +
     (q.doubt ? '<div class="im-doubt">AI 说：' + esc(q.doubt) + '</div>' : '') +
     '<div class="im-qf">' + ans + '</div>' +
   '</div>';
@@ -1387,6 +1464,15 @@ async function imAiDo() {
   toast('AI 整理好了：' + r.questions.length + ' 题。对照原卷看一眼，特别是标黄（AI 存疑）和缺答案的题；不满意可以撤销', 'good');
 }
 
+// 科目名 <-> 科目 key：自带的科目用英文 key（chinese…），自己起的科目名本身就是 key（后台 clean_subject 只留汉字字母数字）
+function subjName(k) { return SUBJECT_NAME[k] || k; }
+function imSubject() {
+  const v = ($('#im-subj') ? $('#im-subj').value : '').trim();
+  if (!v) return 'general';
+  const k = Object.keys(SUBJECT_NAME).find(x => SUBJECT_NAME[x] === v || x === v);
+  return k || v.replace(/[^\w\u4e00-\u9fff-]/g, '').slice(0, 20) || 'general';
+}
+
 async function imSave() {
   const im = state.imp, r = im.res;
   if (!r || !r.questions.length) return;
@@ -1398,11 +1484,11 @@ async function imSave() {
   let d;
   try {
     d = await api('/api/import/save', { method: 'POST', body: { text: $('#im-text').value, name: $('#im-name').value.trim(),
-                                                                subject: $('#im-subj').value, key: im.st.key || '' } });
+                                                                subject: imSubject(), key: im.st.key || '' } });
   } catch (e) { toast(e.message, 'bad'); imParse(); return; }
   if (!im.st.key) { try { localStorage.removeItem(IM_DRAFT); } catch (e) { /* ignore */ } }
   toast((im.st.key ? '已保存：' : '已导入：') + d.paper.name + '，' + d.paper.total + ' 题' + (d.no_answer ? '（' + d.no_answer + ' 题没答案）' : ''), 'good');
-  state.home.subj = $('#im-subj').value;
+  state.home.subj = imSubject();
   state.home.group = '';
   state.home.q = '';
   location.hash = '#/home';
@@ -1588,14 +1674,14 @@ async function viewBank() {
   const b = state.bank;
   await loadHidden();
   if (!b.papers.length) {
-    try { b.papers = (await api('/api/papers')).papers; } catch (e) { /* ignore */ }
+    try { b.papers = (await api('/api/papers')).papers; noteSubjects(b.papers); } catch (e) { /* ignore */ }
   }
   const plist = b.subject ? b.papers.filter(p => p.subject === b.subject) : b.papers.filter(p => !isHidden(p.subject));
   if (b.type && bankTypes(b, plist).indexOf(b.type) < 0) b.type = '';
   app.innerHTML =
     '<div class="filters">' +
       '<select class="inp" id="f-subj"><option value="">全部科目</option>' +
-        shownSubjectKeys().map(k => '<option value="' + k + '"' + (b.subject === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
+        shownSubjectKeys().map(k => '<option value="' + k + '"' + (b.subject === k ? ' selected' : '') + '>' + esc(subjName(k)) + '</option>').join('') +
       '</select>' +
       '<select class="inp" id="f-paper"><option value="0">全部卷子</option>' +
         plist.map(p => '<option value="' + p.id + '"' + (b.paper_id === p.id ? ' selected' : '') + '>' + esc(p.name) + '(' + p.total + ')</option>').join('') +
@@ -1867,7 +1953,7 @@ async function viewWrong() {
       '<button class="chip' + (!tab ? ' on' : '') + '" id="wt0">待消灭(' + items.length + ')</button>' +
       '<button class="chip' + (tab ? ' on' : '') + '" id="wt1">已消灭(' + done.length + ')</button>' +
       '<select class="inp" id="w-subj"><option value="">全部科目</option>' +
-        shownSubjectKeys().map(k => '<option value="' + k + '"' + (subj === k ? ' selected' : '') + '>' + SUBJECT_NAME[k] + '</option>').join('') +
+        shownSubjectKeys().map(k => '<option value="' + k + '"' + (subj === k ? ' selected' : '') + '>' + esc(subjName(k)) + '</option>').join('') +
       '</select>' +
       '<div style="flex:1"></div>' +
       (items.length
@@ -1914,7 +2000,7 @@ async function markWrong(qid, mastered) {
 async function startReview(subject) {
   let d;
   try { d = await api('/api/review' + (subject ? '?subject=' + subject : '')); } catch (e) { toast(e.message, 'bad'); return; }
-  const title = (subject ? SUBJECT_NAME[subject] + ' · ' : '');
+  const title = (subject ? subjName(subject) + ' · ' : '');
   if (d.items.length) {
     beginPractice(d.items, title + '今日复习', 'review');
     allowSave({ subject: subject, scope: 'review' }, title + '今日复习');
@@ -3015,10 +3101,11 @@ async function viewExamNew(subject) {
       '<div class="muted" style="margin-bottom:12px">从该科所有卷子里随机抽题、打乱选项，限时作答，交卷后统一判分。做错和没做的题会自动进错题本。</div>' +
       '<div class="exam-grid">' + subs.map(s =>
         '<div class="exam-pick' + (s.subject === subject ? ' on' : '') + '">' +
-          '<div class="subj-name"><span class="ti">' + SUBJECT_ICON[s.subject] + '</span>' + SUBJECT_NAME[s.subject] + '</div>' +
+          // 自己导入时起的科目（“会计基础”）不在 SUBJECT_NAME 里：名字就用科目本身，图标用第一个字
+          '<div class="subj-name"><span class="ti">' + esc(SUBJECT_ICON[s.subject] || subjName(s.subject).slice(0, 1)) + '</span>' + esc(subjName(s.subject)) + '</div>' +
           '<div class="paper-acts">' +
-            '<button class="btn sm" onclick="startExam(\'' + s.subject + '\',\'standard\')">标准模拟卷</button>' +
-            '<button class="btn ghost sm" onclick="startExam(\'' + s.subject + '\',\'quick\')">20 题小测</button>' +
+            '<button class="btn sm" onclick="startExam(' + jsq(s.subject) + ',\'standard\')">标准模拟卷</button>' +
+            '<button class="btn ghost sm" onclick="startExam(' + jsq(s.subject) + ',\'quick\')">20 题小测</button>' +
           '</div></div>').join('') +
       '</div>' +
     '</div>' +
@@ -3875,6 +3962,7 @@ async function viewSettings() {
   let aic = null;
   if (!IS_APP) try { aic = await api('/api/ai/config'); } catch (e) { /* 老版本程序：没有 AI 助手 */ }
   state.hidden = d.settings.hidden_subjects || [];
+  state.homeHidden = d.settings.home_hidden || [];
   // 可选的科目：题库里有的科目 + 技能实操方向，按文化课 / 技能理论 / 专业技能 / 其他分组
   const subjOpts = d.subjects.map(s => ({ key: s.subject, name: SUBJECT_NAME[s.subject] || s.subject, note: s.total + ' 题' }));
   skills.forEach(s => {
@@ -3888,8 +3976,10 @@ async function viewSettings() {
   const subjList = g => {
     const os = subjOpts.filter(o => subjectGroup(o.key) === g);
     return os.length ? '<div class="set-group-t">' + (GROUP_NAME[g] || '其他') + '</div><div class="set-list">' + os.map(o =>
-      '<label class="set-item subj-check' + (isHidden(o.key) ? ' off' : '') + '"><span class="set-main">' + esc(o.name) + '</span><span class="set-val">' + esc(o.note) + '</span>' +
-        '<input type="checkbox" class="switch" data-k="' + esc(o.key) + '"' + (isHidden(o.key) ? '' : ' checked') + '></label>').join('') + '</div>' : '';
+      '<div class="set-item subj-check' + visClass(o.key) + '" data-k="' + esc(o.key) + '"><span class="set-main">' + esc(o.name) +
+        '<span class="set-sub">' + esc(o.note) + '</span></span>' +
+        '<span class="vis-seg">' + VIS.map(v => '<button data-v="' + v[0] + '"' + (visOf(o.key) === v[0] ? ' class="on"' : '') + '>' + v[1] + '</button>').join('') +
+        '</span></div>').join('') + '</div>' : '';
   };
   const item = (main, val, attrs, cls) =>
     '<' + (attrs ? 'button' : 'div') + ' class="set-item' + (cls ? ' ' + cls : '') + '"' + (attrs || '') + '>' +
@@ -3902,7 +3992,8 @@ async function viewSettings() {
       '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></a>设置</h2>' +
     '<div class="set-page">' +
     GROUPS.map(subjList).join('') + subjList('other') +
-    '<div class="set-foot">关掉的科目不再出现在首页、复习、错题本和模拟考里，做题记录会保留。</div>' +
+    '<div class="set-foot">首页不显示：只是首页的科目和卷子列表里不出现，错题本、搜索、复习、模拟考照常有。<br>' +
+      '都不显示：首页、复习、错题本、搜索和模拟考里都不出现。两种都会保留做题记录，随时可以改回来。</div>' +
 
     '<div class="set-group-t">做题</div><div class="set-list">' +
       '<label class="set-item"><span class="set-main">答题后自动显示翻译</span>' +
@@ -3978,8 +4069,11 @@ async function viewSettings() {
     store.set('quiz.cnafter', ca.checked);
     toast(ca.checked ? '已打开：英语题答完后自动显示翻译' : '已关闭：答完后要看翻译点「译」');
   });
-  $$('.subj-check input').forEach(c => c.addEventListener('change', () => {
-    c.closest('.subj-check').classList.toggle('off', !c.checked);     // 关掉的科目名变灰（老 WebView 不支持 :has，用 class）
+  $$('.subj-check .vis-seg button').forEach(b => b.addEventListener('click', e => {
+    // 用 closest：老手机上 gap 兜底脚本会把按钮文字包进 span
+    const btn = e.target.closest('button'), row = btn.closest('.subj-check');
+    row.querySelectorAll('.vis-seg button').forEach(x => x.classList.toggle('on', x === btn));
+    row.className = 'set-item subj-check' + (btn.dataset.v === 'all' ? ' off' : btn.dataset.v === 'home' ? ' half' : '');
     saveHidden();
   }));
 }
@@ -4139,12 +4233,19 @@ async function syncLogout() {
   catch (e) { toast(e.message, 'bad'); }
 }
 
+// 每个科目三档：show 显示 / home 首页不显示 / all 都不显示（hidden_subjects 是“都不显示”，home_hidden 是“首页不显示”）
+const VIS = [['show', '显示'], ['home', '首页不显示'], ['all', '都不显示']];
+function visOf(k) { return isHidden(k) ? 'all' : state.homeHidden.indexOf(k) >= 0 ? 'home' : 'show'; }
+function visClass(k) { const v = visOf(k); return v === 'all' ? ' off' : v === 'home' ? ' half' : ''; }
 async function saveHidden() {
-  const hidden = $$('.subj-check input').filter(c => !c.checked).map(c => c.dataset.k);
+  const pick = v => $$('.subj-check').filter(r => (r.querySelector('.vis-seg .on') || {}).dataset.v === v).map(r => r.dataset.k);
+  const hidden = pick('all'), home = pick('home');
   try {
-    await api('/api/settings', { method: 'POST', body: { hidden_subjects: hidden } });
+    await api('/api/settings', { method: 'POST', body: { hidden_subjects: hidden, home_hidden: home } });
     state.hidden = hidden;
-    toast(hidden.length ? '已保存，' + hidden.length + ' 个科目不再显示' : '已保存，全部科目都显示', 'good');
+    state.homeHidden = home;
+    toast(!hidden.length && !home.length ? '已保存，全部科目都显示' :
+          '已保存' + (home.length ? '，' + home.length + ' 个科目首页不显示' : '') + (hidden.length ? '，' + hidden.length + ' 个科目都不显示' : ''), 'good');
   } catch (e) { toast(e.message, 'bad'); }
 }
 

@@ -1202,9 +1202,12 @@
         prog.settings.new_per_day = Math.max(0, Math.min(200, n));
       }
       if (/^\d{4}-\d{2}-\d{2}$/.test(String(body.exam_date || ''))) prog.settings.exam_date = body.exam_date;
-      if (Array.isArray(body.hidden_subjects))
-        prog.settings.hidden_subjects = Array.from(new Set(body.hidden_subjects.map(String).filter(s => /^[\w:-]{1,40}$/.test(s)))).sort();
-      ['new_per_day', 'exam_date', 'hidden_subjects'].forEach(k => {
+      // 不学的科目 / 只在首页不显示的科目（科目名可以是中文：电脑上自己导入的卷子起的科目名）
+      ['hidden_subjects', 'home_hidden'].forEach(k => {
+        if (Array.isArray(body[k]))
+          prog.settings[k] = Array.from(new Set(body[k].map(String).filter(s => /^[\w一-鿿:-]{1,40}$/.test(s)))).sort();
+      });
+      ['new_per_day', 'exam_date', 'hidden_subjects', 'home_hidden'].forEach(k => {
         if (k in body) { prog.settings_t[k] = msNow(); dirty('set:' + k); }
       });
       save();

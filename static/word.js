@@ -229,8 +229,21 @@ const WX = (() => {
   }
 
   // ---------------------------------------------------------------- 打包
-  const pngSize = b => (b.length > 24 && b[1] === 0x50 && b[2] === 0x4E) ?
-    [(b[16] << 24 | b[17] << 16 | b[18] << 8 | b[19]) >>> 0, (b[20] << 24 | b[21] << 16 | b[22] << 8 | b[23]) >>> 0] : null;
+  // 图片的宽高和格式：题库自带的都是 PNG；自己导入的 Word 里常有 JPG、GIF（原来只认 PNG，导出时这些图被丢掉）
+  function imgInfo(b) {
+    if (b.length > 24 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47)
+      return ['png', (b[16] << 24 | b[17] << 16 | b[18] << 8 | b[19]) >>> 0, (b[20] << 24 | b[21] << 16 | b[22] << 8 | b[23]) >>> 0];
+    if (b.length > 10 && b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return ['gif', b[6] | b[7] << 8, b[8] | b[9] << 8];
+    if (b.length > 4 && b[0] === 0xFF && b[1] === 0xD8) {
+      for (let i = 2; i + 9 < b.length;) {                 // 找 SOF 段（FFC0～FFCF，去掉 C4 / C8 / CC），里面有高和宽
+        if (b[i] !== 0xFF) { i++; continue; }
+        const m = b[i + 1], len = b[i + 2] << 8 | b[i + 3];
+        if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) return ['jpeg', b[i + 7] << 8 | b[i + 8], b[i + 5] << 8 | b[i + 6]];
+        i += 2 + len;
+      }
+    }
+    return null;
+  }
 
   async function pack(d) {
     const files = [];
@@ -240,8 +253,12 @@ const WX = (() => {
         const r = await fetch('/media/' + p.rel.split('/').map(encodeURIComponent).join('/'));
         if (!r.ok) throw new Error(r.status);
         p.data = new Uint8Array(await r.arrayBuffer());
-        sizes[p.id] = pngSize(p.data);
-        if (sizes[p.id]) files.push(['word/' + p.file, p.data]);
+        const info = imgInfo(p.data);
+        sizes[p.id] = info && info[1] && info[2] ? [info[1], info[2]] : null;
+        if (sizes[p.id]) {
+          p.file = p.file.replace(/\.png$/, '.' + info[0]);
+          files.push(['word/' + p.file, p.data]);
+        }
       } catch (e) { sizes[p.id] = null; }
     }
     let pid = 0;
@@ -277,7 +294,7 @@ const WX = (() => {
     files.unshift(
       ['[Content_Types].xml', enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
         '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
-        '<Default Extension="png" ContentType="image/png"/>' +
+        '<Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="gif" ContentType="image/gif"/>' +
         '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
         '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
         '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>')],

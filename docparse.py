@@ -24,6 +24,8 @@
     - 纯数字题号、无【题型】标签的普通试卷
 """
 import io
+import os
+import posixpath
 import re
 import zipfile
 import xml.etree.ElementTree as ET
@@ -68,21 +70,67 @@ def is_tag_type(tag):
 
 # ---------------------------------------------------------------- 文本抽取
 
-def extract_docx_paras(data):
-    """从 docx 二进制中按段落抽取文本"""
+R_NS = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
+A_BLIP = '{http://schemas.openxmlformats.org/drawingml/2006/main}blip'
+V_IMAGEDATA = '{urn:schemas-microsoft-com:vml}imagedata'
+MC_FALLBACK = '{http://schemas.openxmlformats.org/markup-compatibility/2006}Fallback'
+WEB_IMAGE = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')      # 浏览器能直接显示的图片
+
+
+def extract_docx_paras(data, save_image=None):
+    """从 docx 二进制中按段落抽取文本。
+    图片：传了 save_image(扩展名, 图片字节) -> 存放路径，就把图片存起来、原位置写成 [[img:路径]]（导入整理台用）；
+    没传，或者是浏览器显示不了的（EMF / WMF 矢量图、公式对象），写成 [图片] 记号，预览里标“有图”"""
     zf = zipfile.ZipFile(io.BytesIO(data))
     xml = zf.read('word/document.xml')
     root = ET.fromstring(xml)
+    rels = {}
+    try:
+        for r in ET.fromstring(zf.read('word/_rels/document.xml.rels')):
+            rels[r.get('Id')] = r.get('Target') or ''
+    except (KeyError, ET.ParseError):
+        pass
+    saved = {}
+
+    def image(rid):
+        target = rels.get(rid or '')
+        if not target or not save_image or target.startswith('http'):
+            return None
+        path = target.lstrip('/') if target.startswith('/') else posixpath.normpath(posixpath.join('word', target))
+        if os.path.splitext(path)[1].lower() not in WEB_IMAGE:
+            return None
+        if path not in saved:
+            try:
+                saved[path] = save_image(os.path.splitext(path)[1].lower(), zf.read(path))
+            except KeyError:
+                saved[path] = None
+        return saved[path]
+
     paras = []
     for p in root.iter(W_NS + 'p'):
+        # 新版 Word 的图片写两份：mc:Choice 里的 drawing 和 mc:Fallback 里给老版本看的 pict，只认前一份
+        skip = set()
+        for fb in p.iter(MC_FALLBACK):
+            skip.update(fb.iter())
         buf = []
         for node in p.iter():
+            if node in skip:
+                continue
             if node.tag == W_NS + 't':
                 buf.append(node.text or '')
             elif node.tag == W_NS + 'br':
                 buf.append('\n')
             elif node.tag in (W_NS + 'drawing', W_NS + 'pict', W_NS + 'object'):
-                buf.append('[图片]')                  # 图片、公式对象导入不了，留个记号，预览里标出来
+                ref = None
+                if node.tag != W_NS + 'object':          # object 是公式等嵌入对象，里面那张是 WMF 预览图，显示不了
+                    for b in node.iter():
+                        if b.tag == A_BLIP:
+                            ref = image(b.get(R_NS + 'embed'))
+                            break
+                        if b.tag == V_IMAGEDATA:
+                            ref = image(b.get(R_NS + 'id'))
+                            break
+                buf.append('[[img:%s]]' % ref if ref else '[图片]')
         paras.append(''.join(buf))
     return paras
 
@@ -97,11 +145,11 @@ def decode_text_paras(data):
     return data.decode('utf-8', 'replace').splitlines()
 
 
-def extract_any(data, filename):
-    """根据内容判断 docx 还是纯文本"""
+def extract_any(data, filename, save_image=None):
+    """根据内容判断 docx 还是纯文本；save_image 见 extract_docx_paras"""
     if data[:2] == b'PK':
         try:
-            return extract_docx_paras(data)
+            return extract_docx_paras(data, save_image)
         except Exception:
             # docx 解析失败(老 .doc 改名等)时降级按文本猜
             pass
