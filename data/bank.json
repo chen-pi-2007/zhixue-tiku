@@ -7,7 +7,7 @@
    "total": 36,
    "subject": "politics",
    "key": "politics-1",
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 2,
@@ -16,7 +16,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-1",
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 3,
@@ -25,7 +25,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-2",
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 4,
@@ -34,7 +34,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-3",
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 5,
@@ -43,7 +43,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-4",
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 6,
@@ -52,7 +52,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-5",
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 7,
@@ -61,7 +61,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-1",
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 8,
@@ -70,7 +70,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-2",
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 9,
@@ -79,7 +79,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-3",
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 10,
@@ -88,7 +88,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-4",
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 11,
@@ -97,7 +97,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-5",
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 12,
@@ -106,7 +106,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 13,
@@ -115,7 +115,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 14,
@@ -124,7 +124,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 15,
@@ -133,7 +133,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 16,
@@ -142,7 +142,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 240,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 17,
@@ -151,7 +151,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 18,
@@ -160,7 +160,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 19,
@@ -169,7 +169,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 65,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 20,
@@ -178,7 +178,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 21,
@@ -187,7 +187,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 22,
@@ -196,7 +196,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 48,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 23,
@@ -205,7 +205,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 24,
@@ -214,7 +214,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 30,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 25,
@@ -223,7 +223,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 160,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 26,
@@ -232,7 +232,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 23,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 27,
@@ -241,7 +241,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 202,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 28,
@@ -250,7 +250,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 29,
@@ -259,7 +259,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 30,
@@ -268,7 +268,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 31,
@@ -277,7 +277,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 32,
@@ -286,7 +286,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-22 14:38:21"
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 33,
@@ -295,7 +295,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 60,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 34,
@@ -304,7 +304,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 35,
@@ -313,7 +313,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 36,
@@ -322,7 +322,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 37,
@@ -331,7 +331,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 38,
@@ -340,7 +340,7 @@
    "subject": "english",
    "created_at": "2026-10-10 17:37:09",
    "total": 60,
-   "updated_at": "2026-10-22 14:38:20"
+   "updated_at": "2026-10-26 19:41:39"
   },
   {
    "id": 39,
@@ -349,7 +349,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 40,
@@ -358,7 +358,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 41,
@@ -367,7 +367,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 12:41:45",
    "total": 28,
-   "updated_at": "2026-10-22 14:38:19"
+   "updated_at": "2026-10-26 19:41:38"
   },
   {
    "id": 42,
@@ -375,7 +375,8 @@
    "name": "计算机与网络 数据库管理",
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
-   "total": 95
+   "total": 95,
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 43,
@@ -383,7 +384,8 @@
    "name": "计算机与网络 电工电子技术",
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
-   "total": 28
+   "total": 28,
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 44,
@@ -391,7 +393,8 @@
    "name": "计算机与网络 职业素养与职业健康",
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
-   "total": 39
+   "total": 39,
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 45,
@@ -399,7 +402,8 @@
    "name": "计算机与网络 计算机硬件系统",
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
-   "total": 113
+   "total": 113,
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 46,
@@ -407,7 +411,8 @@
    "name": "计算机与网络 环境保护、劳动保护与版权保护法规",
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
-   "total": 40
+   "total": 40,
+   "updated_at": "2026-10-26 19:41:40"
   },
   {
    "id": 47,
@@ -415,7 +420,8 @@
    "name": "计算机与网络 多媒体技术",
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
-   "total": 81
+   "total": 81,
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 48,
@@ -423,7 +429,8 @@
    "name": "计算机与网络 计算机网络技术",
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
-   "total": 120
+   "total": 120,
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 49,
@@ -431,7 +438,8 @@
    "name": "计算机与网络 计算机操作系统",
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
-   "total": 97
+   "total": 97,
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 50,
@@ -439,7 +447,8 @@
    "name": "计算机与网络 计算机编程基础",
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
-   "total": 81
+   "total": 81,
+   "updated_at": "2026-10-26 19:41:41"
   },
   {
    "id": 51,
@@ -447,7 +456,8 @@
    "name": "计算机与网络 信息安全",
    "subject": "network",
    "created_at": "2026-10-26 10:50:16",
-   "total": 53
+   "total": 53,
+   "updated_at": "2026-10-26 19:41:41"
   }
  ],
  "questions": [
@@ -90248,7 +90258,7 @@
    "paper_id": 42,
    "qno": 34,
    "type": "single",
-   "stem": "开发、管理和使用数据库的人员可分为四类相关人员，其中（ ）负责管理和控制数据库 系统。",
+   "stem": "开发、管理和使用数据库的人员可分为四类相关人员，其中（ ）负责管理和控制数据库系统。",
    "material": "",
    "options": [
     [
@@ -91128,7 +91138,7 @@
    "paper_id": 43,
    "qno": 1,
    "type": "single",
-   "stem": "直流电路如图所示，若U=10V，则R2的阻值为\n[[img:network-electric/001.png]]",
+   "stem": "直流电路如图所示，若U=10V，则R₂的阻值为\n[[img:network-electric/001.png]]",
    "material": "",
    "options": [
     [
@@ -91186,7 +91196,7 @@
    "paper_id": 43,
    "qno": 3,
    "type": "single",
-   "stem": "已知一正弦交流电流[[img:network-electric/003.png]] ，则该交流电的有效值为",
+   "stem": "已知一正弦交流电流i=sin(314t+\\(\\frac{π}{6}\\))A ，则该交流电的有效值为",
    "material": "",
    "options": [
     [
@@ -91331,7 +91341,7 @@
    "paper_id": 43,
    "qno": 8,
    "type": "single",
-   "stem": "由欧姆定律变换式 [[img:network-electric/008.png]]，可知：一段导体的电阻与其两端所加的",
+   "stem": "由欧姆定律变换式 \\(R=\\frac{U}{I}\\)，可知：一段导体的电阻与其两端所加的",
    "material": "",
    "options": [
     [
@@ -99041,7 +99051,7 @@
    "paper_id": 48,
    "qno": 92,
    "type": "judge",
-   "stem": "在连续ARQ协议中，当滑动窗口序号位数为n，则发送窗口最大尺寸为2n-1。",
+   "stem": "在连续ARQ协议中，当滑动窗口序号位数为n，则发送窗口最大尺寸为2ⁿ−1。",
    "material": "",
    "options": [],
    "answer": "对",
@@ -99708,7 +99718,7 @@
    "paper_id": 49,
    "qno": 12,
    "type": "single",
-   "stem": "操作系统是 与 的接口",
+   "stem": "操作系统是（ ）与（ ）的接口",
    "material": "",
    "options": [
     [
@@ -99882,7 +99892,7 @@
    "paper_id": 49,
    "qno": 18,
    "type": "single",
-   "stem": "操作系统的?? 管理部分负责对进程进行调度",
+   "stem": "操作系统的（ ）管理部分负责对进程进行调度",
    "material": "",
    "options": [
     [
@@ -99998,7 +100008,7 @@
    "paper_id": 49,
    "qno": 22,
    "type": "single",
-   "stem": "Windows 7任务栏中的 按钮，可以将所有打开窗口全部最小化",
+   "stem": "Windows 7任务栏中的（ ）按钮，可以将所有打开窗口全部最小化",
    "material": "",
    "options": [
     [
@@ -100979,7 +100989,7 @@
    "paper_id": 49,
    "qno": 74,
    "type": "judge",
-   "stem": "BIOS菜单中的\"SAVE AND EXIT?SETUP\"是指保存并退出设置程序。",
+   "stem": "BIOS菜单中的\"SAVE AND EXIT SETUP\"是指保存并退出设置程序。",
    "material": "",
    "options": [],
    "answer": "对",
@@ -101267,7 +101277,7 @@
    "paper_id": 50,
    "qno": 1,
    "type": "single",
-   "stem": "C语言源程序中主函数名是(　　)",
+   "stem": "C语言源程序中主函数名是( )",
    "material": "",
    "options": [
     [
@@ -101383,7 +101393,7 @@
    "paper_id": 50,
    "qno": 5,
    "type": "single",
-   "stem": "若有int a＝4, 则执行表达式a+=a-=a*a后，a的值是(　　)",
+   "stem": "若有int a＝4, 则执行表达式a+=a-=a*a后，a的值是( )",
    "material": "",
    "options": [
     [
@@ -101499,7 +101509,7 @@
    "paper_id": 50,
    "qno": 9,
    "type": "single",
-   "stem": "C语言源程序的扩展名是(　　)",
+   "stem": "C语言源程序的扩展名是( )",
    "material": "",
    "options": [
     [
@@ -101528,7 +101538,7 @@
    "paper_id": 50,
    "qno": 10,
    "type": "single",
-   "stem": "以下不能定义为用户标识符的是(　　)",
+   "stem": "以下不能定义为用户标识符的是( )",
    "material": "",
    "options": [
     [
@@ -101789,7 +101799,7 @@
    "paper_id": 50,
    "qno": 19,
    "type": "single",
-   "stem": "下面叙述正确的是(　　)",
+   "stem": "下面叙述正确的是( )",
    "material": "",
    "options": [
     [
@@ -101934,7 +101944,7 @@
    "paper_id": 50,
    "qno": 24,
    "type": "single",
-   "stem": "若有定义int i=2,j=7;则表达式(++j)*(i--)的值是(　)",
+   "stem": "若有定义int i=2,j=7;则表达式(++j)*(i--)的值是( )",
    "material": "",
    "options": [
     [
@@ -101963,7 +101973,7 @@
    "paper_id": 50,
    "qno": 25,
    "type": "single",
-   "stem": "扩展名为.exe的文件称为C语言的(　　)",
+   "stem": "扩展名为.exe的文件称为C语言的( )",
    "material": "",
    "options": [
     [
@@ -102079,7 +102089,7 @@
    "paper_id": 50,
    "qno": 29,
    "type": "single",
-   "stem": "x=-13%-5则x的值是（　）",
+   "stem": "x=-13%-5则x的值是（ ）",
    "material": "",
    "options": [
     [
@@ -102166,7 +102176,7 @@
    "paper_id": 50,
    "qno": 32,
    "type": "multi",
-   "stem": "字符‘a'占用的存储空间不为(　　)",
+   "stem": "字符‘a'占用的存储空间不为( )",
    "material": "",
    "options": [
     [
@@ -102253,7 +102263,7 @@
    "paper_id": 50,
    "qno": 35,
    "type": "multi",
-   "stem": "下面叙述错误的是(　　)",
+   "stem": "下面叙述错误的是( )",
    "material": "",
    "options": [
     [
@@ -102306,7 +102316,7 @@
    "paper_id": 50,
    "qno": 38,
    "type": "judge",
-   "stem": "C语言中一条语句可以写在多行上。(　　)",
+   "stem": "C语言中一条语句可以写在多行上。( )",
    "material": "",
    "options": [],
    "answer": "对",
@@ -102486,7 +102496,7 @@
    "paper_id": 50,
    "qno": 53,
    "type": "judge",
-   "stem": "C语言采用的翻译是编译(　　)",
+   "stem": "C语言采用的翻译是编译( )",
    "material": "",
    "options": [],
    "answer": "对",
@@ -102498,7 +102508,7 @@
    "paper_id": 50,
    "qno": 54,
    "type": "judge",
-   "stem": "在C语言中，八进制整常数和十六进制整常数都是以0开头(　　)",
+   "stem": "在C语言中，八进制整常数和十六进制整常数都是以0开头( )",
    "material": "",
    "options": [],
    "answer": "错",
@@ -102570,7 +102580,7 @@
    "paper_id": 50,
    "qno": 60,
    "type": "judge",
-   "stem": "用汇编语言编写的程序称为汇编语言源程序，其特点是使用了助记符号，克服了机器语言难读、难编、难记等缺点。(　　)",
+   "stem": "用汇编语言编写的程序称为汇编语言源程序，其特点是使用了助记符号，克服了机器语言难读、难编、难记等缺点。( )",
    "material": "",
    "options": [],
    "answer": "对",
@@ -102594,7 +102604,7 @@
    "paper_id": 50,
    "qno": 62,
    "type": "judge",
-   "stem": "main只能放在程序的开头位置，但只能有一个主函数(　　)",
+   "stem": "main只能放在程序的开头位置，但只能有一个主函数( )",
    "material": "",
    "options": [],
    "answer": "错",
@@ -102678,7 +102688,7 @@
    "paper_id": 50,
    "qno": 69,
    "type": "judge",
-   "stem": "习惯上，符号常量名用大写，变量名用小字，以示区别。(　　)",
+   "stem": "习惯上，符号常量名用大写，变量名用小字，以示区别。( )",
    "material": "",
    "options": [],
    "answer": "对",
@@ -102690,7 +102700,7 @@
    "paper_id": 50,
    "qno": 70,
    "type": "judge",
-   "stem": "C语言采用的翻译是编译。(　　)",
+   "stem": "C语言采用的翻译是编译。( )",
    "material": "",
    "options": [],
    "answer": "对",
@@ -102774,7 +102784,7 @@
    "paper_id": 50,
    "qno": 77,
    "type": "judge",
-   "stem": "表达式x=2,x＋＋,5的结果与x=（2,x＋＋,5）的结果一样(　　)",
+   "stem": "表达式x=2,x＋＋,5的结果与x=（2,x＋＋,5）的结果一样( )",
    "material": "",
    "options": [],
    "answer": "错",
@@ -102798,7 +102808,7 @@
    "paper_id": 50,
    "qno": 79,
    "type": "judge",
-   "stem": "C语言的注释语句只能是“//”(　　)",
+   "stem": "C语言的注释语句只能是“//”( )",
    "material": "",
    "options": [],
    "answer": "错",
@@ -103508,7 +103518,7 @@
    "paper_id": 51,
    "qno": 26,
    "type": "judge",
-   "stem": "目前常用的可靠性较好的身份认证是多重认证方式的组合认证，如：手机支付、手机银行等应用中，除了口令、指纹之外，还需要输入对方用短信 发送的一个(随机数)验证码来组合认证等。",
+   "stem": "目前常用的可靠性较好的身份认证是多重认证方式的组合认证，如：手机支付、手机银行等应用中，除了口令、指纹之外，还需要输入对方用短信发送的一个(随机数)验证码来组合认证等。",
    "material": "",
    "options": [],
    "answer": "对",

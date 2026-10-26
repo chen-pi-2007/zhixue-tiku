@@ -1,10 +1,10 @@
 {
- "content_version": 90,
- "created": "2026-10-26 11:26:27",
+ "content_version": 91,
+ "created": "2026-10-26 19:43:05",
  "files": {
   "data/bank.json": [
-   "b01b5750e3a4d5aa22d88a36d2a99c8ef05db73212defedf6aff10eae8baef4d",
-   3498639
+   "f8b4044dde8c0f30fa9b0ce8ca27d438d9ca0639c5ad06ab00b44fbaf3a8cf34",
+   3498974
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -738,10 +738,6 @@
    "71fd3cb472d17a266f693fc00bd3082c2622aa93ff2102c81122ff3ecd95ec12",
    20998
   ],
-  "data/media/network-electric/003.png": [
-   "5ca4aba79e53ddfa85e17162ed3564a6bc5dc6c41441a1c4474efca0a0baa806",
-   2176
-  ],
   "data/media/network-electric/004.png": [
    "cb33ca1321b8028415e840be6b7ab5654ce5c4dce1abb2e99835edc8d2ad2977",
    979
@@ -757,10 +753,6 @@
   "data/media/network-electric/007.png": [
    "09b90f1b2ea2ba92a2b1fb87a2c12a981c60400a40720e9d2fbb2e160b687f45",
    1375
-  ],
-  "data/media/network-electric/008.png": [
-   "8f48a21bd4f02de54fdd7a1c95acae2997515629c6a9ac8cac2205d447f44f2d",
-   922
   ],
   "data/media/network-electric/009.png": [
    "bb1d1dee13a46c07eddfbbecbe264acb83b7ff199e826f4e55167c3825d76940",
@@ -1718,7 +1710,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "修复第 89 版部分文件校验不通过，无法更新的问题",
+ "notes": "计算机与网络技术：电工题的两个公式改成清晰的公式显示，修正几道题干的乱码和看不出来的填空（如",
  "py_shell_api": 1,
- "tag": "content-90"
+ "tag": "content-91"
 }
