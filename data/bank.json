@@ -7,7 +7,7 @@
    "total": 36,
    "subject": "politics",
    "key": "politics-1",
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 2,
@@ -16,7 +16,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-1",
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:16"
   },
   {
    "id": 3,
@@ -25,7 +25,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-2",
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:16"
   },
   {
    "id": 4,
@@ -34,7 +34,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-3",
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:16"
   },
   {
    "id": 5,
@@ -43,7 +43,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-4",
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:16"
   },
   {
    "id": 6,
@@ -52,7 +52,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-5",
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 7,
@@ -61,7 +61,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-1",
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 8,
@@ -70,7 +70,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-2",
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 9,
@@ -79,7 +79,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-3",
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 10,
@@ -88,7 +88,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-4",
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 11,
@@ -97,7 +97,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-5",
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 12,
@@ -106,7 +106,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 13,
@@ -114,8 +114,8 @@
    "name": "英语 交际对话",
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
-   "total": 120,
-   "updated_at": "2026-10-26 19:41:38"
+   "total": 125,
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 14,
@@ -124,7 +124,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 15,
@@ -132,8 +132,8 @@
    "name": "英语 图文理解",
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
-   "total": 32,
-   "updated_at": "2026-10-26 19:41:38"
+   "total": 36,
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 16,
@@ -142,7 +142,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 240,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 17,
@@ -151,7 +151,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 18,
@@ -159,8 +159,8 @@
    "name": "英语 书面表达",
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
-   "total": 40,
-   "updated_at": "2026-10-26 19:41:39"
+   "total": 45,
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 19,
@@ -169,7 +169,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 65,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 20,
@@ -178,7 +178,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 21,
@@ -187,7 +187,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 22,
@@ -196,7 +196,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 48,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 23,
@@ -205,7 +205,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 24,
@@ -214,7 +214,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 30,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 25,
@@ -223,7 +223,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 160,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 26,
@@ -232,7 +232,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 23,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 27,
@@ -241,7 +241,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 202,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 28,
@@ -250,7 +250,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 29,
@@ -259,7 +259,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 30,
@@ -268,7 +268,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 31,
@@ -277,7 +277,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 32,
@@ -286,7 +286,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 33,
@@ -295,7 +295,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 60,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 34,
@@ -304,7 +304,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 35,
@@ -313,7 +313,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 36,
@@ -322,7 +322,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 37,
@@ -331,7 +331,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:18"
   },
   {
    "id": 38,
@@ -340,7 +340,7 @@
    "subject": "english",
    "created_at": "2026-10-10 17:37:09",
    "total": 60,
-   "updated_at": "2026-10-26 19:41:39"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 39,
@@ -349,7 +349,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 40,
@@ -358,7 +358,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 41,
@@ -367,7 +367,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 12:41:45",
    "total": 28,
-   "updated_at": "2026-10-26 19:41:38"
+   "updated_at": "2026-11-03 14:54:17"
   },
   {
    "id": 42,
@@ -376,7 +376,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 95,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 43,
@@ -385,7 +385,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 28,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 44,
@@ -394,7 +394,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 39,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 45,
@@ -403,7 +403,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 113,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 46,
@@ -412,7 +412,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 40,
-   "updated_at": "2026-10-26 19:41:40"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 47,
@@ -421,7 +421,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 48,
@@ -430,7 +430,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 120,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 49,
@@ -439,7 +439,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 97,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 50,
@@ -448,7 +448,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
   },
   {
    "id": 51,
@@ -457,7 +457,23 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:16",
    "total": 53,
-   "updated_at": "2026-10-26 19:41:41"
+   "updated_at": "2026-11-03 14:54:19"
+  },
+  {
+   "id": 52,
+   "key": "english-new-1",
+   "name": "英语 新题（11月3日）",
+   "subject": "english",
+   "created_at": "2026-11-03 14:54:17",
+   "total": 14
+  },
+  {
+   "id": 53,
+   "key": "network-new-1",
+   "name": "计算机与网络 新题（11月3日）",
+   "subject": "network",
+   "created_at": "2026-11-03 14:54:19",
+   "total": 8
   }
  ],
  "questions": [
@@ -103847,6 +103863,1938 @@
    "options": [],
    "answer": "错",
    "analysis": ""
+  },
+  {
+   "id": 3164,
+   "key": "english-dialogue#121",
+   "paper_id": 13,
+   "qno": 121,
+   "type": "single",
+   "stem": "第25组 对话第1空应填",
+   "material": "第25组 补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "正确：“埃德温在吗”，电话里先找人。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ]
+  },
+  {
+   "id": 3165,
+   "key": "english-dialogue#122",
+   "paper_id": 13,
+   "qno": 122,
+   "type": "single",
+   "stem": "第25组 对话第2空应填",
+   "material": "第25组 补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "正确：“请问是哪位”，埃德温没听清是谁打来的。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ]
+  },
+  {
+   "id": 3166,
+   "key": "english-dialogue#123",
+   "paper_id": 13,
+   "qno": 123,
+   "type": "single",
+   "stem": "第25组 对话第3空应填",
+   "material": "第25组 补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "E",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "正确：“我觉得信号不好”，所以要挂了重打。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ]
+  },
+  {
+   "id": 3167,
+   "key": "english-dialogue#124",
+   "paper_id": 13,
+   "qno": 124,
+   "type": "single",
+   "stem": "第25组 对话第4空应填",
+   "material": "第25组 补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "D",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "正确：“我是莫莉”，接通后报上自己的名字。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ]
+  },
+  {
+   "id": 3168,
+   "key": "english-dialogue#125",
+   "paper_id": 13,
+   "qno": 125,
+   "type": "single",
+   "stem": "第25组 对话第5空应填",
+   "material": "第25组 补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "正确：“我需要你帮我学英语”，回答“什么事”，后面埃德温说可以在 QQ 上聊。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ]
+  },
+  {
+   "id": 3169,
+   "key": "english-new-1#1",
+   "paper_id": 52,
+   "qno": 1,
+   "type": "single",
+   "stem": "对话第1空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "正确：“埃德温在吗”，电话里先找人。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ],
+   "same_as": "english-dialogue#121",
+   "section": "交际对话"
+  },
+  {
+   "id": 3170,
+   "key": "english-new-1#2",
+   "paper_id": 52,
+   "qno": 2,
+   "type": "single",
+   "stem": "对话第2空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "正确：“请问是哪位”，埃德温没听清是谁打来的。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ],
+   "same_as": "english-dialogue#122",
+   "section": "交际对话"
+  },
+  {
+   "id": 3171,
+   "key": "english-new-1#3",
+   "paper_id": 52,
+   "qno": 3,
+   "type": "single",
+   "stem": "对话第3空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "E",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "正确：“我觉得信号不好”，所以要挂了重打。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ],
+   "same_as": "english-dialogue#123",
+   "section": "交际对话"
+  },
+  {
+   "id": 3172,
+   "key": "english-new-1#4",
+   "paper_id": 52,
+   "qno": 4,
+   "type": "single",
+   "stem": "对话第4空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "D",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "错误：“我需要你帮我学英语”，应该填第 5 空。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "正确：“我是莫莉”，接通后报上自己的名字。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ],
+   "same_as": "english-dialogue#124",
+   "section": "交际对话"
+  },
+  {
+   "id": 3173,
+   "key": "english-new-1#5",
+   "paper_id": 52,
+   "qno": 5,
+   "type": "single",
+   "stem": "对话第5空应填",
+   "material": "补全对话：从选项中选出能填入空白处的最佳选项。\nEdwin: Speaking.\nMolly: Hi, how are you? （__1__）\nMolly: Could you speak up a little please?\nEdwin: This is Edwin. （__2__）\nMolly: I will call you back. （__3__）\n(After a second)\nEdwin: Hello. This is Edwin. Can you hear me?\nMolly: Yes. （__4__）\nEdwin: What was the reason for your call?\nMolly: I'm calling to ask for your help.\nEdwin: What's up?\nMolly: （__5__）\nEdwin: OK. I'd like to. We can chat on QQ.\nMolly: Good idea. See you.",
+   "options": [
+    [
+     "A",
+     "I need you to help me with my English."
+    ],
+    [
+     "B",
+     "Is Edwin there?"
+    ],
+    [
+     "C",
+     "Can I ask who's calling?"
+    ],
+    [
+     "D",
+     "This is Molly."
+    ],
+    [
+     "E",
+     "I think we have a bad connection."
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "我需要你帮我学英语。",
+    "埃德温在吗？",
+    "请问是哪位？",
+    "我是莫莉。",
+    "我觉得信号不太好。"
+   ],
+   "material_cn": "埃德温：我就是。\n莫莉：你好，最近怎么样？（1）\n莫莉：你能大声一点吗？\n埃德温：我是埃德温。（2）\n莫莉：我给你回拨过去。（3）\n（过了一会儿）\n埃德温：喂，我是埃德温。你能听见吗？\n莫莉：能。（4）\n埃德温：你打电话有什么事？\n莫莉：我打电话是想请你帮忙。\n埃德温：什么事？\n莫莉：（5）\n埃德温：好啊，我很乐意。我们可以在 QQ 上聊。\n莫莉：好主意，再见。",
+   "point": "打电话找人：Is … there? 接电话的人自己说 Speaking. 问对方是谁：Who's calling?",
+   "option_notes": [
+    "正确：“我需要你帮我学英语”，回答“什么事”，后面埃德温说可以在 QQ 上聊。",
+    "错误：“埃德温在吗”，应该填第 1 空。",
+    "错误：“请问是哪位”，应该填第 2 空。",
+    "错误：“我是莫莉”，应该填第 4 空。",
+    "错误：“我觉得信号不好”，应该填第 3 空。"
+   ],
+   "phrases": [
+    [
+     "Speaking.",
+     "（电话用语）我就是"
+    ],
+    [
+     "speak up",
+     "大声点说"
+    ],
+    [
+     "call sb. back",
+     "给某人回电话"
+    ],
+    [
+     "bad connection",
+     "信号不好、线路不好"
+    ]
+   ],
+   "same_as": "english-dialogue#125",
+   "section": "交际对话"
+  },
+  {
+   "id": 3174,
+   "key": "english-new-1#6",
+   "paper_id": 52,
+   "qno": 6,
+   "type": "single",
+   "stem": "[[img:english-picture/new-20261103-1.png]]\nYoung people in the USA prefer __________.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "hamburgers"
+    ],
+    [
+     "B",
+     "pizza"
+    ],
+    [
+     "C",
+     "French fries"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "（饼图：美国青少年的快餐喜好——汉堡 33%、比萨 26%、薯条 22%、炸鸡 9%、墨西哥卷饼 7%、寿司 3%）美国的年轻人更喜欢______。",
+   "options_cn": [
+    "汉堡",
+    "比萨",
+    "薯条"
+   ],
+   "point": "prefer 更喜欢；饼图里占比最大的是 Hamburgers（33%）。",
+   "option_notes": [
+    "正确：汉堡占 33%，比例最大。",
+    "错误：比萨占 26%，排第二。",
+    "错误：薯条占 22%，排第三。"
+   ],
+   "phrases": [
+    [
+     "prefer",
+     "更喜欢"
+    ],
+    [
+     "preference",
+     "偏好、喜好"
+    ]
+   ],
+   "same_as": "english-picture#33",
+   "section": "图文理解"
+  },
+  {
+   "id": 3175,
+   "key": "english-new-1#7",
+   "paper_id": 52,
+   "qno": 7,
+   "type": "single",
+   "stem": "[[img:english-picture/new-20261103-2.png]]\nThis toy is suitable for __________.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "girls"
+    ],
+    [
+     "B",
+     "adults"
+    ],
+    [
+     "C",
+     "boys"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "（玩具包装：Baby Alfrendo——给男孩的仿真娃娃；会哭、会吃、会尿湿；培养责任心；现在还会长头发！）这个玩具适合______。",
+   "options_cn": [
+    "女孩",
+    "成年人",
+    "男孩"
+   ],
+   "point": "包装上写着 REALISTIC DOLL FOR BOYS（给男孩的仿真娃娃）。be suitable for 适合……",
+   "option_notes": [
+    "错误：包装上写的是 for boys，不是给女孩的。",
+    "错误：这是儿童玩具，不是给成年人的。",
+    "正确：包装上写着 REALISTIC DOLL FOR BOYS。"
+   ],
+   "phrases": [
+    [
+     "be suitable for",
+     "适合……"
+    ],
+    [
+     "realistic",
+     "逼真的、仿真的"
+    ],
+    [
+     "doll",
+     "玩偶、娃娃"
+    ]
+   ],
+   "same_as": "english-picture#34",
+   "section": "图文理解"
+  },
+  {
+   "id": 3176,
+   "key": "english-new-1#8",
+   "paper_id": 52,
+   "qno": 8,
+   "type": "single",
+   "stem": "Billy: How much are they altogether?\nJoe: En... the coat is £120 and the bag is £80, £200 in all. And we give a 5% discount for credit card.\nBilly will pay ________ by credit card.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "£200"
+    ],
+    [
+     "B",
+     "£190"
+    ],
+    [
+     "C",
+     "£210"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "比利：一共多少钱？\n乔：嗯……外套 120 英镑，包 80 英镑，一共 200 英镑。用信用卡付款打 95 折（优惠 5%）。\n比利用信用卡要付______。",
+   "options_cn": [
+    "200 英镑",
+    "190 英镑",
+    "210 英镑"
+   ],
+   "point": "用信用卡优惠 5%：200 × (1 − 5%) = 190。altogether / in all 总共；discount 折扣。",
+   "option_notes": [
+    "错误：200 英镑是原价，用信用卡还能优惠 5%。",
+    "正确：200 × 95% = 190 英镑。",
+    "错误：打折后会更便宜，不会变成 210 英镑。"
+   ],
+   "phrases": [
+    [
+     "altogether",
+     "总共"
+    ],
+    [
+     "in all",
+     "总共"
+    ],
+    [
+     "discount",
+     "折扣"
+    ]
+   ],
+   "same_as": "english-picture#35",
+   "section": "图文理解"
+  },
+  {
+   "id": 3177,
+   "key": "english-new-1#9",
+   "paper_id": 52,
+   "qno": 9,
+   "type": "single",
+   "stem": "Jack: What's wrong with you? You look very upset.\nBilly: My mother was ill. I am worried about her.\nWhy is Billy worried?",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "Because he was ill."
+    ],
+    [
+     "B",
+     "Because he was upset."
+    ],
+    [
+     "C",
+     "Because his mother was ill."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "杰克：你怎么了？看起来很难过。\n比利：我妈妈病了，我很担心她。\n比利为什么担心？",
+   "options_cn": [
+    "因为他自己病了。",
+    "因为他很难过。",
+    "因为他妈妈病了。"
+   ],
+   "point": "be worried about 担心……；What's wrong with you? 你怎么了？",
+   "option_notes": [
+    "错误：生病的是他妈妈，不是他自己。",
+    "错误：难过是担心的表现，不是原因。",
+    "正确：My mother was ill. I am worried about her."
+   ],
+   "phrases": [
+    [
+     "What's wrong with you?",
+     "你怎么了？"
+    ],
+    [
+     "upset",
+     "难过的、心烦的"
+    ],
+    [
+     "be worried about",
+     "担心……"
+    ]
+   ],
+   "same_as": "english-picture#36",
+   "section": "图文理解"
+  },
+  {
+   "id": 3178,
+   "key": "english-new-1#10",
+   "paper_id": 52,
+   "qno": 10,
+   "type": "single",
+   "stem": "第1空应填",
+   "material": "书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "正确：“请注意”，口头通知的开头。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ],
+   "same_as": "english-writing#41",
+   "section": "书面表达"
+  },
+  {
+   "id": 3179,
+   "key": "english-new-1#11",
+   "paper_id": 52,
+   "qno": 11,
+   "type": "single",
+   "stem": "第2空应填",
+   "material": "书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "E",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "正确：“要学好语法需要有用的书”，引出下一句“我想推荐一本”。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ],
+   "same_as": "english-writing#42",
+   "section": "书面表达"
+  },
+  {
+   "id": 3180,
+   "key": "english-new-1#12",
+   "paper_id": 52,
+   "qno": 12,
+   "type": "single",
+   "stem": "第3空应填",
+   "material": "书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "正确：“它对我们职校生很实用”，介绍完书名、价格后说它的好处。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ],
+   "same_as": "english-writing#43",
+   "section": "书面表达"
+  },
+  {
+   "id": 3181,
+   "key": "english-new-1#13",
+   "paper_id": 52,
+   "qno": 13,
+   "type": "single",
+   "stem": "第4空应填",
+   "material": "书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "正确：“大家可以来看看再决定”，接在“我手上有一本”后面。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ],
+   "same_as": "english-writing#44",
+   "section": "书面表达"
+  },
+  {
+   "id": 3182,
+   "key": "english-new-1#14",
+   "paper_id": 52,
+   "qno": 14,
+   "type": "single",
+   "stem": "第5空应填",
+   "material": "书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "正确：“就这些，谢谢”，口头通知的结尾。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ],
+   "same_as": "english-writing#45",
+   "section": "书面表达"
+  },
+  {
+   "id": 3183,
+   "key": "english-picture#33",
+   "paper_id": 15,
+   "qno": 33,
+   "type": "single",
+   "stem": "[[img:english-picture/new-20261103-1.png]]\nYoung people in the USA prefer __________.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "hamburgers"
+    ],
+    [
+     "B",
+     "pizza"
+    ],
+    [
+     "C",
+     "French fries"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "（饼图：美国青少年的快餐喜好——汉堡 33%、比萨 26%、薯条 22%、炸鸡 9%、墨西哥卷饼 7%、寿司 3%）美国的年轻人更喜欢______。",
+   "options_cn": [
+    "汉堡",
+    "比萨",
+    "薯条"
+   ],
+   "point": "prefer 更喜欢；饼图里占比最大的是 Hamburgers（33%）。",
+   "option_notes": [
+    "正确：汉堡占 33%，比例最大。",
+    "错误：比萨占 26%，排第二。",
+    "错误：薯条占 22%，排第三。"
+   ],
+   "phrases": [
+    [
+     "prefer",
+     "更喜欢"
+    ],
+    [
+     "preference",
+     "偏好、喜好"
+    ]
+   ]
+  },
+  {
+   "id": 3184,
+   "key": "english-picture#34",
+   "paper_id": 15,
+   "qno": 34,
+   "type": "single",
+   "stem": "[[img:english-picture/new-20261103-2.png]]\nThis toy is suitable for __________.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "girls"
+    ],
+    [
+     "B",
+     "adults"
+    ],
+    [
+     "C",
+     "boys"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "（玩具包装：Baby Alfrendo——给男孩的仿真娃娃；会哭、会吃、会尿湿；培养责任心；现在还会长头发！）这个玩具适合______。",
+   "options_cn": [
+    "女孩",
+    "成年人",
+    "男孩"
+   ],
+   "point": "包装上写着 REALISTIC DOLL FOR BOYS（给男孩的仿真娃娃）。be suitable for 适合……",
+   "option_notes": [
+    "错误：包装上写的是 for boys，不是给女孩的。",
+    "错误：这是儿童玩具，不是给成年人的。",
+    "正确：包装上写着 REALISTIC DOLL FOR BOYS。"
+   ],
+   "phrases": [
+    [
+     "be suitable for",
+     "适合……"
+    ],
+    [
+     "realistic",
+     "逼真的、仿真的"
+    ],
+    [
+     "doll",
+     "玩偶、娃娃"
+    ]
+   ]
+  },
+  {
+   "id": 3185,
+   "key": "english-picture#35",
+   "paper_id": 15,
+   "qno": 35,
+   "type": "single",
+   "stem": "Billy: How much are they altogether?\nJoe: En... the coat is £120 and the bag is £80, £200 in all. And we give a 5% discount for credit card.\nBilly will pay ________ by credit card.",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "£200"
+    ],
+    [
+     "B",
+     "£190"
+    ],
+    [
+     "C",
+     "£210"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "比利：一共多少钱？\n乔：嗯……外套 120 英镑，包 80 英镑，一共 200 英镑。用信用卡付款打 95 折（优惠 5%）。\n比利用信用卡要付______。",
+   "options_cn": [
+    "200 英镑",
+    "190 英镑",
+    "210 英镑"
+   ],
+   "point": "用信用卡优惠 5%：200 × (1 − 5%) = 190。altogether / in all 总共；discount 折扣。",
+   "option_notes": [
+    "错误：200 英镑是原价，用信用卡还能优惠 5%。",
+    "正确：200 × 95% = 190 英镑。",
+    "错误：打折后会更便宜，不会变成 210 英镑。"
+   ],
+   "phrases": [
+    [
+     "altogether",
+     "总共"
+    ],
+    [
+     "in all",
+     "总共"
+    ],
+    [
+     "discount",
+     "折扣"
+    ]
+   ]
+  },
+  {
+   "id": 3186,
+   "key": "english-picture#36",
+   "paper_id": 15,
+   "qno": 36,
+   "type": "single",
+   "stem": "Jack: What's wrong with you? You look very upset.\nBilly: My mother was ill. I am worried about her.\nWhy is Billy worried?",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "Because he was ill."
+    ],
+    [
+     "B",
+     "Because he was upset."
+    ],
+    [
+     "C",
+     "Because his mother was ill."
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "stem_cn": "杰克：你怎么了？看起来很难过。\n比利：我妈妈病了，我很担心她。\n比利为什么担心？",
+   "options_cn": [
+    "因为他自己病了。",
+    "因为他很难过。",
+    "因为他妈妈病了。"
+   ],
+   "point": "be worried about 担心……；What's wrong with you? 你怎么了？",
+   "option_notes": [
+    "错误：生病的是他妈妈，不是他自己。",
+    "错误：难过是担心的表现，不是原因。",
+    "正确：My mother was ill. I am worried about her."
+   ],
+   "phrases": [
+    [
+     "What's wrong with you?",
+     "你怎么了？"
+    ],
+    [
+     "upset",
+     "难过的、心烦的"
+    ],
+    [
+     "be worried about",
+     "担心……"
+    ]
+   ]
+  },
+  {
+   "id": 3187,
+   "key": "english-writing#41",
+   "paper_id": 18,
+   "qno": 41,
+   "type": "single",
+   "stem": "第9组 第1空应填",
+   "material": "第9组 书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "B",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "正确：“请注意”，口头通知的开头。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ]
+  },
+  {
+   "id": 3188,
+   "key": "english-writing#42",
+   "paper_id": 18,
+   "qno": 42,
+   "type": "single",
+   "stem": "第9组 第2空应填",
+   "material": "第9组 书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "E",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "正确：“要学好语法需要有用的书”，引出下一句“我想推荐一本”。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ]
+  },
+  {
+   "id": 3189,
+   "key": "english-writing#43",
+   "paper_id": 18,
+   "qno": 43,
+   "type": "single",
+   "stem": "第9组 第3空应填",
+   "material": "第9组 书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "A",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "正确：“它对我们职校生很实用”，介绍完书名、价格后说它的好处。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ]
+  },
+  {
+   "id": 3190,
+   "key": "english-writing#44",
+   "paper_id": 18,
+   "qno": 44,
+   "type": "single",
+   "stem": "第9组 第4空应填",
+   "material": "第9组 书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "正确：“大家可以来看看再决定”，接在“我手上有一本”后面。",
+    "错误：“就这些，应该填第 5 空。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ]
+  },
+  {
+   "id": 3191,
+   "key": "english-writing#45",
+   "paper_id": 18,
+   "qno": 45,
+   "type": "single",
+   "stem": "第9组 第5空应填",
+   "material": "第9组 书面表达：选出每个空对应的句子。\n你们班长正以口头通知的形式，推荐同学们去新华书店购买一本名为“A WORLD OF ENGLISH GRAMMAR”的语法书。请根据通知的格式及上下文内容，选择合适的信息补全通知。\nA. It is very practical for us vocational school students.\nB. Attention, please!\nC. You can come and have a look, then decide whether to buy one or not.\nD. That's all. Thank you!\nE. In order to learn English grammar well, we need some useful books.\nBoys and girls,\n（__1__） （__2__） Now I would like to recommend one to you. The name of the book is A WORLD OF ENGLISH GRAMMAR. It is 15 yuan. （__3__） It can help us a lot with our English grammar. I have one on hand now. （__4__） Those who want to buy the book please get your money ready and give it to me this Saturday morning. I'll go to buy the books for you this Sunday. （__5__）",
+   "options": [
+    [
+     "A",
+     "选项 A（见材料）"
+    ],
+    [
+     "B",
+     "选项 B（见材料）"
+    ],
+    [
+     "C",
+     "选项 C（见材料）"
+    ],
+    [
+     "D",
+     "选项 D（见材料）"
+    ],
+    [
+     "E",
+     "选项 E（见材料）"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。",
+   "options_cn": [
+    "它对我们职校生很实用。",
+    "请注意！",
+    "大家可以来看看，再决定买不买。",
+    "就这些，谢谢！",
+    "要学好英语语法，我们需要一些有用的书。"
+   ],
+   "material_cn": "同学们：\n（1）（2）现在我想给大家推荐一本。书名叫《A WORLD OF ENGLISH GRAMMAR》，15 元。（3）它对我们的英语语法很有帮助。我手上现在就有一本。（4）想买这本书的同学请把钱准备好，这周六上午交给我。我这周日去给大家买。（5）",
+   "point": "口头通知的格式：开头 Attention, please!，结尾 That's all. Thank you!",
+   "option_notes": [
+    "错误：“它对我们职校生很实用”，应该填第 3 空。",
+    "错误：“请注意”，应该填第 1 空。",
+    "错误：“大家可以来看看再决定”，应该填第 4 空。",
+    "正确：“就这些，谢谢”，口头通知的结尾。",
+    "错误：“要学好语法需要有用的书”，应该填第 2 空。"
+   ],
+   "phrases": [
+    [
+     "Attention, please!",
+     "请注意！"
+    ],
+    [
+     "recommend",
+     "推荐"
+    ],
+    [
+     "practical",
+     "实用的"
+    ],
+    [
+     "That's all.",
+     "就这些"
+    ]
+   ]
+  },
+  {
+   "id": 3192,
+   "key": "network-new-1#1",
+   "paper_id": 53,
+   "qno": 1,
+   "type": "single",
+   "stem": "关系运算中花费时间可能最长的运算是",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "除"
+    ],
+    [
+     "B",
+     "投影"
+    ],
+    [
+     "C",
+     "选择"
+    ],
+    [
+     "D",
+     "笛卡儿积"
+    ]
+   ],
+   "answer": "D",
+   "analysis": "笛卡儿积要把两个关系的元组两两组合，结果元组数是两个关系元组数之积，最费时间。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3193,
+   "key": "network-new-1#2",
+   "paper_id": 53,
+   "qno": 2,
+   "type": "single",
+   "stem": "从安全属性对网络攻击进行分类，截获攻击是针对（ ）的攻击。",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "真实性"
+    ],
+    [
+     "B",
+     "可用性"
+    ],
+    [
+     "C",
+     "机密性"
+    ],
+    [
+     "D",
+     "完整性"
+    ]
+   ],
+   "answer": "C",
+   "analysis": "截获是未经授权获取信息，破坏的是信息的机密性（中断破坏可用性、篡改破坏完整性、伪造破坏真实性）。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3194,
+   "key": "network-new-1#3",
+   "paper_id": 53,
+   "qno": 3,
+   "type": "multi",
+   "stem": "下列连接在主机机壳前面板的控制排线有",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "POWER LED"
+    ],
+    [
+     "B",
+     "CPU-FAN"
+    ],
+    [
+     "C",
+     "POWER SW"
+    ],
+    [
+     "D",
+     "H.D.D LED"
+    ]
+   ],
+   "answer": "ACD",
+   "analysis": "POWER LED 电源指示灯、POWER SW 电源开关、H.D.D LED 硬盘指示灯都是前面板的排线；CPU-FAN 是主板上 CPU 风扇的供电接口。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3195,
+   "key": "network-new-1#4",
+   "paper_id": 53,
+   "qno": 4,
+   "type": "multi",
+   "stem": "JPEG图像格式的文件后缀通常为",
+   "material": "",
+   "options": [
+    [
+     "A",
+     "*.jpg"
+    ],
+    [
+     "B",
+     "*.png"
+    ],
+    [
+     "C",
+     "*.jpeg"
+    ],
+    [
+     "D",
+     "*.bmp"
+    ]
+   ],
+   "answer": "AC",
+   "analysis": "JPEG 文件的扩展名是 .jpg 或 .jpeg；.png、.bmp 是另外的图像格式。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3196,
+   "key": "network-new-1#5",
+   "paper_id": 53,
+   "qno": 5,
+   "type": "judge",
+   "stem": "噪声是影响职业健康的物理因素，长期处于噪音环境会产生头昏、耳鸣等症状，还可能造成永久性失聪。",
+   "material": "",
+   "options": [],
+   "answer": "对",
+   "analysis": "对。噪声属于职业病危害中的物理因素，长期接触会导致听力损伤。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3197,
+   "key": "network-new-1#6",
+   "paper_id": 53,
+   "qno": 6,
+   "type": "judge",
+   "stem": "想构建双通道必须是相同容量、相同颗粒以及相同品牌的内存。",
+   "material": "",
+   "options": [],
+   "answer": "错",
+   "analysis": "错。组双通道只要两条内存插在对应的插槽上、工作频率等能匹配就行，不要求容量、颗粒、品牌完全相同（相同的兼容性更好）。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3198,
+   "key": "network-new-1#7",
+   "paper_id": 53,
+   "qno": 7,
+   "type": "judge",
+   "stem": "域名可以自己任意取。",
+   "material": "",
+   "options": [],
+   "answer": "错",
+   "analysis": "错。域名要向域名注册机构申请注册，不能重名，还要符合命名规则。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
+  },
+  {
+   "id": 3199,
+   "key": "network-new-1#8",
+   "paper_id": 53,
+   "qno": 8,
+   "type": "judge",
+   "stem": "HTTP是WWW上用于创建超文本链接的基本语言。",
+   "material": "",
+   "options": [],
+   "answer": "错",
+   "analysis": "错。创建超文本的语言是 HTML（超文本标记语言）；HTTP 是传输网页的超文本传输协议。 本题没有官方答案（2026-11-03 模拟考新出现的题），答案是整理时给出的参考答案。"
   }
  ],
  "version": 2

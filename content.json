@@ -1,10 +1,10 @@
 {
- "content_version": 92,
- "created": "2026-10-26 20:11:28",
+ "content_version": 93,
+ "created": "2026-11-03 14:56:37",
  "files": {
   "data/bank.json": [
-   "f8b4044dde8c0f30fa9b0ce8ca27d438d9ca0639c5ad06ab00b44fbaf3a8cf34",
-   3498974
+   "7cc38cba693fa5b319200d210d8cc7cc5ecf9ae42dcfc8f47e1300077c9ee221",
+   3571035
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -81,6 +81,14 @@
   "data/media/english-picture/019.png": [
    "5a489c5ae12609e730c0edb3d33f77375daef43fde84e9bdd2fa309bbea246df",
    39812
+  ],
+  "data/media/english-picture/new-20261103-1.png": [
+   "2e73c5461aae8d8e1393084653024c929b64f01bffd90c158708954a6d1e30e3",
+   819915
+  ],
+  "data/media/english-picture/new-20261103-2.png": [
+   "1cc1a9e8897f71a6392a1f7e38dadd7c03275878a244c1647067843eee0957e2",
+   424331
   ],
   "data/media/english-writing/001.png": [
    "53508e59d1f3382266963c099d2c1e3a403d5444d9caf5fa001b5443b8c7703e",
@@ -1710,7 +1718,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "导入试卷：Word 里的图片跟着题目一起导进来（预览里就能看到，导出 Word 也带着）；科目可以自己起名（如“会计基础”），首页多一个“我导入的”分类；一次选好几个 Word 可以批量导入，“XX答案”文件自动配给同名卷子；整个导入页都能拖文件。设置里每个科目可以选「显示 / 首页不显示 / 都不显示」，整类科目都关掉后首页不再留一个空的分类",
+ "notes": "新增两张「新题（11月3日）」卷子：计算机与网络 8 道、英语 14 道（补全对话、图文理解、书面表达），是 11 月 3 日模拟考里题库没有的题；英语新题也加进了对应题型。这些题没有官方答案，答案为参考答案",
  "py_shell_api": 1,
- "tag": "content-92"
+ "tag": "content-93"
 }
