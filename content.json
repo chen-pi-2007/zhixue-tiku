@@ -1,10 +1,10 @@
 {
- "content_version": 94,
- "created": "2026-11-04 14:51:44",
+ "content_version": 95,
+ "created": "2026-11-04 15:02:51",
  "files": {
   "data/bank.json": [
-   "c6d75ffd218e256351da62c3e6509f3cd240c977d587d187a392f21e3ed15ce7",
-   3573162
+   "826331be78db9fe33df2c5bd48a27dda470ff14f4d02f2a6ed3b869b6bc4fe1a",
+   3583002
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1687,8 +1687,8 @@
    3659
   ],
   "static/app.js": [
-   "c57ae2588eee3fc60744edf213382863d7faa5b2925cb7c7b550f2e5bedba0bd",
-   301869
+   "f175431aab3c103c6553f759f6ef20071a50dc05d81f2eea83fd828d4463f660",
+   301863
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1703,8 +1703,8 @@
    27524
   ],
   "static/style.css": [
-   "aa89438fda87abc5eee0157510fea05c7921040ad8c7b8e54c9becd4aa119200",
-   92510
+   "c4a9424b84841b706af0b58fc8869a06eb121301a9c63043a926deacf59ea5c2",
+   92693
   ],
   "static/word.js": [
    "e4d530a6b84480e9bd40a0e87b7f04a20c0454aaea5386dea09f79d6dd2b98a5",
@@ -1718,7 +1718,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "考试页的用时和交卷挪到右边答题卡上方，不再挡题目（手机上在屏幕最下面）；书面表达、对话这类共用 A～E 的题，选中的字母更醒目，同一组里一个字母只能用一次（选了别处用过的会自动挪过来）；书面表达材料里的空显示成带编号的空格",
+ "notes": "书面表达：选项印在图里的几组，把选项文字也录进题库，错题单独再出、背题、问答显示时不再只写",
  "py_shell_api": 1,
- "tag": "content-94"
+ "tag": "content-95"
 }

@@ -2802,7 +2802,7 @@ function renderQ() {
       materialBox(q) +
       // 完形的一个空单独出来（错题再考）：不写“2/10、第1篇 第7空”（进度和空号放一起容易看混），直接说原文第几空、标黄了
       (blankNo(q) && q.material && /_{2,}\s*\d+\s*_{2,}/.test(q.material)
-        ? '<div class="stem">原文第 ' + blankNo(q) + ' 空<span class="blank-tip">上面黄色标出的那一空</span></div>'
+        ? '<div class="stem">原文第 ' + blankNo(q) + ' 空<span class="blank-tip">上面高亮的那一空</span></div>'
         : '<div class="stem">' + unitNo(p) + '、' + rich(q.stem) + '</div>') + stemCn(q) +
       '<div id="qbody"></div>' +
       '<div class="msg-bar" id="pstats">' + statsHtml(p) + '</div>' +

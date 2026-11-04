@@ -7,7 +7,7 @@
    "total": 36,
    "subject": "politics",
    "key": "politics-1",
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 2,
@@ -16,7 +16,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-1",
-   "updated_at": "2026-11-04 14:49:08"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 3,
@@ -25,7 +25,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-2",
-   "updated_at": "2026-11-04 14:49:08"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 4,
@@ -34,7 +34,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-3",
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 5,
@@ -43,7 +43,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-4",
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 6,
@@ -52,7 +52,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-5",
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 7,
@@ -61,7 +61,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-1",
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 8,
@@ -70,7 +70,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-2",
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 9,
@@ -79,7 +79,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-3",
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 10,
@@ -88,7 +88,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-4",
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 11,
@@ -97,7 +97,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-5",
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 12,
@@ -106,7 +106,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 13,
@@ -115,7 +115,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 125,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 14,
@@ -124,7 +124,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 15,
@@ -133,7 +133,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 16,
@@ -142,7 +142,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 240,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 17,
@@ -151,7 +151,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 18,
@@ -160,7 +160,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 45,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 19,
@@ -169,7 +169,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 65,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 20,
@@ -178,7 +178,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 21,
@@ -187,7 +187,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 22,
@@ -196,7 +196,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 48,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 23,
@@ -205,7 +205,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 24,
@@ -214,7 +214,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 30,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 25,
@@ -223,7 +223,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 160,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 26,
@@ -232,7 +232,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 23,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 27,
@@ -241,7 +241,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 202,
-   "updated_at": "2026-11-04 14:49:11"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 28,
@@ -250,7 +250,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 29,
@@ -259,7 +259,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 30,
@@ -268,7 +268,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:06"
   },
   {
    "id": 31,
@@ -277,7 +277,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:06"
   },
   {
    "id": 32,
@@ -286,7 +286,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:06"
   },
   {
    "id": 33,
@@ -295,7 +295,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 60,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 34,
@@ -304,7 +304,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 35,
@@ -313,7 +313,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 36,
@@ -322,7 +322,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 37,
@@ -331,7 +331,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:03"
   },
   {
    "id": 38,
@@ -340,7 +340,7 @@
    "subject": "english",
    "created_at": "2026-10-10 17:37:09",
    "total": 60,
-   "updated_at": "2026-11-04 14:49:10"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 39,
@@ -349,7 +349,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:01"
   },
   {
    "id": 40,
@@ -358,7 +358,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 41,
@@ -367,7 +367,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 12:41:45",
    "total": 28,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 42,
@@ -376,7 +376,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 95,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:04"
   },
   {
    "id": 43,
@@ -385,7 +385,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 28,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 44,
@@ -394,7 +394,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 39,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 45,
@@ -403,7 +403,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 113,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 46,
@@ -412,7 +412,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 40,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 47,
@@ -421,7 +421,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 48,
@@ -430,7 +430,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 120,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 49,
@@ -439,7 +439,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 97,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 50,
@@ -448,7 +448,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 51,
@@ -457,7 +457,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:16",
    "total": 53,
-   "updated_at": "2026-11-04 14:49:13"
+   "updated_at": "2026-11-04 15:01:05"
   },
   {
    "id": 52,
@@ -466,7 +466,7 @@
    "subject": "english",
    "created_at": "2026-11-03 14:54:17",
    "total": 14,
-   "updated_at": "2026-11-04 14:49:09"
+   "updated_at": "2026-11-04 15:01:02"
   },
   {
    "id": 53,
@@ -475,7 +475,7 @@
    "subject": "network",
    "created_at": "2026-11-03 14:54:19",
    "total": 8,
-   "updated_at": "2026-11-04 14:49:12"
+   "updated_at": "2026-11-04 15:01:05"
   }
  ],
  "questions": [
@@ -38249,23 +38249,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "D",
@@ -38308,23 +38308,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "E",
@@ -38367,23 +38367,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "A",
@@ -38430,23 +38430,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "C",
@@ -38493,23 +38493,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "B",
@@ -38859,23 +38859,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "E",
@@ -38918,23 +38918,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "D",
@@ -38977,23 +38977,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "A",
@@ -39040,23 +39040,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "B",
@@ -39103,23 +39103,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "C",
@@ -39162,23 +39162,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "D",
@@ -39225,23 +39225,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "C",
@@ -39288,23 +39288,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "B",
@@ -39347,23 +39347,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "E",
@@ -39406,23 +39406,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "A",
@@ -39465,23 +39465,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "because they don't need to go to school and can get money from parents and relatives"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "to relax and visit their relatives and friends"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "It's a time for family members to get together"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "To us Chinese, the Spring Festival is the most important festival throughout the year"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "the family sit around the table, enjoying a lot of delicious food"
     ]
    ],
    "answer": "C",
@@ -39528,23 +39528,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "because they don't need to go to school and can get money from parents and relatives"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "to relax and visit their relatives and friends"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "It's a time for family members to get together"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "To us Chinese, the Spring Festival is the most important festival throughout the year"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "the family sit around the table, enjoying a lot of delicious food"
     ]
    ],
    "answer": "E",
@@ -39591,23 +39591,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "because they don't need to go to school and can get money from parents and relatives"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "to relax and visit their relatives and friends"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "It's a time for family members to get together"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "To us Chinese, the Spring Festival is the most important festival throughout the year"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "the family sit around the table, enjoying a lot of delicious food"
     ]
    ],
    "answer": "A",
@@ -39654,23 +39654,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "because they don't need to go to school and can get money from parents and relatives"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "to relax and visit their relatives and friends"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "It's a time for family members to get together"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "To us Chinese, the Spring Festival is the most important festival throughout the year"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "the family sit around the table, enjoying a lot of delicious food"
     ]
    ],
    "answer": "B",
@@ -39713,23 +39713,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "because they don't need to go to school and can get money from parents and relatives"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "to relax and visit their relatives and friends"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "It's a time for family members to get together"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "To us Chinese, the Spring Festival is the most important festival throughout the year"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "the family sit around the table, enjoying a lot of delicious food"
     ]
    ],
    "answer": "D",
@@ -40079,23 +40079,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "C",
@@ -40138,23 +40138,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "E",
@@ -40201,23 +40201,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "A",
@@ -40260,23 +40260,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "B",
@@ -40319,23 +40319,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "D",
@@ -40378,23 +40378,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Looking forward to your early reply"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "I am good at English"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Now I'd like to introduce myself to you"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I hope we can keep in touch with each other"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "I am glad to read your notice on the Internet"
     ]
    ],
    "answer": "E",
@@ -40441,23 +40441,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Looking forward to your early reply"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "I am good at English"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Now I'd like to introduce myself to you"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I hope we can keep in touch with each other"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "I am glad to read your notice on the Internet"
     ]
    ],
    "answer": "C",
@@ -40500,23 +40500,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Looking forward to your early reply"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "I am good at English"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Now I'd like to introduce myself to you"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I hope we can keep in touch with each other"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "I am glad to read your notice on the Internet"
     ]
    ],
    "answer": "B",
@@ -40559,23 +40559,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Looking forward to your early reply"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "I am good at English"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Now I'd like to introduce myself to you"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I hope we can keep in touch with each other"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "I am glad to read your notice on the Internet"
     ]
    ],
    "answer": "D",
@@ -40622,23 +40622,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Looking forward to your early reply"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "I am good at English"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Now I'd like to introduce myself to you"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I hope we can keep in touch with each other"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "I am glad to read your notice on the Internet"
     ]
    ],
    "answer": "A",
@@ -42338,23 +42338,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "E",
@@ -42399,23 +42399,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "D",
@@ -42460,23 +42460,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "A",
@@ -42525,23 +42525,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "B",
@@ -42590,23 +42590,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The product does not function properly; it will not display any pictures at all."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "(I would appreciate) an exchange for an equivalent or better model, or a refund of ¥580"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "(Please contact me) by phone at 13912200111"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "47 Hunan Road, Nanjing, 210009"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "James John"
     ]
    ],
    "answer": "C",
@@ -51149,23 +51149,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "C",
@@ -51210,23 +51210,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "E",
@@ -51275,23 +51275,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "A",
@@ -51336,23 +51336,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "B",
@@ -51397,23 +51397,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "We assure you that this will not happen again"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "We look forward to serving you again"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "Thank you for your letter of March 10th"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "Yours sincerely"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "We agree that the usual high standards of our services were not met in this instance"
     ]
    ],
    "answer": "D",
@@ -53621,23 +53621,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "D",
@@ -53682,23 +53682,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "E",
@@ -53743,23 +53743,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "A",
@@ -53808,23 +53808,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "C",
@@ -53873,23 +53873,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "Don't eat food which contains too much sugar and fat"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "a happy mood is equally important to our health as healthy diets and regular exercise"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "it is very important to have good living habits"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "I'm sorry to hear that you are ill"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Here I'd like to give you some tips on how to keep healthy"
     ]
    ],
    "answer": "B",
@@ -62436,23 +62436,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "D",
@@ -62501,23 +62501,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "C",
@@ -62566,23 +62566,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "B",
@@ -62627,23 +62627,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "E",
@@ -62688,23 +62688,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "The Students' Union"
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "After the lecture, please go back to your classrooms and have a discussion on the lecture"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "All the students are expected to attend it on time"
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "There will be an English lecture on the importance of English learning by Professor Smith from Beijing University. It will be given in the school stadium from 3:30 p.m. to 5:00 p.m. on Friday, May 6, 2020"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "Each student is asked to make a plan for learning English well after the discussion"
     ]
    ],
    "answer": "A",
@@ -104765,23 +104765,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "B",
@@ -104834,23 +104834,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "E",
@@ -104903,23 +104903,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "A",
@@ -104972,23 +104972,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "C",
@@ -105041,23 +105041,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "D",
@@ -105310,23 +105310,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "B",
@@ -105377,23 +105377,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "E",
@@ -105444,23 +105444,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "A",
@@ -105511,23 +105511,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "C",
@@ -105578,23 +105578,23 @@
    "options": [
     [
      "A",
-     "选项 A（见材料）"
+     "It is very practical for us vocational school students."
     ],
     [
      "B",
-     "选项 B（见材料）"
+     "Attention, please!"
     ],
     [
      "C",
-     "选项 C（见材料）"
+     "You can come and have a look, then decide whether to buy one or not."
     ],
     [
      "D",
-     "选项 D（见材料）"
+     "That's all. Thank you!"
     ],
     [
      "E",
-     "选项 E（见材料）"
+     "In order to learn English grammar well, we need some useful books."
     ]
    ],
    "answer": "D",

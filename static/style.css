@@ -1157,6 +1157,8 @@ mark.hl-3 { --hlc: var(--hl-3); }
 .blank:not(.slot) { display: inline-block; min-width: 3.2em; margin: 0 3px; padding: 0 6px; text-align: center; line-height: 1.35;
   border-bottom: 2px solid var(--ink-2); background: var(--layer-3); border-radius: 4px 4px 0 0; text-indent: 0; }
 .blank:not(.slot) i { font-style: normal; font-weight: 600; font-size: .85em; color: var(--ink); }
+.blank:not(.slot).on { background: var(--fill); border-bottom-color: var(--fill); box-shadow: none; }   /* 正在做的那一空 */
+.blank:not(.slot).on i { color: var(--fill-ink); }
 .blank.on { background: rgba(128, 128, 128, .2); box-shadow: 0 0 0 2px rgba(128, 128, 128, .2); color: var(--ink); font-weight: 600; }
 .blank-tip { display: inline-block; margin-left: 10px; padding: 0 8px; border-radius: 6px; font-size: 12px; line-height: 22px; vertical-align: 2px;
   background: var(--layer-2); color: var(--ink-2); }
