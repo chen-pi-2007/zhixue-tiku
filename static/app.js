@@ -421,7 +421,8 @@ function optNotesBox(q) {
 // 阅读材料/情境材料展示框
 // fold:长材料默认折叠(错题本、报告里同一篇材料会重复出现)
 // 完形原文里的空（__3__）包一层 span，做哪一空就用荧光笔标哪一空（用户：错题再出时题号和直觉对不上，不好找位置）
-const markBlanks = html => html.replace(/_{2,}\s*(\d+)\s*_{2,}/g, '<span class="blank" data-b="$1">$&</span>');
+// 空画成带编号的下划线格子（原来原样显示“__1__”，用户说不显眼）；完形的空 blankSlot 会再改成定宽格子
+const markBlanks = html => html.replace(/（?_{2,}\s*(\d+)\s*_{2,}）?/g, '<span class="blank" data-b="$1"><i>$1</i></span>');
 const blankNo = q => ((q && q.stem || '').match(/第(\d+)空/) || [])[1] || '';
 // 完形原文里的空做成定宽的“格子”：宽度按这道题最长的选项量好一次就固定，填进不同长短的词文章也不跳（用户报：填词时整段跟着动，影响阅读）
 function blankSlot(b, n, q) {
@@ -2681,6 +2682,11 @@ function gTap(btn) {
   const first = !div.querySelector('.opt.sel');  // 这道题是不是第一次选
   if (multi) btn.classList.toggle('sel');
   else Array.from(div.querySelectorAll('.opt')).forEach(b => b.classList.toggle('sel', b === btn));
+  // 配对题一组里每个字母只能用一次（用户要求）：点了别的空用过的字母，就挪到这个空，原来那个空清掉
+  if ($('.g-match') && !multi) $$('.gq').forEach((d, j) => {
+    const o = d !== div && d.querySelector('.opt.sel[data-k="' + btn.dataset.k + '"]');
+    if (o) { o.classList.remove('sel'); toast(btn.dataset.k + ' 原来选在第 ' + (j + 1) + ' 题，已挪到这里'); }
+  });
   const picked = groupLeft();
   // 电脑上小题都列在右边，不自动跳（用户：点着点着瞬移到下一题不对），点到哪道哪道就是当前题；
   // 手机上一次只显示一道：单选第一次选好才跳到下一道没选的，改答案不跳
@@ -3153,14 +3159,10 @@ function renderExamRun() {
   const e = st.exam;
   let n = 0;
   const allItems = [];
+  // 用时、已答、交卷放在右边答题卡顶上（用户：原来吸在正文上方的那条挡住材料）；手机上是一条细的吸顶栏
   app.innerHTML =
-    '<div class="exam-bar">' +
-      '<div class="exam-bar-t">' + esc(e.title) + '</div>' +
-      '<div class="timer" id="timer">--:--</div>' +
-      '<div class="muted" id="exam-progress"></div>' +
-      '<button class="btn sm" onclick="submitExam(false)">交卷</button>' +
-    '</div>' +
     '<div class="exam-layout"><div class="exam-main">' +
+    '<h2 class="exam-title">' + esc(e.title) + '</h2>' +
     e.sections.map((sec, si) => {
       let lastMat = null;
       // 和老师在学习通上组的卷子一样：「一、单选题（共 35 题，35 分）」，共用一段材料的一组算一道题
@@ -3184,7 +3186,7 @@ function renderExamRun() {
             const inPic = opts.every(o => /见材料/.test(o[1]));       // 选项在材料的图里，不再列一遍
             return (first ? examMat(q) + (inPic ? '' : '<div class="card exam-optlist">' + opts.map(o =>
                 '<div class="exam-optline"><b>' + esc(o[0]) + '.</b> ' + rich(o[1]) + '</div>').join('') + '</div>') : '') +
-              '<div class="card exam-q exam-q-mini" id="eq' + q.id + '">' +
+              '<div class="card exam-q exam-q-mini" id="eq' + q.id + '" data-g="' + si + '-' + sec.items.indexOf(grp[0]) + '" data-n="' + n + '">' +
                 '<span class="qno">' + n + '</span><span class="exam-blank">' + esc(q.stem.replace(/^第\d+组\s*/, '')) + '</span>' +
                 '<span class="mini-opts">' + opts.map(o =>
                   '<button class="opt mini" data-q="' + q.id + '" data-k="' + esc(o[0]) + '" onclick="examPick(' + q.id + ',\'' + esc(o[0]) + '\',false)">' + esc(o[0]) + '</button>').join('') +
@@ -3205,8 +3207,15 @@ function renderExamRun() {
     }).join('') +
     '<div style="text-align:center;margin:20px 0"><button class="btn big-btn" onclick="submitExam(false)">交卷</button></div>' +
     '</div>' +
-    '<div class="answer-card" id="acard">' + allItems.map(it =>
-      '<a href="javascript:void(0)" data-q="' + it.q.id + '" onclick="document.getElementById(\'eq' + it.q.id + '\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">' + it.n + '</a>').join('') +
+    '<div class="exam-side">' +
+      '<div class="exam-head">' +
+        '<div class="timer" id="timer">--:--</div>' +
+        '<div class="muted" id="exam-progress"></div>' +
+        '<button class="btn sm" onclick="submitExam(false)">交卷</button>' +
+      '</div>' +
+      '<div class="answer-card" id="acard">' + allItems.map(it =>
+        '<a href="javascript:void(0)" data-q="' + it.q.id + '" onclick="document.getElementById(\'eq' + it.q.id + '\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">' + it.n + '</a>').join('') +
+      '</div>' +
     '</div></div>';
 
   refreshExamMarks();
@@ -3237,6 +3246,12 @@ function examPick(qid, key, multi) {
   if (multi) cur = cur.indexOf(key) >= 0 ? cur.replace(key, '') : (cur + key).split('').sort().join('');
   else cur = cur === key ? '' : key;
   st.answers[qid] = cur;
+  // 配对题（共用一组 A～E）：一个字母只能用一次，挪到这个空，原来用它的空清掉
+  const me = document.getElementById('eq' + qid);
+  if (cur && me && me.dataset.g) $$('.exam-q-mini[data-g="' + me.dataset.g + '"]').forEach(d => {
+    const id = d.id.slice(2);
+    if (d !== me && st.answers[id] === cur) { st.answers[id] = ''; toast(cur + ' 原来选在第 ' + d.dataset.n + ' 题，已挪到这里'); }
+  });
   store.set('quiz.exam', st);
   refreshExamMarks();
 }
@@ -3247,6 +3262,11 @@ function refreshExamMarks() {
   $$('.exam-q .opt').forEach(b => {
     const a = st.answers[b.dataset.q] || '';
     b.classList.toggle('sel', a.indexOf(b.dataset.k) >= 0 && a !== '');
+  });
+  // 配对题：同组别的空用过的字母变淡（和练习时一样）
+  $$('.exam-q-mini[data-g]').forEach(d => {
+    const others = $$('.exam-q-mini[data-g="' + d.dataset.g + '"]').filter(x => x !== d).map(x => st.answers[x.id.slice(2)]);
+    d.querySelectorAll('.opt.mini').forEach(b => b.classList.toggle('used', others.indexOf(b.dataset.k) >= 0));
   });
   let done = 0, total = 0;
   $$('#acard a').forEach(a => {

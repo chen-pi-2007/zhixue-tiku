@@ -1,10 +1,10 @@
 {
- "content_version": 93,
- "created": "2026-11-03 14:56:37",
+ "content_version": 94,
+ "created": "2026-11-04 14:51:44",
  "files": {
   "data/bank.json": [
-   "7cc38cba693fa5b319200d210d8cc7cc5ecf9ae42dcfc8f47e1300077c9ee221",
-   3571035
+   "c6d75ffd218e256351da62c3e6509f3cd240c977d587d187a392f21e3ed15ce7",
+   3573162
   ],
   "data/media/english-picture/001.png": [
    "e7684431312622b03b824c61ebd3de550448b4454049a57402d8adeba0c11815",
@@ -1687,8 +1687,8 @@
    3659
   ],
   "static/app.js": [
-   "4efb1fb83ae78162a5fed4a929d8b24ae5a3268f85708f84c7dc59b4b3b000ae",
-   300189
+   "c57ae2588eee3fc60744edf213382863d7faa5b2925cb7c7b550f2e5bedba0bd",
+   301869
   ],
   "static/index.html": [
    "a98970557b33ae4e35fa3355d3e5a4ea2ad3475a89505ee658ecda4e93516ce4",
@@ -1703,8 +1703,8 @@
    27524
   ],
   "static/style.css": [
-   "89e2398d05750e591fb6ee57b0361dde92c2aaaafaadfa77db14d7ae548f46fc",
-   91426
+   "aa89438fda87abc5eee0157510fea05c7921040ad8c7b8e54c9becd4aa119200",
+   92510
   ],
   "static/word.js": [
    "e4d530a6b84480e9bd40a0e87b7f04a20c0454aaea5386dea09f79d6dd2b98a5",
@@ -1718,7 +1718,7 @@
  "force_min": 0,
  "min_android_version": "1.4.0",
  "min_app_version": "1.4.0",
- "notes": "新增两张「新题（11月3日）」卷子：计算机与网络 8 道、英语 14 道（补全对话、图文理解、书面表达），是 11 月 3 日模拟考里题库没有的题；英语新题也加进了对应题型。这些题没有官方答案，答案为参考答案",
+ "notes": "考试页的用时和交卷挪到右边答题卡上方，不再挡题目（手机上在屏幕最下面）；书面表达、对话这类共用 A～E 的题，选中的字母更醒目，同一组里一个字母只能用一次（选了别处用过的会自动挪过来）；书面表达材料里的空显示成带编号的空格",
  "py_shell_api": 1,
- "tag": "content-93"
+ "tag": "content-94"
 }

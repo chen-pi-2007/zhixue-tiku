@@ -522,15 +522,18 @@ textarea.selfarea:focus { outline: 1px solid var(--line); }
 .exam-pick .paper-acts { margin-top: 12px; }
 .exam-row { display: flex; align-items: center; gap: 16px; height: 44px; padding: 0 14px; border-radius: 8px; color: var(--ink); }
 .exam-row:nth-child(odd) { background: var(--layer-2); }
-.exam-bar { position: sticky; top: calc(var(--top) + 8px); z-index: 40; display: flex; align-items: center; gap: 16px; padding: 10px 16px; margin-bottom: 14px; border-radius: 8px; background: var(--layer-1); box-shadow: var(--pop); }
-.exam-bar-t { flex: 1; font-weight: 600; }
+.exam-title { margin: 0 0 14px; font-size: 18px; font-weight: 600; }
+.exam-side { position: sticky; top: calc(var(--top) + 8px); width: 220px; flex: none; display: flex; flex-direction: column; gap: 10px; }
+.exam-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 12px 14px; border-radius: 8px; background: var(--layer-1); }
+.exam-head .timer { flex-basis: 100%; }
+.exam-head .muted { flex: 1; }
 .timer { font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600; color: var(--ink); }
 .timer.urgent { color: var(--red); }
 .exam-layout { display: flex; gap: 20px; align-items: flex-start; }
 .exam-main { flex: 1; min-width: 0; }
 .exam-main .sec-title { justify-content: flex-start; gap: 2px; }
 .exam-main > .sec-title:first-child { margin-top: 0; }
-.answer-card { position: sticky; top: calc(var(--top) + 76px); width: 220px; flex: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px; border-radius: 8px; background: var(--layer-1); max-height: calc(100vh / var(--z) - 150px); overflow: auto; align-content: start; }
+.answer-card { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 14px; border-radius: 8px; background: var(--layer-1); max-height: calc(100vh / var(--z) - 220px); overflow: auto; align-content: start; }
 .answer-card a { display: flex; align-items: center; justify-content: center; height: 32px; border-radius: 6px; background: var(--layer-2); color: var(--ink-2); font-size: 13px; }
 .answer-card a:hover { background: var(--layer-3); opacity: 1; }
 .answer-card a.done { background: var(--green); color: #fff; }
@@ -649,7 +652,12 @@ table.plan th { background: var(--layer-2); font-weight: 600; }
   .sec-title { flex-wrap: wrap; }
   .sec-title .muted { flex-basis: 100%; margin-top: 4px; font-size: 13px; font-weight: 400; }
   .exam-layout { flex-direction: column; gap: 14px; }
-  .answer-card { position: static; width: 100%; grid-template-columns: repeat(8, 1fr); max-height: none; order: -1; }
+  /* 手机：用时 / 交卷是固定在屏幕最下面的一条小栏（放顶上会挡材料），答题卡在题目上面 */
+  .exam-side { display: contents; }
+  .exam-head { position: fixed; left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 40; flex-wrap: nowrap; padding: 6px 8px 6px 14px; box-shadow: var(--pop); }
+  .exam-head .timer { flex-basis: auto; font-size: 16px; }
+  .exam-main { padding-bottom: 64px; }
+  .answer-card { width: 100%; grid-template-columns: repeat(8, 1fr); max-height: none; order: -1; }
   .ty-src, .ty-line { font-size: 16px; letter-spacing: 0; }
   .ty-src { white-space: normal; }
   .exam-pick { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -979,6 +987,8 @@ main.page-in { animation: page-in .22s ease-out; }
 .exam-q-mini .exam-blank { flex: 1; min-width: 120px; color: var(--ink-2); }
 .mini-opts { display: flex; gap: 6px; flex-wrap: wrap; }
 .opt.mini { width: 40px; height: 36px; padding: 0; align-items: center; justify-content: center; font-weight: 600; line-height: 1; }
+.opt.mini.sel { background: var(--fill); color: var(--fill-ink); }
+.opt.mini.used:not(.sel) { opacity: .35; }   /* 小字母按钮没有圆点，选中直接整块实底（用户：原来只深一点，看不出选了） */
 .material-body .qimg { display: block; margin: 8px 0; }     /* 材料里的图单独一行，不挤在文字中间 */
 
 /* 背题模式：答案（填进句子的词、一问一答的答语）高亮；“先盖住”时答案变成灰块、要点藏起来，点卡片才显示 */
@@ -1144,6 +1154,9 @@ mark.hl-3 { --hlc: var(--hl-3); }
 /* ---------------------------------------------------------------- 完形：正在做的空标出来
  * （2026-10-21 用户说荧光笔黄和上标题号不协调：改成软件自己的黑白灰——灰底 + 加深的下划线） */
 .blank { border-radius: 4px; }
+.blank:not(.slot) { display: inline-block; min-width: 3.2em; margin: 0 3px; padding: 0 6px; text-align: center; line-height: 1.35;
+  border-bottom: 2px solid var(--ink-2); background: var(--layer-3); border-radius: 4px 4px 0 0; text-indent: 0; }
+.blank:not(.slot) i { font-style: normal; font-weight: 600; font-size: .85em; color: var(--ink); }
 .blank.on { background: rgba(128, 128, 128, .2); box-shadow: 0 0 0 2px rgba(128, 128, 128, .2); color: var(--ink); font-weight: 600; }
 .blank-tip { display: inline-block; margin-left: 10px; padding: 0 8px; border-radius: 6px; font-size: 12px; line-height: 22px; vertical-align: 2px;
   background: var(--layer-2); color: var(--ink-2); }

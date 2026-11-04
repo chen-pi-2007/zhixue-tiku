@@ -7,7 +7,7 @@
    "total": 36,
    "subject": "politics",
    "key": "politics-1",
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 2,
@@ -16,7 +16,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-1",
-   "updated_at": "2026-11-03 14:54:16"
+   "updated_at": "2026-11-04 14:49:08"
   },
   {
    "id": 3,
@@ -25,7 +25,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-2",
-   "updated_at": "2026-11-03 14:54:16"
+   "updated_at": "2026-11-04 14:49:08"
   },
   {
    "id": 4,
@@ -34,7 +34,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-3",
-   "updated_at": "2026-11-03 14:54:16"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 5,
@@ -43,7 +43,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-4",
-   "updated_at": "2026-11-03 14:54:16"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 6,
@@ -52,7 +52,7 @@
    "total": 28,
    "subject": "chinese",
    "key": "chinese-5",
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 7,
@@ -61,7 +61,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-1",
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 8,
@@ -70,7 +70,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-2",
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 9,
@@ -79,7 +79,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-3",
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 10,
@@ -88,7 +88,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-4",
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 11,
@@ -97,7 +97,7 @@
    "total": 18,
    "subject": "math",
    "key": "math-5",
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 12,
@@ -106,7 +106,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 13,
@@ -115,7 +115,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 125,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 14,
@@ -124,7 +124,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 40,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 15,
@@ -133,7 +133,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 16,
@@ -142,7 +142,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 240,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 17,
@@ -151,7 +151,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 120,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 18,
@@ -160,7 +160,7 @@
    "subject": "english",
    "created_at": "2026-10-04 18:24:21",
    "total": 45,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 19,
@@ -169,7 +169,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 65,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 20,
@@ -178,7 +178,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 21,
@@ -187,7 +187,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 22,
@@ -196,7 +196,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 48,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 23,
@@ -205,7 +205,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 32,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 24,
@@ -214,7 +214,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 30,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 25,
@@ -223,7 +223,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 160,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 26,
@@ -232,7 +232,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 23,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 27,
@@ -241,7 +241,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 202,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:11"
   },
   {
    "id": 28,
@@ -250,7 +250,7 @@
    "subject": "media",
    "created_at": "2026-10-04 18:24:21",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 29,
@@ -259,7 +259,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 30,
@@ -268,7 +268,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 31,
@@ -277,7 +277,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 32,
@@ -286,7 +286,7 @@
    "subject": "politics",
    "created_at": "2026-10-04 18:24:21",
    "total": 36,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 33,
@@ -295,7 +295,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 60,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 34,
@@ -304,7 +304,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 35,
@@ -313,7 +313,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 80,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 36,
@@ -322,7 +322,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 37,
@@ -331,7 +331,7 @@
    "subject": "english",
    "created_at": "2026-10-10 16:45:42",
    "total": 85,
-   "updated_at": "2026-11-03 14:54:18"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 38,
@@ -340,7 +340,7 @@
    "subject": "english",
    "created_at": "2026-10-10 17:37:09",
    "total": 60,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:10"
   },
   {
    "id": 39,
@@ -349,7 +349,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 40,
@@ -358,7 +358,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 08:52:28",
    "total": 28,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 41,
@@ -367,7 +367,7 @@
    "subject": "chinese",
    "created_at": "2026-10-13 12:41:45",
    "total": 28,
-   "updated_at": "2026-11-03 14:54:17"
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 42,
@@ -376,7 +376,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 95,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 43,
@@ -385,7 +385,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 28,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 44,
@@ -394,7 +394,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 39,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 45,
@@ -403,7 +403,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:14",
    "total": 113,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 46,
@@ -412,7 +412,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 40,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 47,
@@ -421,7 +421,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 48,
@@ -430,7 +430,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 120,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 49,
@@ -439,7 +439,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 97,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 50,
@@ -448,7 +448,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:15",
    "total": 81,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:12"
   },
   {
    "id": 51,
@@ -457,7 +457,7 @@
    "subject": "network",
    "created_at": "2026-10-26 10:50:16",
    "total": 53,
-   "updated_at": "2026-11-03 14:54:19"
+   "updated_at": "2026-11-04 14:49:13"
   },
   {
    "id": 52,
@@ -465,7 +465,8 @@
    "name": "英语 新题（11月3日）",
    "subject": "english",
    "created_at": "2026-11-03 14:54:17",
-   "total": 14
+   "total": 14,
+   "updated_at": "2026-11-04 14:49:09"
   },
   {
    "id": 53,
@@ -473,7 +474,8 @@
    "name": "计算机与网络 新题（11月3日）",
    "subject": "network",
    "created_at": "2026-11-03 14:54:19",
-   "total": 8
+   "total": 8,
+   "updated_at": "2026-11-04 14:49:12"
   }
  ],
  "questions": [
@@ -38550,7 +38552,7 @@
    "qno": 6,
    "type": "single",
    "stem": "第2组 第1空 / 第1句",
-   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -38609,7 +38611,7 @@
    "qno": 7,
    "type": "single",
    "stem": "第2组 第2空 / 第2句",
-   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -38672,7 +38674,7 @@
    "qno": 8,
    "type": "single",
    "stem": "第2组 第3空 / 第3句",
-   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -38735,7 +38737,7 @@
    "qno": 9,
    "type": "single",
    "stem": "第2组 第4空 / 第4句",
-   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -38794,7 +38796,7 @@
    "qno": 10,
    "type": "single",
    "stem": "第2组 第5空 / 第5句",
-   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "第2组 书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39156,7 +39158,7 @@
    "qno": 16,
    "type": "single",
    "stem": "第4组 第1空 / 第1句",
-   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39219,7 +39221,7 @@
    "qno": 17,
    "type": "single",
    "stem": "第4组 第2空 / 第2句",
-   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39282,7 +39284,7 @@
    "qno": 18,
    "type": "single",
    "stem": "第4组 第3空 / 第3句",
-   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39341,7 +39343,7 @@
    "qno": 19,
    "type": "single",
    "stem": "第4组 第4空 / 第4句",
-   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39400,7 +39402,7 @@
    "qno": 20,
    "type": "single",
    "stem": "第4组 第5空 / 第5句",
-   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "第4组 书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -39459,7 +39461,7 @@
    "qno": 21,
    "type": "single",
    "stem": "第5组 第1空 / 第1句",
-   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. 1 . People go back home from all parts of the country. On New Year's Eve, 2 . School Children will have a good time during the Spring Festival 3 . The Spring Festival is also a time for people 4 . They wish each other “A Happy New Year” and hope to have good luck in the coming year. 5 . .[[img:english-writing/007.png]]",
+   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. （__1__）. People go back home from all parts of the country. On New Year's Eve, （__2__）. School Children will have a good time during the Spring Festival （__3__）. The Spring Festival is also a time for people （__4__）. They wish each other “A Happy New Year” and hope to have good luck in the coming year. （__5__）.[[img:english-writing/007.png]]",
    "options": [
     [
      "A",
@@ -39522,7 +39524,7 @@
    "qno": 22,
    "type": "single",
    "stem": "第5组 第2空 / 第2句",
-   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. 1 . People go back home from all parts of the country. On New Year's Eve, 2 . School Children will have a good time during the Spring Festival 3 . The Spring Festival is also a time for people 4 . They wish each other “A Happy New Year” and hope to have good luck in the coming year. 5 . .[[img:english-writing/007.png]]",
+   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. （__1__）. People go back home from all parts of the country. On New Year's Eve, （__2__）. School Children will have a good time during the Spring Festival （__3__）. The Spring Festival is also a time for people （__4__）. They wish each other “A Happy New Year” and hope to have good luck in the coming year. （__5__）.[[img:english-writing/007.png]]",
    "options": [
     [
      "A",
@@ -39585,7 +39587,7 @@
    "qno": 23,
    "type": "single",
    "stem": "第5组 第3空 / 第3句",
-   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. 1 . People go back home from all parts of the country. On New Year's Eve, 2 . School Children will have a good time during the Spring Festival 3 . The Spring Festival is also a time for people 4 . They wish each other “A Happy New Year” and hope to have good luck in the coming year. 5 . .[[img:english-writing/007.png]]",
+   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. （__1__）. People go back home from all parts of the country. On New Year's Eve, （__2__）. School Children will have a good time during the Spring Festival （__3__）. The Spring Festival is also a time for people （__4__）. They wish each other “A Happy New Year” and hope to have good luck in the coming year. （__5__）.[[img:english-writing/007.png]]",
    "options": [
     [
      "A",
@@ -39648,7 +39650,7 @@
    "qno": 24,
    "type": "single",
    "stem": "第5组 第4空 / 第4句",
-   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. 1 . People go back home from all parts of the country. On New Year's Eve, 2 . School Children will have a good time during the Spring Festival 3 . The Spring Festival is also a time for people 4 . They wish each other “A Happy New Year” and hope to have good luck in the coming year. 5 . .[[img:english-writing/007.png]]",
+   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. （__1__）. People go back home from all parts of the country. On New Year's Eve, （__2__）. School Children will have a good time during the Spring Festival （__3__）. The Spring Festival is also a time for people （__4__）. They wish each other “A Happy New Year” and hope to have good luck in the coming year. （__5__）.[[img:english-writing/007.png]]",
    "options": [
     [
      "A",
@@ -39707,7 +39709,7 @@
    "qno": 25,
    "type": "single",
    "stem": "第5组 第5空 / 第5句",
-   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. 1 . People go back home from all parts of the country. On New Year's Eve, 2 . School Children will have a good time during the Spring Festival 3 . The Spring Festival is also a time for people 4 . They wish each other “A Happy New Year” and hope to have good luck in the coming year. 5 . .[[img:english-writing/007.png]]",
+   "material": "第5组 书面表达：选出每个空（或每个位置）对应的句子。\n按照要求选择合适的信息完成一篇小短文。 The Spring Festival is a traditional festival in China. Please complete the passage with the given information.春节是中国的传统节日，请选择正确的信息完成一篇有关春节的作文。 作文要点：1. 春节是一个家人团聚的节日，人们从四面八方赶回家中。 2. 除夕夜，家庭成员围坐在桌边，享用丰盛的美食。 3. 春节期间，孩子很开心，因为他们不用上学，而且还可以得到许多压岁钱。 4. 春节也是人们休闲和走亲访友的好日子，大家互祝“新年快乐”，并预祝来年 好运。 The Spring Festival is a traditional festival in China and is celebrated on the first day of the lunar year. （__1__）. People go back home from all parts of the country. On New Year's Eve, （__2__）. School Children will have a good time during the Spring Festival （__3__）. The Spring Festival is also a time for people （__4__）. They wish each other “A Happy New Year” and hope to have good luck in the coming year. （__5__）.[[img:english-writing/007.png]]",
    "options": [
     [
      "A",
@@ -39770,7 +39772,7 @@
    "qno": 26,
    "type": "single",
    "stem": "第6组 第1空 / 第1句",
-   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -39829,7 +39831,7 @@
    "qno": 27,
    "type": "single",
    "stem": "第6组 第2空 / 第2句",
-   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -39888,7 +39890,7 @@
    "qno": 28,
    "type": "single",
    "stem": "第6组 第3空 / 第3句",
-   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -39951,7 +39953,7 @@
    "qno": 29,
    "type": "single",
    "stem": "第6组 第4空 / 第4句",
-   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -40014,7 +40016,7 @@
    "qno": 30,
    "type": "single",
    "stem": "第6组 第5空 / 第5句",
-   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "第6组 书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -40073,7 +40075,7 @@
    "qno": 31,
    "type": "single",
    "stem": "第7组 第1空 / 第1句",
-   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -40132,7 +40134,7 @@
    "qno": 32,
    "type": "single",
    "stem": "第7组 第2空 / 第2句",
-   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -40195,7 +40197,7 @@
    "qno": 33,
    "type": "single",
    "stem": "第7组 第3空 / 第3句",
-   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -40254,7 +40256,7 @@
    "qno": 34,
    "type": "single",
    "stem": "第7组 第4空 / 第4句",
-   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -40313,7 +40315,7 @@
    "qno": 35,
    "type": "single",
    "stem": "第7组 第5空 / 第5句",
-   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "第7组 书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -45154,7 +45156,7 @@
    "qno": 26,
    "type": "single",
    "stem": "第1空 / 第1句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -45215,7 +45217,7 @@
    "qno": 27,
    "type": "single",
    "stem": "第2空 / 第2句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -45276,7 +45278,7 @@
    "qno": 28,
    "type": "single",
    "stem": "第3空 / 第3句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -45341,7 +45343,7 @@
    "qno": 29,
    "type": "single",
    "stem": "第4空 / 第4句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -45406,7 +45408,7 @@
    "qno": 30,
    "type": "single",
    "stem": "第5空 / 第5句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam， 1 2 3 4 5 Yours faithfully， Wang Tao",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n用所给信息完成一封投诉信。 Wang Tao bought a computer online, but there was something wrong with the computer. Please rearrange the sentences to complete a complaint letter. 王涛于2019年8月26日在某电脑公司网购了一台电脑，收到电脑打开盒子后，发现电脑外观有损坏。下面是打乱顺序的投诉信正文部分，请根据投诉信的格式要求，将下面句子重新排序，帮助王涛组成一篇正确的投诉信。\nA. I would like you to exchange the computer as soon as possible. Otherwise, I would like to have my full refund.\nB. I would appreciate anything you can do to help us in this matter．\nC. When we opened the box, we found there are two dents at the back of the computer and there are some scratches on the screen.\nD. I am writing to complain about the computer I bought from your online store．\nE. The computer we ordered on August 26,2019 arrived yesterday.\nA Complaint Letter August 28th,2019 Dear Sir/ Madam，\n（__1__）（__2__）（__3__）（__4__）（__5__）\nYours faithfully，\nWang Tao",
    "options": [
     [
      "A",
@@ -51143,7 +51145,7 @@
    "qno": 76,
    "type": "single",
    "stem": "第1空 / 第1句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -51204,7 +51206,7 @@
    "qno": 77,
    "type": "single",
    "stem": "第2空 / 第2句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -51269,7 +51271,7 @@
    "qno": 78,
    "type": "single",
    "stem": "第3空 / 第3句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -51330,7 +51332,7 @@
    "qno": 79,
    "type": "single",
    "stem": "第4空 / 第4句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -51391,7 +51393,7 @@
    "qno": 80,
    "type": "single",
    "stem": "第5空 / 第5句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang， 1 . I would like to apologize for the error made by our bookstore. 2 .That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. 3 . We have dispatched the new items. 4 . 5 , David Watt",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照调解信的要求选择合适的信息完成信件。 David Watt 是一家网上书店的服务经理，他在回复客户李扬写来的一封投诉信。请按照调 解信的格式要求，从下面方框中选出正确的选项填入空白处，使该信内容完整。 [[img:english-writing/008.png]]An Adjustment LetterDear Li Yang，\n（__1__）. I would like to apologize for the error made by our bookstore. （__2__）. That was caused by an unexpected malfunction (故障). We understand how disappointing it can be when your expectations are not met. （__3__）. We have dispatched the new items. （__4__）.\n（__5__），\nDavid Watt",
    "options": [
     [
      "A",
@@ -57797,7 +57799,7 @@
    "qno": 41,
    "type": "single",
    "stem": "第1空 / 第1句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -57858,7 +57860,7 @@
    "qno": 42,
    "type": "single",
    "stem": "第2空 / 第2句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -57923,7 +57925,7 @@
    "qno": 43,
    "type": "single",
    "stem": "第3空 / 第3句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -57988,7 +57990,7 @@
    "qno": 44,
    "type": "single",
    "stem": "第4空 / 第4句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -58049,7 +58051,7 @@
    "qno": 45,
    "type": "single",
    "stem": "第5空 / 第5句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood. 1 2 3 . 4 5",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n将下列句子重新排列, 组成一篇顺序正确的小短文。 Rearrange the following sentences to compose a short passage. 以下为一篇歌手周杰伦的个人简介，请根据所给内容，将句子重新排序，组成一篇小短文。\nA. In 2000, Jay was given his chance to release his first album Jay, which became an instant hit.\nB. Jay first entered the music industry when he appeared in a talent show with his friend, where he accompanied as the pianist.\nC. Jay Chou is a popular Taiwanese musician specializing in R&B and rap.\nD. When his second album Fantasy was released, he was already among one of the top pop stars in the Chinese-speaking community.\nE. He was born on the 18th of January, 1979 in Taiwan. He was raised by his mother and was shy and quiet during his childhood.\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -62430,7 +62432,7 @@
    "qno": 41,
    "type": "single",
    "stem": "第1空 / 第1句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -62495,7 +62497,7 @@
    "qno": 42,
    "type": "single",
    "stem": "第2空 / 第2句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -62560,7 +62562,7 @@
    "qno": 43,
    "type": "single",
    "stem": "第3空 / 第3句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -62621,7 +62623,7 @@
    "qno": 44,
    "type": "single",
    "stem": "第4空 / 第4句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
@@ -62682,7 +62684,7 @@
    "qno": 45,
    "type": "single",
    "stem": "第5空 / 第5句",
-   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE May 4，2020 1 . 2 . 3 . 4 . 5 .",
+   "material": "书面表达：选出每个空（或每个位置）对应的句子。\n按照书面通知的格式要求，将所给信息重新排列，组成一则完整的书面通知。 Please compose a written notice according to the given information. 学生会要组织一次英语讲座，你是学生会干部，请将下面给出的通知内容,按照书面通知的格式要求，重新排序，组成一则正确的书面通知。[[img:english-writing/006.png]]\nNOTICE\nMay 4，2020\n（__1__）（__2__）（__3__）（__4__）（__5__）",
    "options": [
     [
      "A",
